@@ -1,9 +1,9 @@
 # GregsOUPR6
 Real Options for Adoption and Resilience:  Ornstein-Uhlenbeck Process:  R6 Objects
 
-GregsOUPR6 is an R app written with R6 objects, to run locally from the console.
-GregsOUPShiny is a Shiny app powered by GregsOUPR6, to deploy on a server.
-GregsOUP is both, to run the R and Shiny apps locally.
+GregsOUPR6 is an R app written with R6 objects, to run locally from the console.<br>
+GregsOUPShiny is a Shiny app powered by GregsOUPR6, to deploy on a server.<br>
+GregsOUP is both, to run the R and Shiny apps locally.<br>
 GregsOUPExcel contains Excel workbooks with user-defined functions and VBA code for application development.
 
 Description:<br>
