@@ -1,0 +1,78 @@
+A_DecisionThreshold   calculate, print and plot
+A_Density   calculate, print and plot
+A_Diffusion   calculate, print and plot
+A_DoubleIntegral   calculate, print and plot
+A_Drift   calculate, print and plot
+A_Mean   calculate, print and plot
+A_MeanToConverge   calculate, print and plot
+A_Obligation   calculate, print and plot
+A_Option   calculate, print and plot
+A_OptionEnvelope   calculate, print and plot
+A_PassageTimeDensity   calculate, print and plot
+A_PassageTimeMean   calculate, print and plot
+A_PassageTimeMedian   calculate, print and plot
+A_PassageTimeMode   calculate, print and plot
+A_PassageTimePercentiles   calculate, print and plot
+A_PassageTimeProbability   calculate, print and plot
+A_PassageTimeVariance   calculate, print and plot
+A_PlotDecisionThreshold   plot only
+A_PlotDensity   plot only
+A_PlotDiffusion   plot only
+A_PlotDoubleIntegral   plot only
+A_PlotDrift   plot only
+A_PlotMean   plot only
+A_PlotMeanToConverge   plot only
+A_PlotObligation   plot only
+A_PlotOption   plot only
+A_PlotOptionEnvelope   plot only
+A_PlotPassageTimeDensity   plot only
+A_PlotPassageTimeModeMedianMean   plot only
+A_PlotPassageTimePercentiles   plot only
+A_PlotPassageTimeProbability   plot only
+A_PlotPassageTimeVariance   plot only
+A_PlotProbability   plot only
+A_PlotVariance   plot only
+A_PlotVarianceToConverge   plot only
+A_Probability   calculate, print and plot
+A_Variance   calculate, print and plot
+A_VarianceToConverge  calculate, print and plot
+FD_Calibrate_Plots   plots to accompany FD_Calibrate
+FD_Calibrate   set finite difference parameters to minimize errors
+FD_DecisionThreshold   calculate, print and plot
+FD_Diffusion   calculate, print and plot
+FD_Drift   calculate, print and plot
+FD_Option   calculate, print and plot
+FD_OptionEnvelope   calculate, print and plot
+FD_PlotDecisionThreshold   plot only
+FD_PlotDiffusion   plot only
+FD_PlotDrift   plot only
+FD_PlotOption   plot only
+FD_PlotOptionEnvelope   plot only
+FD_PlotTerminalValue   plot only
+FD_TerminalValue_Degenerate   calculate, print and plot
+FD_TerminalValue_Gompertz   calculate, print and plot
+FD_TerminalValue_Kinked   calculate, print and plot
+FD_TerminalValue_Linear   calculate, print and plot
+FD_TerminalValue_Logistic   calculate, print and plot
+FD_TerminalValue_Mitscherlich   calculate, print and plot
+FD_TerminalValue_Stepped   calculate, print and plot
+FD_TerminalValue_Transcendental   calculate, print and plot
+FD_TerminalValue_YieldIndex   calculate, print and plot
+FD_TerminalValue   calculate, print and plot
+ML_Estimates   calculate, print and plot
+ML_GoodnessOfFit   calculate, print and plot
+ML_LikelihoodRatioTest   calculate, print and plot
+ML_LogLikelihood   calculate, print and plot
+ML_PlotEstimates   plot only
+ML_PlotTimeSeries   plot only
+Option_Butterfly   terminal value and option pricing for butterfly option
+Option_IndexInsurance    terminal value and option pricing for yield index insurance
+Option_Exit   exit option eliminates obligation
+Option_Exit_FixedCosts  exit option with fixed costs
+Option_Entry  entry option eliminates prohibition
+Option_Entry_Subsidy   entry option with subsidy
+Option_OnFutures   European put and call
+Option_Regime   independent regime
+PlotInfo   customizing plots
+Time_HittingFuturesStopLoss   mode, median, mean and percentile times to hit stop loss
+Time_RegimeEntryToExit   percentile times from entry to exit

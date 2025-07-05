@@ -1,0 +1,10 @@
+Package: GregsOUPR6
+Title: Real Options for Adoption and Resilience: Ornstein-Uhlenbeck Process: R6 Objects
+Version: 1.3.5.0
+Authors@R: c(person("Greg", "Hertzler", , "ghertzlerau@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3123-7898")),person("Tim","Capon",,,role="ctb"),person("CSIRO IMT Scientific Computing",,,role=c("ctb","fnd")),person("CSIRO Environment",,,role="fnd"))
+Description: A complete set of functions for maximum likelihood estimation and for the calculation of probabilities, option prices, decision thresholds, visiting times, first passage times and more--everything for a real options analysis.
+License: GPL (>=3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: plotly, stringr

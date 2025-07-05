@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "name": "ribbonhelp server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+    },
+  "author": "Mozilla Developers Network (MDN)",
+  "license": "ISC",
+  "description": "Node.js server without a framework, modified for query string"
+}
