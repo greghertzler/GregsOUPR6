@@ -10,8 +10,8 @@ Description:<br>
 Analytical, Finite Difference, Maximum Likelihood and Monte Carlo methods--a complete set of functions for maximum likelihood estimation and the calculation of probabilities, option prices, decision thresholds, visiting times, first passage times and more--everything for a real options analysis.
 
 Versions:<br>
-R Version:  1.3.5.0 (Stochastic Process.Modules.Help.Bugs)<br>
-Excel Version:  1.4.5.0 (Stochastic Process.Modules.Help.Bugs)
+Excel Version:  1.4.5.0 (Stochastic Process.Modules.Help.Bugs)<br>
+R Version:  1.3.5.0 (Stochastic Process.Modules.Help.Bugs)
 
 Code:<br>
 Excel user-defined functions, Visual Basic for Applications code, R6 objects and a Shiny App.
