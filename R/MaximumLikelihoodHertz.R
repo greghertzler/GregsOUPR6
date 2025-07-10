@@ -2211,9 +2211,12 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
   # class end ----
 )
 # data roxygen ----
-#' Default
+
+#' Default data
 #'
-#' Simulated data matching default data in Maximum Likelihood object
+#' Simulated data to estimate default parameters, rho=0.5, mu=15 and sigma=15,
+#'  where rho is the rate of convergence, mu is the location and sigma is the
+#'  scale.
 #'
 #' \itemize{
 #'   \item tau: time variable
@@ -2223,33 +2226,13 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
 #' @docType data
 #' @keywords datasets
 #' @name Default
-#' @format csv file with 176 rows and 2 columns
-NULL
-
-#' Kangaroo Population and Harvest in South Australia
-#'
-#' Government of South Australia, Department of Environment, population surveys and
-#'  meat processor records of harvest aggregated across all regions of South Australia.
-#'
-#' \itemize{
-#'   \item Year: time variable
-#'   \item Red Pop: Estimated population of Red Kangaroos
-#'   \item Red Harvest: Number of Red Kangaroos commercially harvested
-#'   \item Grey Pop: Estimated population of Western Grey Kangaroos
-#'   \item Grey Harvest: Number of Western Grey Kangaroos commercially harvested
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_Kangaroos_SouthAustralia
-#' @format csv file with 47 rows and 7 columns
-#' @source https://www.environment.sa.gov.au/topics/animals-and-plants/sustainable-use-of-animals-and-plants/kangaroo-conservation-and-management/quotas-harvest-data
+#' @format csv file with 6 rows and 2 columns
 NULL
 
 #' Observation intervals and the Ornstein-Uhlenbeck Process
 #'
-#' Monte-Carlo simulation of the stochastic integral equation, with different
-#'  observation intervals.
+#' Monte-Carlo simulation to demonstrate the effect of the observation interval on the
+#'  rate of convergence, rho, and the scale, sigma.
 #'
 #' \itemize{
 #'   \item year 1: time variable in annual increments
@@ -2258,71 +2241,126 @@ NULL
 #'   \item z rho 10: sample paths with time increments of 1/20 year and a rate of convergence of 10
 #' }
 #'
+#' This data has two sample paths.  Within a sample path, observation intervals are
+#'  of equal length.  Between sample paths the observation intervals are of unequal
+#'  lengths.  Otherwise, the sample paths have the same shocks and give equivalent
+#'  estimates of the parameters.
+#'
+#'  Both sets of estimates have the same rho(t-s), where t-s is the observation interval.
+#'  A common example is annual versus daily intervals; t-s=1 and rho=1/2 is equivalent to
+#'  t-s=1/365 and rho=365/2.  Location parameter, mu, is the same in both sets of estimates,
+#'  but scale parameter, sigma, is larger if rho is larger because the asymptotic variance,
+#'  sigma^2/2rho, is the same in both sets of estimates.
+#'
 #' @docType data
 #' @keywords datasets
-#' @name ML_OUP_ObservationInterval
+#' @name OUP_ObservationInterval
 #' @format csv file with 201 rows and 4 columns
+NULL
+
+#' Sample sizes for the Ornstein-Uhlenbeck Process
+#'
+#' Monte-Carlo simulation to demonstrate the effect of sample size on hypothesis tests
+#'  for the Ornstein-Uhlenbeck Process.
+#'
+#' \itemize{
+#'   \item year: time variable in annual increments for all sample paths
+#'   \item xsmall: sample with 37 measurements or 36 observations
+#'   \item small: sample with 2 x 37 measurements or 73 observations
+#'   \item medium: sample with 8 x 37 measurements or 295 observations
+#'   \item large: sample with 32 x 37 measurements or 1183 observations
+#'   \item xlarge: sample with 128 x 37 measurements or 4735 observations
+#' }
+#'
+#' This data starts with a very small sample and then replicates it.  Larger
+#'  samples contain no more information than smaller samples and hypothesis
+#'  tests for the Ornstein-Uhlenbeck Process do not change with the sample size.
+#'  The usual Chi^2 tests, however, will reject all null hypotheses for medium
+#'  to large sample sizes.
+#'
+#' If larger samples contain more information, hypothesis tests for the
+#'  Ornstein-Uhlenbeck Process will reject more null hypotheses, but not all
+#'  hypotheses as do Chi^2 tests.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name OUP_SampleSize
+#' @format csv file with 4736 rows and 6 columns
 NULL
 
 #' Simulated sample paths for the Ornstein-Uhlenbeck Process
 #'
-#' Monte-Carlo simulation of the stochastic integral equation, with different
-#'  rates of convergence.
+#' Monte-Carlo simulation to demonstrate different different rates of convergence, rho.
 #'
 #' \itemize{
 #'   \item year: time variable in annual increments for all sample paths
 #'   \item z1-z5: sample paths in sets of three, each set with the same pseudo-random shocks but different rates of convergence
 #' }
 #'
+#' The rate of convergence, rho, determines the probability distribution of the
+#'  estimated parameters and the correlation between two sets of parameters in
+#'  hypothesis tests.  Small rho tends toward Brownian Motion, which does not
+#'  converge.  Large rho tends toward a stationary or ergodic process which has
+#'  converged every time it is observed.  In between is an Ornstein-Uhlenbeck
+#'  Process which converges but has not yet converged.
+#'
+#' Parameters for Browian Motion have an Erlang distribution.  Parameters for
+#'  a stationary or ergodic process have a Chi^2 distribution.  These distributions
+#'  are special cases of a Gamma distribution.  In general, parameters for the
+#'  Ornstein-Uhlenbeck Process have a Gamma distribution.
+#'
 #' @docType data
 #' @keywords datasets
-#' @name ML_OUP_SimulatedData
+#' @name OUP_SimulatedData
 #' @format csv file with 177 rows and 16 columns
 NULL
 
 #' Smoothed sample paths for the Ornstein-Uhlenbeck Process
 #'
-#' This is not even a simulated data set. Instead a simulated sample path is
-#'  smoothed nine times by estimating the parameters and calculating the means
-#'  for each observation. Then the calculated means are used, as if they are
-#'  data, in a subsequent estimation. Means are calculated again and used in
-#'  the next estimation and so on nine times. The rate of convergence and the
-#'  location parameters are recovered from each estimation, but the scale
-#'  parameter gets successively smaller.
-#'
-#' By the ninth smoothing, the log of the likelihood becomes positive. Hence,
-#'  the likelihood, itself, becomes greater than one. In other words, if this
-#'  were a real sample path, there would be a greater than 100% chance it would
-#'  be observed. A small sigma or a positive log likelihood are tell-tale signs
-#'  the data has been smoothed.
-#'
-#' This is the second best scenario. The model used for the smoothing is
-#'  consistent with the data. Surprisingly, hypothesis tests and decision
-#'  thresholds are not greatly affected.
-#'
-#' The third best scenario is much more likely. The data may have been smoothed
-#'  by an undocumented model inconsistent with the model you wish to estimate.
-#'  Your estimates will be rubbish but you won't be able to tell.
-#'
-#' The first best scenario is finding the raw data.
-#'
+#' Simulated and smoothed data to demonstrate the effect of smoothing on
+#'  parameter estimates.
 #'
 #' \itemize{
 #'   \item year: time variable in annual increments
 #'   \item Data: simulated sample path
-#'   \item G uno-G nuevo: nine successively smoother paths
+#'   \item G uno-G diez: ten successively smoother paths
 #' }
+#'
+#' Simulated data is smoothed ten times.  First, the parameters are estimated
+#'  and the means calculated for each observation. Then the calculated means
+#'  are used, as if they are data, in a subsequent estimation. Means are
+#'  calculated again and used in the next estimation and so on ten times.
+#'  The true rate of convergence, rho, and location, mu, are recovered from
+#'  each estimation, but the scale, sigma, goes toward zero.
+#'
+#' By the ninth smoothing, the log of the likelihood becomes positive. Hence,
+#'  the likelihood, as the anti-log, becomes greater than one. In other words,
+#'  if the ninth and tenth smoothings were real samples, the probability of
+#'  observing them would be greater than 100%. Further smoothings would increase
+#'  this probability.  A small sigma is a tell-tale sign the data has been smoothed.
+#'  A positive log likelihood is a sure sign.
+#'
+#' This is the best possible smoothing method. The model used for the smoothing
+#'  is consistent with the data. Surprisingly, hypothesis tests and decision
+#'  thresholds are not greatly affected.  However, passage times are calculated
+#'  to be much larger and are completely unreliable.
+#'
+#' The best possible smoothing is unlikely. Any model used to smooth the data is
+#'  probably not the Ornstein-Uhlenbeck Process.  The estimates will be wrong
+#'  and the actual system will be much more uncertain. How much more uncertain
+#'  is uncertain.
+#'
+#' Always use the raw data.
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_OUP_SmoothedData
-#' @format csv file with 170 rows and 10 columns
+#' @name OUP_SmoothedData
+#' @format csv file with 177 rows and 11 columns
 NULL
 
 #' Unequal observation intervals and the Ornstein-Uhlenbeck Process
 #'
-#' Monte-Carlo simulation of the stochastic integral equation, with observations
-#'  having unequal time intervals
+#' Simulated data to demonstrate that observations are never 'missing'.
 #'
 #' \itemize{
 #'   \item year 1: time variable in annual increments
@@ -2331,215 +2369,59 @@ NULL
 #'   \item z rho 10: sample paths with time increments of 1/20 year or longer and a rate of convergence of 10
 #' }
 #'
+#' An observation consists of the initial state, the initial time, the terminal state
+#'  and the terminal time.  The terminal time minus the initial time can differ among
+#'  observations because each observation has its own mean and variance.  Longer
+#'  observation intervals have smaller means and larger variances but, otherwise,
+#'  parameters estimated from unequal observation intervals are statistically
+#'  equivalent to parameters estimated from equal intervals.
+#'
+#' The usual time-series methods are special cases of estimating the Ornstein-Uhlenbeck
+#'  Process.  They estimate location, mu, and scale, sigma, but not the rate of
+#'  convergence, rho.  They eliminate rho by assuming weak stationarity.  The mean of
+#'  each observation is assumed to have converged and lost its connection to its
+#'  initial state.  The variance of each observation does not depend upon an initial
+#'  state and may still be converging.  Observations will have equal variances if
+#'  observation intervals are equal.
+#'
+#' For the Ornstein-Uhlenbeck Process, variances converge twice as fast as means.
+#'  If variances are still converging, so are means.  Observations over equal time
+#'  intervals will have equal variances but different means.  In other words, weak
+#'  stationarity does not exist.  Any assumption of stationarity is strong stationarity
+#'  in which both the means and variances have converged.
+#'
+#' Stationarity is an hypothesis to test, not an assumption to impose.  Goodness
+#'  of fit for the Ornstein-Uhlenbeck Process tests for stationarity, and also
+#'  for the other extreme of Brownian Motion.
+#'
+#' If you have a time series with measurements at sporadic times, don't fill in for
+#'  observations that aren't missing.  If you must, first estimate the parameters.
+#'  Then use the parameters to calculate means for the times of your choosing.
+#'  Means are the maximum likelihood estimates of unobserved states of nature.
+#'
 #' @docType data
 #' @keywords datasets
-#' @name ML_OUP_UnequalIntervals
+#' @name OUP_UnequalIntervals
 #' @format csv file with 151 rows and 4 columns
 NULL
 
-#' Sea Level at Port Kembla
+#' Water in Farm Dams in the Riverina of New South Wales
 #'
-#' Bureau of Meteorology Australian Baseline Sea Level Monitoring Project, with
-#' measurements smoothed to eliminate variability.
-#'
-#' \itemize{
-#'   \item Day in 2023: time variable in hourly increments
-#'   \item Sea Level: metres above Tide Gauge Zero
-#'   \item Water Temperature: degrees Celcius
-#'   \item Air Temperature: degrees Celcius
-#'   \item Barometric Pressure: hPa
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_SeaLevel_PortKembla
-#' @format csv file with 7986 rows and 5 columns
-#' @source http://www.bom.gov.au/oceanography/projects/abslmp/data/data.shtml
-NULL
-
-#' Soil Mineral Nitrogen with Stubble Management
-#'
-#' CSIRO Harden Long-Term Tillage Experiment
-#'
-#' \itemize{
-#'   \item Year: time variable in sporadic increments
-#'   \item Burn: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble burning
-#'   \item Bash: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble bashing
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_SoilNitrogen_Harden
-#' @format csv file with 28 rows and 3 columns
-#' @source https://data.csiro.au/collection/csiro:61293?q=population%20data&_st=keyword&_str=210&_si=7
-NULL
-
-#' Soil Water with Stubble Management
-#'
-#' CSIRO Harden Long-Term Tillage Experiment
-#'
-#' \itemize{
-#'   \item Year: time variable in sporadic increments
-#'   \item Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
-#'   \item Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_SoilWater_Harden
-#' @format csv file with 22 rows and 3 columns
-#' @source https://data.csiro.au/collection/csiro:61293?q=population%20data&_st=keyword&_str=210&_si=7
-NULL
-
-#' Southern Bluefin Tuna
-#'
-#' CSIRO Fisheries Biomass Provisioning Services
-#'
-#' \itemize{
-#'   \item Fin Year: time variable for financial year 1 July to 30 June
-#'   \item Catch: kilograms caught per year
-#'   \item GVP: Gross value product in dollars as market price times catch
-#'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_SouthernBluefinTuna
-#' @format csv file with 23 rows and 4 columns
-#' @source https://doi.org/10.25919/nzrp-6702
-NULL
-
-#' Sunspot Numbers
-#'
-#' World Data Center SILSO, Royal Observatory of Belgium
-#'
-#' \itemize{
-#'   \item DecimalYear: time variable in daily increments
-#'   \item Average: Simple average of the daily total sunspot number over all days of each calendar month.
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_Sunspots
-#' @format csv file with 3317 rows and 2 columns
-#' @source https://doi.org/10.24414/qnza-ac80
-NULL
-
-#' Maximum daily temperatures at Cape Otway
-#'
-#' Bureau of Meteorology, raw (unhomogenized) data.
-#'
-#' \itemize{
-#'   \item Year: time variable in daily increments
-#'   \item Max: maximum temperature in degrees centigrade
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_TempsMax_CapeOtway
-#' @format csv file with 8888 rows and 2 columns
-#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 090015
-NULL
-
-#' Maximum daily temperatures at Darwin
-#'
-#' Bureau of Meteorology, raw (Unhomogenized) data.
-#'
-#' \itemize{
-#'   \item Year: time variable in daily increments
-#'   \item Max: maximum temperature in degrees centigrade
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_TempsMax_Darwin
-#' @format csv file with 9127 rows and 2 columns
-#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 014040
-NULL
-
-#' Maximum daily temperatures at Tennant Creek
-#'
-#' Bureau of Meteorology, raw (Unhomogenized) data.
-#'
-#' \itemize{
-#'   \item Year: time variable in daily increments
-#'   \item Max: maximum temperature in degrees centigrade
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_TempsMax_TennantCreek
-#' @format csv file with 9115 rows and 2 columns
-#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 015135
-NULL
-
-#' Tree shelter belts
-#'
-#' Sheep gross margins per paddock with and without trees
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item With trees: gross margins per paddock with tree shelter belt
-#'   \item Without trees: gross margins per paddock without tree shelter belt
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_TreeShelterBelts_Tasmania
-#' @format csv file with 52 rows and 3 columns
-#' @author Tim Capon \email{tim.capon@csiro.au}
-NULL
-
-#' Tropical Rock Lobster
-#'
-#' CSIRO Fisheries Biomass Provisioning Services
-#'
-#' \itemize{
-#'   \item Fin Year: time variable for financial year 1 July to 30 June
-#'   \item Catch: kilograms caught per year
-#'   \item GVP: Gross value product in dollars as market price times catch
-#'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_TropicalRockLobster
-#' @format csv file with 23 rows and 4 columns
-#' @source https://doi.org/10.25919/nzrp-6702
-NULL
-
-#' Water in Farm Dams in the Riverina
-#'
-#' Simulated water volumes with and without tree windbreaks to control evaporation
-#'  and a merino sheep flock size of 1500.
+#' Matlab generated water volumes in a 4000 cubic metre dam, with and without
+#'  tree windbreaks to control evaporation, and a merino sheep flock size of
+#'  1500 dry sheep equivalents.
 #'
 #' \itemize{
 #'   \item Day: time variable in daily increments
-#'   \item Without: water volumes in m3 without a windbreak
-#'   \item With: water volumes in m3 with a windbreak
+#'   \item Without: water volumes in cubic metres without a windbreak
+#'   \item With: water volumes in cubic metres with a windbreak
 #' }
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WaterFarmDams_Riverina
+#' @name Agric_NSW_FarmDamsRiverina
 #' @format csv file with 19313 rows and 3 columns
-#' @author Tim Capon \email{tim.capon@csiro.au}
-NULL
-
-#' Water Supply for Irrigated Agriculture
-#'
-#' CSIRO Agricultural water supply data for national ecosystem services accounts.
-#'
-#' \itemize{
-#'   \item Fin Year: time variable for financial year 1 July to 30 June
-#'   \item WaterSupply: irrigation water supplied in Australia in megalitres
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name ML_WaterSupply_Irrigation
-#' @format csv file with 14 rows and 2 columns
-#' @source https://doi.org/10.25919/7jj7-8826
+#' @author { Tim Capon \email{tim.capon.csiro.au}, Helena Clayton \email{helena.clayton@anu.edu.au}, Sally Thompson \email{sally.thompson@uwa.edu.au}, Greg Hertzler \email{ghertzlerau@gmail.com}, Philip Graham \email{phil@gramadvisory.com.au}, David Lindemayer \email{david.lindemayer@anu.edu} }
 NULL
 
 #' Farm Adaptation at Cootamundra, New South Wales
@@ -2556,7 +2438,7 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WheatCanolaSheep_Cootamundra
+#' @name Agric_NSW_GMCootamundra
 #' @format csv file with 50 rows and 5 columns
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
@@ -2575,7 +2457,7 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WheatCanolaSheep_Narrendera
+#' @name Agric_NSW_GMNarrendera
 #' @format csv file with 50 rows and 5 columns
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
@@ -2594,30 +2476,43 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WheatCanolaSheep_Temora
+#' @name Agric_NSW_GMTemora
 #' @format csv file with 50 rows and 5 columns
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
-#' Kansas City Hard Red Wheat Futures
+#' Soil Mineral Nitrogen with Stubble Management
 #'
-#' Daily futures from 25 July 2023 to 25 January 2024
+#' CSIRO Harden Long-Term Tillage Experiment
 #'
 #' \itemize{
-#'   \item Day: time variable in days since 25 July 2023
-#'   \item Open: Price at market open in USD/ton
-#'   \item High: Daily high price in USD/ton
-#'   \item Low: Daily low price in USD/ton
-#'   \item Close: Price at market close in USD/ton
-#'   \item Adj Close: Same as Close for futures
-#'   \item Volume: Daily number of trades
+#'   \item Year: time variable in sporadic increments
+#'   \item Burn: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble burning
+#'   \item Bash: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble bashing
 #' }
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WheatFutures_KansasCity
-#' @format csv file with 253 rows and 7 columns
-#' @source https://finance.yahoo.com/quote (search for KE=F)
+#' @name Agric_NSW_SoilNitrogenHarden
+#' @format csv file with 27 rows and 3 columns
+#' @source https://data.csiro.au/collection/csiro:61293?q=population%20data&_st=keyword&_str=210&_si=7
+NULL
+
+#' Soil Water with Stubble Management
+#'
+#' CSIRO Harden Long-Term Tillage Experiment
+#'
+#' \itemize{
+#'   \item Year: time variable in sporadic increments
+#'   \item Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
+#'   \item Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Agric_NSW_SoilWaterHarden
+#' @format csv file with 21 rows and 3 columns
+#' @source https://data.csiro.au/collection/csiro:61293?q=population%20data&_st=keyword&_str=210&_si=7
 NULL
 
 #' Farm Adaptation at Clare, South Australia
@@ -2636,7 +2531,7 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WheatSheep_Clare
+#' @name Agric_SA_GMClare
 #' @format csv file with 108 rows and 7 columns
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
@@ -2657,7 +2552,7 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WheatSheep_Hawker
+#' @name Agric_SA_GMHawker
 #' @format csv file with 108 rows and 7 columns
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
@@ -2678,7 +2573,228 @@ NULL
 #'
 #' @docType data
 #' @keywords datasets
-#' @name ML_WheatSheep_Orroroo
+#' @name Agric_SA_GMOrroroo
 #' @format csv file with 108 rows and 7 columns
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
+NULL
+
+#' Tree shelter belts in Tasmania
+#'
+#' CSIRO Perennial Prosperity Project
+#'
+#' \itemize{
+#'   \item Year: time variable in annual increments
+#'   \item With trees: sheep gross margins per paddock with tree shelter belt
+#'   \item Without trees: sheep gross margins per paddock without tree shelter belt
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Agric_Tas_TreeShelterBelts
+#' @format csv file with 52 rows and 3 columns
+#' @author { Tim Capon \email{tim.capon@csiro.au}, Daniel Mendham \email{daniel.mendham@csiro.au} }
+NULL
+
+#' Sea Level at Port Kembla
+#'
+#' Bureau of Meteorology Australian Baseline Sea Level Monitoring Project, with
+#' measurements smoothed to eliminate variability.
+#'
+#' \itemize{
+#'   \item Day in 2023: time variable in hourly increments
+#'   \item Sea Level: metres above Tide Gauge Zero
+#'   \item Water Temperature: degrees Celsius
+#'   \item Air Temperature: degrees Celsius
+#'   \item Barometric Pressure: hPa
+#' }
+#'
+#' This is radically smoothed data.  Do not use this data for decisions under uncertainty.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Climate_SeaLevel_PortKembla
+#' @format csv file with 7985 rows and 5 columns
+#' @source http://www.bom.gov.au/oceanography/projects/abslmp/data/data.shtml
+NULL
+
+#' Sunspot Numbers
+#'
+#' World Data Center SILSO, Royal Observatory of Belgium
+#'
+#' \itemize{
+#'   \item DecimalYear: time variable in daily increments
+#'   \item Average: Simple average of the daily total sunspot number over all days of each calendar month.
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Climate_Sunspots
+#' @format csv file with 3316 rows and 2 columns
+#' @source https://doi.org/10.24414/qnza-ac80
+NULL
+
+#' Maximum daily temperatures at Cape Otway
+#'
+#' Bureau of Meteorology, raw (unhomogenized) data.
+#'
+#' \itemize{
+#'   \item Year: time variable in daily increments
+#'   \item Max: maximum temperature in degrees centigrade
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Climate_TempsMax_CapeOtway
+#' @format csv file with 8888 rows and 2 columns
+#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 090015
+NULL
+
+#' Maximum daily temperatures at Darwin
+#'
+#' Bureau of Meteorology, raw (Unhomogenized) data.
+#'
+#' \itemize{
+#'   \item Year: time variable in daily increments
+#'   \item Max: maximum temperature in degrees centigrade
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Climate_TempsMax_Darwin
+#' @format csv file with 9127 rows and 2 columns
+#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 014040
+NULL
+
+#' Maximum daily temperatures at Tennant Creek
+#'
+#' Bureau of Meteorology, raw (Unhomogenized) data.
+#'
+#' \itemize{
+#'   \item Year: time variable in daily increments
+#'   \item Max: maximum temperature in degrees centigrade
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Climate_TempsMax_TennantCreek
+#' @format csv file with 9115 rows and 2 columns
+#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 015135
+NULL
+
+#' Water Supply for Irrigated Agriculture in Eastern Australia
+#'
+#' CSIRO Agricultural water supply data for national ecosystem services accounts.
+#'
+#' \itemize{
+#'   \item Fin Year: time variable for financial year 1 July to 30 June
+#'   \item WaterSupply: irrigation water supplied in Australia in megalitres
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_IrrigationWaterSupply
+#' @format csv file with 13 rows and 2 columns
+#' @source https://doi.org/10.25919/7jj7-8826
+NULL
+
+#' Kangaroo Population and Harvest in South Australia
+#'
+#' Government of South Australia, Department of Environment, population surveys and
+#'  meat processor records of harvest aggregated across all regions of South Australia.
+#'
+#' \itemize{
+#'   \item Year: time variable
+#'   \item Red Pop: Estimated population of Red Kangaroos
+#'   \item Red Harvest: Number of Red Kangaroos commercially harvested
+#'   \item Grey Pop: Estimated population of Western Grey Kangaroos
+#'   \item Grey Harvest: Number of Western Grey Kangaroos commercially harvested
+#'   \item Euro Pop: Estimated population of European Kangaroos
+#'   \item Euro Harvest: Number of European Kangaroos commercially harvested
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_Kangaroos
+#' @format csv file with 46 rows and 7 columns
+#' @source https://www.environment.sa.gov.au/topics/animals-and-plants/sustainable-use-of-animals-and-plants/kangaroo-conservation-and-management/quotas-harvest-data
+NULL
+
+#' Southern Bluefin Tuna in Australian Waters
+#'
+#' CSIRO Fisheries Biomass Provisioning Services
+#'
+#' \itemize{
+#'   \item Fin Year: time variable for financial year 1 July to 30 June
+#'   \item Catch: kilograms caught per year
+#'   \item GVP: Gross value product in dollars as market price times catch
+#'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_SouthernBluefinTuna
+#' @format csv file with 22 rows and 4 columns
+#' @source https://doi.org/10.25919/nzrp-6702
+NULL
+
+#' Tropical Rock Lobster in Australian Waters
+#'
+#' CSIRO Fisheries Biomass Provisioning Services
+#'
+#' \itemize{
+#'   \item Fin Year: time variable for financial year 1 July to 30 June
+#'   \item Catch: kilograms caught per year
+#'   \item GVP: Gross value product in dollars as market price times catch
+#'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_TropicalRockLobsters
+#' @format csv file with 22 rows and 4 columns
+#' @source https://doi.org/10.25919/nzrp-6702
+NULL
+
+#' Kansas City Hard Red Wheat Futures
+#'
+#' Daily futures for September 2025 maturity from 1 July 2024 to 30 June 2025
+#'
+#' \itemize{
+#'   \item Day: time variable in days since 1 July 2024
+#'   \item Open: Price at market open in USD/ton
+#'   \item High: Daily high price in USD/ton
+#'   \item Low: Daily low price in USD/ton
+#'   \item Close: Price at market close in USD/ton
+#'   \item Adj Close: Same as Close for futures
+#'   \item Volume: Daily number of trades
+#'   \item Year: time variable as decimal year
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Finance_KansasCity_WheatFutures
+#' @format csv file with 250 rows and 8 columns
+#' @source https://finance.yahoo.com/quote (search for KE=F)
+NULL
+
+#' US Dollars per Australian Dollar
+#'
+#' Daily exchange rates from 1 July 2024 to 30 June 2025,
+#'  with AUD as the base currency and USD as the quote currency
+#'
+#' \itemize{
+#'   \item Day: time variable in days since 1 July 2024
+#'   \item Open: Rate at session open in USD/AUD
+#'   \item High: Daily high rate in USD/AUD
+#'   \item Low: Daily low rate in USD/AUD
+#'   \item Close: Rate at session close in USD/AUD
+#'   \item Adj Close: Same as Close for exchange rates
+#'   \item Year: time variable as decimal year
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Finance_USDAUD
+#' @format csv file with 258 rows and 7 columns
+#' @source https://finance.yahoo.com/quote (search for AUDUSD=X)
 NULL

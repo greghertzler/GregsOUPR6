@@ -3,12 +3,14 @@
 \docType{data}
 \name{Default}
 \alias{Default}
-\title{Default}
+\title{Default data}
 \format{
-csv file with 176 rows and 2 columns
+csv file with 6 rows and 2 columns
 }
 \description{
-Simulated data matching default data in Maximum Likelihood object
+Simulated data to estimate default parameters, rho=0.5, mu=15 and sigma=15,
+where rho is the rate of convergence, mu is the location and sigma is the
+scale.
 }
 \details{
 \itemize{

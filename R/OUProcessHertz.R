@@ -300,19 +300,15 @@ library(R6)
 #' or, open the A_Density.R file in RStudio and Source it from the menu.
 #'
 #' Available data sets for Maximum Likelihood estimation have their own help.
-#'  Type:
+#'  Type one of the categories:
 #'
-#'       ?ML_
+#'       ?Agric_
+#'       ?Climate_
+#'       ?Ecosys_
+#'       ?Finance_
+#'       ?OUP_
 #'
 #'  and then select from the drop-down list.
-#'
-#' An RShiny app demonstrates all the methods and data and can be launched from
-#'  the console:
-#'
-#'       OUPShiny()
-#'
-#' Or, the shiny app is in the 'GregsOUPShiny' directory. Open either the file
-#'  'server.R' or the file 'ui.R' and Run App from the menu.
 #'
 #' Examples in R6 don't work the same as in S3 and S4 modules.  There is only
 #'  one example for an R6 object, not one for each method in the object.
@@ -481,22 +477,29 @@ OUProcess <- R6::R6Class("OUProcess",
   # class end ----
 )
 # help launch ----
-#' Function to launch roxygen and HTML help for GregsOUP
+#' Function to launch roxygen help for GregsOUPR6
 #'
 #' @description
-#' Launch ?OUProcess, ?Analytical, ?MaximumLikelihood and ?MonteCarlo
-#'     in RStudio and OUP_Help in the default browser.
-#' @return Help and Browser instances
+#' Launch ?OUProcess, ?Analytical, ?MaximumLikelihood and ?MonteCarlo in Help Viewer
+#' @return Help instance
 #' @export
 #' @examples
 #'   OUPHelp()
 OUPHelp = function()
 {
-  rstudioapi::previewRd(paste(sep="",getwd(),"/man/MonteCarlo.Rd"))
-  rstudioapi::previewRd(paste(sep="",getwd(),"/man/MaximumLikelihood.Rd"))
-  rstudioapi::previewRd(paste(sep="",getwd(),"/man/FiniteDifference.Rd"))
-  rstudioapi::previewRd(paste(sep="",getwd(),"/man/Analytical.Rd"))
-  rstudioapi::previewRd(paste(sep="",getwd(),"/man/OUProcess.Rd"))
-  utils::browseURL(paste(sep="","file:///",getwd(),"/htmlhelp/OUP_Help.html"))
+  help("MonteCarlo","GregsOUPR6")
+  help("MaximumLikelihood","GregsOUPR6")
+  help("FiniteDifference","GregsOUPR6")
+  help("Analytical","GregsOUPR6")
+  help("OUProcess","GregsOUPR6")
 }
+#' Function to launch Ribbon Help for GregsOUPR6
+#'
+#' @description
+#' Launch OUP_Help in the default browser.
+#' @return Browser instance
+#' @export
+#' @examples
+#'   OUPRibbonHelp()
+OUPRibbonHelp = function() { browseURL(file.path(find.package("GregsOUPR6"),"ribbonhelp","OUP_Help.html")) }
 

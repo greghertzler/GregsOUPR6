@@ -2,16 +2,15 @@
 % Please edit documentation in R/OUProcessHertz.R
 \name{OUPHelp}
 \alias{OUPHelp}
-\title{Function to launch roxygen and HTML help for GregsOUP}
+\title{Function to launch roxygen help for GregsOUPR6}
 \usage{
 OUPHelp()
 }
 \value{
-Help and Browser instances
+Help instance
 }
 \description{
-Launch ?OUProcess, ?Analytical, ?MaximumLikelihood and ?MonteCarlo
-in RStudio and OUP_Help in the default browser.
+Launch ?OUProcess, ?Analytical, ?MaximumLikelihood and ?MonteCarlo in Help Viewer
 }
 \examples{
   OUPHelp()

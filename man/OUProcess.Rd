@@ -337,21 +337,16 @@ or type:
 or, open the A_Density.R file in RStudio and Source it from the menu.
 
 Available data sets for Maximum Likelihood estimation have their own help.
-Type:
+Type one of the categories:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?ML_
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?Agric_
+  ?Climate_
+  ?Ecosys_
+  ?Finance_
+  ?OUP_
 }\if{html}{\out{</div>}}
 
 and then select from the drop-down list.
-
-An RShiny app demonstrates all the methods and data and can be launched from
-the console:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPShiny()
-}\if{html}{\out{</div>}}
-
-Or, the shiny app is in the 'GregsOUPShiny' directory. Open either the file
-'server.R' or the file 'ui.R' and Run App from the menu.
 
 Examples in R6 don't work the same as in S3 and S4 modules.  There is only
 one example for an R6 object, not one for each method in the object.
