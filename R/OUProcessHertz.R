@@ -501,5 +501,5 @@ OUPHelp = function()
 #' @export
 #' @examples
 #'   OUPRibbonHelp()
-OUPRibbonHelp = function() { browseURL(file.path(find.package("GregsOUPR6"),"ribbonhelp","OUP_Help.html")) }
+OUPRibbonHelp = function() { browseURL(system.file("ribbonhelp/OUP_Help.html",package="GregsOUPR6")) }
 
