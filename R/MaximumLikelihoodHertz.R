@@ -2212,21 +2212,52 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
 )
 # data roxygen ----
 
-#' Default data
+#' My data for the Ornstein-Uhlenbeck Process
 #'
-#' Simulated data to estimate default parameters, rho=0.5, mu=15 and sigma=15,
-#'  where rho is the rate of convergence, mu is the location and sigma is the
-#'  scale.
+#' Data to estimate parameters, rho, mu and sigma, where rho is the rate of convergence,
+#'  mu is the location and sigma is the scale.
 #'
 #' \itemize{
 #'   \item tau: time variable
 #'   \item z: state variable
 #' }
 #'
+#' The data must be in a .csv (Comma Separated Values) file.  The first column should
+#'  be times and the second column should be states of nature.  There can be more columns
+#'  for times and states if you wish.  There can be blank entries.  The data will be
+#'  cleaned and sorted by time before it is used.
+#'
 #' @docType data
 #' @keywords datasets
-#' @name Default
-#' @format csv file with 6 rows and 2 columns
+#' @name MyData
+#' @format csv file with at least 3 rows and 2 columns
+NULL
+
+#' Rates of convergence for the Ornstein-Uhlenbeck Process
+#'
+#' Monte-Carlo simulation to demonstrate different rates of convergence, rho.
+#'
+#' \itemize{
+#'   \item year: time variable in annual increments for all sample paths
+#'   \item z1-z5: sample paths in sets of three, each set with the same pseudo-random shocks but different rates of convergence
+#' }
+#'
+#' The rate of convergence, rho, determines the probability distribution of the
+#'  estimated parameters and the correlation between two sets of parameters in
+#'  hypothesis tests.  Small rho tends toward Brownian Motion, which does not
+#'  converge.  Large rho tends toward a stationary or ergodic process which has
+#'  converged every time it is observed.  In between is an Ornstein-Uhlenbeck
+#'  Process which converges but has not yet converged.
+#'
+#' Parameters for Browian Motion have an Erlang distribution.  Parameters for
+#'  a stationary or ergodic process have a Chi^2 distribution.  These distributions
+#'  are special cases of a Gamma distribution.  In general, parameters for the
+#'  Ornstein-Uhlenbeck Process have a Gamma distribution.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name OUP_Convergence
+#' @format csv file with 177 rows and 16 columns
 NULL
 
 #' Observation intervals and the Ornstein-Uhlenbeck Process
@@ -2286,33 +2317,6 @@ NULL
 #' @keywords datasets
 #' @name OUP_SampleSize
 #' @format csv file with 4736 rows and 6 columns
-NULL
-
-#' Simulated sample paths for the Ornstein-Uhlenbeck Process
-#'
-#' Monte-Carlo simulation to demonstrate different different rates of convergence, rho.
-#'
-#' \itemize{
-#'   \item year: time variable in annual increments for all sample paths
-#'   \item z1-z5: sample paths in sets of three, each set with the same pseudo-random shocks but different rates of convergence
-#' }
-#'
-#' The rate of convergence, rho, determines the probability distribution of the
-#'  estimated parameters and the correlation between two sets of parameters in
-#'  hypothesis tests.  Small rho tends toward Brownian Motion, which does not
-#'  converge.  Large rho tends toward a stationary or ergodic process which has
-#'  converged every time it is observed.  In between is an Ornstein-Uhlenbeck
-#'  Process which converges but has not yet converged.
-#'
-#' Parameters for Browian Motion have an Erlang distribution.  Parameters for
-#'  a stationary or ergodic process have a Chi^2 distribution.  These distributions
-#'  are special cases of a Gamma distribution.  In general, parameters for the
-#'  Ornstein-Uhlenbeck Process have a Gamma distribution.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name OUP_SimulatedData
-#' @format csv file with 177 rows and 16 columns
 NULL
 
 #' Smoothed sample paths for the Ornstein-Uhlenbeck Process
@@ -2753,6 +2757,28 @@ NULL
 #' @name Ecosys_TropicalRockLobsters
 #' @format csv file with 22 rows and 4 columns
 #' @source https://doi.org/10.25919/nzrp-6702
+NULL
+
+#' Metals and Energy Commodities
+#'
+#' Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
+#'
+#' \itemize{
+#'   \item Day: time variable in days since 1 January 2009
+#'   \item Gold: London Bullion Market fix at the Perth (Aus) Mint in USD/troy ounce
+#'   \item Silver: London Bullion Market fix in USD/troy ounce
+#'   \item Copper: London Metals Exchange spot price, Copper, Grade A, USD/tonne
+#'   \item Iron Ore: Cleared for Export Tianjin port, Iron Ore Fines 62% FE spot price in USD/tonne
+#'   \item WTI: West Texas Intermediate in USD/bbl
+#'   \item Brent: Brent Crude in USD/bbl
+#'   \item Year: time variable as decimal year
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Finance_Commodities
+#' @format csv file with 197 rows and 8 columns
+#' @source https://files.marketindex.com.au/files/workbooks/commodities-workbook.xlsx
 NULL
 
 #' Kansas City Hard Red Wheat Futures

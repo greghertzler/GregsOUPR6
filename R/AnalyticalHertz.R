@@ -174,7 +174,7 @@ Analytical <- R6::R6Class("Analytical",
       private$z_stoch_args <- list(z=xyzseq)
       private$y_stoch_args <- list(t=seq(from=0,to=10,by=0.1),y=xyzseq,s=0,x=-15,psi=-1,eps=0.05)
       private$x_stoch_args <- list(s=seq(from=10,to=0,by=-0.1),x=xyzseq,t=10,y=0,r=0.05,phi=0,b=0,c=0)
-      private$t_stoch_args <- list(t=seq(from=0,to=10,by=0.1),k=0,s=0,x=15,z=seq(from=-30,to=30,by=6),omega=1,Ppct=0.841345)
+      private$t_stoch_args <- list(t=seq(from=0,to=10,by=0.1),k=0,s=0,x=15,z=seq(from=-30,to=30,by=6),omega=1,Ppct=0.75)
       private$psiphi <- -1
       self$default_save()
       # plot info ----
