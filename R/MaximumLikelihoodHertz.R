@@ -2759,6 +2759,34 @@ NULL
 #' @source https://doi.org/10.25919/nzrp-6702
 NULL
 
+#' Sydney Drinking Water Catchment
+#'
+#' WaterNSW WaterInsight, Water Storage from August 2015 to July 2025
+#'
+#' \itemize{
+#'   \item Day: time variable for days from August 2015
+#'   \item All: All Storage volume in gigalitres
+#'   \item Blue Mtns: Blue Mountains Dams volume in gigalitres
+#'   \item Nepean: Nepean Dam volume in gigalitres
+#'   \item Avon: Avon Dam volume in gigalitres
+#'   \item Wingecarribe: Wingecarribe Reservoir volume in gigalitres
+#'   \item Cordeaux: Cordeaux Dam volume in gigalitres
+#'   \item Cataract: Cataract Dam volume in gigalitres
+#'   \item Warragamba: Warragamba Dam volume in gigalitres
+#'   \item Woronora: Woronora Dam volume in gigalitres
+#'   \item Prospect: Prospect Reservoir volume in gigalitres
+#'   \item Tallowa: Tallowa Dam volume in gigalitres
+#'   \item Fitzroy: Fitzroy Falls Dam volume in gigalitres
+#'   \item Year: time variable as decimal year
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_SydneyWater
+#' @format csv file with 120 rows and 14 columns
+#' @source https://waterinsights.waternsw.com.au/12964-sydney-drinking-water-catchment/storage
+NULL
+
 #' Metals and Energy Commodities
 #'
 #' Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
