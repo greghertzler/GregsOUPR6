@@ -3203,7 +3203,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       else
       {
         if(labels == TRUE) { lookdown <- list(text=syms,showarrow=FALSE,yref="container",y=0) }
-        else { lookdown <- list(text="") }
+        else { lookdown <- list(text="",showarrow=FALSE,yref="container",y=0) }
         if(is.null(xaxis)) { xaxis <- "<i>x</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>s</i>" }
         if(is.null(zaxis)) { zaxis <- "\uD835\uDD46(<i>s,x</i>|<i>g,h</i><sup>2</sup><i>,V</i>)" }
@@ -3373,7 +3373,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       else
       {
         if(labels == TRUE) { lookdown <- list(text=syms,showarrow=FALSE,yref="container",y=0) }
-        else { lookdown <- list(text="") }
+        else { lookdown <- list(text="",showarrow=FALSE,yref="container",y=0) }
         if(is.null(xaxis)) { xaxis <- "<i>x</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>s</i>" }
         if(is.null(zaxis)) { zaxis <- "\u00D4(<i>x</i>|<i>g,h</i><sup>2</sup>,<i>V</i>)" }
