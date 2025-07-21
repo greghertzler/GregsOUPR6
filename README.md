@@ -17,4 +17,5 @@ Code:<br>
 Excel user-defined functions, Visual Basic for Applications code, R6 objects and a Shiny App.
 
 Help:<br>
+Shiny Tutorials--step-by-step instructions for the Shiny app.<br>
 Ribbon Help--context-sensitive help for Excel workbooks, the R app and a website.
