@@ -39,7 +39,7 @@ library(stringr)
 #'       lnLu:   unrestricted log likelihood -inf<lnLu<=0
 #'       alphau: identifies distribution of lnLu 1<=alphau<=2
 #'       lnLr:   restricted log likelihood -inf<lnLr<=lnLu
-#'       alphar: identifies distribution of lnLr 1<=alphar<=2
+#'       alpha: identifies distribution of lnLu 1<=alpha<=2
 #'       m1:     number of observations 0<m1=m-1
 #'
 #' @details # Using the methods:
@@ -145,7 +145,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       private$oup_params_restr <- list(rhor=0.5,mur=-15,sigmar=15)
       private$oup_params_start <- list(rhos=0.5,mus=-15,sigmas=15)
       # time series ----
-      private$oup_stats <- list(lnLu=-447.788922,lnLr=-449.338874,alphar=0.9756147,m1=175)
+      private$oup_stats <- list(lnLu=-447.788922,alphau=0.974685404,lnLr=-449.338874,alphar=0.972555599,m1=175)
       tau <- c(20,20.05,20.1,20.15,20.2,20.25,20.3,20.35,20.55,20.6,20.65,20.7,20.75,20.8,20.95,21,21.05,21.1,21.15,21.2,21.25,21.3,21.35,21.4,21.45,21.5,21.55,21.6,21.65,21.7,21.75,21.8,21.85,21.9,21.95,22,22.05,22.1,22.15,22.2,22.25,22.3,22.35,22.4,22.45,22.5,22.55,22.6,22.65,22.7,22.75,22.8,22.85,22.9,22.95,23,23.05,23.45,23.5,23.55,23.6,23.65,23.7,23.75,23.8,23.85,23.9,23.95,24.1,24.15,24.2,24.25,24.3,24.35,24.4,24.45,24.5,24.6,24.65,24.75,24.8,24.95,25,25.05,25.1,25.15,25.2,25.25,25.3,25.35,25.4,25.45,25.5,25.55,25.6,25.95,26,26.05,26.1,26.15,26.2,26.25,26.3,26.35,26.4,26.45,26.5,26.55,26.6,26.65,26.7,26.75,26.85,26.9,26.95,27,27.05,27.1,27.15,27.2,27.25,27.3,27.35,27.4,27.45,27.5,27.55,27.6,27.65,27.7,27.75,27.8,27.85,27.9,27.95,28,28.05,28.1,28.15,28.2,28.25,28.3,28.35,28.4,28.45,28.5,28.55,28.6,28.65,28.7,28.75,28.8,28.85,28.9,28.95,29,29.05,29.1,29.15,29.2,29.25,29.3,29.35,29.4,29.45,29.5,29.55,29.6,29.65,29.7,29.75,29.8,29.85,29.9,29.95,30)
       z <- c(30,27.49,24.08,23.45,24.72,21.5,22.15,21.05,27.9,27.71,33.01,30.55,32.42,26.43,24.37,23.22,17.02,17.89,20.04,17.9,19.52,16.78,16.13,16.91,13.92,15.02,13.04,8.19,10.62,12.04,10.39,11.94,14.62,6.61,1.7,1.71,-0.22,-2.69,1.69,-2.98,0.19,3.36,-0.3,-1.24,-4.35,-5.14,-14.63,-14.25,-19.83,-20.51,-20.98,-17.14,-18.94,-21.53,-25.73,-23.74,-24.57,-20.15,-22.54,-20.45,-17.59,-19.29,-21.85,-23.17,-23.8,-27.92,-26.87,-24.97,-17.32,-13.92,-13.49,-11.5,-9.23,-10.3,-9.54,-7.25,-4.04,-9.64,-9.42,-7.87,-6.86,-6.68,-9.03,-20.15,-19.21,-20.75,-21.07,-17.12,-9.99,-12.91,-12.19,-11.42,-8.96,-13.32,-17.8,-21.72,-26.66,-29.16,-28.77,-28.06,-22.83,-24.47,-29.79,-31.28,-34.05,-36.76,-38.97,-39.09,-32.89,-32.89,-31.25,-32.98,-36.19,-36.12,-40.74,-40.57,-42.75,-40.7,-38.5,-38.91,-40.66,-45.96,-48.73,-49.76,-48.19,-47.9,-47.73,-43.19,-41.62,-41.96,-42.98,-44.98,-41.98,-40.65,-36.21,-33.61,-33.73,-29.53,-34.07,-37.05,-33.84,-29.71,-29.24,-30.83,-26.19,-28.73,-30.27,-32.39,-30.3,-25.83,-29.39,-27.64,-25.63,-23.81,-23.34,-18.32,-16.53,-13.82,-13.74,-13.28,-16.98,-13,-13.03,-14.26,-16.94,-15.62,-13.54,-19.63,-14.06,-17.23,-17.6,-19.67,-19.87,-20.65,-14.42,-10.23)
       private$timeseries <- data.frame(tau=tau,z=z)
@@ -297,11 +297,12 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' @description
     #' Set OUP statistics for estimation and hypothesis tests
     #' @param lnLu   unrestricted log likelihood -inf<lnLu<=0
+    #' @param alphau identifies the distribution of lnLu, 0.5<=alphau<=1
     #' @param lnLr   restricted log likelihood -inf<lnLr<=lnLu
-    #' @param alphar identifies probability of restricted log likelihood 0.5<=alphar<=1
+    #' @param alphar identifies the distribution of lnLr, 0.5<=alphar<=1
     #' @param m1     number of observations 0<m1
-    #' @return list(lnLu,lnLr,alphar,m1)
-    set_oup_stats = function(lnLu=NULL,lnLr=NULL,alphar=NULL,m1=NULL)
+    #' @return list(lnLu,alphau,lnLr,alphar,m1)
+    set_oup_stats = function(lnLu=NULL,alphau=NULL,lnLr=NULL,alphar=NULL,m1=NULL)
     {
       if(!is.null(lnLu) & !is.null(lnLr))
       {
@@ -326,7 +327,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         lnLu <- private$extract_scalar(lnLu)
         if(!is.null(lnLu))
         {
-          lnL <- private$oup_stats[[2]]
+          lnL <- private$oup_stats[[3]]
           if(!is.null(lnL) && lnLu < lnL) { message("new lnLu < existing lnLr.  lnLu not set.") }
           else
           {
@@ -351,6 +352,26 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         }
         else { message("lnLr not set.") }
       }
+      if(!is.null(alphau))
+      {
+        sca <- private$extract_scalar(alphau)
+        if(!is.null(sca))
+        {
+          if(sca < 0.5)
+          {
+            message("alphau < 0.5 set to 0.5.")
+            sca <- 0.5
+          }
+          if(sca > 1)
+          {
+            message("alphau > 1 set to 1.")
+            sca <- 1
+          }
+          private$oup_stats$alphau <- sca
+          private$likelyratio <- NULL
+        }
+        else { message("alphau not set.") }
+      }
       if(!is.null(alphar))
       {
         sca <- private$extract_scalar(alphar)
@@ -369,7 +390,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           private$oup_stats$alphar <- sca
           private$likelyratio <- NULL
         }
-        else { message("m1 not set.") }
+        else { message("alphar not set.") }
       }
       if(!is.null(m1))
       {
@@ -511,7 +532,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
                     private$oup_params_unrestr <- list(rhohat=NULL,muhat=NULL,sigmahat=NULL)
                     private$oup_params_restr <- list(rhor=NULL,mur=NULL,sigmar=NULL)
                     private$oup_params_start <- list(rhos=NULL,mus=NULL,sigmas=NULL)
-                    private$oup_stats <- list(lnLu=NULL,lnLr=NULL,alphar=NULL,m1=NULL)
+                    private$oup_stats <- list(lnLu=NULL,alphau=NULL,lnLr=NULL,alphar=NULL,m1=NULL)
                     private$loglikely <- NULL
                     private$theta_u <- NULL
                     private$theta_r <- NULL
@@ -818,7 +839,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     get_oup_params_start = function() { return(private$oup_params_start) },
     #' @description
     #' Get OUP statistics for estimation and hypothesis tests
-    #' @return list(lnLu,lnLr,alphar,m1)
+    #' @return list(lnLu,alphau,lnLr,alphar,m1)
     get_oup_stats = function() { return(private$oup_stats) },
     #' @description
     #' Get time series data for time tau and state z
@@ -919,7 +940,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         alpha <- 0.5*alpha/m1
         if(nmstart[[2]][1] != 0 & nmstart[[2]][2] != 0 & nmstart[[2]][3] != 0)
         {
-          self$set_oup_stats(lnLu=lnL,NULL,NULL,m1=m1)
+          self$set_oup_stats(lnLu=lnL,alphau=alpha,NULL,NULL,m1=m1)
           self$set_timeseries_info(NULL,NULL,NULL,NULL,NULL,"Unrestricted")
           private$oup_params_start$rhos <- rho
           private$oup_params_start$mus <- mu
@@ -930,7 +951,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         }
         else
         {
-          self$set_oup_stats(NULL,lnLr=lnL,alphar=alpha,m1=m1)
+          self$set_oup_stats(NULL,NULL,lnLr=lnL,alphar=alpha,m1=m1)
           self$set_timeseries_info(NULL,NULL,NULL,NULL,NULL,"Restricted")
           if(nmstart[[2]][1] != 0) { theta <- list(rhobar=rho) }
           else { theta <- list(rhor=rho) }
@@ -978,8 +999,11 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       {
         # unrestricted
         lnLu <- private$OUPLogLikelihood(tau,z,rho,mu,sigma)
-        # invariant
         m <- length(tau)
+        alpha <- 0
+        for(i in 1:(m-1)) { alpha <- alpha+1+exp(-2*rho*(tau[i+1]-tau[i])) }
+        alpha <- 0.5*alpha/(m-1)
+        # invariant
         ave <- 0
         for(i in 1:(m-1)) { ave <- ave+z[i+1] }
         ave <- ave/(m-1)
@@ -990,11 +1014,12 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         Upsilon2 <- 2*(lnLu-lnLr)
         if(Upsilon2 < 0)
         {
-          message("parameters do not fit the data.")
-          message("Inv R2 is negative.")
+          Upsilon2 <- 0
+          message("parameters rho, mu and sigma may not fit the data.")
+          message(paste(sep="","Inv:  lnLr=",lnLr," is greater than lnL=",lnLu,"."))
         }
-        R2 <- 1-exp(-log(2)*Upsilon2/(m-1))
-        Pval <- private$GammaBigRatio(0.5*(m-1),0.5*Upsilon2)
+        R2 <- 1-exp(-log(2)*0.5*Upsilon2/(alpha*(m-1)))
+        Pval <- private$GammaBigRatio(alpha*(m-1),0.5*Upsilon2)
         Inv <- list(R2=R2,Pval=Pval)
         # scaled brownian motion
         sumsq <- 0
@@ -1009,11 +1034,12 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         Upsilon2 <- 2*(lnLu-lnLr)
         if(Upsilon2 < 0)
         {
-          message("parameters do not fit the data.")
-          message("SBM R2 is negative.")
+          Upsilon2 <- 0
+          message("parameters rho, mu and sigma may not fit the data.")
+          message(paste(sep="","SBM:  lnLr=",lnLr," is greater than lnL=",lnLu,"."))
         }
-        R2 <- 1-exp(-log(2)*0.5*Upsilon2/(m-1))
-        Pval <- private$GammaBigRatio(m-1,0.5*Upsilon2)
+        R2 <- 1-exp(-log(2)*0.5*Upsilon2/(alpha*(m-1)))
+        Pval <- private$GammaBigRatio(alpha*(m-1),0.5*Upsilon2)
         SBM <- list(R2=R2,Pval=Pval)
         goodness <- list(Inv=Inv,SBM=SBM)
         private$goodness <- goodness
@@ -1024,28 +1050,28 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' Test for significant difference between two likelihoods
     #' @param lnLu   unrestricted log likelihood -inf<lnLu<=0
     #' @param lnLr   restricted log likelihood -inf<lnLr<=lnLu
-    #' @param alphar identifies distribution of restricted log likelihood 0.5<=alphar<=1
+    #' @param alphau identifies distribution of LnLu 0.5<=alphau<=1
     #' @param m1     number of observations 0<m1=m-1
     #' @return list(R2,Pval)
-    LikelihoodRatioTest = function(lnLu=NULL,lnLr=NULL,alphar=NULL,m1=NULL)
+    LikelihoodRatioTest = function(lnLu=NULL,lnLr=NULL,alphau=NULL,m1=NULL)
     {
       # set / get ----
-      self$set_oup_stats(lnLu,lnLr,alphar,m1)
+      self$set_oup_stats(lnLu,alphau,lnLr,NULL,m1)
       lnLu <- private$oup_stats[[1]]
-      lnLr <- private$oup_stats[[2]]
-      alphar <- private$oup_stats[[3]]
-      m1 <- private$oup_stats[[4]]
+      alpha <- private$oup_stats[[2]]
+      lnLr <- private$oup_stats[[3]]
+      m1 <- private$oup_stats[[5]]
       likelyratio <- private$likelyratio
       # calculate ----
       if(is.null(likelyratio))
       {
-        if(is.null(lnLu) | is.null(m1))
+        if(is.null(lnLu) | is.null(alpha) | is.null(m1))
         {
           message("no unrestricted log likelihood.")
           R2 <- 1
           Pval <- 0
         }
-        else if(is.null(lnLr) | is.null(alphar) | is.null(m1))
+        else if(is.null(lnLr) | is.null(m1))
         {
           message("no restricted log likelihood.")
           R2 <- 0
@@ -1060,8 +1086,9 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         else
         {
           Upsilon2 <- 2*(lnLu-lnLr)
-          R2 <- 1-exp(-log(2)*0.5*Upsilon2/(alphar*m1))
-          Pval <- private$GammaBigRatio(alphar*m1,0.5*Upsilon2)
+          if(Upsilon2 < 0) { Upsilon2 <- 0 }
+          R2 <- 1-exp(-log(2)*0.5*Upsilon2/(alpha*m1))
+          Pval <- private$GammaBigRatio(alpha*m1,0.5*Upsilon2)
         }
         likelyratio <- list(R2=R2,Pval=Pval)
         private$likelyratio <- likelyratio
@@ -2739,6 +2766,34 @@ NULL
 #' @name Ecosys_SouthernBluefinTuna
 #' @format csv file with 22 rows and 4 columns
 #' @source https://doi.org/10.25919/nzrp-6702
+NULL
+
+#' Sydney Drinking Water Catchment
+#'
+#' WaterNSW WaterInsight, Water Storage from August 2015 to July 2025
+#'
+#' \itemize{
+#'   \item Day: time variable for days from August 2015
+#'   \item All: All Storage volume in gigalitres
+#'   \item Blue Mtns: Blue Mountains Dams volume in gigalitres
+#'   \item Nepean: Nepean Dam volume in gigalitres
+#'   \item Avon: Avon Dam volume in gigalitres
+#'   \item Wingecarribe: Wingecarribe Reservoir volume in gigalitres
+#'   \item Cordeaux: Cordeaux Dam volume in gigalitres
+#'   \item Cataract: Cataract Dam volume in gigalitres
+#'   \item Warragamba: Warragamba Dam volume in gigalitres
+#'   \item Woronora: Woronora Dam volume in gigalitres
+#'   \item Prospect: Prospect Reservoir volume in gigalitres
+#'   \item Tallowa: Tallowa Dam volume in gigalitres
+#'   \item Fitzroy: Fitzroy Falls Dam volume in gigalitres
+#'   \item Year: time variable as decimal year
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_SydneyWater
+#' @format csv file with 120 rows and 14 columns
+#' @source https://waterinsights.waternsw.com.au/12964-sydney-drinking-water-catchment/storage
 NULL
 
 #' Tropical Rock Lobster in Australian Waters
