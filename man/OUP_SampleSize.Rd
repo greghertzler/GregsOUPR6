@@ -5,30 +5,22 @@
 \alias{OUP_SampleSize}
 \title{Sample sizes for the Ornstein-Uhlenbeck Process}
 \format{
-csv file with 4736 rows and 6 columns
+csv file with 501 rows and 4 columns
 }
 \description{
-Monte-Carlo simulation to demonstrate the effect of sample size on hypothesis tests
-for the Ornstein-Uhlenbeck Process.
+Monte-Carlo simulation to demonstrate the effect of sample size on discovering the
+parameters of the Ornstein-Uhlenbeck Process.
 }
 \details{
 \itemize{
 \item year: time variable in annual increments for all sample paths
-\item xsmall: sample with 37 measurements or 36 observations
-\item small: sample with 2 x 37 measurements or 73 observations
-\item medium: sample with 8 x 37 measurements or 295 observations
-\item large: sample with 32 x 37 measurements or 1183 observations
-\item xlarge: sample with 128 x 37 measurements or 4735 observations
+\item small: 5 observations
+\item medium: 50 observations
+\item large: 500 observations
 }
 
-This data starts with a very small sample and then replicates it.  Larger
-samples contain no more information than smaller samples and hypothesis
-tests for the Ornstein-Uhlenbeck Process do not change with the sample size.
-The usual Chi^2 tests, however, will reject all null hypotheses for medium
-to large sample sizes.
-
-If larger samples contain more information, hypothesis tests for the
-Ornstein-Uhlenbeck Process will reject more null hypotheses, but not all
-hypotheses as do Chi^2 tests.
+The first 5 and the first 50 observations are the same as those of 500 simulated
+observations.  More observations get closer to the true parameters of rho=0.5,
+mu=15 and sigma=50.
 }
 \keyword{datasets}

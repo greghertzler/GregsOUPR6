@@ -2287,63 +2287,101 @@ NULL
 #' @format csv file with 177 rows and 16 columns
 NULL
 
+#' Observation intervals of different lengths and the Ornstein-Uhlenbeck Process
+#'
+#' Simulated data to demonstrate that observations are never 'missing'.
+#'
+#' \itemize{
+#'   \item Day: time variable in days
+#'   \item Equal: sample paths with equal observation intervals
+#'   \item Unequal: sample paths with unequal observation intervals
+#'   \item Average: sample paths filled in with the average of states of nature
+#'   \item Means: sample paths filled in with Means
+#'   \item Year: time variable as decimal year
+#' }
+#'
+#' An observation consists of the initial state, the initial time, the terminal state
+#'  and the terminal time.  The terminal time minus the initial time can differ among
+#'  observations because each observation has its own mean and variance.  Longer
+#'  observation intervals have smaller means and larger variances but, otherwise,
+#'  parameters estimated from unequal observation intervals are statistically
+#'  equivalent to parameters estimated from equal intervals.
+#'
+#' The usual time-series methods are special cases of estimating the Ornstein-Uhlenbeck
+#'  Process.  They estimate location, mu, and scale, sigma, but not the rate of
+#'  convergence, rho.  They eliminate rho by assuming weak stationarity.  The mean of
+#'  each observation is assumed to have converged and lost its connection to its
+#'  initial state.  The variance of each observation does not depend upon an initial
+#'  state and may still be converging.  Observations will have equal variances if
+#'  observation intervals are equal.
+#'
+#' For the Ornstein-Uhlenbeck Process, variances converge twice as fast as means.
+#'  If variances are still converging, so are means.  Observations over equal time
+#'  intervals will have equal variances but different means.  In other words, weak
+#'  stationarity does not exist.  Any assumption of stationarity is strong stationarity
+#'  in which both the means and variances have converged.
+#'
+#' Stationarity is an hypothesis to test, not an assumption to impose.  Goodness
+#'  of fit for the Ornstein-Uhlenbeck Process tests for stationarity, and also
+#'  for the other extreme of Brownian Motion.
+#'
+#' If you have a time series with measurements at sporadic times, don't fill in for
+#'  observations that aren't missing.  If you must, first estimate the parameters.
+#'  Then use the parameters to calculate means for the times of your choosing.
+#'  Means are the maximum likelihood estimates of unobserved states of nature.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name OUP_NotMissing
+#' @format csv file with 366 rows and 6 columns
+NULL
+
 #' Observation intervals and the Ornstein-Uhlenbeck Process
 #'
 #' Monte-Carlo simulation to demonstrate the effect of the observation interval on the
 #'  rate of convergence, rho, and the scale, sigma.
 #'
 #' \itemize{
-#'   \item year 1: time variable in annual increments
-#'   \item z rho 0.5: sample paths with annual time increments and a rate of convergence of 0.5
-#'   \item year 0.05: time variable in increments of 1/20 year
-#'   \item z rho 10: sample paths with time increments of 1/20 year and a rate of convergence of 10
+#'   \item Day: time variable in daily increments
+#'   \item z: sample paths with daily observations
+#'   \item Year: time variable as decimal year
 #' }
 #'
-#' This data has two sample paths.  Within a sample path, observation intervals are
-#'  of equal length.  Between sample paths the observation intervals are of unequal
-#'  lengths.  Otherwise, the sample paths have the same shocks and give equivalent
-#'  estimates of the parameters.
+#' Observation intervals are measured in two different units:  days and years.
 #'
-#'  Both sets of estimates have the same rho(t-s), where t-s is the observation interval.
-#'  A common example is annual versus daily intervals; t-s=1 and rho=1/2 is equivalent to
-#'  t-s=1/365 and rho=365/2.  Location parameter, mu, is the same in both sets of estimates,
-#'  but scale parameter, sigma, is larger if rho is larger because the asymptotic variance,
-#'  sigma^2/2rho, is the same in both sets of estimates.
+#' Both sets of estimates have the same rho(t-s), where rho is the rate of convergence and
+#'  t-s is the observation interval.  For observation intervals measured in days, t-s=1 and
+#'  rho=1/2.  For observation intervals measured in years, t-s=1/365 and rho=365/2.  Location
+#'   parameter, mu, is the same in both sets of estimates.  Scale parameter, sigma, is larger
+#'   if rho is larger because the asymptotic variance, sigma^2/2rho, is the same in both sets
+#'   of estimates.  If rho is 365 times bigger, sigma is 365^0.5 = 19.105 times bigger.
 #'
 #' @docType data
 #' @keywords datasets
 #' @name OUP_ObservationInterval
-#' @format csv file with 201 rows and 4 columns
+#' @format csv file with 366 rows and 3 columns
 NULL
 
 #' Sample sizes for the Ornstein-Uhlenbeck Process
 #'
-#' Monte-Carlo simulation to demonstrate the effect of sample size on hypothesis tests
-#'  for the Ornstein-Uhlenbeck Process.
+#' Monte-Carlo simulation to demonstrate the effect of sample size on discovering the
+#'  parameters of the Ornstein-Uhlenbeck Process.
 #'
 #' \itemize{
 #'   \item year: time variable in annual increments for all sample paths
-#'   \item xsmall: sample with 37 measurements or 36 observations
-#'   \item small: sample with 2 x 37 measurements or 73 observations
-#'   \item medium: sample with 8 x 37 measurements or 295 observations
-#'   \item large: sample with 32 x 37 measurements or 1183 observations
-#'   \item xlarge: sample with 128 x 37 measurements or 4735 observations
+#'   \item small: 5 observations
+#'   \item medium: 50 observations
+#'   \item large: 500 observations
 #' }
 #'
-#' This data starts with a very small sample and then replicates it.  Larger
-#'  samples contain no more information than smaller samples and hypothesis
-#'  tests for the Ornstein-Uhlenbeck Process do not change with the sample size.
-#'  The usual Chi^2 tests, however, will reject all null hypotheses for medium
-#'  to large sample sizes.
-#'
-#' If larger samples contain more information, hypothesis tests for the
-#'  Ornstein-Uhlenbeck Process will reject more null hypotheses, but not all
-#'  hypotheses as do Chi^2 tests.
+#' The first 5 and the first 50 observations are the same as those of 500 simulated
+#'  observations.  More observations get closer to the true parameters of rho=0.5,
+#'  mu=15 and sigma=50.
 #'
 #' @docType data
 #' @keywords datasets
 #' @name OUP_SampleSize
-#' @format csv file with 4736 rows and 6 columns
+#' @format csv file with 501 rows and 4 columns
 NULL
 
 #' Smoothed sample paths for the Ornstein-Uhlenbeck Process
@@ -2387,53 +2425,6 @@ NULL
 #' @keywords datasets
 #' @name OUP_SmoothedData
 #' @format csv file with 177 rows and 11 columns
-NULL
-
-#' Unequal observation intervals and the Ornstein-Uhlenbeck Process
-#'
-#' Simulated data to demonstrate that observations are never 'missing'.
-#'
-#' \itemize{
-#'   \item year 1: time variable in annual increments
-#'   \item z rho 0.5: sample paths with annual time increments or longer and a rate of convergence of 0.5
-#'   \item year 0.05: time variable in increments of 1/20 year
-#'   \item z rho 10: sample paths with time increments of 1/20 year or longer and a rate of convergence of 10
-#' }
-#'
-#' An observation consists of the initial state, the initial time, the terminal state
-#'  and the terminal time.  The terminal time minus the initial time can differ among
-#'  observations because each observation has its own mean and variance.  Longer
-#'  observation intervals have smaller means and larger variances but, otherwise,
-#'  parameters estimated from unequal observation intervals are statistically
-#'  equivalent to parameters estimated from equal intervals.
-#'
-#' The usual time-series methods are special cases of estimating the Ornstein-Uhlenbeck
-#'  Process.  They estimate location, mu, and scale, sigma, but not the rate of
-#'  convergence, rho.  They eliminate rho by assuming weak stationarity.  The mean of
-#'  each observation is assumed to have converged and lost its connection to its
-#'  initial state.  The variance of each observation does not depend upon an initial
-#'  state and may still be converging.  Observations will have equal variances if
-#'  observation intervals are equal.
-#'
-#' For the Ornstein-Uhlenbeck Process, variances converge twice as fast as means.
-#'  If variances are still converging, so are means.  Observations over equal time
-#'  intervals will have equal variances but different means.  In other words, weak
-#'  stationarity does not exist.  Any assumption of stationarity is strong stationarity
-#'  in which both the means and variances have converged.
-#'
-#' Stationarity is an hypothesis to test, not an assumption to impose.  Goodness
-#'  of fit for the Ornstein-Uhlenbeck Process tests for stationarity, and also
-#'  for the other extreme of Brownian Motion.
-#'
-#' If you have a time series with measurements at sporadic times, don't fill in for
-#'  observations that aren't missing.  If you must, first estimate the parameters.
-#'  Then use the parameters to calculate means for the times of your choosing.
-#'  Means are the maximum likelihood estimates of unobserved states of nature.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name OUP_UnequalIntervals
-#' @format csv file with 151 rows and 4 columns
 NULL
 
 #' Water in Farm Dams in the Riverina of New South Wales
@@ -2512,37 +2503,22 @@ NULL
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
-#' Soil Mineral Nitrogen with Stubble Management
+#' Soil Health with Stubble Management
 #'
 #' CSIRO Harden Long-Term Tillage Experiment
 #'
 #' \itemize{
 #'   \item Year: time variable in sporadic increments
-#'   \item Burn: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble burning
-#'   \item Bash: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble bashing
+#'   \item N Burn: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble burning
+#'   \item N Bash: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble bashing
+#'   \item W Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
+#'   \item W Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
 #' }
 #'
 #' @docType data
 #' @keywords datasets
-#' @name Agric_NSW_SoilNitrogenHarden
-#' @format csv file with 27 rows and 3 columns
-#' @source https://data.csiro.au/collection/csiro:61293?q=population%20data&_st=keyword&_str=210&_si=7
-NULL
-
-#' Soil Water with Stubble Management
-#'
-#' CSIRO Harden Long-Term Tillage Experiment
-#'
-#' \itemize{
-#'   \item Year: time variable in sporadic increments
-#'   \item Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
-#'   \item Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_NSW_SoilWaterHarden
-#' @format csv file with 21 rows and 3 columns
+#' @name Agric_NSW_SoilHealthHarden
+#' @format csv file with 30 rows and 5 columns
 #' @source https://data.csiro.au/collection/csiro:61293?q=population%20data&_st=keyword&_str=210&_si=7
 NULL
 
@@ -2812,34 +2788,6 @@ NULL
 #' @name Ecosys_TropicalRockLobsters
 #' @format csv file with 22 rows and 4 columns
 #' @source https://doi.org/10.25919/nzrp-6702
-NULL
-
-#' Sydney Drinking Water Catchment
-#'
-#' WaterNSW WaterInsight, Water Storage from August 2015 to July 2025
-#'
-#' \itemize{
-#'   \item Day: time variable for days from August 2015
-#'   \item All: All Storage volume in gigalitres
-#'   \item Blue Mtns: Blue Mountains Dams volume in gigalitres
-#'   \item Nepean: Nepean Dam volume in gigalitres
-#'   \item Avon: Avon Dam volume in gigalitres
-#'   \item Wingecarribe: Wingecarribe Reservoir volume in gigalitres
-#'   \item Cordeaux: Cordeaux Dam volume in gigalitres
-#'   \item Cataract: Cataract Dam volume in gigalitres
-#'   \item Warragamba: Warragamba Dam volume in gigalitres
-#'   \item Woronora: Woronora Dam volume in gigalitres
-#'   \item Prospect: Prospect Reservoir volume in gigalitres
-#'   \item Tallowa: Tallowa Dam volume in gigalitres
-#'   \item Fitzroy: Fitzroy Falls Dam volume in gigalitres
-#'   \item Year: time variable as decimal year
-#' }
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Ecosys_SydneyWater
-#' @format csv file with 120 rows and 14 columns
-#' @source https://waterinsights.waternsw.com.au/12964-sydney-drinking-water-catchment/storage
 NULL
 
 #' Metals and Energy Commodities

@@ -41,7 +41,7 @@ robust estimation algorithm and with testing for simple hypotheses.
   lnLu:   unrestricted log likelihood -inf<lnLu<=0
   alphau: identifies distribution of lnLu 1<=alphau<=2
   lnLr:   restricted log likelihood -inf<lnLr<=lnLu
-  alphar: identifies distribution of lnLr 1<=alphar<=2
+  alpha: identifies distribution of lnLu 1<=alpha<=2
   m1:     number of observations 0<m1=m-1
 }\if{html}{\out{</div>}}
 }
@@ -285,6 +285,7 @@ Set OUP statistics for estimation and hypothesis tests
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_oup_stats(
   lnLu = NULL,
+  alphau = NULL,
   lnLr = NULL,
   alphar = NULL,
   m1 = NULL
@@ -296,16 +297,18 @@ Set OUP statistics for estimation and hypothesis tests
 \describe{
 \item{\code{lnLu}}{unrestricted log likelihood -inf<lnLu<=0}
 
+\item{\code{alphau}}{identifies the distribution of lnLu, 0.5<=alphau<=1}
+
 \item{\code{lnLr}}{restricted log likelihood -inf<lnLr<=lnLu}
 
-\item{\code{alphar}}{identifies probability of restricted log likelihood 0.5<=alphar<=1}
+\item{\code{alphar}}{identifies the distribution of lnLr, 0.5<=alphar<=1}
 
 \item{\code{m1}}{number of observations 0<m1}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-list(lnLu,lnLr,alphar,m1)
+list(lnLu,alphau,lnLr,alphar,m1)
 }
 }
 \if{html}{\out{<hr>}}
@@ -490,7 +493,7 @@ Get OUP statistics for estimation and hypothesis tests
 }
 
 \subsection{Returns}{
-list(lnLu,lnLr,alphar,m1)
+list(lnLu,alphau,lnLr,alphar,m1)
 }
 }
 \if{html}{\out{<hr>}}
@@ -677,7 +680,7 @@ Test for significant difference between two likelihoods
 \if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$LikelihoodRatioTest(
   lnLu = NULL,
   lnLr = NULL,
-  alphar = NULL,
+  alphau = NULL,
   m1 = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -689,7 +692,7 @@ Test for significant difference between two likelihoods
 
 \item{\code{lnLr}}{restricted log likelihood -inf<lnLr<=lnLu}
 
-\item{\code{alphar}}{identifies distribution of restricted log likelihood 0.5<=alphar<=1}
+\item{\code{alphau}}{identifies distribution of LnLu 0.5<=alphau<=1}
 
 \item{\code{m1}}{number of observations 0<m1=m-1}
 }

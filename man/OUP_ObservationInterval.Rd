@@ -5,7 +5,7 @@
 \alias{OUP_ObservationInterval}
 \title{Observation intervals and the Ornstein-Uhlenbeck Process}
 \format{
-csv file with 201 rows and 4 columns
+csv file with 366 rows and 3 columns
 }
 \description{
 Monte-Carlo simulation to demonstrate the effect of the observation interval on the
@@ -13,21 +13,18 @@ rate of convergence, rho, and the scale, sigma.
 }
 \details{
 \itemize{
-\item year 1: time variable in annual increments
-\item z rho 0.5: sample paths with annual time increments and a rate of convergence of 0.5
-\item year 0.05: time variable in increments of 1/20 year
-\item z rho 10: sample paths with time increments of 1/20 year and a rate of convergence of 10
+\item Day: time variable in daily increments
+\item z: sample paths with daily observations
+\item Year: time variable as decimal year
 }
 
-This data has two sample paths.  Within a sample path, observation intervals are
-of equal length.  Between sample paths the observation intervals are of unequal
-lengths.  Otherwise, the sample paths have the same shocks and give equivalent
-estimates of the parameters.
+Observation intervals are measured in two different units:  days and years.
 
-Both sets of estimates have the same rho(t-s), where t-s is the observation interval.
-A common example is annual versus daily intervals; t-s=1 and rho=1/2 is equivalent to
-t-s=1/365 and rho=365/2.  Location parameter, mu, is the same in both sets of estimates,
-but scale parameter, sigma, is larger if rho is larger because the asymptotic variance,
-sigma^2/2rho, is the same in both sets of estimates.
+Both sets of estimates have the same rho(t-s), where rho is the rate of convergence and
+t-s is the observation interval.  For observation intervals measured in days, t-s=1 and
+rho=1/2.  For observation intervals measured in years, t-s=1/365 and rho=365/2.  Location
+parameter, mu, is the same in both sets of estimates.  Scale parameter, sigma, is larger
+if rho is larger because the asymptotic variance, sigma^2/2rho, is the same in both sets
+of estimates.  If rho is 365 times bigger, sigma is 365^0.5 = 19.105 times bigger.
 }
 \keyword{datasets}
