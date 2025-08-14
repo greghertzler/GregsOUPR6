@@ -13,7 +13,7 @@ library(stringr)
 #'  diffusion and several possible terminal values are pre-programmed.  User-defined
 #'  terminal values can also be entered.
 #'
-#' @details # Formaulas and methods:
+#' @details # Formulas and methods:
 #'     x stochastic
 #'       Drift
 #'       Diffusion
@@ -21,6 +21,7 @@ library(stringr)
 #'       TerminalValue_Degenerate
 #'       TerminalValue_Stepped
 #'       TerminalValue_Kinked
+#'       TerminalValue_Butterfly
 #'       TerminalValue_Mitscherlich
 #'       TerminalValue_Gompertz
 #'       TerminalValue_Logistic
@@ -53,7 +54,7 @@ library(stringr)
 #'       sigma: scale parameter
 #'       xo:    state at the intercept, spike, step or kink
 #'       xi:    state at the inflection point
-#'       xm:    state at the maximum
+#'       xm:    state at the maximum or kink
 #'       vs:    slope or direction of a step
 #'       vr:    rate of change
 #'       Vmax:  maximum terminal value
@@ -164,13 +165,14 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_linear_args <- list(xo=0,vs=1)
       private$V_degenerate_args <- list(xo=0,Vmax=0.5,Vmin=0)
       private$V_stepped_args <- list(xo=0,vs=-1,Vmax=1,Vmin=0)
-      private$V_kinked_args <- list(xo=0,vs=-1,Vmax=Inf,Vmin=0)
+      private$V_kinked_args <- list(xo=0,vs=-1,Vmax=30,Vmin=0)
+      private$V_butterfly_args <- list(xo=-5,xm=5,vs=-1,Vmax=25,Vmin=0)
       private$V_mitscherlich_args <- list(xo=0,vr=-0.1,Vmax=10,Vmin=0)
       private$V_gompertz_args <- list(xi=-5,vr=-0.1,Vmax=10,Vmin=0)
       private$V_logistic_args <- list(xi=-5,vr=-0.1,Vmax=10,Vmin=0)
       private$V_transcendental_args <- list(xo=25,xi=10,xm=-5,Vmax=10,Vmin=0)
       private$V_yieldindex_args <- list(xo=25,xi=10,xm=-5,Vmax=8,Vmin=-2)
-      private$V_info <- list(Ix=4,name="Kinked",names=list("Linear","Degenerate","Stepped","Kinked","Mitscherlich","Gompertz","Logistic","Transcendental","Yield Index"),text="Linear, Degenerate, Stepped, Kinked, Mitscherlich, Gompertz, Logistic, Transcendental, Yield Index")
+      private$V_info <- list(Ix=4,name="Kinked",names=list("Linear","Degenerate","Stepped","Kinked","Butterfly","Mitscherlich","Gompertz","Logistic","Transcendental","Yield Index"),text="Linear, Degenerate, Stepped, Kinked, Butterfly, Mitscherlich, Gompertz, Logistic, Transcendental, Yield Index")
       self$default_save()
       # plot info ----
       plottype <- list(type=3)
@@ -356,8 +358,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$g <- NULL
             private$h2 <- NULL
             private$V_linear <- NULL
-            private$V_kinked <- NULL
+            private$V_degenerate <- NULL
             private$V_stepped <- NULL
+            private$V_kinked <- NULL
+            private$V_butterfly <- NULL
             private$V_mitscherlich <- NULL
             private$V_gompertz <- NULL
             private$V_logistic <- NULL
@@ -866,6 +870,172 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       return(private$V_kinked_args)
     },
     #' @description
+    #' Set V butterfly arguments
+    #' @param xo   state at the left wing
+    #' @param xm   state at the right wing
+    #' @param vs   slope
+    #' @param Vmax maximum terminal value
+    #' @param Vmin minimum terminal value
+    #' @return list(xo,xm,vs,Vmax,Vmin)
+    set_V_butterfly_args = function(xo=NULL,xm=NULL,vs=NULL,Vmax=NULL,Vmin=NULL)
+    {
+      if(!is.null(xo) & !is.null(xm))
+      {
+        scao <- private$extract_scalar(xo)
+        scam <- private$extract_scalar(xm)
+        if(!is.null(scao) & !is.null(scam))
+        {
+          if(scao <= scam)
+          {
+            if(scao != private$V_butterfly_args$xo | scam != private$V_butterfly_args$xm)
+            {
+              private$V_butterfly_args$xo <- scao
+              private$V_butterfly_args$xm <- scam
+              private$V_butterfly <- NULL
+              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            }
+          }
+          else
+          {
+            message("xo > xm.")
+            message("x0 and xm not set.")
+          }
+        }
+        else { message("xo and xm not set.")}
+      }
+      else if(!is.null(xo))
+      {
+        scao <- private$extract_scalar(xo)
+        if(!is.null(scao))
+        {
+          scam <- private$V_butterfly_args[[2]]
+          if(scao <= scam)
+          {
+            if(scao != private$V_butterfly_args$scao)
+            {
+              private$V_butterfly_args$xo <- scao
+              private$V_butterfly <- NULL
+              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            }
+          }
+          else
+          {
+            message(paste("xo > mx=",scam))
+            message("xo not set.")
+          }
+        }
+        else { message("xo not set.")}
+      }
+      else if(!is.null(xm))
+      {
+        scam <- private$extract_scalar(xm)
+        if(!is.null(scam))
+        {
+          scao <- private$V_butterfly_args[[1]]
+          if(scam >= scao)
+          {
+            if(scam != private$V_butterfly_args$xm)
+            {
+              private$V_butterfly_args$xm <- scam
+              private$V_butterfly <- NULL
+              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            }
+          }
+          else
+          {
+            message(paste("xm < existing xo=",scao))
+            message("xm not set.")
+          }
+        }
+        else { message("xm not set.")}
+      }
+      if(!is.null(vs))
+      {
+        sca <- private$extract_scalar(vs)
+        if(!is.null(sca))
+        {
+          if(sca != private$V_butterfly_args$vs)
+          {
+            private$V_butterfly_args$vs <- sca
+            private$V_butterfly <- NULL
+            if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+          }
+        }
+        else { message("vs not set.")}
+      }
+      if(!is.null(Vmax) & !is.null(Vmin))
+      {
+        mx <- private$extract_scalar(Vmax)
+        mn <- private$extract_scalar(Vmin)
+        if(!is.null(mx) & !is.null(mn))
+        {
+          if(mx > mn)
+          {
+            if(mx != private$V_butterfly_args$Vmax | mn != private$V_butterfly_args$Vmin)
+            {
+              private$V_butterfly_args$Vmax <- mx
+              private$V_butterfly_args$Vmin <- mn
+              private$V_butterfly <- NULL
+              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            }
+          }
+          else
+          {
+            message("Vmax <= Vmin.")
+            message("Vmax and Vmin not set.")
+          }
+        }
+        else { message("Vmax and Vmin not set.")}
+      }
+      else if(!is.null(Vmax))
+      {
+        mx <- private$extract_scalar(Vmax)
+        if(!is.null(mx))
+        {
+          mn <- private$V_butterfly_args[[5]]
+          if(mx > mn)
+          {
+            if(mx != private$V_butterfly_args$Vmax)
+            {
+              private$V_butterfly_args$Vmax <- mx
+              private$V_butterfly <- NULL
+              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            }
+          }
+          else
+          {
+            message(paste("Vmax <= existing Vmin=",mn))
+            message("Vmax not set.")
+          }
+        }
+        else { message("Vmax not set.")}
+      }
+      else if(!is.null(Vmin))
+      {
+        mn <- private$extract_scalar(Vmin)
+        if(!is.null(mn))
+        {
+          mx <- private$V_butterfly_args[[4]]
+          if(mn < mx)
+          {
+            if(mn != private$V_butterfly_args$Vmin)
+            {
+              private$V_butterfly_args$Vmin <- mn
+              private$V_butterfly <- NULL
+              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            }
+          }
+          else
+          {
+            message(paste("Vmin >= existing Vmax=",mx))
+            message("Vmin not set.")
+          }
+        }
+        else { message("Vmin not set.")}
+      }
+      return(private$V_butterfly_args)
+    },
+    #' @description
     #' Set V mitscherlich arguments
     #' @param xo   state at the intercept
     #' @param vr   rate of change
@@ -883,7 +1053,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_mitscherlich_args$xo <- sca
             private$V_mitscherlich <- NULL
-            if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xo not set.")}
@@ -897,7 +1067,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_mitscherlich_args$vr <- sca
             private$V_mitscherlich <- NULL
-            if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("vr not set.")}
@@ -915,7 +1085,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               private$V_mitscherlich_args$Vmax <- mx
               private$V_mitscherlich_args$Vmin <- mn
               private$V_mitscherlich <- NULL
-            if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -938,7 +1108,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_mitscherlich_args$Vmax <- mx
               private$V_mitscherlich <- NULL
-              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -961,7 +1131,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_mitscherlich_args$Vmin <- mn
               private$V_mitscherlich <- NULL
-              if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -992,7 +1162,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_gompertz_args$xi <- sca
             private$V_gompertz <- NULL
-            if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xi not set.")}
@@ -1006,7 +1176,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_gompertz_args$vr <- sca
             private$V_gompertz <- NULL
-            if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("vr not set.")}
@@ -1024,7 +1194,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               private$V_gompertz_args$Vmax <- mx
               private$V_gompertz_args$Vmin <- mn
               private$V_gompertz <- NULL
-              if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1047,7 +1217,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_gompertz_args$Vmax <- mx
               private$V_gompertz <- NULL
-              if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1070,7 +1240,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_gompertz_args$Vmin <- mn
               private$V_gompertz <- NULL
-              if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1101,7 +1271,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_logistic_args$xi <- sca
             private$V_logistic <- NULL
-            if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xi not set.")}
@@ -1115,7 +1285,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_logistic_args$vr <- sca
             private$V_logistic <- NULL
-            if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("vr not set.")}
@@ -1133,7 +1303,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               private$V_logistic_args$Vmax <- mx
               private$V_logistic_args$Vmin <- mn
               private$V_logistic <- NULL
-              if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1156,7 +1326,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_logistic_args$Vmax <- mx
               private$V_logistic <- NULL
-              if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1179,7 +1349,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_logistic_args$Vmin <- mn
               private$V_logistic <- NULL
-              if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1211,7 +1381,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_transcendental_args$xo <- sca
             private$V_transcendental <- NULL
-            if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xo not set.")}
@@ -1225,7 +1395,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_transcendental_args$xi <- sca
             private$V_transcendental <- NULL
-            if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xi not set.")}
@@ -1239,7 +1409,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_transcendental_args$xm <- sca
             private$V_transcendental <- NULL
-            if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xm not set.")}
@@ -1257,7 +1427,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               private$V_transcendental_args$Vmax <- mx
               private$V_transcendental_args$Vmin <- mn
               private$V_transcendental <- NULL
-              if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1280,7 +1450,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_transcendental_args$Vmax <- mx
               private$V_transcendental <- NULL
-              if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1303,7 +1473,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_transcendental_args$Vmin <- mn
               private$V_transcendental <- NULL
-              if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1335,7 +1505,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_yieldindex_args$xo <- sca
             private$V_yieldindex <- NULL
-            if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xo not set.")}
@@ -1349,7 +1519,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_yieldindex_args$xi <- sca
             private$V_yieldindex <- NULL
-            if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xi not set.")}
@@ -1363,7 +1533,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             private$V_yieldindex_args$xm <- sca
             private$V_yieldindex <- NULL
-            if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
+            if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
         else { message("xm not set.")}
@@ -1381,7 +1551,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               private$V_yieldindex_args$Vmax <- mx
               private$V_yieldindex_args$Vmin <- mn
               private$V_yieldindex <- NULL
-              if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1404,7 +1574,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_yieldindex_args$Vmax <- mx
               private$V_yieldindex <- NULL
-              if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1427,7 +1597,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             {
               private$V_yieldindex_args$Vmin <- mn
               private$V_yieldindex <- NULL
-              if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
+              if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
           else
@@ -1449,7 +1619,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     #' @param v3   third parameter
     #' @param v4   fourth parameter
     #' @param v5   fifth parameter
-    #' @return list(xo,xi,xm,vs,vr,Vmax,Vmin)
+    #' @return list(Ix,name,v1,v2,v3,v4,v5)
     set_V_args = function(Ix=NULL,name=NULL,v1=NULL,v2=NULL,v3=NULL,v4=NULL,v5=NULL)
     {
       OK <- FALSE
@@ -1490,11 +1660,12 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       else if(Ix == 2) { V_args <- self$set_V_degenerate_args(v1,v2,v3) }
       else if(Ix == 3) { V_args <- self$set_V_stepped_args(v1,v2,v3,v4) }
       else if(Ix == 4) { V_args <- self$set_V_kinked_args(v1,v2,v3,v4) }
-      else if(Ix == 5) { V_args <- self$set_V_mitscherlich_args(v1,v2,v3,v4) }
-      else if(Ix == 6) { V_args <- self$set_V_gompertz_args(v1,v2,v3,v4) }
-      else if(Ix == 7) { V_args <- self$set_V_logistic_args(v1,v2,v3,v4) }
-      else if(Ix == 8) { V_args <- self$set_V_transcendental_args(v1,v2,v3,v4,v5) }
-      else if(Ix == 9) { V_args <- self$set_V_yieldindex_args(v1,v2,v3,v4,v5) }
+      else if(Ix == 5) { V_args <- self$set_V_butterfly_args(v1,v2,v3,v4) }
+      else if(Ix == 6) { V_args <- self$set_V_mitscherlich_args(v1,v2,v3,v4) }
+      else if(Ix == 7) { V_args <- self$set_V_gompertz_args(v1,v2,v3,v4) }
+      else if(Ix == 8) { V_args <- self$set_V_logistic_args(v1,v2,v3,v4) }
+      else if(Ix == 9) { V_args <- self$set_V_transcendental_args(v1,v2,v3,v4,v5) }
+      else if(Ix == 10) { V_args <- self$set_V_yieldindex_args(v1,v2,v3,v4,v5) }
 
       return(V_args)
     },
@@ -1513,7 +1684,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           if(!is.null(sca))
           {
             Ix <- as.integer(sca)
-            if(Ix > 0 & Ix < 10)
+            if(Ix > 0 & Ix < 11)
             {
               if(Ix != private$V_info$Ix)
               {
@@ -1525,9 +1696,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
                 private$kOhat <- NULL
               }
             }
-            else { message("Ix must be from 1 to 9.") }
+            else { message("Ix must be from 1 to 10.") }
           }
-          else { message("Ix must be from 1 to 9.") }
+          else { message("Ix must be from 1 to 10.") }
         }
         else if(is.character(Ix))
         {
@@ -1697,7 +1868,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     # public get methods ----
     #' @description
     #' Get all arguments and parameters
-    #' @return list(x_stoch_args,abm_params,gbm_params,oup_params,ggp_params,V_linear_args,V_stepped_args,V_kinked_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,plot_info)
+    #' @return list(oup_params,x_stoch_args,V_linear_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,plot_info)
     get_all = function()
     {
       all <- list(oup_params=private$oup_params,
@@ -1706,6 +1877,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         V_degenerate_args=private$V_degenerate_args,
         V_stepped_args=private$V_stepped_args,
         V_kinked_args=private$V_kinked_args,
+        V_butterfly_args=private$V_butterfly_args,
         V_mitscherlich_args=private$V_mitscherlich_args,
         V_gompertz_args=private$V_gompertz_args,
         V_logistic_args=private$V_logistic_args,
@@ -1741,6 +1913,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     #' @return list(xo,vs,Vmax,Vmin)
     get_V_kinked_args = function() { return(private$V_kinked_args) },
     #' @description
+    #' Get V butterfly arguments
+    #' @return list(xo,xm,vs,Vmax,Vmin)
+    get_V_butterfly_args = function() { return(private$V_butterfly_args) },
+    #' @description
     #' Get V mitscherlich arguments
     #' @return list(xo,vr,Vmax,Vmin)
     get_V_mitscherlich_args = function() { return(private$V_mitscherlich_args) },
@@ -1773,7 +1949,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(is.numeric(Ix) & is.finite(Ix) & !is.na(Ix))
         {
           Ix <- as.integer(private$extract_scalar(Ix))
-          if(Ix > 0 & Ix < 10) { OK <- TRUE }
+          if(Ix > 0 & Ix < 11) { OK <- TRUE }
         }
         else if(is.character(Ix))
         {
@@ -1799,11 +1975,12 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       else if(Ix == 2) { V_args <- self$get_V_degenerate_args() }
       else if(Ix == 3) { V_args <- self$get_V_stepped_args() }
       else if(Ix == 4) { V_args <- self$get_V_kinked_args() }
-      else if(Ix == 5) { V_args <- self$get_V_mitscherlich_args() }
-      else if(Ix == 6) { V_args <- self$get_V_gompertz_args() }
-      else if(Ix == 7) { V_args <- self$get_V_logistic_args() }
-      else if(Ix == 8) { V_args <- self$get_V_transcendental_args() }
-      else if(Ix == 9) { V_args <- self$get_V_yieldindex_args() }
+      else if(Ix == 5) { V_args <- self$get_V_butterfly_args() }
+      else if(Ix == 6) { V_args <- self$get_V_mitscherlich_args() }
+      else if(Ix == 7) { V_args <- self$get_V_gompertz_args() }
+      else if(Ix == 8) { V_args <- self$get_V_logistic_args() }
+      else if(Ix == 9) { V_args <- self$get_V_transcendental_args() }
+      else if(Ix == 10) { V_args <- self$get_V_yieldindex_args() }
       return(V_args)
     },
     #' @description
@@ -1877,8 +2054,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         private$g <- NULL
         private$h2 <- NULL
         private$V_linear <- NULL
-        private$V_kinked <- NULL
+        private$V_degenerate <- NULL
         private$V_stepped <- NULL
+        private$V_kinked <- NULL
+        private$V_butterfly <- NULL
         private$V_mitscherlich <- NULL
         private$V_gompertz <- NULL
         private$V_logistic <- NULL
@@ -1893,7 +2072,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     # public default methods ----
     #' @description
     #' Get default
-    #' @return list(oup_params,x_stoch_args,V_linear_args,V_degenerate_args,,V_stepped_args,V_kinked_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,V_info)
+    #' @return list(oup_params,x_stoch_args,V_linear_args,V_degenerate_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,V_info)
     get_default = function() { return(private$default) },
     #' @description
     #' Save to_default->current arguments are stored as defaults
@@ -1906,6 +2085,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         V_degenerate_args=private$V_degenerate_args,
         V_stepped_args=private$V_stepped_args,
         V_kinked_args=private$V_kinked_args,
+        V_butterfly_args=private$V_butterfly_args,
         V_mitscherlich_args=private$V_mitscherlich_args,
         V_gompertz_args=private$V_gompertz_args,
         V_logistic_args=private$V_logistic_args,
@@ -1935,18 +2115,20 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_degenerate_args <- private$default[[4]]
       private$V_stepped_args <- private$default[[5]]
       private$V_kinked_args <- private$default[[6]]
-      private$V_mitscherlich_args <- private$default[[7]]
-      private$V_gompertz_args <- private$default[[8]]
-      private$V_logistic_args <- private$default[[9]]
-      private$V_transcendental_args <- private$default[[10]]
-      private$V_yieldindex_args <- private$default[[11]]
-      private$V_info <- private$default[[12]]
+      private$V_butterfly_args <- private$default[[7]]
+      private$V_mitscherlich_args <- private$default[[8]]
+      private$V_gompertz_args <- private$default[[9]]
+      private$V_logistic_args <- private$default[[10]]
+      private$V_transcendental_args <- private$default[[11]]
+      private$V_yieldindex_args <- private$default[[12]]
+      private$V_info <- private$default[[13]]
       private$g <- NULL
       private$h2 <- NULL
       private$V_linear <- NULL
-      private$V_kinked <- NULL
       private$V_degenerate <- NULL
       private$V_stepped <- NULL
+      private$V_kinked <- NULL
+      private$V_butterfly <- NULL
       private$V_mitscherlich <- NULL
       private$V_gompertz <- NULL
       private$V_logistic <- NULL
@@ -2195,6 +2377,57 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       return(list(V=terminalvalues))
     },
     #' @description
+    #' Create and plot butterfly terminal values
+    #' @param x       vector of n states
+    #' @param xo      state at the left wing
+    #' @param xm      state at the right wing
+    #' @param vs      slope
+    #' @param Vmax    maximum terminal value
+    #' @param Vmin    minimum terminal value
+    #' @param plotit  TRUE or
+    #' @return list(V(1xn))
+    TerminalValue_Butterfly = function(x=NULL,xo=NULL,xm=NULL,vs=NULL,Vmax=NULL,Vmin=NULL,plotit=TRUE)
+    {
+      # set / get ----
+      self$set_x_stoch_args(NULL,x,NULL,NULL,NULL,NULL,NULL)
+      self$set_V_butterfly_args(xo,xm,vs,Vmax,Vmin)
+      x <- private$x_stoch_args[[2]]
+      xo <- private$V_butterfly_args[[1]]
+      xm <- private$V_butterfly_args[[2]]
+      vs <- private$V_butterfly_args[[3]]
+      Vmax <- private$V_butterfly_args[[4]]
+      Vmin <- private$V_butterfly_args[[5]]
+      # calculate ----
+      terminalvalues <- private$V_butterfly
+      if(is.null(terminalvalues))
+      {
+        slope <- abs(vs)
+        n <- length(x)
+        j <- 0
+        while(j < n)
+        {
+          j <- j+1
+          left <- -slope*(x[j]-xo)
+          right <- slope*(x[j]-xm)
+          if(left > right) { terminalvalues[j] <- left }
+          else { terminalvalues[j] <- right }
+          if(terminalvalues[j] > Vmax) { terminalvalues[j] <- Vmax }
+          else if(terminalvalues[j] < Vmin) { terminalvalues[j] <- Vmin }
+        }
+        private$V_butterfly <- terminalvalues
+      }
+      private$x_stoch_args$V <- terminalvalues
+      private$V_info$Ix <- 5
+      private$V_info$name <- "Butterfly"
+      private$O <- NULL
+      private$Ohat <- NULL
+      private$kOhat <- NULL
+      # plot ----
+      if(plotit == TRUE) { print(self$PlotTerminalValue(NULL)) }
+
+      return(list(V=terminalvalues))
+    },
+    #' @description
     #' Create and plot Mitscherlich terminal values
     #' @param x       vector of n states
     #' @param xo      state at the intercept
@@ -2229,7 +2462,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         private$V_mitscherlich <- terminalvalues
       }
       private$x_stoch_args$V <- terminalvalues
-      private$V_info$Ix <- 5
+      private$V_info$Ix <- 6
       private$V_info$name <- "Mitscherlich"
       private$O <- NULL
       private$Ohat <- NULL
@@ -2267,7 +2500,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         private$V_gompertz <- terminalvalues
       }
       private$x_stoch_args$V <- terminalvalues
-      private$V_info$Ix <- 6
+      private$V_info$Ix <- 7
       private$V_info$name <- "Gompertz"
       private$O <- NULL
       private$Ohat <- NULL
@@ -2305,7 +2538,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         private$V_logistic <- terminalvalues
       }
       private$x_stoch_args$V <- terminalvalues
-      private$V_info$Ix <- 7
+      private$V_info$Ix <- 8
       private$V_info$name <- "Logistic"
       private$O <- NULL
       private$Ohat <- NULL
@@ -2365,7 +2598,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         private$V_transcendental <- terminalvalues
       }
       private$x_stoch_args$V <- terminalvalues
-      private$V_info$Ix <- 8
+      private$V_info$Ix <- 9
       private$V_info$name <- "Transcendental"
       private$O <- NULL
       private$Ohat <- NULL
@@ -2426,7 +2659,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         private$V_yieldindex <- terminalvalues
       }
       private$x_stoch_args$V <- terminalvalues
-      private$V_info$Ix <- 9
+      private$V_info$Ix <- 10
       private$V_info$name <- "Yield Index"
       private$O <- NULL
       private$Ohat <- NULL
@@ -2455,11 +2688,12 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         else if(Ix == 2) { V <- self$TerminalValue_Degenerate(plotit=plotit)[[1]] }
         else if(Ix == 3) { V <- self$TerminalValue_Stepped(plotit=plotit)[[1]] }
         else if(Ix == 4) { V <- self$TerminalValue_Kinked(plotit=plotit)[[1]] }
-        else if(Ix == 5) { V <- self$TerminalValue_Mitscherlich(plotit=plotit)[[1]] }
-        else if(Ix == 6) { V <- self$TerminalValue_Gompertz(plotit=plotit)[[1]] }
-        else if(Ix == 7) { V <- self$TerminalValue_Logistic(plotit=plotit)[[1]] }
-        else if(Ix == 8) { V <- self$TerminalValue_Transcendental(plotit=plotit)[[1]] }
-        else if(Ix == 9) { V <- self$TerminalValue_YieldIndex(plotit=plotit)[[1]] }
+        else if(Ix == 5) { V <- self$TerminalValue_Butterfly(plotit=plotit)[[1]] }
+        else if(Ix == 6) { V <- self$TerminalValue_Mitscherlich(plotit=plotit)[[1]] }
+        else if(Ix == 7) { V <- self$TerminalValue_Gompertz(plotit=plotit)[[1]] }
+        else if(Ix == 8) { V <- self$TerminalValue_Logistic(plotit=plotit)[[1]] }
+        else if(Ix == 9) { V <- self$TerminalValue_Transcendental(plotit=plotit)[[1]] }
+        else if(Ix == 10) { V <- self$TerminalValue_YieldIndex(plotit=plotit)[[1]] }
       }
       else
       {
@@ -3030,13 +3264,21 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         }
         else if(Ix == 5)
         {
+          xo <- private$V_butterfly_args[[1]]
+          xm <- private$V_butterfly_args[[2]]
+          Vmax <- private$V_butterfly_args[[3]]
+          Vmin <- private$V_butterfly_args[[4]]
+          syms <- paste(sep="",bsml,"(<i>x</i><sub>0</sub>=",format(xo,digits=4),",<i>x</i><sub>m</sub>=",format(xm,digits=4),",<i>V</i><sub>max</sub>=",format(Vmax,digits=4),",<i>V</i><sub>min</sub>=",format(Vmin,digits=4),")",esml)
+        }
+        else if(Ix == 6)
+        {
           xo <- private$V_mitscherlich_args[[1]]
           vr <- private$V_mitscherlich_args[[2]]
           Vmax <- private$V_mitscherlich_args[[3]]
           Vmin <- private$V_mitscherlich_args[[4]]
           syms <- paste(sep="",bsml,"(<i>x</i><sub>0</sub>=",format(xo,digits=4),",<i>v</i><sub>2</sub>=",format(vr,digits=4),",<i>V</i><sub>max</sub>=",format(Vmax,digits=4),",<i>V</i><sub>min</sub>=",format(Vmin,digits=4),")",esml)
         }
-        else if(Ix == 6)
+        else if(Ix == 7)
         {
           xi <- private$V_gompertz_args[[1]]
           vr <- private$V_gompertz_args[[2]]
@@ -3044,7 +3286,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           Vmin <- private$V_gompertz_args[[4]]
           syms <- paste(sep="",bsml,"(<i>x</i><sub>1</sub>=",format(xi,digits=4),",<i>v</i><sub>2</sub>=",format(vr,digits=4),",<i>V</i><sub>max</sub>=",format(Vmax,digits=4),",<i>V</i><sub>min</sub>=",format(Vmin,digits=4),")",esml)
         }
-        else if(Ix == 7)
+        else if(Ix == 8)
         {
           xi <- private$V_logistic_args[[1]]
           vr <- private$V_logistic_args[[2]]
@@ -3052,7 +3294,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           Vmin <- private$V_logistic_args[[4]]
           syms <- paste(sep="",bsml,"(<i>x</i><sub>1</sub>=",format(xi,digits=4),",<i>v</i><sub>2</sub>=",format(vr,digits=4),",<i>V</i><sub>max</sub>=",format(Vmax,digits=4),",<i>V</i><sub>min</sub>=",format(Vmin,digits=4),")",esml)
         }
-        else if(Ix == 8)
+        else if(Ix == 9)
         {
           xo <- private$V_transcendental_args[[1]]
           xi <- private$V_transcendental_args[[2]]
@@ -3061,7 +3303,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           Vmin <- private$V_transcendental_args[[5]]
           syms <- paste(sep="",bsml,"(<i>x</i><sub>0</sub>=",format(xo,digits=4),",<i>x</i><sub>1</sub>=",format(xi,digits=4),",<i>x</i><sub>2</sub>=",format(xm,digits=4),",<i>V</i><sub>max</sub>=",format(Vmax,digits=4),",<i>V</i><sub>min</sub>=",format(Vmin,digits=4),")",esml)
         }
-        else if(Ix == 9)
+        else if(Ix == 10)
         {
           xo <- private$V_yieldindex_args[[1]]
           xi <- private$V_yieldindex_args[[2]]
@@ -3528,6 +3770,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     V_degenerate_args = NULL,
     V_stepped_args = NULL,
     V_kinked_args = NULL,
+    V_butterfly_args = NULL,
     V_mitscherlich_args = NULL,
     V_gompertz_args = NULL,
     V_logistic_args = NULL,
@@ -3542,6 +3785,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     V_degenerate = NULL,
     V_stepped = NULL,
     V_kinked = NULL,
+    V_butterfly = NULL,
     V_mitscherlich = NULL,
     V_gompertz = NULL,
     V_logistic = NULL,

@@ -11,7 +11,7 @@ prices, an option envelope and a decision threshold can be calculated.  Drift,
 diffusion and several possible terminal values are pre-programmed.  User-defined
 terminal values can also be entered.
 }
-\section{Formaulas and methods:}{
+\section{Formulas and methods:}{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{x stochastic
   Drift
   Diffusion
@@ -19,6 +19,7 @@ terminal values can also be entered.
   TerminalValue_Degenerate
   TerminalValue_Stepped
   TerminalValue_Kinked
+  TerminalValue_Butterfly
   TerminalValue_Mitscherlich
   TerminalValue_Gompertz
   TerminalValue_Logistic
@@ -55,7 +56,7 @@ terminal values can also be entered.
   sigma: scale parameter
   xo:    state at the intercept, spike, step or kink
   xi:    state at the inflection point
-  xm:    state at the maximum
+  xm:    state at the maximum or kink
   vs:    slope or direction of a step
   vr:    rate of change
   Vmax:  maximum terminal value
@@ -163,6 +164,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 \item \href{#method-FiniteDifference-set_V_degenerate_args}{\code{FiniteDifference$set_V_degenerate_args()}}
 \item \href{#method-FiniteDifference-set_V_stepped_args}{\code{FiniteDifference$set_V_stepped_args()}}
 \item \href{#method-FiniteDifference-set_V_kinked_args}{\code{FiniteDifference$set_V_kinked_args()}}
+\item \href{#method-FiniteDifference-set_V_butterfly_args}{\code{FiniteDifference$set_V_butterfly_args()}}
 \item \href{#method-FiniteDifference-set_V_mitscherlich_args}{\code{FiniteDifference$set_V_mitscherlich_args()}}
 \item \href{#method-FiniteDifference-set_V_gompertz_args}{\code{FiniteDifference$set_V_gompertz_args()}}
 \item \href{#method-FiniteDifference-set_V_logistic_args}{\code{FiniteDifference$set_V_logistic_args()}}
@@ -178,6 +180,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 \item \href{#method-FiniteDifference-get_V_degenerate_args}{\code{FiniteDifference$get_V_degenerate_args()}}
 \item \href{#method-FiniteDifference-get_V_stepped_args}{\code{FiniteDifference$get_V_stepped_args()}}
 \item \href{#method-FiniteDifference-get_V_kinked_args}{\code{FiniteDifference$get_V_kinked_args()}}
+\item \href{#method-FiniteDifference-get_V_butterfly_args}{\code{FiniteDifference$get_V_butterfly_args()}}
 \item \href{#method-FiniteDifference-get_V_mitscherlich_args}{\code{FiniteDifference$get_V_mitscherlich_args()}}
 \item \href{#method-FiniteDifference-get_V_gompertz_args}{\code{FiniteDifference$get_V_gompertz_args()}}
 \item \href{#method-FiniteDifference-get_V_logistic_args}{\code{FiniteDifference$get_V_logistic_args()}}
@@ -197,6 +200,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 \item \href{#method-FiniteDifference-TerminalValue_Degenerate}{\code{FiniteDifference$TerminalValue_Degenerate()}}
 \item \href{#method-FiniteDifference-TerminalValue_Stepped}{\code{FiniteDifference$TerminalValue_Stepped()}}
 \item \href{#method-FiniteDifference-TerminalValue_Kinked}{\code{FiniteDifference$TerminalValue_Kinked()}}
+\item \href{#method-FiniteDifference-TerminalValue_Butterfly}{\code{FiniteDifference$TerminalValue_Butterfly()}}
 \item \href{#method-FiniteDifference-TerminalValue_Mitscherlich}{\code{FiniteDifference$TerminalValue_Mitscherlich()}}
 \item \href{#method-FiniteDifference-TerminalValue_Gompertz}{\code{FiniteDifference$TerminalValue_Gompertz()}}
 \item \href{#method-FiniteDifference-TerminalValue_Logistic}{\code{FiniteDifference$TerminalValue_Logistic()}}
@@ -427,6 +431,40 @@ list(xo,vs,Vmax,Vmin)
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-set_V_butterfly_args"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_butterfly_args}{}}}
+\subsection{Method \code{set_V_butterfly_args()}}{
+Set V butterfly arguments
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_butterfly_args(
+  xo = NULL,
+  xm = NULL,
+  vs = NULL,
+  Vmax = NULL,
+  Vmin = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{xo}}{state at the left wing}
+
+\item{\code{xm}}{state at the right wing}
+
+\item{\code{vs}}{slope}
+
+\item{\code{Vmax}}{maximum terminal value}
+
+\item{\code{Vmin}}{minimum terminal value}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+list(xo,xm,vs,Vmax,Vmin)
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_mitscherlich_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_mitscherlich_args}{}}}
 \subsection{Method \code{set_V_mitscherlich_args()}}{
@@ -624,7 +662,7 @@ Set V arguments by position in list
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-list(xo,xi,xm,vs,vr,Vmax,Vmin)
+list(Ix,name,v1,v2,v3,v4,v5)
 }
 }
 \if{html}{\out{<hr>}}
@@ -714,7 +752,7 @@ Get all arguments and parameters
 }
 
 \subsection{Returns}{
-list(x_stoch_args,abm_params,gbm_params,oup_params,ggp_params,V_linear_args,V_stepped_args,V_kinked_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,plot_info)
+list(oup_params,x_stoch_args,V_linear_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,plot_info)
 }
 }
 \if{html}{\out{<hr>}}
@@ -793,6 +831,19 @@ Get V kinked arguments
 
 \subsection{Returns}{
 list(xo,vs,Vmax,Vmin)
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-get_V_butterfly_args"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_butterfly_args}{}}}
+\subsection{Method \code{get_V_butterfly_args()}}{
+Get V butterfly arguments
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_butterfly_args()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+list(xo,xm,vs,Vmax,Vmin)
 }
 }
 \if{html}{\out{<hr>}}
@@ -944,7 +995,7 @@ Get default
 }
 
 \subsection{Returns}{
-list(oup_params,x_stoch_args,V_linear_args,V_degenerate_args,,V_stepped_args,V_kinked_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,V_info)
+list(oup_params,x_stoch_args,V_linear_args,V_degenerate_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,V_info)
 }
 }
 \if{html}{\out{<hr>}}
@@ -1147,6 +1198,46 @@ Create and plot kinked terminal values
 \item{\code{x}}{vector of n states}
 
 \item{\code{xo}}{state at the kink}
+
+\item{\code{vs}}{slope}
+
+\item{\code{Vmax}}{maximum terminal value}
+
+\item{\code{Vmin}}{minimum terminal value}
+
+\item{\code{plotit}}{TRUE or}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+list(V(1xn))
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Butterfly"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Butterfly}{}}}
+\subsection{Method \code{TerminalValue_Butterfly()}}{
+Create and plot butterfly terminal values
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Butterfly(
+  x = NULL,
+  xo = NULL,
+  xm = NULL,
+  vs = NULL,
+  Vmax = NULL,
+  Vmin = NULL,
+  plotit = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{vector of n states}
+
+\item{\code{xo}}{state at the left wing}
+
+\item{\code{xm}}{state at the right wing}
 
 \item{\code{vs}}{slope}
 
