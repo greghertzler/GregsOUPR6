@@ -1628,8 +1628,8 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(is.numeric(Ix) & is.finite(Ix) & !is.na(Ix))
         {
           Ix <- as.integer(private$extract_scalar(Ix))
-          if(Ix > 0 & Ix < 10) { OK <- TRUE }
-          else { message("Ix must be from 1 to 9.") }
+          if(Ix > 0 & Ix < 11) { OK <- TRUE }
+          else { message("Ix must be from 1 to 10.") }
         }
         else if(is.character(Ix))
         {
@@ -1660,7 +1660,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       else if(Ix == 2) { V_args <- self$set_V_degenerate_args(v1,v2,v3) }
       else if(Ix == 3) { V_args <- self$set_V_stepped_args(v1,v2,v3,v4) }
       else if(Ix == 4) { V_args <- self$set_V_kinked_args(v1,v2,v3,v4) }
-      else if(Ix == 5) { V_args <- self$set_V_butterfly_args(v1,v2,v3,v4) }
+      else if(Ix == 5) { V_args <- self$set_V_butterfly_args(v1,v2,v3,v4,v5) }
       else if(Ix == 6) { V_args <- self$set_V_mitscherlich_args(v1,v2,v3,v4) }
       else if(Ix == 7) { V_args <- self$set_V_gompertz_args(v1,v2,v3,v4) }
       else if(Ix == 8) { V_args <- self$set_V_logistic_args(v1,v2,v3,v4) }
