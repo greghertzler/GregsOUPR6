@@ -3089,7 +3089,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       driftline <- list(color=cyn$d,width=4)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_FD_Drift2D")
       fig <- plot_ly() %>%
-        add_trace(.,type="scatter",x=x,y=drift,name="<i>g</i>(<i>z</i>)",hoverinfo="x+y+name",mode="lines",line=driftline) %>%
+        add_trace(.,type="scatter",x=x,y=drift,name="<i>g</i>(<i>z</i>)",mode="lines",line=driftline) %>%
         config(.,toImageButtonOptions=imageoptions) %>%
         layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
@@ -3170,9 +3170,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_FD_Diffusion2Dg")
         legendpos <- list(orientation="h",x=1.05,y=1.0,xanchor="right")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=x,y=drift,name="<i>g</i>(<i>x</i>)",mode="lines",line=driftline) %>%
-          add_trace(.,type="scatter",x=x,y=driftplus,name="<i>g</i>(<i>x</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h") %>%
-          add_trace(.,type="scatter",x=x,y=driftminus,name="<i>g</i>(<i>x</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h",showlegend=FALSE) %>%
+          add_trace(.,type="scatter",x=x,y=drift,name="<i>g</i>(<i>x</i>)",mode="lines",line=driftline,hoverinfo="x+y") %>%
+          add_trace(.,type="scatter",x=x,y=driftplus,name="<i>g</i>(<i>x</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h",hoverinfo="x+y") %>%
+          add_trace(.,type="scatter",x=x,y=driftminus,name="<i>g</i>(<i>x</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h",showlegend=FALSE,hoverinfo="x+y") %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -3186,7 +3186,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         diffusionline <- list(color=mgn$d,width=4)
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_FD_Diffusion2D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=x,y=diffusion,name="<i>h</i><sup>2</sup>",hoverinfo="x+y+name",mode="lines",line=diffusionline) %>%
+          add_trace(.,type="scatter",x=x,y=diffusion,name="<i>h</i><sup>2</sup>",mode="lines",line=diffusionline) %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -3330,7 +3330,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       Vline <- list(color=gry$d,width=4)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_FD_Terminal2D")
       fig <- plot_ly() %>%
-        add_trace(.,type="scatter",x=x,y=V,name="<i>V</i>(<i>x</i>)",hoverinfo="x+y+name",mode="lines",line=Vline) %>%
+        add_trace(.,type="scatter",x=x,y=V,name="<i>V</i>(<i>x</i>)",mode="lines",line=Vline) %>%
         config(.,toImageButtonOptions=imageoptions) %>%
         layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
@@ -3434,7 +3434,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         i <- 1
         while(i <= m)
         {
-          fig <- add_trace(fig,type="scatter",x=x,y=options[i,],name=paste(sep="","&#x1D546;(",s[i],"<i>,x</i>)"),mode="lines",line=optionline,opacity=lineopacity)
+          fig <- add_trace(fig,type="scatter",x=x,y=options[i,],name=paste(sep="","&#x1D546;(",s[i],"<i>,x</i>)"),mode="lines",line=optionline,opacity=lineopacity,hoverinfo="x+y")
           i <- i+ds
           lineopacity <- lineopacity-0.05
         }
@@ -3606,8 +3606,8 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         terminalline <- list(color=gry$c,width=4)
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_FD_Envelope2D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=x,y=V,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline) %>%
-          add_trace(.,type="scatter",x=x,y=Oenv,name="\u00D4(<i>x</i>)",mode="lines",line=Oenvline) %>%
+          add_trace(.,type="scatter",x=x,y=V,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline,hoverinfo="x+y") %>%
+          add_trace(.,type="scatter",x=x,y=Oenv,name="\u00D4(<i>x</i>)",mode="lines",line=Oenvline,hoverinfo="x+y") %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -3740,17 +3740,17 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       kline <- list(dash="dot",color=red$d,width=4)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_FD_Decision2D")
       fig <- plot_ly() %>%
-        add_trace(.,type="scatter",x=x,y=V,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline) %>%
-        add_trace(.,type="scatter",x=x,y=Oenv,name="\u00D4(<i>x</i>)",mode="lines",line=Oenvline) %>%
-        add_trace(.,type="scatter",x=c(k,k),y=c(0,Ohat),name="<i>k</i>",mode="lines",line=kline)
+        add_trace(.,type="scatter",x=x,y=V,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=x,y=Oenv,name="\u00D4(<i>x</i>)",mode="lines",line=Oenvline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(k,k),y=c(0,Ohat),name="<i>k</i>",mode="lines",line=kline,hoverinfo="x+y")
       if(phi > 0 | (phi == 0 & V[n] > V[1]))
       {
-        fig <- add_trace(fig,type="scatter",x=c(x[n],k),y=c(Ohat,Ohat),name="\u00D4",mode="lines",line=oline)
+        fig <- add_trace(fig,type="scatter",x=c(x[n],k),y=c(Ohat,Ohat),name="\u00D4",mode="lines",line=oline,hoverinfo="x+y")
         kOhat <- list(x=k,y=Ohat,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(Ohat,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",showarrow=FALSE)
       }
       else
       {
-        fig <- add_trace(fig,type="scatter",x=c(x[1],k),y=c(Ohat,Ohat),name="\u00D4",mode="lines",line=oline)
+        fig <- add_trace(fig,type="scatter",x=c(x[1],k),y=c(Ohat,Ohat),name="\u00D4",mode="lines",line=oline,hoverinfo="x+y")
         kOhat <- list(x=k,y=Ohat,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(Ohat,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",showarrow=FALSE)
       }
       fig <- config(fig,toImageButtonOptions=imageoptions) %>%

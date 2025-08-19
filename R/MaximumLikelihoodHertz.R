@@ -1149,7 +1149,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       zmarker <- list(color=gry$e,size=8)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_ML_TimeSeries2D")
       fig <- plot_ly()  %>%
-        add_trace(.,type="scatter",x=tauplot,y=zplot,name="<i>z</i>",hoverinfo="x+y+name",mode="lines+markers",line=zline,marker=zmarker) %>%
+        add_trace(.,type="scatter",x=tauplot,y=zplot,name="<i>z</i>",mode="lines+markers",line=zline,marker=zmarker) %>%
         config(.,toImageButtonOptions=imageoptions) %>%
         layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
@@ -1249,10 +1249,10 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_ML_Estimates2D")
       legendpos <- list(orientation="h",x=1.0,y=1.05,xanchor="right")
       fig <- plot_ly()  %>%
-        add_trace(.,type="scatter",x=tauplot,y=zplot,name="<i>z</i>",mode="markers",marker=zmarker) %>%
-        add_trace(.,type="scatter",x=taumv,y=mean,name="<i>G</i>",mode="lines+markers",line=meanline,marker=meanmarker) %>%
-        add_trace(.,type="scatter",x=taumv,y=variance,name="<i>H</i><sup>2</sup>",mode="lines+markers",line=varianceline,marker=variancemarker,visible="legendonly") %>%
-        add_trace(.,type="scatter",x=taumv,y=resid,name="<i>v</i>",mode="lines+markers",line=residline,marker=residmarker,visible="legendonly") %>%
+        add_trace(.,type="scatter",x=tauplot,y=zplot,name="<i>z</i>",mode="markers",marker=zmarker,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=taumv,y=mean,name="<i>G</i>",mode="lines+markers",line=meanline,marker=meanmarker,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=taumv,y=variance,name="<i>H</i><sup>2</sup>",mode="lines+markers",line=varianceline,marker=variancemarker,visible="legendonly",hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=taumv,y=resid,name="<i>v</i>",mode="lines+markers",line=residline,marker=residmarker,visible="legendonly",hoverinfo="x+y") %>%
         config(.,toImageButtonOptions=imageoptions) %>%
         layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 

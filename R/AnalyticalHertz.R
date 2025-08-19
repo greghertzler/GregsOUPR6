@@ -2682,7 +2682,7 @@ Analytical <- R6::R6Class("Analytical",
       driftline <- list(color=cyn$d,width=4)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Drift2D")
       fig <- plot_ly() %>%
-        add_trace(.,type="scatter",x=z,y=drift,name="<i>g</i>(<i>z</i>)",hoverinfo="x+y+name",mode="lines",line=driftline) %>%
+        add_trace(.,type="scatter",x=z,y=drift,name="<i>g</i>(<i>z</i>)",mode="lines",line=driftline) %>%
         config(.,toImageButtonOptions=imageoptions) %>%
         layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
@@ -2763,9 +2763,9 @@ Analytical <- R6::R6Class("Analytical",
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Diffusion2Dg")
         legendpos <- list(orientation="h",x=1.05,y=1.0,xanchor="right")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=z,y=drift,name="<i>g</i>(<i>z</i>)",mode="lines",line=driftline) %>%
-          add_trace(.,type="scatter",x=z,y=driftplus,name="<i>g</i>(<i>z</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h") %>%
-          add_trace(.,type="scatter",x=z,y=driftminus,name="<i>g</i>(<i>z</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h",showlegend=FALSE) %>%
+          add_trace(.,type="scatter",x=z,y=drift,name="<i>g</i>(<i>z</i>)",mode="lines",line=driftline,hoverinfo="x+y") %>%
+          add_trace(.,type="scatter",x=z,y=driftplus,name="<i>g</i>(<i>z</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h",hoverinfo="x+y") %>%
+          add_trace(.,type="scatter",x=z,y=driftminus,name="<i>g</i>(<i>z</i>)&plusmn;<i>h</i>",mode="lines",line=diffusionline,legendgroup="g+h",showlegend=FALSE,hoverinfo="x+y") %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -2779,7 +2779,7 @@ Analytical <- R6::R6Class("Analytical",
         diffusionline <- list(color=mgn$d,width=4)
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Diffusion2D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=z,y=diffusion,name="<i>h</i><sup>2</sup>",hoverinfo="x+y+name",mode="lines",line=diffusionline) %>%
+          add_trace(.,type="scatter",x=z,y=diffusion,name="<i>h</i><sup>2</sup>",mode="lines",line=diffusionline) %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -2881,7 +2881,7 @@ Analytical <- R6::R6Class("Analytical",
         meanline <- list(color=cyn$d,width=4)
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Mean2D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y+name") %>%
+          add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline) %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -3003,7 +3003,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -3076,11 +3076,11 @@ Analytical <- R6::R6Class("Analytical",
       else { tepsG <- list(x=timeeps,y=meanteps,text=paste(sep="","&nbsp;<i>t</i>",bsym,"=",esym,format(timeeps,digits=4),"<br>&nbsp;<i>G</i>",bsym,"=",esym,format(meanteps,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",align="left",showarrow=FALSE) }
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_MeanToConverge2D")
       fig <- plot_ly() %>%
-        add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline) %>%
-        add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),name=" ",mode="lines",line=horzline) %>%
-        add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(x,x),name=" ",mode="lines",line=horzline) %>%
-        add_trace(.,type="scatter",x=c(t[1],timeeps),y=c(meanteps,meanteps),name=paste(sep="","<i>G</i>(<i>t</i><sub>",eps,"</sub>)"),mode="lines",line=meantepsline) %>%
-        add_trace(.,type="scatter",x=c(timeeps,timeeps),y=c(mu,x),name=paste(sep="","<i>t</i><sub>",eps,"</sub>"),mode="lines",line=tepsline) %>%
+        add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),name=" ",mode="lines",line=horzline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(x,x),name=" ",mode="lines",line=horzline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(t[1],timeeps),y=c(meanteps,meanteps),name=paste(sep="","<i>G</i>(<i>t</i><sub>",eps,"</sub>)"),mode="lines",line=meantepsline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(timeeps,timeeps),y=c(mu,x),name=paste(sep="","<i>t</i><sub>",eps,"</sub>"),mode="lines",line=tepsline,hoverinfo="x+y") %>%
         config(.,toImageButtonOptions=imageoptions) %>%
         layout(.,title=lookup,annotations=tepsG,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
@@ -3202,10 +3202,10 @@ Analytical <- R6::R6Class("Analytical",
           else { legendy <- legendy+0.15 }
           legendpos <- list(orientation="h",x=1.0,y=legendy,xanchor="right")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline) %>%
-            add_trace(.,type="scatter",x=t,y=meansplus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,legendgroup="G+H") %>%
-            add_trace(.,type="scatter",x=t,y=meansminus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,legendgroup="G+H",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=t,y=meansplus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,legendgroup="G+H",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=t,y=meansminus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,legendgroup="G+H",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,showlegend=FALSE,hoverinfo="x+y") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -3219,7 +3219,7 @@ Analytical <- R6::R6Class("Analytical",
           varianceline <- list(color=mgn$d,width=4)
           imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Variance2D")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter",x=t,y=variances,name="<i>H</i><sup>2</sup>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y+name") %>%
+            add_trace(.,type="scatter",x=t,y=variances,name="<i>H</i><sup>2</sup>(<i>t</i>)",mode="lines",line=varianceline) %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -3397,7 +3397,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -3469,10 +3469,10 @@ Analytical <- R6::R6Class("Analytical",
       tepsH2 <- list(x=timeeps,y=varianceteps,text=paste(sep="","&nbsp;<i>t</i>",bsym,"=",esym,format(timeeps,digits=4),"<br>&nbsp;<i>H</i><sup>2</sup>",bsym,"=",esym,format(varianceteps,digits=4)),xref="x",yref="y",xanchor="left",yanchor="top",align="left",showarrow=FALSE)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_VarianceToConverge2D")
       fig <- plot_ly()  %>%
-        add_trace(.,type="scatter",x=t,y=variances,name="<i>H</i><sup>2</sup>(<i>t</i>)",mode="lines",line=varianceline) %>%
-        add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(asymvar,asymvar),name=" ",mode="lines",line=horzline) %>%
-        add_trace(.,type="scatter",x=c(t[1],timeeps),y=c(varianceteps,varianceteps),name=paste(sep="","<i>H</i><sup>2</sup>(t<sub>",eps,"</sub>)"),mode="lines",line=variancetepsline) %>%
-        add_trace(.,type="scatter",x=c(timeeps,timeeps),y=c(0,asymvar),name=paste(sep="","<i>t</i><sub>",eps,"</sub>"),mode="lines",line=tepsline) %>%
+        add_trace(.,type="scatter",x=t,y=variances,name="<i>H</i><sup>2</sup>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(asymvar,asymvar),name=" ",mode="lines",line=horzline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(t[1],timeeps),y=c(varianceteps,varianceteps),name=paste(sep="","<i>H</i><sup>2</sup>(t<sub>",eps,"</sub>)"),mode="lines",line=variancetepsline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(timeeps,timeeps),y=c(0,asymvar),name=paste(sep="","<i>t</i><sub>",eps,"</sub>"),mode="lines",line=tepsline,hoverinfo="x+y") %>%
         config(.,toImageButtonOptions=imageoptions) %>%
         layout(.,title=lookup,annotations=tepsH2,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
@@ -3570,7 +3570,7 @@ Analytical <- R6::R6Class("Analytical",
         i <- 1
         while(i <= m)
         {
-          fig <- add_trace(fig,type="scatter",x=y,y=densities[i,],name=paste(sep="","<i>p</i>(",t[i],"<i>,y</i>)"),mode="lines",line=densityline,opacity=lineopacity)
+          fig <- add_trace(fig,type="scatter",x=y,y=densities[i,],name=paste(sep="","<i>p</i>(",t[i],"<i>,y</i>)"),mode="lines",line=densityline,opacity=lineopacity,hoverinfo="x+y")
           i <- i+dt
           lineopacity <- lineopacity-0.05
         }
@@ -3646,7 +3646,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -3741,7 +3741,7 @@ Analytical <- R6::R6Class("Analytical",
         i <- 1
         while(i <= m)
         {
-          fig <- add_trace(fig,type="scatter",x=y,y=probabilities[i,],name=paste(sep="","<i>P</i>(",t[i],"<i>,y</i>)"),mode="lines",line=probabilityline,opacity=lineopacity)
+          fig <- add_trace(fig,type="scatter",x=y,y=probabilities[i,],name=paste(sep="","<i>P</i>(",t[i],"<i>,y</i>)"),mode="lines",line=probabilityline,opacity=lineopacity,hoverinfo="x+y")
           i <- i+dt
           lineopacity <- lineopacity-0.05
         }
@@ -3816,7 +3816,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -3911,7 +3911,7 @@ Analytical <- R6::R6Class("Analytical",
         i <- 1
         while(i <= m)
         {
-          fig <- add_trace(fig,type="scatter",x=y,y=doubleintegrals[i,],name=paste(sep="","\u2119(",t[i],"<i>,y</i>)"),mode="lines",line=doubleintegralline,opacity=lineopacity)
+          fig <- add_trace(fig,type="scatter",x=y,y=doubleintegrals[i,],name=paste(sep="","\u2119(",t[i],"<i>,y</i>)"),mode="lines",line=doubleintegralline,opacity=lineopacity,hoverinfo="x+y")
           i <- i+dt
           lineopacity <- lineopacity-0.05
         }
@@ -3986,7 +3986,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -4082,7 +4082,7 @@ Analytical <- R6::R6Class("Analytical",
         i <- 1
         while(i <= m)
         {
-          fig <- add_trace(fig,type="scatter",x=x,y=options[i,],name=paste(sep="","\uD835\uDD39(",s[i],"<i>,x</i>)"),mode="lines",line=optionline,opacity=lineopacity)
+          fig <- add_trace(fig,type="scatter",x=x,y=options[i,],name=paste(sep="","\uD835\uDD46(",s[i],"<i>,x</i>)"),mode="lines",line=optionline,opacity=lineopacity,hoverinfo="x+y")
           i <- i+ds
           lineopacity <- lineopacity-0.05
         }
@@ -4160,7 +4160,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -4273,8 +4273,8 @@ Analytical <- R6::R6Class("Analytical",
         terminalline <- list(color=gry$c,width=4)
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Envelope2D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=x,y=terminal,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline) %>%
-          add_trace(.,type="scatter",x=x,y=Ohat,name="\u00D4(<i>x</i>)",mode="lines",line=Ohatline) %>%
+          add_trace(.,type="scatter",x=x,y=terminal,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline,hoverinfo="x+y") %>%
+          add_trace(.,type="scatter",x=x,y=Ohat,name="\u00D4(<i>x</i>)",mode="lines",line=Ohatline,hoverinfo="x+y") %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -4376,7 +4376,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -4465,17 +4465,17 @@ Analytical <- R6::R6Class("Analytical",
       kline <- list(dash="dot",color=red$d,width=4)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Decision2D")
       fig <- plot_ly() %>%
-        add_trace(.,type="scatter",x=x,y=terminal,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline) %>%
-        add_trace(.,type="scatter",x=x,y=Ohat,name="\u00D4(<i>x</i>)",mode="lines",line=Ohatline) %>%
-        add_trace(.,type="scatter",x=c(k,k),y=c(0,O),name="<i>k</i>",mode="lines",line=kline)
+        add_trace(.,type="scatter",x=x,y=terminal,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=x,y=Ohat,name="\u00D4(<i>x</i>)",mode="lines",line=Ohatline,hoverinfo="x+y") %>%
+        add_trace(.,type="scatter",x=c(k,k),y=c(0,O),name="<i>k</i>",mode="lines",line=kline,hoverinfo="x+y")
       if(phi > 0)
       {
-        fig <- add_trace(fig,type="scatter",x=c(x[n],k),y=c(O,O),name="\u00D4",mode="lines",line=oline)
+        fig <- add_trace(fig,type="scatter",x=c(x[n],k),y=c(O,O),name="\u00D4",mode="lines",line=oline,hoverinfo="x+y")
         KO <- list(x=k,y=O,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(O,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",align="right",showarrow=FALSE)
       }
       else
       {
-        fig <- add_trace(fig,type="scatter",x=c(x[1],k),y=c(O,O),name="\u00D4",mode="lines",line=oline)
+        fig <- add_trace(fig,type="scatter",x=c(x[1],k),y=c(O,O),name="\u00D4",mode="lines",line=oline,hoverinfo="x+y")
         KO <- list(x=k,y=O,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(O,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",align="left",showarrow=FALSE)
       }
       fig <- config(fig,toImageButtonOptions=imageoptions) %>%
@@ -4593,7 +4593,7 @@ Analytical <- R6::R6Class("Analytical",
         {
           while(i <= m)
           {
-            fig <- add_trace(fig,type="scatter",x=x,y=obligations[i,],name=paste(sep="","\u2102(",s[i],"<i>,x</i>)"),mode="lines",line=obligationline,opacity=lineopacity)
+            fig <- add_trace(fig,type="scatter",x=x,y=obligations[i,],name=paste(sep="","\u2102(",s[i],"<i>,x</i>)"),mode="lines",line=obligationline,opacity=lineopacity,hoverinfo="x+y")
             i <- i+ds
             lineopacity <- lineopacity-0.05
           }
@@ -4602,7 +4602,7 @@ Analytical <- R6::R6Class("Analytical",
         {
           while(i <= m)
           {
-            fig <- add_trace(fig,type="scatter",x=x,y=obligations[i,],name=paste(sep="","\uD835\uDD39(",s[i],"<i>,x</i>)"),mode="lines",line=obligationline,opacity=lineopacity)
+            fig <- add_trace(fig,type="scatter",x=x,y=obligations[i,],name=paste(sep="","\uD835\uDD39(",s[i],"<i>,x</i>)"),mode="lines",line=obligationline,opacity=lineopacity,hoverinfo="x+y")
             i <- i+ds
             lineopacity <- lineopacity-0.05
           }
@@ -4801,7 +4801,7 @@ Analytical <- R6::R6Class("Analytical",
             add_trace(.,type="mesh3d",x=exercisemesh$xvertex,y=exercisemesh$yvertex,z=exercisemesh$zvertex,i=exercisemesh$ivertex,j=exercisemesh$jvertex,k=exercisemesh$kvertex,intensity=exercisemesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=opgradient,reversescale=reverse,opacity=0.7,hoverinfo="text",text=coordinatesophat)
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -4939,8 +4939,8 @@ Analytical <- R6::R6Class("Analytical",
         }
         else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
         lookdown <- list(text=xaxis)
-        densityline <- list(color=blu$e,width=4)
-        probabilityline <- list(color=grn$e,width=4)
+        densityline <- list(color=blu$d,width=4)
+        probabilityline <- list(color=grn$d,width=4)
         meandashline <- list(color=cyn$d,dash="longdash",width=3)
         meandotline <- list(color=cyn$d,dash="dot",width=3)
         mediandashline <- list(color=grn$d,dash="dash",width=3)
@@ -4972,16 +4972,16 @@ Analytical <- R6::R6Class("Analytical",
           if(rho > 0)
           {
             ptmean <- private$OUPPassageTimeDensity(s,x,tmean,k,omega,rho,mu,sigma,dt)
-            fig <- add_trace(fig,type="scatter",x=c(tmean,tmean),y=c(0,ptmean),name="mean",mode="lines",line=meandashline,legendgroup="mean") %>%
-              add_trace(.,type="scatter",x=c(s,tmean),y=c(ptmean,ptmean),name="<i>p<sub>t</sub></i>(mean)",mode="lines",line=meandotline,legendgroup="mean",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter",x=c(tmean,tmean),y=c(0,ptmean),name="mean",mode="lines",line=meandashline,legendgroup="mean",hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(s,tmean),y=c(ptmean,ptmean),name="<i>p<sub>t</sub></i>(mean)",mode="lines",line=meandotline,legendgroup="mean",showlegend=FALSE,hoverinfo="x+y")
           }
           ptmedian <- private$OUPPassageTimeDensity(s,x,tmedian,k,omega,rho,mu,sigma,dt)
           ptmode <- private$OUPPassageTimeDensity(s,x,tmode,k,omega,rho,mu,sigma,dt)
-          fig <-  add_trace(fig,type="scatter",x=c(tmedian,tmedian),y=c(0,ptmedian),name="median",mode="lines",line=mediandashline,legendgroup="median") %>%
-            add_trace(.,type="scatter",x=c(s,tmedian),y=c(ptmedian,ptmedian),name="<i>p<sub>t</sub></i>(median)",mode="lines",line=mediandotline,legendgroup="median",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=c(tmode,tmode),y=c(0,ptmode),name="mode",mode="lines",line=modedashline,legendgroup="mode") %>%
-            add_trace(.,type="scatter",x=c(s,tmode),y=c(ptmode,ptmode),name="<i>p<sub>t</sub></i>(mode)",mode="lines",line=modedotline,legendgroup="mode",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=t,y=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=densityline)
+          fig <-  add_trace(fig,type="scatter",x=c(tmedian,tmedian),y=c(0,ptmedian),name="median",mode="lines",line=mediandashline,legendgroup="median",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tmedian),y=c(ptmedian,ptmedian),name="<i>p<sub>t</sub></i>(median)",mode="lines",line=mediandotline,legendgroup="median",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(tmode,tmode),y=c(0,ptmode),name="mode",mode="lines",line=modedashline,legendgroup="mode",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tmode),y=c(ptmode,ptmode),name="<i>p<sub>t</sub></i>(mode)",mode="lines",line=modedotline,legendgroup="mode",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=t,y=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=densityline,hoverinfo="x+y")
         }
         # OUP_A_PassageTimeModeMedianMean2DPt
         else
@@ -4995,16 +4995,16 @@ Analytical <- R6::R6Class("Analytical",
           if(rho > 0)
           {
             Ptmean <- private$OUPPassageTimeProbability(s,x,tmean,k,omega,rho,mu,sigma)
-            fig <- add_trace(fig,type="scatter",x=c(tmean,tmean),y=c(0,Ptmean),name="mean",mode="lines",line=meandashline,legendgroup="mean") %>%
-              add_trace(.,type="scatter",x=c(s,tmean),y=c(Ptmean,Ptmean),name="<i>P<sub>t</sub></i>(mean)",mode="lines",line=meandotline,legendgroup="mean",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter",x=c(tmean,tmean),y=c(0,Ptmean),name="mean",mode="lines",line=meandashline,legendgroup="mean",hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(s,tmean),y=c(Ptmean,Ptmean),name="<i>P<sub>t</sub></i>(mean)",mode="lines",line=meandotline,legendgroup="mean",showlegend=FALSE,hoverinfo="x+y")
           }
           Ptmedian <- private$OUPPassageTimeProbability(s,x,tmedian,k,omega,rho,mu,sigma)
           Ptmode <- private$OUPPassageTimeProbability(s,x,tmode,k,omega,rho,mu,sigma)
-          fig <-  add_trace(fig,type="scatter",x=c(tmedian,tmedian),y=c(0,Ptmedian),name="median",mode="lines",line=mediandashline,legendgroup="median") %>%
-            add_trace(.,type="scatter",x=c(s,tmedian),y=c(Ptmedian,Ptmedian),name="<i>P<sub>t</sub></i>(median)",mode="lines",line=mediandotline,legendgroup="median",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=c(tmode,tmode),y=c(0,Ptmode),name="mode",mode="lines",line=modedashline,legendgroup="mode") %>%
-            add_trace(.,type="scatter",x=c(s,tmode),y=c(Ptmode,Ptmode),name="<i>P<sub>t</sub></i>(mode)",mode="lines",line=modedotline,legendgroup="mode",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=t,y=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=probabilityline)
+          fig <-  add_trace(fig,type="scatter",x=c(tmedian,tmedian),y=c(0,Ptmedian),name="median",mode="lines",line=mediandashline,legendgroup="median",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tmedian),y=c(Ptmedian,Ptmedian),name="<i>P<sub>t</sub></i>(median)",mode="lines",line=mediandotline,legendgroup="median",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(tmode,tmode),y=c(0,Ptmode),name="mode",mode="lines",line=modedashline,legendgroup="mode",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tmode),y=c(Ptmode,Ptmode),name="<i>P<sub>t</sub></i>(mode)",mode="lines",line=modedotline,legendgroup="mode",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=t,y=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=probabilityline,hoverinfo="x+y")
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
@@ -5067,27 +5067,27 @@ Analytical <- R6::R6Class("Analytical",
           if(is.finite(tmean)) { if(tmean > legendy) { legendy <- tmean } }
           if(is.finite(tmedian)) { if(tmedian > legendy) { legendy <- tmedian } }
           if(is.finite(tmode)) { if(tmode > legendy) { legendy <- tmode } }
-          if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(tmedian,tmean),name="mean",mode="lines",line=meandotline) }
-          fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(tmode,tmedian),name="median",mode="lines",line=mediandotline) %>%
-            add_trace(.,type="scatter",x=c(x,x),y=c(s,tmode),name="mode",mode="lines",line=modedotline) %>%
-            add_trace(.,type="scatter",x=c(z[1],z[n]),y=c(s,s),mode="lines",line=horzline)
+          if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(tmedian,tmean),name="mean",mode="lines",line=meandotline,hoverinfo="x+y") }
+          fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(tmode,tmedian),name="median",mode="lines",line=mediandotline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(x,x),y=c(s,tmode),name="mode",mode="lines",line=modedotline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(z[1],z[n]),y=c(s,s),mode="lines",line=horzline,hoverinfo="x+y")
           if(x > k)
           {
-            if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tmean,tmean),name="mean",mode="lines",line=meandashline) }
-            fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tmedian,tmedian),name="median",mode="lines",line=mediandashline) %>%
-              add_trace(.,type="scatter",x=c(x,z[n]),y=c(tmode,tmode),name="mode",mode="lines",line=modedashline)
-            xmmm <- list(x=x,y=legendy,text=paste(sep="","mean",bsym,"=",esym,format(tmean,digits=4),"<br>median",bsym,"=",esym,format(tmedian,digits=4),"<br>mode",bsym,"=",esym,format(tmode,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",align="right",showarrow=FALSE)
+            if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tmean,tmean),name="mean",mode="lines",line=meandashline,hoverinfo="x+y") }
+            fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tmedian,tmedian),name="median",mode="lines",line=mediandashline,hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(x,z[n]),y=c(tmode,tmode),name="mode",mode="lines",line=modedashline,hoverinfo="x+y")
+            xmmm <- list(x=x,y=legendy,text=paste(sep="","mean",bsym,"=",esym,format(tmean,digits=4),"<br>median",bsym,"=",esym,format(tmedian,digits=4),"<br>mode",bsym,"=",esym,format(tmode,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",align="right",showarrow=FALSE,hoverinfo="x+y")
           }
           else
           {
-            if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tmean,tmean),name="mean",mode="lines",line=meandashline) }
-            fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tmedian,tmedian),name="median",mode="lines",line=mediandashline) %>%
-              add_trace(.,type="scatter",x=c(z[1],x),y=c(tmode,tmode),name="mode",mode="lines",line=modedashline)
+            if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tmean,tmean),name="mean",mode="lines",line=meandashline,hoverinfo="x+y") }
+            fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tmedian,tmedian),name="median",mode="lines",line=mediandashline,hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(z[1],x),y=c(tmode,tmode),name="mode",mode="lines",line=modedashline,hoverinfo="x+y")
             xmmm <- list(x=x,y=legendy,text=paste(sep="","mean",bsym,"=",esym,format(tmean,digits=4),"<br>median",bsym,"=",esym,format(tmedian,digits=4),"<br>mode",bsym,"=",esym,format(tmode,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",align="left",showarrow=FALSE)
           }
-          if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=z,y=tmeans,name="mean(<i>z</i>)",mode="lines",line=meanline) }
-          fig <- add_trace(fig,type="scatter",x=z,y=tmedians,name="median(<i>z</i>)",mode="lines",line=medianline) %>%
-            add_trace(.,type="scatter",x=z,y=tmodes,name="mode(<i>z</i>)",mode="lines",line=modeline) %>%
+          if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=z,y=tmeans,name="mean(<i>z</i>)",mode="lines",line=meanline,hoverinfo="x+y") }
+          fig <- add_trace(fig,type="scatter",x=z,y=tmedians,name="median(<i>z</i>)",mode="lines",line=medianline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=z,y=tmodes,name="mode(<i>z</i>)",mode="lines",line=modeline,hoverinfo="x+y") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,annotations=xmmm,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -5099,10 +5099,10 @@ Analytical <- R6::R6Class("Analytical",
           else if(legendx > 0.85) { legendx <- 0.85 }
           legendpos <- list(x=legendx,y=1.0,xanchor="center",yanchor="top")
           imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_PassageTimeModeMedianMean2D")
-          if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=z,y=tmeans,name="mean(<i>z</i>)",mode="lines",line=meanline) }
-          fig <-  add_trace(fig,type="scatter",x=z,y=tmedians,name="median(<i>z</i>)",mode="lines",line=medianline) %>%
-            add_trace(.,type="scatter",x=z,y=tmodes,name="mode(<i>z</i>)",mode="lines",line=modeline) %>%
-            add_trace(.,type="scatter",x=c(z[1],z[n]),y=c(s,s),mode="lines",line=horzline,showlegend=FALSE) %>%
+          if(is.finite(tmean)) { fig <- add_trace(fig,type="scatter",x=z,y=tmeans,name="mean(<i>z</i>)",mode="lines",line=meanline,hoverinfo="x+y") }
+          fig <-  add_trace(fig,type="scatter",x=z,y=tmedians,name="median(<i>z</i>)",mode="lines",line=medianline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=z,y=tmodes,name="mode(<i>z</i>)",mode="lines",line=modeline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(z[1],z[n]),y=c(s,s),mode="lines",line=horzline,showlegend=FALSE,hoverinfo="x+y") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -5354,7 +5354,7 @@ Analytical <- R6::R6Class("Analytical",
           fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=Ptxline,hoverinfo="text",text=coordinatex,visible="legendonly")
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -5451,18 +5451,18 @@ Analytical <- R6::R6Class("Analytical",
         variancedashline <- list(color=mgn$d,dash="longdash",width=3)
         variancedotline <- list(color=mgn$d,dash="dot",width=3)
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_PassageTimeVariance2Dx")
-        fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(0,tvariance),name="variance",mode="lines",line=variancedotline)
+        fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(0,tvariance),name="variance",mode="lines",line=variancedotline,hoverinfo="x+y")
         if(x > k)
         {
-          fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tvariance,tvariance),name="variance",mode="lines",line=variancedashline)
+          fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tvariance,tvariance),name="variance",mode="lines",line=variancedashline,hoverinfo="x+y")
           xv <- list(x=x,y=tvariance,text=paste(sep="","variance",bsym,"=",esym,format(tvariance,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",align="right",showarrow=FALSE)
         }
         else
         {
-          fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tvariance,tvariance),name="variance",mode="lines",line=variancedashline)
+          fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tvariance,tvariance),name="variance",mode="lines",line=variancedashline,hoverinfo="x+y")
           xv <- list(x=x,y=tvariance,text=paste(sep="","variance",bsym,"=",esym,format(tvariance,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",align="left",showarrow=FALSE)
         }
-        fig <- add_trace(fig,type="scatter",x=z,y=tvariances,name="variance(<i>z</i>)",mode="lines",line=varianceline) %>%
+        fig <- add_trace(fig,type="scatter",x=z,y=tvariances,name="variance(<i>z</i>)",mode="lines",line=varianceline,hoverinfo="x+y") %>%
           config(.,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,annotations=xv,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
@@ -5643,13 +5643,13 @@ Analytical <- R6::R6Class("Analytical",
           ptupper <- private$OUPPassageTimeDensity(s,x,tupper,k,omega,rho,mu,sigma,dt)
           pthalf <- private$OUPPassageTimeDensity(s,x,thalf,k,omega,rho,mu,sigma,dt)
           ptlower <- private$OUPPassageTimeDensity(s,x,tlower,k,omega,rho,mu,sigma,dt)
-          fig <- add_trace(fig,type="scatter",x=c(tupper,tupper),y=c(0,ptupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline,legendgroup="upper") %>%
-            add_trace(.,type="scatter",x=c(s,tupper),y=c(ptupper,ptupper),name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=upperdotline,legendgroup="upper",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=c(thalf,thalf),y=c(0,pthalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline,legendgroup="half") %>%
-            add_trace(.,type="scatter",x=c(s,thalf),y=c(pthalf,pthalf),name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=halfdotline,legendgroup="half",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=c(tlower,tlower),y=c(0,ptlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline,legendgroup="lower") %>%
-            add_trace(.,type="scatter",x=c(s,tlower),y=c(ptlower,ptlower),name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=lowerdotline,legendgroup="lower",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=t,y=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=densityline)
+          fig <- add_trace(fig,type="scatter",x=c(tupper,tupper),y=c(0,ptupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline,legendgroup="upper",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tupper),y=c(ptupper,ptupper),name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=upperdotline,legendgroup="upper",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(thalf,thalf),y=c(0,pthalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline,legendgroup="half",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,thalf),y=c(pthalf,pthalf),name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=halfdotline,legendgroup="half",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(tlower,tlower),y=c(0,ptlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline,legendgroup="lower",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tlower),y=c(ptlower,ptlower),name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=lowerdotline,legendgroup="lower",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=t,y=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=densityline,hoverinfo="x+y")
         }
         # OUP_A_PassageTimePercentiles2DPt
         else
@@ -5663,13 +5663,13 @@ Analytical <- R6::R6Class("Analytical",
           Ptupper <- private$OUPPassageTimeProbability(s,x,tupper,k,omega,rho,mu,sigma)
           Pthalf <- private$OUPPassageTimeProbability(s,x,thalf,k,omega,rho,mu,sigma)
           Ptlower <- private$OUPPassageTimeProbability(s,x,tlower,k,omega,rho,mu,sigma)
-          fig <- add_trace(fig,type="scatter",x=c(tupper,tupper),y=c(0,Ptupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline,legendgroup="upper") %>%
-            add_trace(.,type="scatter",x=c(s,tupper),y=c(Ptupper,Ptupper),name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=upperdotline,legendgroup="upper",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=c(thalf,thalf),y=c(0,Pthalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline,legendgroup="half") %>%
-            add_trace(.,type="scatter",x=c(s,thalf),y=c(Pthalf,Pthalf),name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=halfdotline,legendgroup="half",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=c(tlower,tlower),y=c(0,Ptlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline,legendgroup="lower") %>%
-            add_trace(.,type="scatter",x=c(s,tlower),y=c(Ptlower,Ptlower),name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=lowerdotline,legendgroup="lower",showlegend=FALSE) %>%
-            add_trace(.,type="scatter",x=t,y=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=probabilityline)
+          fig <- add_trace(fig,type="scatter",x=c(tupper,tupper),y=c(0,Ptupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline,legendgroup="upper",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tupper),y=c(Ptupper,Ptupper),name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=upperdotline,legendgroup="upper",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(thalf,thalf),y=c(0,Pthalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline,legendgroup="half",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,thalf),y=c(Pthalf,Pthalf),name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=halfdotline,legendgroup="half",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(tlower,tlower),y=c(0,Ptlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline,legendgroup="lower",hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(s,tlower),y=c(Ptlower,Ptlower),name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=lowerdotline,legendgroup="lower",showlegend=FALSE,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=t,y=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=probabilityline,hoverinfo="x+y")
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
           layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
@@ -5712,27 +5712,27 @@ Analytical <- R6::R6Class("Analytical",
           imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_PassageTimePercentiles2Dx")
           legendy <- s
           if(tupper > legendy) { legendy <- tupper }
-          fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(thalf,tupper),name="<i>x</i>",mode="lines",line=upperdotline) %>%
-            add_trace(.,type="scatter",x=c(x,x),y=c(tlower,thalf),name="<i>x</i>",mode="lines",line=halfdotline) %>%
-            add_trace(.,type="scatter",x=c(x,x),y=c(s,tlower),name="<i>x</i>",mode="lines",line=lowerdotline) %>%
-            add_trace(.,type="scatter",x=c(z[1],z[n]),y=c(s,s),mode="lines",line=horzline)
+          fig <- add_trace(fig,type="scatter",x=c(x,x),y=c(thalf,tupper),name="<i>x</i>",mode="lines",line=upperdotline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(x,x),y=c(tlower,thalf),name="<i>x</i>",mode="lines",line=halfdotline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(x,x),y=c(s,tlower),name="<i>x</i>",mode="lines",line=lowerdotline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=c(z[1],z[n]),y=c(s,s),mode="lines",line=horzline,hoverinfo="x+y")
           if(x > k)
           {
-            fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tupper,tupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline) %>%
-              add_trace(.,type="scatter",x=c(x,z[n]),y=c(thalf,thalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline) %>%
-              add_trace(.,type="scatter",x=c(x,z[n]),y=c(tlower,tlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline)
+            fig <- add_trace(fig,type="scatter",x=c(x,z[n]),y=c(tupper,tupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline,hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(x,z[n]),y=c(thalf,thalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline,hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(x,z[n]),y=c(tlower,tlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline,hoverinfo="x+y")
             xmmm <- list(x=x,y=legendy,text=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>",bsym,"=",esym,format(tupper,digits=4),"<br><i>t</i><sub>",format(Phalf,digits=4),"</sub>",bsym,"=",esym,format(thalf,digits=4),"<br><i>t</i><sub>",format(Plower,digits=4),"</sub>",bsym,"=",esym,format(tlower,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",align="right",showarrow=FALSE)
           }
           else
           {
-            fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tupper,tupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline) %>%
-              add_trace(.,type="scatter",x=c(z[1],x),y=c(thalf,thalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline) %>%
-              add_trace(.,type="scatter",x=c(z[1],x),y=c(tlower,tlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline)
+            fig <- add_trace(fig,type="scatter",x=c(z[1],x),y=c(tupper,tupper),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperdashline,hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(z[1],x),y=c(thalf,thalf),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfdashline,hoverinfo="x+y") %>%
+              add_trace(.,type="scatter",x=c(z[1],x),y=c(tlower,tlower),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerdashline,hoverinfo="x+y")
             xmmm <- list(x=x,y=legendy,text=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>",bsym,"=",esym,format(tupper,digits=4),"<br><i>t</i><sub>",format(Phalf,digits=4),"</sub>",bsym,"=",esym,format(thalf,digits=4),"<br><i>t</i><sub>",format(Plower,digits=4),"</sub>",bsym,"=",esym,format(tlower,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",align="left",showarrow=FALSE)
           }
-          fig <- add_trace(fig,type="scatter",x=z,y=tuppers,name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperline) %>%
-            add_trace(.,type="scatter",x=z,y=thalfs,name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfline) %>%
-            add_trace(.,type="scatter",x=z,y=tlowers,name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerline) %>%
+          fig <- add_trace(fig,type="scatter",x=z,y=tuppers,name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>"),mode="lines",line=upperline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=z,y=thalfs,name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>"),mode="lines",line=halfline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=z,y=tlowers,name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>"),mode="lines",line=lowerline,hoverinfo="x+y") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,annotations=xmmm,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -5744,9 +5744,9 @@ Analytical <- R6::R6Class("Analytical",
           else if(legendx > 0.85) { legendx <- 0.85 }
           legendpos <- list(x=legendx,y=1.0,xanchor="center",yanchor="top")
           imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_PassageTimePercentiles2D")
-          fig <- add_trace(fig,type="scatter",x=z,y=tuppers,name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=upperline) %>%
-            add_trace(.,type="scatter",x=z,y=thalfs,name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=halfline) %>%
-            add_trace(.,type="scatter",x=z,y=tlowers,name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=lowerline) %>%
+          fig <- add_trace(fig,type="scatter",x=z,y=tuppers,name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=upperline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=z,y=thalfs,name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=halfline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=z,y=tlowers,name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=lowerline,hoverinfo="x+y") %>%
             add_trace(.,type="scatter",x=c(z[1],z[n]),y=c(s,s),mode="lines",line=horzline,showlegend=FALSE) %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
@@ -5967,7 +5967,7 @@ Analytical <- R6::R6Class("Analytical",
           fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=Ptxline,hoverinfo="text",text=coordinatex,visible="legendonly")
         }
         fig <- config(fig,toImageButtonOptions=imageoptions) %>%
-          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+          layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
       return(fig)
     },
@@ -6089,16 +6089,16 @@ Analytical <- R6::R6Class("Analytical",
           lineopacity <- 0.75
           j <- 1
           q <- 1
-          fig <- add_trace(fig,type="scatter",x=t,y=pt[,j],name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)"),mode="lines",line=ptline,opacity=lineopacity,legendgroup="pt")
+          fig <- add_trace(fig,type="scatter",x=t,y=pt[,j],name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)"),mode="lines",line=ptline,opacity=lineopacity,legendgroup="pt",hoverinfo="x+y")
           while(j <= n)
           {
-            fig <- add_trace(fig,type="scatter",x=t,y=pt[,j],name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|",z[j],")"),mode="lines",line=ptline,opacity=lineopacity,legendgroup="pt",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter",x=t,y=pt[,j],name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|",z[j],")"),mode="lines",line=ptline,opacity=lineopacity,legendgroup="pt",showlegend=FALSE,hoverinfo="x+y")
             j <- j+dx
             q <- q+1
             if(q < 7) { lineopacity <- lineopacity+0.05 }
             else { lineopacity <- lineopacity-0.05 }
           }
-          fig <- add_trace(fig,type="scatter",x=t,y=ptx,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),mode="lines",line=ptxline,visible="legendonly") %>%
+          fig <- add_trace(fig,type="scatter",x=t,y=ptx,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),mode="lines",line=ptxline,visible="legendonly",hoverinfo="x+y") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -6106,7 +6106,7 @@ Analytical <- R6::R6Class("Analytical",
         else
         {
           imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_PassageTimeDensity2DOneCurve")
-          fig <- add_trace(fig,type="scatter",x=t,y=ptx,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),hoverinfo="x+y+name",mode="lines",line=ptxline) %>%
+          fig <- add_trace(fig,type="scatter",x=t,y=ptx,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),mode="lines",line=ptxline) %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -6154,7 +6154,7 @@ Analytical <- R6::R6Class("Analytical",
           fig <- plot_ly() %>%
             add_trace(.,type="surface",x=z,y=t,z=pt,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates) %>%
             config(.,toImageButtonOptions=imageoptions) %>%
-            layout(.,title=lookup,annotations=lookdown,scene=view,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+            layout(.,title=lookup,annotations=lookdown,scene=view,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
         }
         # OUP_A_PassageTimeDensity3DSurfaceScatter
         else if(type < 4.5)
@@ -6191,7 +6191,7 @@ Analytical <- R6::R6Class("Analytical",
           }
           fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=ptxline,hoverinfo="text",text=coordinatex,visible="legendonly") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
-            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
         }
         # OUP_A_PassageTimeDensity3DScatter
         else
@@ -6228,7 +6228,7 @@ Analytical <- R6::R6Class("Analytical",
           }
           fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=ptxline,hoverinfo="text",text=coordinatex,visible="legendonly") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
-            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
         }
       }
       return(fig)
@@ -6344,17 +6344,17 @@ Analytical <- R6::R6Class("Analytical",
           lineopacity <- 0.75
           j <- 1
           q <- 1
-          fig <- add_trace(fig,type="scatter",x=t,y=Pt[,j],name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)"),mode="lines",line=Ptline,opacity=lineopacity,legendgroup="Pt")
+          fig <- add_trace(fig,type="scatter",x=t,y=Pt[,j],name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)"),mode="lines",line=Ptline,opacity=lineopacity,legendgroup="Pt",hoverinfo="x+y")
           while(j <= n)
           {
-            fig <- add_trace(fig,type="scatter",x=t,y=Pt[,j],name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|",z[j],")"),mode="lines",line=Ptline,opacity=lineopacity,legendgroup="Pt",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter",x=t,y=Pt[,j],name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|",z[j],")"),mode="lines",line=Ptline,opacity=lineopacity,legendgroup="Pt",showlegend=FALSE,hoverinfo="x+y")
             j <- j+dx
             q <- q+1
             if(q < 7) { lineopacity <- lineopacity+0.05 }
             else { lineopacity <- lineopacity-0.05 }
           }
-          if(kindex > 0) { fig <- add_trace(fig,type="scatter",x=c(t[1],t[1]),y=c(0,Pt[1,kindex]),mode="lines",line=Ptline,legendgroup="Pt",showlegend=FALSE) }
-          fig <- add_trace(fig,type="scatter",x=t,y=Ptx,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),mode="lines",line=Ptxline,visible="legendonly") %>%
+          if(kindex > 0) { fig <- add_trace(fig,type="scatter",x=c(t[1],t[1]),y=c(0,Pt[1,kindex]),mode="lines",line=Ptline,legendgroup="Pt",showlegend=FALSE,hoverinfo="x+y") }
+          fig <- add_trace(fig,type="scatter",x=t,y=Ptx,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),mode="lines",line=Ptxline,visible="legendonly",hoverinfo="x+y") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -6362,7 +6362,7 @@ Analytical <- R6::R6Class("Analytical",
         else
         {
           imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_PassageTimeProbability2DOneCurve")
-          fig <- add_trace(fig,type="scatter",x=t,y=Ptx,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),mode="lines",line=Ptxline,hoverinfo="x+y+name") %>%
+          fig <- add_trace(fig,type="scatter",x=t,y=Ptx,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)"),mode="lines",line=Ptxline) %>%
             config(.,toImageButtonOptions=imageoptions) %>%
             layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
@@ -6404,7 +6404,7 @@ Analytical <- R6::R6Class("Analytical",
           fig <- plot_ly() %>%
             add_trace(.,type="surface",x=z,y=t,z=Pt,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates) %>%
             config(.,toImageButtonOptions=imageoptions) %>%
-            layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+            layout(.,title=lookup,annotations=lookdown,scene=view,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
         }
         # OUP_A_PassageTimeProbability3DSurfaceScatter
         else if(type < 4.5)
@@ -6442,7 +6442,7 @@ Analytical <- R6::R6Class("Analytical",
           }
           fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=Ptxline,hoverinfo="text",text=coordinatex,visible="legendonly") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
-            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
         }
         # OUP_A_PassageTimeProbability3DScatter
         else
@@ -6480,7 +6480,7 @@ Analytical <- R6::R6Class("Analytical",
           }
           fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=Ptxline,hoverinfo="text",text=coordinatex,visible="legendonly") %>%
             config(.,toImageButtonOptions=imageoptions) %>%
-            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,hoverlabel=hover,margin=list(t=0,r=0,b=0,l=0))
+            layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
         }
       }
       return(fig)
