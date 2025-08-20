@@ -4939,8 +4939,8 @@ Analytical <- R6::R6Class("Analytical",
         }
         else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
         lookdown <- list(text=xaxis)
-        densityline <- list(color=blu$d,width=4)
-        probabilityline <- list(color=grn$d,width=4)
+        densityline <- list(color=blu$d,width=4,shape="spline",smoothing=1.3)
+        probabilityline <- list(color=grn$d,width=4,shape="spline",smoothing=1.3)
         meandashline <- list(color=cyn$d,dash="longdash",width=3)
         meandotline <- list(color=cyn$d,dash="dot",width=3)
         mediandashline <- list(color=grn$d,dash="dash",width=3)
@@ -5614,8 +5614,8 @@ Analytical <- R6::R6Class("Analytical",
         }
         else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
         lookdown <- list(text=xaxis)
-        densityline <- list(color=blu$d,width=4)
-        probabilityline <- list(color=grn$d,width=4)
+        densityline <- list(color=blu$d,width=4,shape="spline",smoothing=1.3)
+        probabilityline <- list(color=grn$d,width=4,shape="spline",smoothing=1.3)
         upperdashline <- list(color=grn$d,dash="longdash",width=3)
         upperdotline <- list(color=grn$d,dash="dot",width=3)
         halfdashline <- list(color=grn$d,dash="dash",width=3)
