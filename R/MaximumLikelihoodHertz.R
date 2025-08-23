@@ -98,7 +98,7 @@ library(stringr)
 #'
 #' The available data sets are documented. To see the documentation, type:
 #'
-#'       ?ML_
+#'       ?
 #'
 #'  and then select from the drop-down list.
 #'
@@ -153,7 +153,11 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       # plot info ----
       plotfont <- list(family="Cambria",size=14)
       plotfile <- list(format="png",width=640,height=480)
-      plottheme <- list(name="dark",opaque=1.0)
+      plottheme <- list(name="light",opaque=1.0)
+      if(rstudioapi::isAvailable())
+      {
+        if(rstudioapi::getThemeInfo()$dark) { plottheme$name <- "dark"}
+      }
       private$plot_info <- list(plotfont=plotfont,plotfile=plotfile,plottheme=plottheme,plotlabels=TRUE)
       private$plot_colors <- private$rainbow(plottheme$name,plottheme$opaque)
     },
@@ -2392,7 +2396,7 @@ NULL
 #' \itemize{
 #'   \item year: time variable in annual increments
 #'   \item Data: simulated sample path
-#'   \item G uno-G diez: ten successively smoother paths
+#'   \item G uno-G nueve: nine successively smoother paths
 #' }
 #'
 #' Simulated data is smoothed ten times.  First, the parameters are estimated
@@ -2402,9 +2406,9 @@ NULL
 #'  The true rate of convergence, rho, and location, mu, are recovered from
 #'  each estimation, but the scale, sigma, goes toward zero.
 #'
-#' By the ninth smoothing, the log of the likelihood becomes positive. Hence,
+#' By the eighth smoothing, the log of the likelihood becomes positive. Hence,
 #'  the likelihood, as the anti-log, becomes greater than one. In other words,
-#'  if the ninth and tenth smoothings were real samples, the probability of
+#'  if the eighth and ninth smoothings were real samples, the probability of
 #'  observing them would be greater than 100%. Further smoothings would increase
 #'  this probability.  A small sigma is a tell-tale sign the data has been smoothed.
 #'  A positive log likelihood is a sure sign.
