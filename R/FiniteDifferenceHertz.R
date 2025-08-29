@@ -173,16 +173,13 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_transcendental_args <- list(xo=25,xi=10,xm=-5,Vmax=10,Vmin=0)
       private$V_yieldindex_args <- list(xo=25,xi=10,xm=-5,Vmax=8,Vmin=-2)
       private$V_info <- list(Ix=4,name="Kinked",names=list("Linear","Degenerate","Stepped","Kinked","Butterfly","Mitscherlich","Gompertz","Logistic","Transcendental","Yield Index"),text="Linear, Degenerate, Stepped, Kinked, Butterfly, Mitscherlich, Gompertz, Logistic, Transcendental, Yield Index")
-      self$default_save()
+      private$undo_args <- list(list(oup_params=private$oup_params,x_stoch_args=private$x_stoch_args,V_linear_args=private$V_linear_args,V_degenerate_args=private$V_degenerate_args,V_stepped_args=private$V_stepped_args,V_kinked_args=private$V_kinked_args,V_butterfly_args=private$V_butterfly_args,V_mitscherlich_args=private$V_mitscherlich_args,V_gompertz_args=private$V_gompertz_args,V_logistic_args=private$V_logistic_args,V_transcendental_args=private$V_transcendental_args,V_yieldindex_args=private$V_yieldindex_args,V_info=private$V_info))
+      private$undoIx <- 1
       # plot info ----
       plottype <- list(type=3)
       plotfont <- list(family="Cambria",size=14)
       plotfile <- list(format="png",width=640,height=480)
-      plottheme <- list(name="light",opaque=1.0)
-      if(rstudioapi::isAvailable())
-      {
-        if(rstudioapi::getThemeInfo()$dark) { plottheme$name <- "dark"}
-      }
+      plottheme <- list(name="dark",opaque=1.0)
       plot3D <- list(walls=TRUE,floor=TRUE)
       private$plot_info <- list(plottype=plottype,plotfont=plotfont,plotfile=plotfile,plottheme=plottheme,plot3D=plot3D,plotlabels=TRUE)
       private$plot_colors <- private$rainbow(plottheme$name,plottheme$opaque)
@@ -1748,6 +1745,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           else { message("'name' is not recognized. Names are: ",private$V_info$text) }
         }
       }
+
       return(private$V_info)
     },
     #' @description
@@ -2073,17 +2071,14 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       }
       return(NULL)
     },
-    # public default methods ----
+    # public undo methods ----
     #' @description
-    #' Get default
-    #' @return list(oup_params,x_stoch_args,V_linear_args,V_degenerate_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,V_info)
-    get_default = function() { return(private$default) },
-    #' @description
-    #' Save to_default->current arguments are stored as defaults
-    #' @return NULL
-    default_save = function()
+    #' Clear undo list and save current arguments to list
+    #' @return 1
+    undo_clear = function()
     {
-      private$default <- list(oup_params=private$oup_params,
+      private$undo_args <- NULL
+      private$undo_args <- list(list(oup_params=private$oup_params,
         x_stoch_args=private$x_stoch_args,
         V_linear_args=private$V_linear_args,
         V_degenerate_args=private$V_degenerate_args,
@@ -2095,37 +2090,116 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         V_logistic_args=private$V_logistic_args,
         V_transcendental_args=private$V_transcendental_args,
         V_yieldindex_args=private$V_yieldindex_args,
-        V_info=private$V_info)
+        V_info=private$V_info))
+      private$undoIx <- 1
 
-      return(NULL)
+      return(1)
     },
     #' @description
-    #' Read from default<-defaults replace current arguments
-    #' @return NULL
-    default_read = function()
+    #' Save current arguments to undo list
+    #' @return number of argument sets
+    undo_save = function()
     {
-      private$oup_params <- private$default[[1]]
+      n <- length(private$undo_args)
+      last_undo_args <- private$undo_args[[n]]
+      not_equal <- TRUE
+      if(private$lists_equal(last_undo_args[[1]],private$oup_params))
+      {
+        if(private$lists_equal(last_undo_args[[2]],private$x_stoch_args))
+        {
+          if(private$lists_equal(last_undo_args[[3]],private$V_linear_args))
+          {
+            if(private$lists_equal(last_undo_args[[4]],private$V_degenerate_args))
+            {
+              if(private$lists_equal(last_undo_args[[5]],private$V_stepped_args))
+              {
+                if(private$lists_equal(last_undo_args[[6]],private$V_kinked_args))
+                {
+                  if(private$lists_equal(last_undo_args[[7]],private$V_butterfly_args))
+                  {
+                    if(private$lists_equal(last_undo_args[[8]],private$V_mitscherlich_args))
+                    {
+                      if(private$lists_equal(last_undo_args[[9]],private$V_gompertz_args))
+                      {
+                        if(private$lists_equal(last_undo_args[[10]],private$V_logistic_args))
+                        {
+                          if(private$lists_equal(last_undo_args[[11]],private$V_transcendental_args))
+                          {
+                            if(private$lists_equal(last_undo_args[[12]],private$V_yieldindex_args))
+                            {
+                              if(last_undo_args[[13]][[1]] == private$V_info[[1]])
+                              {
+                                if(last_undo_args[[13]][[2]] == private$V_info[[2]])
+                                {
+                                  not_equal <- FALSE
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      if(not_equal)
+      {
+        private$undo_args <- append(private$undo_args,
+          list(list(oup_params=private$oup_params,
+            x_stoch_args=private$x_stoch_args,
+            V_linear_args=private$V_linear_args,
+            V_degenerate_args=private$V_degenerate_args,
+            V_stepped_args=private$V_stepped_args,
+            V_kinked_args=private$V_kinked_args,
+            V_butterfly_args=private$V_butterfly_args,
+            V_mitscherlich_args=private$V_mitscherlich_args,
+            V_gompertz_args=private$V_gompertz_args,
+            V_logistic_args=private$V_logistic_args,
+            V_transcendental_args=private$V_transcendental_args,
+            V_yieldindex_args=private$V_yieldindex_args,
+            V_info=private$V_info)))
+        n <- n+1
+      }
+
+      return(n)
+    },
+    #' @description
+    #' Replace current arguments from undo list
+    #' @return c(index of this argument set, number of argument sets)
+    undo_undo = function()
+    {
+      n <- length(private$undo_args)
+      this_Ix <- private$undoIx
+      these_undo_args <- private$undo_args[[this_Ix]]
+      private$oup_params <- these_undo_args[[1]]
       rho <- private$oup_params$rho
       mu <- private$oup_params$mu
       sigma <- private$oup_params$sigma
       if(!is.null(private$OUP)) { private$OUP$send_oup_params(rho,mu,sigma,"FD") }
-      private$x_stoch_args <- private$default[[2]]
+      private$x_stoch_args <- these_undo_args[[2]]
       s <- private$x_stoch_args$s
       x <- private$x_stoch_args$x
       r <- private$x_stoch_args$r
       phi <- private$x_stoch_args$phi
       if(!is.null(private$OUP)) { private$OUP$send_x_stoch_args(s,x,r,phi,"FD") }
-      private$V_linear_args <- private$default[[3]]
-      private$V_degenerate_args <- private$default[[4]]
-      private$V_stepped_args <- private$default[[5]]
-      private$V_kinked_args <- private$default[[6]]
-      private$V_butterfly_args <- private$default[[7]]
-      private$V_mitscherlich_args <- private$default[[8]]
-      private$V_gompertz_args <- private$default[[9]]
-      private$V_logistic_args <- private$default[[10]]
-      private$V_transcendental_args <- private$default[[11]]
-      private$V_yieldindex_args <- private$default[[12]]
-      private$V_info <- private$default[[13]]
+      private$V_linear_args <- these_undo_args[[3]]
+      private$V_degenerate_args <- these_undo_args[[4]]
+      private$V_stepped_args <- these_undo_args[[5]]
+      private$V_kinked_args <- these_undo_args[[6]]
+      private$V_butterfly_args <- these_undo_args[[7]]
+      private$V_mitscherlich_args <- these_undo_args[[8]]
+      private$V_gompertz_args <- these_undo_args[[9]]
+      private$V_logistic_args <- these_undo_args[[10]]
+      private$V_transcendental_args <- these_undo_args[[11]]
+      private$V_yieldindex_args <- these_undo_args[[12]]
+      private$V_info <- these_undo_args[[13]]
+      next_Ix <- this_Ix+1
+      if(next_Ix > n) { next_Ix <- 1 }
+      private$undoIx <- next_Ix
       private$g <- NULL
       private$h2 <- NULL
       private$V_linear <- NULL
@@ -2142,7 +2216,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$Ohat <- NULL
       private$kOhat <- NULL
 
-      return(NULL)
+      return(c(this_Ix,n))
     },
     # public calculate methods ----
     #' @description
@@ -3781,8 +3855,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     V_logistic_args = NULL,
     V_transcendental_args = NULL,
     V_yieldindex_args = NULL,
+    undo_args = NULL,
     plot_info = NULL,
-    default = NULL,
+    # private globals ----
+    undoIx = NULL,
     # private intermediate fields ----
     g = NULL,
     h2 = NULL,
@@ -3993,6 +4069,23 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         else { message(paste("non-character input:",input)) }
       }
       return(clr)
+    },
+    lists_equal = function(list1,list2)
+    {
+      allequal <- TRUE
+      n1 <- length(list1)
+      n2 <- length(list2)
+      if(n1 == n2)
+      {
+        j <- 0
+        while(j < n1 & allequal == TRUE )
+        {
+          j <- j+1
+          allequal <- vecs_equal(list1[[j]],list2[[j]])
+        }
+      }
+      else { allequal <- FALSE }
+      return(allequal)
     },
     vecs_equal = function(vec1,vec2)
     {

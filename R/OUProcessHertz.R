@@ -487,11 +487,11 @@ OUProcess <- R6::R6Class("OUProcess",
 #'   OUPHelp()
 OUPHelp = function()
 {
-  help("MonteCarlo","GregsOUPR6")
-  help("MaximumLikelihood","GregsOUPR6")
-  help("FiniteDifference","GregsOUPR6")
-  help("Analytical","GregsOUPR6")
-  help("OUProcess","GregsOUPR6")
+  utils::help("MonteCarlo","GregsOUPR6")
+  utils::help("MaximumLikelihood","GregsOUPR6")
+  utils::help("FiniteDifference","GregsOUPR6")
+  utils::help("Analytical","GregsOUPR6")
+  utils::help("OUProcess","GregsOUPR6")
 }
 #' Function to launch Ribbon Help for GregsOUPR6
 #'
@@ -501,5 +501,5 @@ OUPHelp = function()
 #' @export
 #' @examples
 #'   OUPRibbonHelp()
-OUPRibbonHelp = function() { browseURL(system.file("ribbonhelp/OUP_Help.html",package="GregsOUPR6")) }
+OUPRibbonHelp = function() { utils::browseURL(system.file("ribbonhelp/OUP_Help.html",package="GregsOUPR6")) }
 

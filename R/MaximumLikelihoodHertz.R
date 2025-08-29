@@ -153,11 +153,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       # plot info ----
       plotfont <- list(family="Cambria",size=14)
       plotfile <- list(format="png",width=640,height=480)
-      plottheme <- list(name="light",opaque=1.0)
-      if(rstudioapi::isAvailable())
-      {
-        if(rstudioapi::getThemeInfo()$dark) { plottheme$name <- "dark"}
-      }
+      plottheme <- list(name="dark",opaque=1.0)
       private$plot_info <- list(plotfont=plotfont,plotfile=plotfile,plottheme=plottheme,plotlabels=TRUE)
       private$plot_colors <- private$rainbow(plottheme$name,plottheme$opaque)
     },
@@ -963,10 +959,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           else { theta <- append(theta,list(mur=mu)) }
           if(nmstart[[2]][3] != 0) { theta <- append(theta,list(sigmabar=sigma)) }
           else { theta <- append(theta,list(sigmar=sigma)) }
-          theta <- append(theta,list(lnLr=lnL))
-          theta <- append(theta,list(kr=nk))
-          theta <- append(theta,list(alphar=alpha))
-          theta <- append(theta,list(m1=m1))
+          theta <- append(theta,list(lnLr=lnL,kr=nk,alphar=alpha,m1=m1))
           private$theta_r <- theta
         }
       }
@@ -2715,12 +2708,12 @@ NULL
 #'
 #' \itemize{
 #'   \item Year: time variable
-#'   \item Red Pop: Estimated population of Red Kangaroos
-#'   \item Red Harvest: Number of Red Kangaroos commercially harvested
-#'   \item Grey Pop: Estimated population of Western Grey Kangaroos
-#'   \item Grey Harvest: Number of Western Grey Kangaroos commercially harvested
-#'   \item Euro Pop: Estimated population of European Kangaroos
-#'   \item Euro Harvest: Number of European Kangaroos commercially harvested
+#'   \item Red Pop: Estimated population of Red Kangaroos in 1000 head
+#'   \item Red Harvest: Number of Red Kangaroos commercially harvested in 1000 head
+#'   \item Grey Pop: Estimated population of Western Grey Kangaroos in 1000 head
+#'   \item Grey Harvest: Number of Western Grey Kangaroos commercially harvested in 1000 head
+#'   \item Euro Pop: Estimated population of European Kangaroos in 1000 head
+#'   \item Euro Harvest: Number of European Kangaroos commercially harvested in 1000 head
 #' }
 #'
 #' @docType data

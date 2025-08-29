@@ -108,7 +108,7 @@ ratio test:
 
 The available data sets are documented. To see the documentation, type:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?ML_
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?
 }\if{html}{\out{</div>}}
 
 and then select from the drop-down list.

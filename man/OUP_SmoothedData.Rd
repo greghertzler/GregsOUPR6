@@ -25,7 +25,7 @@ calculated again and used in the next estimation and so on ten times.
 The true rate of convergence, rho, and location, mu, are recovered from
 each estimation, but the scale, sigma, goes toward zero.
 
-By the eight smoothing, the log of the likelihood becomes positive. Hence,
+By the eighth smoothing, the log of the likelihood becomes positive. Hence,
 the likelihood, as the anti-log, becomes greater than one. In other words,
 if the eighth and ninth smoothings were real samples, the probability of
 observing them would be greater than 100\%. Further smoothings would increase

@@ -176,16 +176,13 @@ Analytical <- R6::R6Class("Analytical",
       private$x_stoch_args <- list(s=seq(from=10,to=0,by=-0.1),x=xyzseq,t=10,y=0,r=0.05,phi=0,b=0,c=0)
       private$t_stoch_args <- list(t=seq(from=0,to=10,by=0.1),k=0,s=0,x=15,z=seq(from=-30,to=30,by=6),omega=1,Ppct=0.75)
       private$psiphi <- -1
-      self$default_save()
+      private$undo_args <- list(list(oup_params=private$oup_params,z_stoch_args=private$z_stoch_args,y_stoch_args=private$y_stoch_args,x_stoch_args=private$x_stoch_args,t_stoch_args=private$t_stoch_args))
+      private$undoIx <- 1
       # plot info ----
       plottype <- list(type=3,pmax=0.066,ptmax=1.1)
       plotfont <- list(family="Cambria",size=14)
       plotfile <- list(format="png",width=640,height=480)
-      plottheme <- list(name="light",opaque=1.0)
-      if(rstudioapi::isAvailable())
-      {
-        if(rstudioapi::getThemeInfo()$dark) { plottheme$name <- "dark"}
-      }
+      plottheme <- list(name="dark",opaque=1.0)
       plot3D <- list(walls=TRUE,floor=TRUE)
       private$plot_info <- list(plottype=plottype,plotfont=plotfont,plotfile=plotfile,plottheme=plottheme,plot3D=plot3D,plotlabels=TRUE)
       private$plot_colors <- private$rainbow(plottheme$name,plottheme$opaque)
@@ -1451,19 +1448,39 @@ Analytical <- R6::R6Class("Analytical",
     sync_zyxt_stoch = function()
     {
       # get
+      rho <- private$oup_params[[1]]
+      mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
       x <- private$y_stoch_args[[4]]
       psi <- private$y_stoch_args[[5]]
       phi <- private$x_stoch_args[[6]]
       if(phi <= 0)
       {
-        x <- self$DecisionThreshold(phi=1,plotit=FALSE)[[1]]
-        k <- self$DecisionThreshold(phi=-1,plotit=FALSE)[[1]]
+        decision <- private$KOneg
+        if(is.null(decision))
+        {
+          k <- mu
+          x <- k+sigma*(2/rho)^0.5
+        }
+        else
+        {
+          x <- self$DecisionThreshold(phi=1,plotit=FALSE)[[1]]
+          k <- self$DecisionThreshold(phi=-1,plotit=FALSE)[[1]]
+        }
       }
       else
       {
-        x <- self$DecisionThreshold(phi=-1,plotit=FALSE)[[1]]
-        k <- self$DecisionThreshold(phi=1,plotit=FALSE)[[1]]
+        decision <- private$KOpos
+        if(is.null(decision))
+        {
+          k <- mu
+          x <- k-sigma*(2/rho)^0.5
+        }
+        else
+        {
+          x <- self$DecisionThreshold(phi=-1,plotit=FALSE)[[1]]
+          k <- self$DecisionThreshold(phi=1,plotit=FALSE)[[1]]
+        }
       }
       # t state
       if(is.finite(k))
@@ -1572,43 +1589,84 @@ Analytical <- R6::R6Class("Analytical",
       }
       return(NULL)
     },
-    # public default methods ----
+    # public undo methods ----
     #' @description
-    #' Get default
-    #' @return list(oup_params,z_stoch_args,y_stoch_args,x_stoch_args,t_stoch_args)
-    get_default = function() { return(private$default) },
-    #' @description
-    #' Save to_default--current arguments are stored as defaults
-    #' @return NULL
-    default_save = function()
+    #' Clear undo list and save current arguments to list
+    #' @return 1
+    undo_clear = function()
     {
-      private$default <- list(oup_params=private$oup_params,
+      private$undo_args <- NULL
+      private$undo_args <- list(list(oup_params=private$oup_params,
         z_stoch_args=private$z_stoch_args,
         y_stoch_args=private$y_stoch_args,
         x_stoch_args=private$x_stoch_args,
-        t_stoch_args=private$t_stoch_args)
+        t_stoch_args=private$t_stoch_args))
+      private$undoIx <- 1
 
-      return(NULL)
+      return(1)
     },
     #' @description
-    #' Read from default--defaults replace current arguments
-    #' @return NULL
-    default_read = function()
+    #' Save current arguments to undo list
+    #' @return number of argument sets
+    undo_save = function()
     {
-      private$oup_params <- private$default[[1]]
+      n <- length(private$undo_args)
+      last_undo_args <- private$undo_args[[n]]
+      not_equal <- TRUE
+      if(private$lists_equal(last_undo_args[[1]],private$oup_params))
+      {
+        if(private$lists_equal(last_undo_args[[2]],private$z_stoch_args))
+        {
+          if(private$lists_equal(last_undo_args[[3]],private$y_stoch_args))
+          {
+            if(private$lists_equal(last_undo_args[[4]],private$x_stoch_args))
+            {
+              if(private$lists_equal(last_undo_args[[5]],private$t_stoch_args))
+              {
+                not_equal <- FALSE
+              }
+            }
+          }
+        }
+      }
+      if(not_equal)
+      {
+        private$undo_args <- append(private$undo_args,
+          list(list(oup_params=private$oup_params,
+            z_stoch_args=private$z_stoch_args,
+            y_stoch_args=private$y_stoch_args,
+            x_stoch_args=private$x_stoch_args,
+            t_stoch_args=private$t_stoch_args)))
+        n <- n+1
+      }
+
+      return(n)
+    },
+    #' @description
+    #' Replace current arguments from undo list
+    #' @return c(index of this argument set, number of argument sets)
+    undo_undo = function()
+    {
+      n <- length(private$undo_args)
+      this_Ix <- private$undoIx
+      these_undo_args <- private$undo_args[[this_Ix]]
+      private$oup_params <- these_undo_args[[1]]
       rho <- private$oup_params$rho
       mu <- private$oup_params$mu
       sigma <- private$oup_params$sigma
       if(!is.null(private$OUP)) { private$OUP$send_oup_params(rho,mu,sigma,"A") }
-      private$z_stoch_args <- private$default[[2]]
-      private$y_stoch_args <- private$default[[3]]
-      private$x_stoch_args <- private$default[[4]]
+      private$z_stoch_args <- these_undo_args[[2]]
+      private$y_stoch_args <- these_undo_args[[3]]
+      private$x_stoch_args <- these_undo_args[[4]]
       s <- private$x_stoch_args$s
       x <- private$x_stoch_args$x
       r <- private$x_stoch_args$r
       phi <- private$x_stoch_args$phi
       if(!is.null(private$OUP)) { private$OUP$send_x_stoch_args(s,x,r,phi,"A") }
-      private$t_stoch_args <- private$default[[5]]
+      private$t_stoch_args <- these_undo_args[[5]]
+      next_Ix <- this_Ix+1
+      if(next_Ix > n) { next_Ix <- 1 }
+      private$undoIx <- next_Ix
       private$g <- NULL
       private$h2 <- NULL
       private$G <- NULL
@@ -1645,7 +1703,7 @@ Analytical <- R6::R6Class("Analytical",
       private$Ptx <- NULL
       private$Pt <- NULL
 
-      return(NULL)
+      return(c(this_Ix,n))
     },
     # public calculate methods ----
     #' @description
@@ -6500,10 +6558,11 @@ Analytical <- R6::R6Class("Analytical",
     y_stoch_args = NULL,
     x_stoch_args = NULL,
     t_stoch_args = NULL,
+    undo_args = NULL,
     plot_info = NULL,
-    default = NULL,
     # private globals ----
-    psiphi = -1,
+    psiphi = NULL,
+    undoIx = NULL,
     # private output fields ----
     g = NULL,
     h2 = NULL,
@@ -6732,6 +6791,23 @@ Analytical <- R6::R6Class("Analytical",
         else { message(paste("non-character input:",input)) }
       }
       return(clr)
+    },
+    lists_equal = function(list1,list2)
+    {
+      allequal <- TRUE
+      n1 <- length(list1)
+      n2 <- length(list2)
+      if(n1 == n2)
+      {
+        j <- 0
+        while(j < n1 & allequal == TRUE )
+        {
+          j <- j+1
+          allequal <- vecs_equal(list1[[j]],list2[[j]])
+        }
+      }
+      else { allequal <- FALSE }
+      return(allequal)
     },
     vecs_equal = function(vec1,vec2)
     {

@@ -28,7 +28,7 @@ V <- FD$TerminalValue(plotit=FALSE)
 FD$set_x_stoch_args(x=seq(from=-50,to=50,by=1))
 FD$PlotOptionEnvelope(title="My Title")
 # exotic options
-FD$default_read()
+FD$undo_undo()
 V <- FD$TerminalValue_Linear(plotit=FALSE)
 Ohat <- FD$OptionEnvelope()
 V <- FD$TerminalValue_Kinked(plotit=FALSE)

@@ -8,11 +8,11 @@ ML$Estimates(plotit=FALSE)
 # restricted estimates
 ML$Estimates(rhor=0.5,mur=-15,plotit=FALSE)
 # other data
-df<-read.csv("data/ML_OUP_UnequalIntervals.csv")
+df<-read.csv("data/OUP_NotMissing.csv")
 ML$Estimates(df=df,plotit=FALSE)
 # other columns in data
-ML$Estimates(df=df,taucol=3,zcol=4,plotit=FALSE)
+ML$Estimates(df=df,taucol=1,zcol=3,plotit=FALSE)
 # with plot this time
-ML$Estimates(df=df,taucol=3,zcol=4)
+ML$Estimates(df=df,taucol=1,zcol=3)
 # customize plot
-ML$PlotEstimates(title="My Estimates",tbeg=4,tend=6)
+ML$PlotEstimates(title="My Estimates",tbeg=200)

@@ -191,9 +191,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 \item \href{#method-FiniteDifference-get_plot_info}{\code{FiniteDifference$get_plot_info()}}
 \item \href{#method-FiniteDifference-get_plot_colors}{\code{FiniteDifference$get_plot_colors()}}
 \item \href{#method-FiniteDifference-axes_x_stoch}{\code{FiniteDifference$axes_x_stoch()}}
-\item \href{#method-FiniteDifference-get_default}{\code{FiniteDifference$get_default()}}
-\item \href{#method-FiniteDifference-default_save}{\code{FiniteDifference$default_save()}}
-\item \href{#method-FiniteDifference-default_read}{\code{FiniteDifference$default_read()}}
+\item \href{#method-FiniteDifference-undo_clear}{\code{FiniteDifference$undo_clear()}}
+\item \href{#method-FiniteDifference-undo_save}{\code{FiniteDifference$undo_save()}}
+\item \href{#method-FiniteDifference-undo_undo}{\code{FiniteDifference$undo_undo()}}
 \item \href{#method-FiniteDifference-Drift}{\code{FiniteDifference$Drift()}}
 \item \href{#method-FiniteDifference-Diffusion}{\code{FiniteDifference$Diffusion()}}
 \item \href{#method-FiniteDifference-TerminalValue_Linear}{\code{FiniteDifference$TerminalValue_Linear()}}
@@ -986,42 +986,42 @@ NULL
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FiniteDifference-get_default"></a>}}
-\if{latex}{\out{\hypertarget{method-FiniteDifference-get_default}{}}}
-\subsection{Method \code{get_default()}}{
-Get default
+\if{html}{\out{<a id="method-FiniteDifference-undo_clear"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-undo_clear}{}}}
+\subsection{Method \code{undo_clear()}}{
+Clear undo list and save current arguments to list
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_default()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$undo_clear()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-list(oup_params,x_stoch_args,V_linear_args,V_degenerate_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,V_info)
+1
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FiniteDifference-default_save"></a>}}
-\if{latex}{\out{\hypertarget{method-FiniteDifference-default_save}{}}}
-\subsection{Method \code{default_save()}}{
-Save to_default->current arguments are stored as defaults
+\if{html}{\out{<a id="method-FiniteDifference-undo_save"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-undo_save}{}}}
+\subsection{Method \code{undo_save()}}{
+Save current arguments to undo list
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$default_save()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$undo_save()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-NULL
+number of argument sets
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FiniteDifference-default_read"></a>}}
-\if{latex}{\out{\hypertarget{method-FiniteDifference-default_read}{}}}
-\subsection{Method \code{default_read()}}{
-Read from default<-defaults replace current arguments
+\if{html}{\out{<a id="method-FiniteDifference-undo_undo"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-undo_undo}{}}}
+\subsection{Method \code{undo_undo()}}{
+Replace current arguments from undo list
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$default_read()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$undo_undo()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-NULL
+c(index of this argument set, number of argument sets)
 }
 }
 \if{html}{\out{<hr>}}

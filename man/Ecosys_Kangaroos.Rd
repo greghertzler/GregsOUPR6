@@ -17,12 +17,12 @@ meat processor records of harvest aggregated across all regions of South Austral
 \details{
 \itemize{
 \item Year: time variable
-\item Red Pop: Estimated population of Red Kangaroos
-\item Red Harvest: Number of Red Kangaroos commercially harvested
-\item Grey Pop: Estimated population of Western Grey Kangaroos
-\item Grey Harvest: Number of Western Grey Kangaroos commercially harvested
-\item Euro Pop: Estimated population of European Kangaroos
-\item Euro Harvest: Number of European Kangaroos commercially harvested
+\item Red Pop: Estimated population of Red Kangaroos in 1000 head
+\item Red Harvest: Number of Red Kangaroos commercially harvested in 1000 head
+\item Grey Pop: Estimated population of Western Grey Kangaroos in 1000 head
+\item Grey Harvest: Number of Western Grey Kangaroos commercially harvested in 1000 head
+\item Euro Pop: Estimated population of European Kangaroos in 1000 head
+\item Euro Harvest: Number of European Kangaroos commercially harvested in 1000 head
 }
 }
 \keyword{datasets}

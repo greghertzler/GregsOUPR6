@@ -33,7 +33,7 @@ FD$PlotOption(title="type=5",type=5)
 FD$PlotOption(title="type=2",type=2)
 FD$PlotOption(title="type=3 (Default)",type=3)
 # exotic options
-FD$default_read()
+FD$undo_undo()
 V <- FD$TerminalValue_Linear(plotit=FALSE)
 O <- FD$Option()
 V <- FD$TerminalValue_Kinked(plotit=FALSE)

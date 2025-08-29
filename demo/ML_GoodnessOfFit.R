@@ -17,11 +17,11 @@ ML$GoodnessOfFit()
 ML$Estimates(rhor=0,plotit=FALSE)
 ML$GoodnessOfFit()
 # other data
-df<-read.csv("data/ML_OUP_UnequalIntervals.csv")
+df<-read.csv("data/OUP_NotMissing.csv")
 ML$Estimates(df=df,plotit=FALSE)
 ML$GoodnessOfFit()
 # other columns in data
-ML$Estimates(df=df,taucol=3,zcol=4,plotit=FALSE)
+ML$Estimates(df=df,taucol=1,zcol=3,plotit=FALSE)
 ML$GoodnessOfFit()
 # with plots this time
 ML$PlotTimeSeries(df=df)
