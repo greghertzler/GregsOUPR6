@@ -1649,59 +1649,20 @@ Analytical <- R6::R6Class("Analytical",
     {
       n <- length(private$undo_args)
       this_Ix <- private$undoIx
-      these_undo_args <- private$undo_args[[this_Ix]]
-      private$oup_params <- these_undo_args[[1]]
-      rho <- private$oup_params$rho
-      mu <- private$oup_params$mu
-      sigma <- private$oup_params$sigma
-      if(!is.null(private$OUP)) { private$OUP$send_oup_params(rho,mu,sigma,"A") }
-      private$z_stoch_args <- these_undo_args[[2]]
-      private$y_stoch_args <- these_undo_args[[3]]
-      private$x_stoch_args <- these_undo_args[[4]]
-      s <- private$x_stoch_args$s
-      x <- private$x_stoch_args$x
-      r <- private$x_stoch_args$r
-      phi <- private$x_stoch_args$phi
-      if(!is.null(private$OUP)) { private$OUP$send_x_stoch_args(s,x,r,phi,"A") }
-      private$t_stoch_args <- these_undo_args[[5]]
+      these_undo <- private$undo_args[[this_Ix]]
+      oup <- these_undo[[1]]
+      z_stoch <- these_undo[[2]]
+      y_stoch <- these_undo[[3]]
+      x_stoch <- these_undo[[4]]
+      t_stoch <- these_undo[[5]]
+      self$set_oup_params(oup[[1]],oup[[2]],oup[[3]])
+      self$set_z_stoch_args(z_stoch[[1]])
+      self$set_y_stoch_args(y_stoch[[1]],y_stoch[[2]],y_stoch[[3]],y_stoch[[4]],y_stoch[[5]],y_stoch[[6]])
+      self$set_x_stoch_args(x_stoch[[1]],x_stoch[[2]],x_stoch[[3]],x_stoch[[4]],x_stoch[[5]],x_stoch[[6]],x_stoch[[7]],x_stoch[[8]])
+      self$set_t_stoch_args(t_stoch[[1]],t_stoch[[2]],t_stoch[[3]],t_stoch[[4]],t_stoch[[5]],t_stoch[[6]],t_stoch[[7]])
       next_Ix <- this_Ix+1
       if(next_Ix > n) { next_Ix <- 1 }
       private$undoIx <- next_Ix
-      private$g <- NULL
-      private$h2 <- NULL
-      private$G <- NULL
-      private$Gteps <- NULL
-      private$H2 <- NULL
-      private$H2teps <- NULL
-      private$p <- NULL
-      private$Pneg <- NULL
-      private$Ppos <- NULL
-      private$PPneg <- NULL
-      private$PPpos <- NULL
-      private$Oneg <- NULL
-      private$Opos <- NULL
-      private$Oshatneg <- NULL
-      private$Oshatpos <- NULL
-      private$Oscarfneg <- NULL
-      private$Oscarfpos <- NULL
-      private$KOneg <- NULL
-      private$KOpos <- NULL
-      private$BCneg <- NULL
-      private$BCpos <- NULL
-      private$tmode <- NULL
-      private$tmodes <- NULL
-      private$tmedian <- NULL
-      private$tmedians <- NULL
-      private$tmean <- NULL
-      private$tmeans <- NULL
-      private$tvariance <- NULL
-      private$tvariances <- NULL
-      private$tpercentile <- NULL
-      private$tpercentiles <- NULL
-      private$ptx <- NULL
-      private$pt <- NULL
-      private$Ptx <- NULL
-      private$Pt <- NULL
 
       return(c(this_Ix,n))
     },

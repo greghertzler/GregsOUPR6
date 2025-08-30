@@ -2174,47 +2174,36 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     {
       n <- length(private$undo_args)
       this_Ix <- private$undoIx
-      these_undo_args <- private$undo_args[[this_Ix]]
-      private$oup_params <- these_undo_args[[1]]
-      rho <- private$oup_params$rho
-      mu <- private$oup_params$mu
-      sigma <- private$oup_params$sigma
-      if(!is.null(private$OUP)) { private$OUP$send_oup_params(rho,mu,sigma,"FD") }
-      private$x_stoch_args <- these_undo_args[[2]]
-      s <- private$x_stoch_args$s
-      x <- private$x_stoch_args$x
-      r <- private$x_stoch_args$r
-      phi <- private$x_stoch_args$phi
-      if(!is.null(private$OUP)) { private$OUP$send_x_stoch_args(s,x,r,phi,"FD") }
-      private$V_linear_args <- these_undo_args[[3]]
-      private$V_degenerate_args <- these_undo_args[[4]]
-      private$V_stepped_args <- these_undo_args[[5]]
-      private$V_kinked_args <- these_undo_args[[6]]
-      private$V_butterfly_args <- these_undo_args[[7]]
-      private$V_mitscherlich_args <- these_undo_args[[8]]
-      private$V_gompertz_args <- these_undo_args[[9]]
-      private$V_logistic_args <- these_undo_args[[10]]
-      private$V_transcendental_args <- these_undo_args[[11]]
-      private$V_yieldindex_args <- these_undo_args[[12]]
-      private$V_info <- these_undo_args[[13]]
+      these_undo <- private$undo_args[[this_Ix]]
+      oup <- these_undo[[1]]
+      x_stoch <- these_undo[[2]]
+      V_linear <- these_undo[[3]]
+      V_degenerate <- these_undo[[4]]
+      V_stepped <- these_undo[[5]]
+      V_kinked <- these_undo[[6]]
+      V_butterfly <- these_undo[[7]]
+      V_mitscherlich <- these_undo[[8]]
+      V_gompertz <- these_undo[[9]]
+      V_logistic <- these_undo[[10]]
+      V_transcendental <- these_undo[[11]]
+      V_yieldindex <- these_undo[[12]]
+      V_info <- these_undo[[13]]
+      self$set_oup_params(oup[[1]],oup[[2]],oup[[3]])
+      self$set_x_stoch_args(x_stoch[[1]],x_stoch[[2]],x_stoch[[3]],x_stoch[[4]],x_stoch[[5]],x_stoch[[6]],x_stoch[[7]])
+      self$set_V_linear_args(V_linear[[1]],V_linear[[2]])
+      self$set_V_degenerate_args(V_degenerate[[1]],V_degenerate[[2]],V_degenerate[[3]])
+      self$set_V_stepped_args(V_stepped[[1]],V_stepped[[2]],V_stepped[[3]],V_stepped[[4]])
+      self$set_V_kinked_args(V_kinked[[1]],V_kinked[[2]],V_kinked[[3]],V_kinked[[4]])
+      self$set_V_butterfly_args(V_butterfly[[1]],V_butterfly[[2]],V_butterfly[[3]],V_butterfly[[4]],V_butterfly[[5]])
+      self$set_V_mitscherlich_args(V_mitscherlich[[1]],V_mitscherlich[[2]],V_mitscherlich[[3]],V_mitscherlich[[4]])
+      self$set_V_gompertz_args(V_gompertz[[1]],V_gompertz[[2]],V_gompertz[[3]],V_gompertz[[4]])
+      self$set_V_logistic_args(V_logistic[[1]],V_logistic[[2]],V_logistic[[3]],V_logistic[[4]])
+      self$set_V_transcendental_args(V_transcendental[[1]],V_transcendental[[2]],V_transcendental[[3]],V_transcendental[[4]],V_transcendental[[5]])
+      self$set_V_yieldindex_args(V_yieldindex[[1]],V_yieldindex[[2]],V_yieldindex[[3]],V_yieldindex[[4]],V_yieldindex[[5]])
+      self$set_V_info(V_info[[1]],V_info[[2]])
       next_Ix <- this_Ix+1
       if(next_Ix > n) { next_Ix <- 1 }
       private$undoIx <- next_Ix
-      private$g <- NULL
-      private$h2 <- NULL
-      private$V_linear <- NULL
-      private$V_degenerate <- NULL
-      private$V_stepped <- NULL
-      private$V_kinked <- NULL
-      private$V_butterfly <- NULL
-      private$V_mitscherlich <- NULL
-      private$V_gompertz <- NULL
-      private$V_logistic <- NULL
-      private$V_transcendental <- NULL
-      private$V_yieldindex <- NULL
-      private$O <- NULL
-      private$Ohat <- NULL
-      private$kOhat <- NULL
 
       return(c(this_Ix,n))
     },
