@@ -2278,6 +2278,9 @@ NULL
 #'  are special cases of a Gamma distribution.  In general, parameters for the
 #'  Ornstein-Uhlenbeck Process have a Gamma distribution.
 #'
+#' The shape parameter, alpha, identifies the distribution with 0.5 <= alpha <=1. Chi^2
+#'  has alpha = 0.5.  Erlang has alpha = 1.
+#'
 #' @docType data
 #' @keywords datasets
 #' @name OUP_Convergence
@@ -2353,6 +2356,9 @@ NULL
 #'   if rho is larger because the asymptotic variance, sigma^2/2rho, is the same in both sets
 #'   of estimates.  If rho is 365 times bigger, sigma is 365^0.5 = 19.105 times bigger.
 #'
+#' Because rho(t-s) is the same, alpha = 0.5(1+exp(-rho(t-s))) is also the same, where alpha
+#'  identifies the probability distribution of the estimates.
+#'
 #' @docType data
 #' @keywords datasets
 #' @name OUP_ObservationInterval
@@ -2426,20 +2432,23 @@ NULL
 
 #' Water in Farm Dams in the Riverina of New South Wales
 #'
-#' Matlab generated water volumes in a 4000 cubic metre dam, with and without
-#'  tree windbreaks to control evaporation, and a merino sheep flock size of
-#'  1500 dry sheep equivalents.
+#' Matlab generated water volumes in a 4000 cubic metre dam with tree
+#'  windbreaks to suppress evaporation, and a merino sheep flock size of
+#'  2000 dry sheep equivalents.
 #'
 #' \itemize{
-#'   \item Day: time variable in daily increments
-#'   \item Without: water volumes in cubic metres without a windbreak
-#'   \item With: water volumes in cubic metres with a windbreak
+#'   \item Run Days: time variable in daily increments
+#'   \item Baseline: water volumes in cubic metres without a windbreak
+#'   \item TwentyPct scenario: water volumes in cubic metres with a windbreak
+#'    to suppress evaporation by 20%
+#'   \item FortyPct scenario: water volumes in cubic metres with a windbreak
+#'    to suppress evaporation by 40%
 #' }
 #'
 #' @docType data
 #' @keywords datasets
 #' @name Agric_NSW_FarmDamsRiverina
-#' @format csv file with 19313 rows and 3 columns
+#' @format csv file with 19313 rows and 4 columns
 #' @author { Tim Capon \email{tim.capon.csiro.au}, Helena Clayton \email{helena.clayton@anu.edu.au}, Sally Thompson \email{sally.thompson@uwa.edu.au}, Greg Hertzler \email{ghertzlerau@gmail.com}, Philip Graham \email{phil@gramadvisory.com.au}, David Lindemayer \email{david.lindemayer@anu.edu} }
 NULL
 
@@ -2582,6 +2591,50 @@ NULL
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
+#' Waite Permanent Rotation Trial, South Australia
+#'
+#' Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993
+#'
+#' \itemize{
+#'   \item Year: time variable in annual increments
+#'   \item Plt 1-2 WF W: Wheat Fallow rotation, Wheat yields in kilograms per hectare
+#'   \item Plt 3-4 WPe W: Wheat Peas rotation, Wheat yields in kilograms her hectare
+#'   \item Plt 3-4 WPe Pe: Wheat Peas rotation, Pea yield in kilograms per hectare
+#'   \item Plt 5-7 WPF W: Wheat Pasture Fallow rotation, Wheat yield in kilograms per hectare
+#'   \item Plt 5-7 WPF P: Wheat Pasture Fallow rotation, Pasture dry matter in kilograms per hectare
+#'   \item Plt 8-10 WOF W: Wheat Oats Fallow rotation, Wheat yield in kilograms per hectare
+#'   \item Plt 8-10 WOF O: Wheat Oats Fallow rotation, Oat yield in kilograms per hectare
+#'   \item Plt 11-16 WWPPPP W: Wheatx2 Pasturex4 rotation, Wheat yield in kilograms per hectare
+#'   \item Plt 11-16 WWPPPP P: Wheatx2 Pasturex4 rotation, Pasture dry matter in kilograms per hectare
+#'   \item Plt 17 W W: continuous Wheat, Wheat yield in kilograms per hectare
+#'   \item Plt 18-20 WPP W: Wheat Pasturex2 rotation, Wheat yield in kilograms per hectare
+#'   \item Plt 18-20 WPP P: Wheat Pasturex2 rotation, Pasture dry matter in kilograms per hectare
+#'   \item Plt 21-23 WBPe W: Wheat Barley Peas rotation, Wheat yield in kilograms per hectare
+#'   \item Plt 21-23 WBPe B: Wheat Barley Peas rotation, Barley yield in kilograms per hectare
+#'   \item Plt 21-23 WBPe Pe: Wheat Barley Peas rotation, Pea yield in kilograms per hectare
+#'   \item Plt 24-27 WOPF W: Wheat Oats Pasture Fallow rotation, Wheat yield in kilograms per hectare
+#'   \item Plt 24-27 WOPF O: Wheat Oats Pasture Fallow rotation, Oat yield in kilograms per hectare
+#'   \item Plt 24-27 WOPF P: Wheat Oats Pasture Fallow rotation, Pasture dry matter in kilograms per hectare
+#'   \item Plt 28-29 P P: continuous Pasture, Pasture dry matter in kilograms per hectare
+#'   \item Plt 30-33 WPPF W: Wheat Pasturex2 Fallow rotation, Wheat yield in kilograms per hectare
+#'   \item Plt 30-33 WPPF W: Wheat Pasturex2 Fallow rotation, Pasture dry matter in kilograms per hectare
+#'   \item Plt 34-35 WF W: Wheat Fallow rotation, Wheat yield in kilograms per hectare
+#'   \item Annual Rain: Annual rainfall in millimetres
+#'   \item Apr-Oct Rain: April through October rainfall in millimetres
+#'   \item Plt 1 WF Carbon: Wheat Fallow rotation, Carbon in milligrams per hectare
+#'   \item Plt 10 WOF Carbon: Wheat Oats Fallow rotation, Carbon in milligrams per hectare
+#'   \item Plt 13 WWPPPP Carbon: Wheatx2 Pasturex4 rotation, Carbon in milligrams per hectare
+#'   \item Plt 17 W Carbon: continuous Wheat, Carbon in milligrams per hectare
+#'   \item Plt 29 P Carbon: continuous Pasture, Carbon in milligrams per hectare
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Agric_SA_WaiteRotationTrial
+#' @format csv file with 70 rows and 30 columns
+#' @source Sanderman, Jonathan; David, Rakesh; Moore, Andrew; Keith, Heather; & Farquharson, Ryan (2015): Waite Permanent Rotation Trial. v4. CSIRO. Data Collection. https://doi.org/10.4225/08/55E5165EC0D29
+NULL
+
 #' Tree shelter belts in Tasmania
 #'
 #' CSIRO Perennial Prosperity Project
@@ -2597,6 +2650,26 @@ NULL
 #' @name Agric_Tas_TreeShelterBelts
 #' @format csv file with 52 rows and 3 columns
 #' @author { Tim Capon \email{tim.capon@csiro.au}, Daniel Mendham \email{daniel.mendham@csiro.au} }
+NULL
+
+#' European Union Emission Trading System
+#'
+#' Daily price of Carbon Permits from 1 January 2021 to 31 December 2025
+#'
+#' \itemize{
+#'   \item Year: time variable as decimal year
+#'   \item Open: Price at market open in EUR/tonne
+#'   \item High: Daily high price in EUR/tonne
+#'   \item Low: Daily low price in EUR/tonne
+#'   \item Close: Price at market close in EUR/tonne
+#'   \item Day: time variable in days since 1 January 2021
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Climate_CarbonCredits_EECXM
+#' @format csv file with 1519 rows and 6 columns
+#' @source https://seekingalpha.com/symbol/EECXM
 NULL
 
 #' Sea Level at Port Kembla
@@ -2683,6 +2756,24 @@ NULL
 #' @name Climate_TempsMax_TennantCreek
 #' @format csv file with 9115 rows and 2 columns
 #' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 015135
+NULL
+
+#' Albatross Egg Counts
+#'
+#' The Australian Threatened Species Index 2024
+#'
+#' \itemize{
+#'   \item Year: time variable in annual increments
+#'   \item Wandering Albatross: egg count
+#'   \item Black-browed Albatross: egg count
+#'   \item Grey-headed Albatross: egg count
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_Albatross
+#' @format csv file with 60 rows and 4 columns
+#' @source https://tsx.org.au/tsx2024
 NULL
 
 #' Water Supply for Irrigated Agriculture in Eastern Australia
