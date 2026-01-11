@@ -27,5 +27,8 @@ Parameters for Browian Motion have an Erlang distribution.  Parameters for
 a stationary or ergodic process have a Chi^2 distribution.  These distributions
 are special cases of a Gamma distribution.  In general, parameters for the
 Ornstein-Uhlenbeck Process have a Gamma distribution.
+
+The shape parameter, alpha, identifies the distribution with 0.5 <= alpha <=1. Chi^2
+has alpha = 0.5.  Erlang has alpha = 1.
 }
 \keyword{datasets}

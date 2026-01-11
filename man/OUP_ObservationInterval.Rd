@@ -26,5 +26,8 @@ rho=1/2.  For observation intervals measured in years, t-s=1/365 and rho=365/2. 
 parameter, mu, is the same in both sets of estimates.  Scale parameter, sigma, is larger
 if rho is larger because the asymptotic variance, sigma^2/2rho, is the same in both sets
 of estimates.  If rho is 365 times bigger, sigma is 365^0.5 = 19.105 times bigger.
+
+Because rho(t-s) is the same, alpha = 0.5(1+exp(-rho(t-s))) is also the same, where alpha
+identifies the probability distribution of the estimates.
 }
 \keyword{datasets}

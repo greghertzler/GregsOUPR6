@@ -5,18 +5,21 @@
 \alias{Agric_NSW_FarmDamsRiverina}
 \title{Water in Farm Dams in the Riverina of New South Wales}
 \format{
-csv file with 19313 rows and 3 columns
+csv file with 19313 rows and 4 columns
 }
 \description{
-Matlab generated water volumes in a 4000 cubic metre dam, with and without
-tree windbreaks to control evaporation, and a merino sheep flock size of
-1500 dry sheep equivalents.
+Matlab generated water volumes in a 4000 cubic metre dam with tree
+windbreaks to suppress evaporation, and a merino sheep flock size of
+2000 dry sheep equivalents.
 }
 \details{
 \itemize{
-\item Day: time variable in daily increments
-\item Without: water volumes in cubic metres without a windbreak
-\item With: water volumes in cubic metres with a windbreak
+\item Run Days: time variable in daily increments
+\item Baseline: water volumes in cubic metres without a windbreak
+\item TwentyPct scenario: water volumes in cubic metres with a windbreak
+to suppress evaporation by 20\%
+\item FortyPct scenario: water volumes in cubic metres with a windbreak
+to suppress evaporation by 40\%
 }
 }
 \author{
