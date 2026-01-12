@@ -8,10 +8,11 @@
 csv file with 30 rows and 5 columns
 }
 \source{
-https://data.csiro.au/collection/csiro:61293?q=population\%20data&_st=keyword&_str=210&_si=7
+https://doi.org/10.25919/2jqe-mz45
 }
 \description{
-CSIRO Harden Long-Term Tillage Experiment
+CSIRO Harden Long-Term Tillage Experiment. v3. CSIRO. Data Collection.
+Soil nitrogen and water in the top 160 millimetres.
 }
 \details{
 \itemize{
@@ -21,5 +22,8 @@ CSIRO Harden Long-Term Tillage Experiment
 \item W Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
 \item W Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
 }
+}
+\author{
+Kirkegaard, John; & Lilley, Julianne, 2023
 }
 \keyword{datasets}

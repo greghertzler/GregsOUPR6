@@ -11,7 +11,8 @@ csv file with 120 rows and 14 columns
 https://waterinsights.waternsw.com.au/12964-sydney-drinking-water-catchment/storage
 }
 \description{
-WaterNSW WaterInsight, Water Storage from August 2015 to July 2025
+WaterNSW, WaterInsight.
+Drinking Water Storage from August 2015 to July 2025.
 }
 \details{
 \itemize{
@@ -30,5 +31,8 @@ WaterNSW WaterInsight, Water Storage from August 2015 to July 2025
 \item Fitzroy: Fitzroy Falls Dam volume in gigalitres
 \item Year: time variable as decimal year
 }
+}
+\author{
+WaterNSW
 }
 \keyword{datasets}

@@ -3,15 +3,16 @@
 \docType{data}
 \name{Agric_SA_WaiteRotationTrial}
 \alias{Agric_SA_WaiteRotationTrial}
-\title{Waite Permanent Rotation Trial, South Australia}
+\title{Long Term Crop Rotations, South Australia}
 \format{
 csv file with 70 rows and 30 columns
 }
 \source{
-Sanderman, Jonathan; David, Rakesh; Moore, Andrew; Keith, Heather; & Farquharson, Ryan (2015): Waite Permanent Rotation Trial. v4. CSIRO. Data Collection. https://doi.org/10.4225/08/55E5165EC0D29
+https://doi.org/10.4225/08/55E5165EC0D29
 }
 \description{
-Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993
+Waite Permanent Rotation Trial. v4. CSIRO. Data Collection.
+Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993.
 }
 \details{
 \itemize{
@@ -46,5 +47,8 @@ Experimental crop yields and pasture dry matter for permanent rotations from 192
 \item Plt 17 W Carbon: continuous Wheat, Carbon in milligrams per hectare
 \item Plt 29 P Carbon: continuous Pasture, Carbon in milligrams per hectare
 }
+}
+\author{
+Sanderman, Jonathan; David, Rakesh; Moore, Andrew; Keith, Heather; & Farquharson, Ryan, 2015
 }
 \keyword{datasets}

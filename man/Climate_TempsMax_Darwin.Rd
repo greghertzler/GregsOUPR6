@@ -11,12 +11,15 @@ csv file with 9127 rows and 2 columns
 http://www.bom.gov.au/climate/data/?ref=ftr, Station number 014040
 }
 \description{
-Bureau of Meteorology, raw (Unhomogenized) data.
+Raw (Unhomogenized) data.
 }
 \details{
 \itemize{
 \item Year: time variable in daily increments
 \item Max: maximum temperature in degrees centigrade
 }
+}
+\author{
+Bureau of Meteorology
 }
 \keyword{datasets}

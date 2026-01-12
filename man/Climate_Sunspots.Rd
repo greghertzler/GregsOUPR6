@@ -11,12 +11,16 @@ csv file with 3316 rows and 2 columns
 https://doi.org/10.24414/qnza-ac80
 }
 \description{
-World Data Center SILSO, Royal Observatory of Belgium
+International Sunspot Number V2.0.
+Sunspot numbers and groups of sunspot numbers.
 }
 \details{
 \itemize{
 \item DecimalYear: time variable in daily increments
 \item Average: Simple average of the daily total sunspot number over all days of each calendar month.
 }
+}
+\author{
+Royal Observatory of Belgium
 }
 \keyword{datasets}

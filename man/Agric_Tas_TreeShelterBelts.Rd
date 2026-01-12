@@ -7,8 +7,11 @@
 \format{
 csv file with 52 rows and 3 columns
 }
+\source{
+corresponding author, Tim Capon \email{tim.capon@csiro.au}
+}
 \description{
-CSIRO Perennial Prosperity Project
+CSIRO Perennial Prosperity Project.
 }
 \details{
 \itemize{
@@ -18,6 +21,6 @@ CSIRO Perennial Prosperity Project
 }
 }
 \author{
-{ Tim Capon \email{tim.capon@csiro.au}, Daniel Mendham \email{daniel.mendham@csiro.au} }
+Tim Capon, Daniel Mendham, 2024
 }
 \keyword{datasets}

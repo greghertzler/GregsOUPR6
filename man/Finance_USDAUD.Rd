@@ -11,8 +11,7 @@ csv file with 258 rows and 7 columns
 https://finance.yahoo.com/quote (search for AUDUSD=X)
 }
 \description{
-Daily exchange rates from 1 July 2024 to 30 June 2025,
-with AUD as the base currency and USD as the quote currency
+Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base currency and USD as the quote currency.
 }
 \details{
 \itemize{

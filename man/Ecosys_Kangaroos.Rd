@@ -11,8 +11,8 @@ csv file with 46 rows and 7 columns
 https://www.environment.sa.gov.au/topics/animals-and-plants/sustainable-use-of-animals-and-plants/kangaroo-conservation-and-management/quotas-harvest-data
 }
 \description{
-Government of South Australia, Department of Environment, population surveys and
-meat processor records of harvest aggregated across all regions of South Australia.
+Population surveys and meat processor records of harvest.
+Regions are aggregated for all of South Australia.
 }
 \details{
 \itemize{
@@ -24,5 +24,8 @@ meat processor records of harvest aggregated across all regions of South Austral
 \item Euro Pop: Estimated population of European Kangaroos in 1000 head
 \item Euro Harvest: Number of European Kangaroos commercially harvested in 1000 head
 }
+}
+\author{
+Government of South Australia, Department of Environment
 }
 \keyword{datasets}

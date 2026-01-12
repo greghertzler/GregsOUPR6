@@ -11,6 +11,7 @@ csv file with 197 rows and 8 columns
 https://files.marketindex.com.au/files/workbooks/commodities-workbook.xlsx
 }
 \description{
+London Bullion Market Association, World Gold Council, GoldHub, Perth Mint and International Monetary Fund prices.
 Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
 }
 \details{

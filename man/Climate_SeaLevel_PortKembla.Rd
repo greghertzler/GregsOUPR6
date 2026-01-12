@@ -11,8 +11,8 @@ csv file with 7985 rows and 5 columns
 http://www.bom.gov.au/oceanography/projects/abslmp/data/data.shtml
 }
 \description{
-Bureau of Meteorology Australian Baseline Sea Level Monitoring Project, with
-measurements smoothed to eliminate variability.
+Australian Baseline Sea Level Monitoring Project.
+Sea levels above Tide Guage Zero for 2023.
 }
 \details{
 \itemize{
@@ -24,5 +24,8 @@ measurements smoothed to eliminate variability.
 }
 
 This is radically smoothed data.  Do not use this data for decisions under uncertainty.
+}
+\author{
+Bureau of Meteorology
 }
 \keyword{datasets}

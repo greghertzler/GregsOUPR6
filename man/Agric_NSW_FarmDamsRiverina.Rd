@@ -7,22 +7,22 @@
 \format{
 csv file with 19313 rows and 4 columns
 }
+\source{
+corresponding author: Tim Capon \email{tim.capon.csiro.au}
+}
 \description{
-Matlab generated water volumes in a 4000 cubic metre dam with tree
-windbreaks to suppress evaporation, and a merino sheep flock size of
-2000 dry sheep equivalents.
+Stock water management to improve drought resilience in intensive-use grazing landscapes.
+MatLab simulated water volumes for a 4,000 cubic metre dam.
 }
 \details{
 \itemize{
 \item Run Days: time variable in daily increments
 \item Baseline: water volumes in cubic metres without a windbreak
-\item TwentyPct scenario: water volumes in cubic metres with a windbreak
-to suppress evaporation by 20\%
-\item FortyPct scenario: water volumes in cubic metres with a windbreak
-to suppress evaporation by 40\%
+\item TwentyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 20\%
+\item FortyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 40\%
 }
 }
 \author{
-{ Tim Capon \email{tim.capon.csiro.au}, Helena Clayton \email{helena.clayton@anu.edu.au}, Sally Thompson \email{sally.thompson@uwa.edu.au}, Greg Hertzler \email{ghertzlerau@gmail.com}, Philip Graham \email{phil@gramadvisory.com.au}, David Lindemayer \email{david.lindemayer@anu.edu} }
+Helena Clayton, Sally Thompson, Tim Capon, Greg Hertzler, Philip Graham, and David Lindenmayer, 2026
 }
 \keyword{datasets}
