@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><title>R: Observation intervals and the Ornstein-Uhlenbeck Process</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>OUP_ObservationInterval</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Observation intervals and the Ornstein-Uhlenbeck Process</h2>
+
+<h3>Description</h3>
+
+<p>Monte-Carlo simulation to demonstrate the effect of the observation interval on the
+rate of convergence, rho, and the scale, sigma.
+</p>
+
+
+<h3>Format</h3>
+
+<p>csv file with 366 rows and 3 columns
+</p>
+
+
+<h3>Details</h3>
+
+
+<ul>
+<li><p> Day: time variable in daily increments
+</p>
+</li>
+<li><p> z: sample paths with daily observations
+</p>
+</li>
+<li><p> Year: time variable as decimal year
+</p>
+</li></ul>
+
+<p>Observation intervals are measured in two different units:  days and years.
+</p>
+<p>Both sets of estimates have the same rho(t-s), where rho is the rate of convergence and
+t-s is the observation interval.  For observation intervals measured in days, t-s=1 and
+rho=1/2.  For observation intervals measured in years, t-s=1/365 and rho=365/2.  Location
+parameter, mu, is the same in both sets of estimates.  Scale parameter, sigma, is larger
+if rho is larger because the asymptotic variance, sigma^2/2rho, is the same in both sets
+of estimates.  If rho is 365 times bigger, sigma is 365^0.5 = 19.105 times bigger.
+</p>
+<p>Because rho(t-s) is the same, alpha = 0.5(1+exp(-rho(t-s))) is also the same, where alpha
+identifies the probability distribution of the estimates.
+</p>
+
+</main>
+
+</div>
+</body></html>

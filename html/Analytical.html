@@ -1,0 +1,3360 @@
+<!DOCTYPE html><html><head><title>R: R6 Class implementing Analytical formulas for an...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>Analytical</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>R6 Class implementing Analytical formulas for an Ornstein-Uhlenbeck Process</h2>
+
+<h3>Description</h3>
+
+<p>A set of functions to calculate probabilities, option prices, visiting
+times, first passage times and decision thresholds&ndash;everything for
+simple exit and entry options in a Real Options Analysis.
+</p>
+
+
+<h3>Formulas:</h3>
+
+<div class="sourceCode"><pre>z stochastic
+  Drift
+  Diffusion
+y stochastic
+  Mean
+  MeanToConverge
+  Variance
+  VarianceToConverge
+  Density
+  Probability
+  DoubleIntegral
+x stochastic
+  Option
+  OptionEnvelope
+  DecisionThreshold
+  Obligation
+t stochastic
+  PassageTimeMode
+  PassageTimeMedian
+  PassateTimeMean
+  PassageTimeVariance
+  PassageTimePercentiles
+  PassageTimeDensity
+  PassageTimeProbability
+</pre></div>
+
+
+<h3>Plots</h3>
+
+<div class="sourceCode"><pre>  PlotDrift
+  PlotDiffusion
+  PlotMean
+  PlotMeanToConverge
+  PlotVariance
+  PlotVarianceToConverge
+  PlotDensity
+  PlotProbability
+  PlotDoubleIntegral
+  PlotOption
+  PlotOptionEnvelope
+  PlotDecisionThreshold
+  PlotObligation
+  PlotPassageTimeModeMedianMean
+  PlotPassageTimeVariance
+  PlotPassageTimePercentiles
+  PlotPassageTimeDensity
+  PlotPassageTimeProbability
+</pre></div>
+
+
+<h3>Arguments of functions:</h3>
+
+<div class="sourceCode"><pre>  All arguments are optional in all functions.
+OUP parameters
+  rho:    rate parameter 0&lt;=rho&lt;inf
+  mu:     location parameter -inf&lt;mu&lt;inf
+  sigma:  scale parameter -inf&lt;sigma&lt;inf
+z stochastic
+  z:      vector of states -inf&lt;z&lt;inf
+y stochastic
+  t:      vector of times s&lt;=t&lt;inf
+  y:      vector of states -inf&lt;y&lt;inf
+  s:      initial time -inf&lt;s&lt;inf
+  x:      initial state -inf&lt;x&lt;inf
+  psi:    &lt;=0 for integral -inf to y,
+           &gt;0 for integral y to inf
+  eps:    proportion remaining after convergence 0&lt;=eps&lt;=1
+x stochastic
+  s:      vector of times -inf&lt;s&lt;t
+  x:      vector of states -inf&lt;x&lt;inf
+  t:      terminal time -inf&lt;t&lt;inf
+  y:      terminal state -inf&lt;y&lt;inf
+  r:      discount rate -inf&lt;r&lt;inf
+  phi:    &lt;=0 for exit option,
+           &gt;0 for entry option
+t stochastic
+  t:      vector of times s&lt;=t&lt;inf
+  k:      decision threshold -inf&lt;k&lt;int
+  s:      initial time -inf&lt;s&lt;inf
+  x:      initial state -inf&lt;x&lt;inf
+  omega:  degree of irreversibility 0&lt;=omega&lt;=1
+</pre></div>
+
+
+<h3>Using the formulas:</h3>
+
+<p>Demonstration scripts are files in the 'demo' directory. Identify a formula
+and in the console type:
+</p>
+<div class="sourceCode"><pre>  demo(A_FormulaName), or
+  demo(A_PlotFormulaName).
+</pre></div>
+
+
+<h3>Discussion:</h3>
+
+<p>Mathematical formulas and convergence criteria assume exact arithmetic.
+Floating-point arithmetic is another matter. It may overflow, underflow
+or have extreme cancellation. In principle, everything can be calculated
+by Monte Carlo simulation or Finite Difference methods. These solve
+continuous equations at discrete nodes, creating another source of error.
+Monte Carlo simulation of passage times can be accurate or biased,
+sometimes wildly so. The Finite Difference method can be accurate or give
+reasonable looking solutions that diverge from the true answers.
+</p>
+<p>Even if great care is taken, it is a good idea to calculate a solution in
+more than one way. This is one reason for analytical formulas.
+</p>
+<p>Another reason is to speed the calculations. Compared with the Finite
+Difference method, an analytical formula can calculate an option price
+up to 10,000 times quicker. Compared with Monte Carlo simulation, an
+analytical formula can calculate passage time probabilities up to
+100,000 times quicker.
+</p>
+<p>The bottom line of a real options analysis is the decision threshold
+and the mode, median and mean passage times. The many functions available
+are used in the calculations, but to go straight to the bottom line:
+</p>
+<div class="sourceCode"><pre>  A &lt;- Analytical$new()
+  A$DecisionThreshold()
+  A$PassageTimeMean()
+  A$PassageTimeVariance()
+  A$PlotPassageTimePercentiles(type=1)
+  A$PlotPassageTimePercentiles(type=2)
+</pre></div>
+<p>Perhaps a better measure of passage times are the percentiles. The mean
+does not exist if rho is zero and the variance does not exist if rho is
+small. The mode and median always exist.  Percentiles, which include the
+median, always exist.
+</p>
+<p>The passage time calculations are challenging. For example, the passage
+time density is too complicated to explain in this short discussion.
+But don't be surprised if it is bi-modal or even negative. Care must be
+taken in interpreting passage times.
+</p>
+<p>Examples in R6 don't work the same way as other R modules.  There is only
+one example for an R6 object, not one for each function in the object.
+To run examples, the devtools::run_examples() works, but the R command
+example(&quot;Analytical&quot;) doesn't.  You can copy commands to the clipboard,
+paste into the console and press Enter. Examples in this help and a simple
+example at the bottom can be run in this way.
+</p>
+<p>A better alternative is demo(), but this works sometimes, sometimes not.
+If you don't see the demos for this package, go to Files and demo.  You will
+see the demo names and then type something like demo(A_DecisionThreshold).
+</p>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-Analytical-new"><code>Analytical$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_oup_params"><code>Analytical$set_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_z_stoch_args"><code>Analytical$set_z_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_y_stoch_args"><code>Analytical$set_y_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_x_stoch_args"><code>Analytical$set_x_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_t_stoch_args"><code>Analytical$set_t_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_plot_info"><code>Analytical$set_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_all"><code>Analytical$get_all()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_oup_params"><code>Analytical$get_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_z_stoch_args"><code>Analytical$get_z_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_y_stoch_args"><code>Analytical$get_y_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_x_stoch_args"><code>Analytical$get_x_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_t_stoch_args"><code>Analytical$get_t_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_plot_info"><code>Analytical$get_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_plot_colors"><code>Analytical$get_plot_colors()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-axes_z_stoch"><code>Analytical$axes_z_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-axes_y_stoch"><code>Analytical$axes_y_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-axes_x_stoch"><code>Analytical$axes_x_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-axes_t_stoch"><code>Analytical$axes_t_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-sync_zyxt_stoch"><code>Analytical$sync_zyxt_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-undo_clear"><code>Analytical$undo_clear()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-undo_save"><code>Analytical$undo_save()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-undo_undo"><code>Analytical$undo_undo()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Drift"><code>Analytical$Drift()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Diffusion"><code>Analytical$Diffusion()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Mean"><code>Analytical$Mean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-MeanToConverge"><code>Analytical$MeanToConverge()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Variance"><code>Analytical$Variance()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-VarianceToConverge"><code>Analytical$VarianceToConverge()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Density"><code>Analytical$Density()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Probability"><code>Analytical$Probability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-DoubleIntegral"><code>Analytical$DoubleIntegral()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Option"><code>Analytical$Option()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-OptionEnvelope"><code>Analytical$OptionEnvelope()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-DecisionThreshold"><code>Analytical$DecisionThreshold()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-Obligation"><code>Analytical$Obligation()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PassageTimeMode"><code>Analytical$PassageTimeMode()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PassageTimeMedian"><code>Analytical$PassageTimeMedian()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PassageTimeMean"><code>Analytical$PassageTimeMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PassageTimeVariance"><code>Analytical$PassageTimeVariance()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PassageTimePercentiles"><code>Analytical$PassageTimePercentiles()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PassageTimeDensity"><code>Analytical$PassageTimeDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PassageTimeProbability"><code>Analytical$PassageTimeProbability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotDrift"><code>Analytical$PlotDrift()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotDiffusion"><code>Analytical$PlotDiffusion()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotMean"><code>Analytical$PlotMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotMeanToConverge"><code>Analytical$PlotMeanToConverge()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotVariance"><code>Analytical$PlotVariance()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotVarianceToConverge"><code>Analytical$PlotVarianceToConverge()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotDensity"><code>Analytical$PlotDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotProbability"><code>Analytical$PlotProbability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotDoubleIntegral"><code>Analytical$PlotDoubleIntegral()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotOption"><code>Analytical$PlotOption()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotOptionEnvelope"><code>Analytical$PlotOptionEnvelope()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotDecisionThreshold"><code>Analytical$PlotDecisionThreshold()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotObligation"><code>Analytical$PlotObligation()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotPassageTimeModeMedianMean"><code>Analytical$PlotPassageTimeModeMedianMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotPassageTimeVariance"><code>Analytical$PlotPassageTimeVariance()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotPassageTimePercentiles"><code>Analytical$PlotPassageTimePercentiles()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotPassageTimeDensity"><code>Analytical$PlotPassageTimeDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-PlotPassageTimeProbability"><code>Analytical$PlotPassageTimeProbability()</code></a>
+</p>
+</li></ul>
+
+
+<hr>
+<a id="method-Analytical-new"></a>
+
+
+
+<h4>Method <code>new()</code></h4>
+
+<p>Create an Analytical object
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$new(OUP = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>OUP</code></dt><dd><p>pointer set by the OUProcess object</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A new Analytical object
+</p>
+
+
+
+<h5>Examples</h5>
+
+<div class="r example copy">
+<pre>  A &lt;- Analytical$new()
+  A$DecisionThreshold()
+</pre>
+</div>
+
+
+<hr>
+<a id="method-Analytical-set_oup_params"></a>
+
+
+
+<h4>Method <code>set_oup_params()</code></h4>
+
+<p>Set OUP parameters
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rho,mu,sigma)
+</p>
+
+
+<hr>
+<a id="method-Analytical-set_z_stoch_args"></a>
+
+
+
+<h4>Method <code>set_z_stoch_args()</code></h4>
+
+<p>Set z as a stochastic state
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$set_z_stoch_args(z = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>z</code></dt><dd><p>vector of n states -inf&lt;z&lt;inf</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(z)
+</p>
+
+
+<hr>
+<a id="method-Analytical-set_y_stoch_args"></a>
+
+
+
+<h4>Method <code>set_y_stoch_args()</code></h4>
+
+<p>Set y as a stochastic state and its arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$set_y_stoch_args(
+  t = NULL,
+  y = NULL,
+  s = NULL,
+  x = NULL,
+  psi = NULL,
+  eps = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of n states -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
+<dt><code>eps</code></dt><dd><p>proportion remaining after convergence 0&lt;=eps&lt;=1</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,y,s,x,psi,eps)
+</p>
+
+
+<hr>
+<a id="method-Analytical-set_x_stoch_args"></a>
+
+
+
+<h4>Method <code>set_x_stoch_args()</code></h4>
+
+<p>Set x as a stochastic state and its arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$set_x_stoch_args(
+  s = NULL,
+  x = NULL,
+  t = NULL,
+  y = NULL,
+  r = NULL,
+  phi = NULL,
+  b = NULL,
+  c = NULL,
+  who = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>vector of m times -inf&lt;s&lt;t</p>
+</dd>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>t</code></dt><dd><p>terminal time -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
+</dd>
+<dt><code>b</code></dt><dd><p>lump-sum benefit for entry option</p>
+</dd>
+<dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(s,x,t,y,r,phi)
+</p>
+
+
+<hr>
+<a id="method-Analytical-set_t_stoch_args"></a>
+
+
+
+<h4>Method <code>set_t_stoch_args()</code></h4>
+
+<p>Set t stochastic arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$set_t_stoch_args(
+  t = NULL,
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  Ppct = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;inf</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of n alternate initial states -inf&lt;z&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>Ppct</code></dt><dd><p>passage time probability for a percentile  0.01&lt;=Ppct&lt;=0.99</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,k,s,x,z,omega)
+</p>
+
+
+<hr>
+<a id="method-Analytical-set_plot_info"></a>
+
+
+
+<h4>Method <code>set_plot_info()</code></h4>
+
+<p>Set information for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$set_plot_info(
+  type = NULL,
+  pmax = NULL,
+  ptmax = NULL,
+  fontfamily = NULL,
+  fontsize = NULL,
+  fileformat = NULL,
+  filewidth = NULL,
+  fileheight = NULL,
+  theme = NULL,
+  opaque = NULL,
+  walls = NULL,
+  floor = NULL,
+  labels = NULL,
+  who = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3 and 4 for 3D</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum vertical axis for transition density plot</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum vertical axis for passage time density plot</p>
+</dd>
+<dt><code>fontfamily</code></dt><dd><p>font family for plot labels</p>
+</dd>
+<dt><code>fontsize</code></dt><dd><p>font size for plot labels</p>
+</dd>
+<dt><code>fileformat</code></dt><dd><p>'png' or 'svg'</p>
+</dd>
+<dt><code>filewidth</code></dt><dd><p>pixel width of 2D plot, pixel width and height of 3D plot</p>
+</dd>
+<dt><code>fileheight</code></dt><dd><p>pixel height of 2D plot</p>
+</dd>
+<dt><code>theme</code></dt><dd><p>'light' or 'dark'</p>
+</dd>
+<dt><code>opaque</code></dt><dd><p>transparent to opaque background 0.0&lt;=opaque&lt;=1.0</p>
+</dd>
+<dt><code>walls</code></dt><dd><p>3D walls TRUE or FALSE</p>
+</dd>
+<dt><code>floor</code></dt><dd><p>3D floor TRUE or FALSE</p>
+</dd>
+<dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(type,font,file,theme,3D)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_all"></a>
+
+
+
+<h4>Method <code>get_all()</code></h4>
+
+<p>Get all arguments, time series and information
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_all()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(oup_params,z_stoch_args,y_stoch_args,x_stoch_args,t_stoch_args,plot_info)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_oup_params"></a>
+
+
+
+<h4>Method <code>get_oup_params()</code></h4>
+
+<p>Get OUP parameters
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_oup_params()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rho,mu,sigma)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_z_stoch_args"></a>
+
+
+
+<h4>Method <code>get_z_stoch_args()</code></h4>
+
+<p>Get z as a stochastic state
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_z_stoch_args()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(z)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_y_stoch_args"></a>
+
+
+
+<h4>Method <code>get_y_stoch_args()</code></h4>
+
+<p>Get y as a stochastic state and its arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_y_stoch_args()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,y,s,x,psi,eps)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_x_stoch_args"></a>
+
+
+
+<h4>Method <code>get_x_stoch_args()</code></h4>
+
+<p>Get x as a stochastic state and its arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_x_stoch_args()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(s,x,t,y,r,phi)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_t_stoch_args"></a>
+
+
+
+<h4>Method <code>get_t_stoch_args()</code></h4>
+
+<p>Get t stochastic arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_t_stoch_args()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,k,s,x,z,omega,Ppct)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_plot_info"></a>
+
+
+
+<h4>Method <code>get_plot_info()</code></h4>
+
+<p>Get information for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_plot_info()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(type,font,file,theme,3D,labels)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_plot_colors"></a>
+
+
+
+<h4>Method <code>get_plot_colors()</code></h4>
+
+<p>Get colors for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$get_plot_colors()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+</p>
+
+
+<hr>
+<a id="method-Analytical-axes_z_stoch"></a>
+
+
+
+<h4>Method <code>axes_z_stoch()</code></h4>
+
+<p>Scale axes for z stochastic arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$axes_z_stoch()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-Analytical-axes_y_stoch"></a>
+
+
+
+<h4>Method <code>axes_y_stoch()</code></h4>
+
+<p>Scale axes for y stochastic arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$axes_y_stoch()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-Analytical-axes_x_stoch"></a>
+
+
+
+<h4>Method <code>axes_x_stoch()</code></h4>
+
+<p>Scale axes for x stochastic arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$axes_x_stoch()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-Analytical-axes_t_stoch"></a>
+
+
+
+<h4>Method <code>axes_t_stoch()</code></h4>
+
+<p>Scale axes for t stochastic arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$axes_t_stoch()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-Analytical-sync_zyxt_stoch"></a>
+
+
+
+<h4>Method <code>sync_zyxt_stoch()</code></h4>
+
+<p>Synchronize states
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$sync_zyxt_stoch()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-Analytical-undo_clear"></a>
+
+
+
+<h4>Method <code>undo_clear()</code></h4>
+
+<p>Clear undo list and save current arguments to list
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$undo_clear()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>1
+</p>
+
+
+<hr>
+<a id="method-Analytical-undo_save"></a>
+
+
+
+<h4>Method <code>undo_save()</code></h4>
+
+<p>Save current arguments to undo list
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$undo_save()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>number of argument sets
+</p>
+
+
+<hr>
+<a id="method-Analytical-undo_undo"></a>
+
+
+
+<h4>Method <code>undo_undo()</code></h4>
+
+<p>Replace current arguments from undo list
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$undo_undo()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>c(index of this argument set, number of argument sets)
+</p>
+
+
+<hr>
+<a id="method-Analytical-Drift"></a>
+
+
+
+<h4>Method <code>Drift()</code></h4>
+
+<p>Calculate, plot and return drifts
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Drift(z = NULL, rho = NULL, mu = NULL, plotit = TRUE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>z</code></dt><dd><p>vector of n states</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(g(1xn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-Diffusion"></a>
+
+
+
+<h4>Method <code>Diffusion()</code></h4>
+
+<p>Calculate, plot and return diffusions
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Diffusion(z = NULL, sigma = NULL, plotit = TRUE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>z</code></dt><dd><p>vector of n states</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(h2(1xn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-Mean"></a>
+
+
+
+<h4>Method <code>Mean()</code></h4>
+
+<p>Calculate and plot means
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Mean(
+  t = NULL,
+  s = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(G(mx1))
+</p>
+
+
+<hr>
+<a id="method-Analytical-MeanToConverge"></a>
+
+
+
+<h4>Method <code>MeanToConverge()</code></h4>
+
+<p>Calculate and plot time for mean to converge
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$MeanToConverge(s = NULL, rho = NULL, eps = NULL, plotit = TRUE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>eps</code></dt><dd><p>proportion remaining after convergence 0&lt;=eps&lt;=1</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(Gteps)
+</p>
+
+
+<hr>
+<a id="method-Analytical-Variance"></a>
+
+
+
+<h4>Method <code>Variance()</code></h4>
+
+<p>Calculate and plot variances
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Variance(
+  t = NULL,
+  s = NULL,
+  rho = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(H2(mx1))
+</p>
+
+
+<hr>
+<a id="method-Analytical-VarianceToConverge"></a>
+
+
+
+<h4>Method <code>VarianceToConverge()</code></h4>
+
+<p>Calculate and plot time for variance to converge
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$VarianceToConverge(s = NULL, rho = NULL, eps = NULL, plotit = TRUE)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>eps</code></dt><dd><p>proportion remaining after convergence 0&lt;=eps&lt;=1</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(H2teps)
+</p>
+
+
+<hr>
+<a id="method-Analytical-Density"></a>
+
+
+
+<h4>Method <code>Density()</code></h4>
+
+<p>Calculate and plot transition densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Density(
+  t = NULL,
+  y = NULL,
+  s = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of n states -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(p(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-Probability"></a>
+
+
+
+<h4>Method <code>Probability()</code></h4>
+
+<p>Calculate and plot transition probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Probability(
+  t = NULL,
+  y = NULL,
+  s = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  psi = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of nstates -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(P(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-DoubleIntegral"></a>
+
+
+
+<h4>Method <code>DoubleIntegral()</code></h4>
+
+<p>Calculate and plot double integrals of transition densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$DoubleIntegral(
+  t = NULL,
+  y = NULL,
+  s = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  psi = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of n states -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(PP(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-Option"></a>
+
+
+
+<h4>Method <code>Option()</code></h4>
+
+<p>Calculate and plot option prices
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Option(
+  s = NULL,
+  x = NULL,
+  t = NULL,
+  y = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  r = NULL,
+  phi = NULL,
+  b = NULL,
+  c = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>vector of m times -inf&lt;s&lt;t</p>
+</dd>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>t</code></dt><dd><p>terminal time -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
+</dd>
+<dt><code>b</code></dt><dd><p>lump-sum benefit for entry option</p>
+</dd>
+<dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(O(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-OptionEnvelope"></a>
+
+
+
+<h4>Method <code>OptionEnvelope()</code></h4>
+
+<p>Calculate and plot the envelope of option prices
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$OptionEnvelope(
+  x = NULL,
+  y = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  r = NULL,
+  phi = NULL,
+  b = NULL,
+  c = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
+</dd>
+<dt><code>b</code></dt><dd><p>lump-sum benefit for entry option</p>
+</dd>
+<dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(Ohat(1xn),shat(1xn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-DecisionThreshold"></a>
+
+
+
+<h4>Method <code>DecisionThreshold()</code></h4>
+
+<p>Calculate and plot the decision threshold
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$DecisionThreshold(
+  x = NULL,
+  y = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  r = NULL,
+  phi = NULL,
+  b = NULL,
+  c = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
+</dd>
+<dt><code>b</code></dt><dd><p>lump-sum benefit for entry option</p>
+</dd>
+<dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(k,O)
+</p>
+
+
+<hr>
+<a id="method-Analytical-Obligation"></a>
+
+
+
+<h4>Method <code>Obligation()</code></h4>
+
+<p>Calculate and plot obligations and prohibitions, ie. benefit/cost analysis
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$Obligation(
+  s = NULL,
+  x = NULL,
+  t = NULL,
+  y = NULL,
+  rho = NULL,
+  mu = NULL,
+  r = NULL,
+  phi = NULL,
+  b = NULL,
+  c = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>vector of m times -inf&lt;s&lt;t</p>
+</dd>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>t</code></dt><dd><p>terminal time -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for obligation, &gt;0 for prohibition</p>
+</dd>
+<dt><code>b</code></dt><dd><p>lump-sum benefit for entry option</p>
+</dd>
+<dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(BC(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PassageTimeMode"></a>
+
+
+
+<h4>Method <code>PassageTimeMode()</code></h4>
+
+<p>Calculate and plot passage time modes
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PassageTimeMode(
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(tmode(1xn),tmodes(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PassageTimeMedian"></a>
+
+
+
+<h4>Method <code>PassageTimeMedian()</code></h4>
+
+<p>Calculate and plot passage time medians
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PassageTimeMedian(
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(tmedian(1xn),tmedians(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PassageTimeMean"></a>
+
+
+
+<h4>Method <code>PassageTimeMean()</code></h4>
+
+<p>Calculate and plot passage time means
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PassageTimeMean(
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(tmean(1xn),tmeans(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PassageTimeVariance"></a>
+
+
+
+<h4>Method <code>PassageTimeVariance()</code></h4>
+
+<p>Calculate and plot passage time variances
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PassageTimeVariance(
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>(tvariance(1xn),tvariances(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PassageTimePercentiles"></a>
+
+
+
+<h4>Method <code>PassageTimePercentiles()</code></h4>
+
+<p>Calculate and plot passage time percentiles
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PassageTimePercentiles(
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  Ppct = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>Ppct</code></dt><dd><p>passage time probability for a percentile 0.01&lt;=Ppct&lt;=0.99</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(tpercentile(1xn),tpercentiles(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PassageTimeDensity"></a>
+
+
+
+<h4>Method <code>PassageTimeDensity()</code></h4>
+
+<p>Calculate and plot passage time densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PassageTimeDensity(
+  t = NULL,
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(ptx(1xn),pt(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PassageTimeProbability"></a>
+
+
+
+<h4>Method <code>PassageTimeProbability()</code></h4>
+
+<p>Calculate and plot passage time probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PassageTimeProbability(
+  t = NULL,
+  k = NULL,
+  s = NULL,
+  x = NULL,
+  z = NULL,
+  omega = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(Ptx(1xn),Pt(mxn))
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotDrift"></a>
+
+
+
+<h4>Method <code>PlotDrift()</code></h4>
+
+<p>Plot drifts
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotDrift(
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotDiffusion"></a>
+
+
+
+<h4>Method <code>PlotDiffusion()</code></h4>
+
+<p>Plot diffusions
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotDiffusion(
+  type = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 2 and 3 for 2D</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotMean"></a>
+
+
+
+<h4>Method <code>PlotMean()</code></h4>
+
+<p>Plot means
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotMean(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 3 for 2D, 4 and 5 for 3D</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum scale for vertical axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotMeanToConverge"></a>
+
+
+
+<h4>Method <code>PlotMeanToConverge()</code></h4>
+
+<p>Plot the mean to converge
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotMeanToConverge(
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotVariance"></a>
+
+
+
+<h4>Method <code>PlotVariance()</code></h4>
+
+<p>Plot variances
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotVariance(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 2 and 3 for 2D, 4 and 5 for 3D</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum scale for vertical axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotVarianceToConverge"></a>
+
+
+
+<h4>Method <code>PlotVarianceToConverge()</code></h4>
+
+<p>Plot the variance to converge
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotVarianceToConverge(
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotDensity"></a>
+
+
+
+<h4>Method <code>PlotDensity()</code></h4>
+
+<p>Plot transition densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotDensity(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum scale for vertical axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotProbability"></a>
+
+
+
+<h4>Method <code>PlotProbability()</code></h4>
+
+<p>Plot transition probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotProbability(
+  type = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotDoubleIntegral"></a>
+
+
+
+<h4>Method <code>PlotDoubleIntegral()</code></h4>
+
+<p>Plot double integrals of transition densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotDoubleIntegral(
+  type = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotOption"></a>
+
+
+
+<h4>Method <code>PlotOption()</code></h4>
+
+<p>Plot options
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotOption(
+  type = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  sbeg = NULL,
+  send = NULL,
+  xbeg = NULL,
+  xend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>sbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>send</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>xbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>xend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotOptionEnvelope"></a>
+
+
+
+<h4>Method <code>PlotOptionEnvelope()</code></h4>
+
+<p>Plot the option envelope
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotOptionEnvelope(
+  type = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  sbeg = NULL,
+  send = NULL,
+  xbeg = NULL,
+  xend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 3 for 2D, 4, 5 and 6 for 3D</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>sbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>send</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>xbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>xend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotDecisionThreshold"></a>
+
+
+
+<h4>Method <code>PlotDecisionThreshold()</code></h4>
+
+<p>Plot the decision threshold
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotDecisionThreshold(
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  xbeg = NULL,
+  xend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>xbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>xend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotObligation"></a>
+
+
+
+<h4>Method <code>PlotObligation()</code></h4>
+
+<p>Plot obligations
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotObligation(
+  type = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  sbeg = NULL,
+  send = NULL,
+  xbeg = NULL,
+  xend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4, 5 and 6 for 3D</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>sbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>send</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>xbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>xend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotPassageTimeModeMedianMean"></a>
+
+
+
+<h4>Method <code>PlotPassageTimeModeMedianMean()</code></h4>
+
+<p>Plot passage time modes, medians and means
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotPassageTimeModeMedianMean(
+  type = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  ptmax = NULL,
+  title = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 1, 2, 3 and 4 for 2D, 5 and 6 for 3D</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum scale for vertical axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotPassageTimeVariance"></a>
+
+
+
+<h4>Method <code>PlotPassageTimeVariance()</code></h4>
+
+<p>Plot passage time variances
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotPassageTimeVariance(
+  type = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  title = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 3 and 4 for 2D</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotPassageTimePercentiles"></a>
+
+
+
+<h4>Method <code>PlotPassageTimePercentiles()</code></h4>
+
+<p>Plot passage time lower, median and upper percentiles
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotPassageTimePercentiles(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 1, 2, 3 and 4 for 2D, 5 and 6 for 3D</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum scale for vertical axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotPassageTimeDensity"></a>
+
+
+
+<h4>Method <code>PlotPassageTimeDensity()</code></h4>
+
+<p>Plot passage time densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotPassageTimeDensity(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3, 4 and 5 for 3D</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum scale for vertical axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-Analytical-PlotPassageTimeProbability"></a>
+
+
+
+<h4>Method <code>PlotPassageTimeProbability()</code></h4>
+
+<p>Plot passage time probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>Analytical$PlotPassageTimeProbability(
+  type = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3, 4 and 5 for 3D</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+
+
+<h3>Examples</h3>
+
+<pre><code class='language-R'>
+## ------------------------------------------------
+## Method `Analytical$new`
+## ------------------------------------------------
+
+  A &lt;- Analytical$new()
+  A$DecisionThreshold()
+</code></pre>
+
+</main>
+
+</div>
+</body></html>

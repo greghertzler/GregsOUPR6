@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><title>R: Farm Adaptation at Temora, New South Wales</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>Agric_NSW_GMTemora</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Farm Adaptation at Temora, New South Wales</h2>
+
+<h3>Description</h3>
+
+<p>APSIM generated gross margins for wheat (W), canola (C) and sheep (S)
+</p>
+
+
+<h3>Format</h3>
+
+<p>csv file with 50 rows and 5 columns
+</p>
+
+
+<h3>Details</h3>
+
+
+<ul>
+<li><p> Year: time variable in annual increments
+</p>
+</li>
+<li><p> CWWCWW GM: Gross margins per hectare for CWWCWW rotation
+</p>
+</li>
+<li><p> CWWSSS GM: Gross margins per hectare for CWWSSS rotation
+</p>
+</li>
+<li><p> SSSSC GM: Gross margins per hectare for SSSSC rotation
+</p>
+</li>
+<li><p> S GM: Gross margins per hectare for continuous S
+</p>
+</li></ul>
+
+
+
+<h3>Source</h3>
+
+<p>https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
+</p>
+
+</main>
+
+</div>
+</body></html>

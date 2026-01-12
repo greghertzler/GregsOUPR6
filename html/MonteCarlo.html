@@ -1,0 +1,341 @@
+<!DOCTYPE html><html><head><title>R: R6 Class implementing Monte Carlo simulation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>MonteCarlo</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>R6 Class implementing Monte Carlo simulation</h2>
+
+<h3>Description</h3>
+
+<p>This object is a placeholder to be completed in a future version.
+</p>
+
+
+<h3>Methods:</h3>
+
+<p>To be completed.
+</p>
+
+
+<h3>Plots:</h3>
+
+<p>To be completed,
+</p>
+
+
+<h3>Arguments of functions:</h3>
+
+<div class="sourceCode"><pre>  All arguments are optional in all functions.
+</pre></div>
+<p>To be completed.
+</p>
+
+
+<h3>Using the methods:</h3>
+
+<p>Demonstration scripts are in files in the 'demo' directory. Identify a
+formula and in the console type:
+</p>
+<div class="sourceCode"><pre>  demo(MC_FormulaName), or
+  demo(MC_PlotFormulaName).
+</pre></div>
+
+
+<h3>Discussion:</h3>
+
+<p>To be completed.
+</p>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-MonteCarlo-new"><code>MonteCarlo$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-set_oup_params"><code>MonteCarlo$set_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-set_plot_info"><code>MonteCarlo$set_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_oup_params"><code>MonteCarlo$get_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_plot_info"><code>MonteCarlo$get_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_plot_colors"><code>MonteCarlo$get_plot_colors()</code></a>
+</p>
+</li></ul>
+
+
+<hr>
+<a id="method-MonteCarlo-new"></a>
+
+
+
+<h4>Method <code>new()</code></h4>
+
+<p>Create a MonteCarlo object
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MonteCarlo$new(OUP = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>OUP</code></dt><dd><p>pointer set by the OUProcess object</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A new MonteCarlo object
+</p>
+
+
+
+<h5>Examples</h5>
+
+<div class="r example copy">
+<pre>  MC &lt;- MonteCarlo$new()
+  MC$get_oup_params()
+</pre>
+</div>
+
+
+<hr>
+<a id="method-MonteCarlo-set_oup_params"></a>
+
+
+
+<h4>Method <code>set_oup_params()</code></h4>
+
+<p>Set OUP parameters
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MonteCarlo$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rho,mu,sigma)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-set_plot_info"></a>
+
+
+
+<h4>Method <code>set_plot_info()</code></h4>
+
+<p>Set information for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MonteCarlo$set_plot_info(
+  type = NULL,
+  pmax = NULL,
+  ptmax = NULL,
+  fontfamily = NULL,
+  fontsize = NULL,
+  fileformat = NULL,
+  filewidth = NULL,
+  fileheight = NULL,
+  theme = NULL,
+  opaque = NULL,
+  walls = NULL,
+  floor = NULL,
+  labels = NULL,
+  who = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3 and 4 for 3D</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum vertical axis for transition density plot</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum vertical axis for passage time density plot</p>
+</dd>
+<dt><code>fontfamily</code></dt><dd><p>font family for plot labels</p>
+</dd>
+<dt><code>fontsize</code></dt><dd><p>font size for plot labels</p>
+</dd>
+<dt><code>fileformat</code></dt><dd><p>'png' or 'svg'</p>
+</dd>
+<dt><code>filewidth</code></dt><dd><p>pixel width of 2D plot, pixel width and height of 3D plot</p>
+</dd>
+<dt><code>fileheight</code></dt><dd><p>pixel height of 2D plot</p>
+</dd>
+<dt><code>theme</code></dt><dd><p>'light' or 'dark'</p>
+</dd>
+<dt><code>opaque</code></dt><dd><p>transparent to opaque background 0.0&lt;=opaque&lt;=1.0</p>
+</dd>
+<dt><code>walls</code></dt><dd><p>3D walls TRUE or FALSE</p>
+</dd>
+<dt><code>floor</code></dt><dd><p>3D floor TRUE or FALSE</p>
+</dd>
+<dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(type,font,file,theme,3D,labels)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_oup_params"></a>
+
+
+
+<h4>Method <code>get_oup_params()</code></h4>
+
+<p>Get OUP parameters
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MonteCarlo$get_oup_params()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rho,mu,sigma)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_plot_info"></a>
+
+
+
+<h4>Method <code>get_plot_info()</code></h4>
+
+<p>Get information for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MonteCarlo$get_plot_info()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(type,font,file,theme,3D,labels)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_plot_colors"></a>
+
+
+
+<h4>Method <code>get_plot_colors()</code></h4>
+
+<p>Get colors for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MonteCarlo$get_plot_colors()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+</p>
+
+
+
+
+<h3>Examples</h3>
+
+<pre><code class='language-R'>
+## ------------------------------------------------
+## Method `MonteCarlo$new`
+## ------------------------------------------------
+
+  MC &lt;- MonteCarlo$new()
+  MC$get_oup_params()
+</code></pre>
+
+</main>
+
+</div>
+</body></html>

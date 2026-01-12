@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><title>R: US Dollars per Australian Dollar</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>Finance_USDAUD</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>US Dollars per Australian Dollar</h2>
+
+<h3>Description</h3>
+
+<p>Daily exchange rates from 1 July 2024 to 30 June 2025,
+with AUD as the base currency and USD as the quote currency
+</p>
+
+
+<h3>Format</h3>
+
+<p>csv file with 258 rows and 7 columns
+</p>
+
+
+<h3>Details</h3>
+
+
+<ul>
+<li><p> Day: time variable in days since 1 July 2024
+</p>
+</li>
+<li><p> Open: Rate at session open in USD/AUD
+</p>
+</li>
+<li><p> High: Daily high rate in USD/AUD
+</p>
+</li>
+<li><p> Low: Daily low rate in USD/AUD
+</p>
+</li>
+<li><p> Close: Rate at session close in USD/AUD
+</p>
+</li>
+<li><p> Adj Close: Same as Close for exchange rates
+</p>
+</li>
+<li><p> Year: time variable as decimal year
+</p>
+</li></ul>
+
+
+
+<h3>Source</h3>
+
+<p>https://finance.yahoo.com/quote (search for AUDUSD=X)
+</p>
+
+</main>
+
+</div>
+</body></html>

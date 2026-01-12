@@ -1,0 +1,706 @@
+<!DOCTYPE html><html><head><title>R: R6 Class implementing OUProcess, a container to synchronize...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>OUProcess</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>R6 Class implementing OUProcess, a container to synchronize OUP objects.</h2>
+
+<h3>Description</h3>
+
+<p>The Analytical, FiniteDifference, MaximumLikelihood and MonteCarlo objects
+are a complete set of functions for maximum likelihood estimation and
+for the calculation of probabilities, option prices, visiting times, first
+passage times, decision thresholds and more&ndash;everything for a Real Options
+Analysis.
+Each object can be used by itself.  This object, OUProcess, will instantiate
+and synchronize the other objects.
+</p>
+
+
+<h3>Functions are categorized by:</h3>
+
+<div class="sourceCode"><pre>Solution methods,
+Stochastic variables and
+Random variables.
+</pre></div>
+
+
+<h3>Solution methods include:</h3>
+
+<div class="sourceCode"><pre>Analytical formulas,
+Finite Difference method,
+Maximum Likelihood estimation, and
+Monte Carlo simulation.
+</pre></div>
+
+
+<h3>Stochastic variables can be:</h3>
+
+<div class="sourceCode"><pre>z, generic states of the system,
+y, future or forward states of the system,
+x, current or backward states of the system, and
+t, future or forward times.
+</pre></div>
+
+
+<h3>Random variables can be::</h3>
+
+<div class="sourceCode"><pre>rho, mu and sigma, the OUP parameters.
+</pre></div>
+
+
+<h3>Analytical formulas:</h3>
+
+<div class="sourceCode"><pre>z stochastic
+  Drift
+  Diffusion
+y stochastic
+  Mean
+  MeanToConverge
+  Variance
+  VarianceToConverge
+  Density
+  Probability
+  DoubleIntegral
+x stochastic
+  Option
+  OptionEnvelope
+  DecisionThreshold
+t stochastic
+  PassageTimeMode
+  PassageTimeMedian
+  PassageTimeMean
+  PassageTimeVariance
+  PassageTimePercentile
+  PassageTimeDensity
+  PassageTimeProbability
+</pre></div>
+
+
+<h3>Finite Difference method:</h3>
+
+<div class="sourceCode"><pre>x stochastic
+  Drift
+  Diffusion
+  TerminalValue_Linear
+  TerminalValue_Kinked
+  TerminalValue_Stepped
+  TerminalValue_Mitscherlich
+  TerminalValue_Gompertz
+  TerminalValue_Logistic
+  TerminalValue_Transcendental
+  TerminalValue_YieldIndex
+  TerminalValue
+  Option
+  OptionEnvelope
+  DecisionThreshold
+</pre></div>
+
+
+<h3>Maximum Likelihood estimation:</h3>
+
+<div class="sourceCode"><pre>rho, mu and sigma random
+  LogLikelihood
+  Estimates
+  GoodnessOfFit
+  LikelihoodRatioTest
+</pre></div>
+
+
+<h3>Monte Carlo simulation:</h3>
+
+<div class="sourceCode"><pre>y stochastic
+  SamplePaths
+  BoundedSamplePaths
+  Probabilities
+x stochastic
+  Option
+t stochastic
+  PassageTimeProbabilities
+</pre></div>
+
+
+<h3>Using the formulas and methods:</h3>
+
+<p>This object, OUProcess, and the Analytical, FiniteDifference,
+MaximumLikelihood and Monte-Carlo objects can be instantiated together
+by:
+</p>
+<div class="sourceCode"><pre>  OUP &lt;- OUProcess$new()
+</pre></div>
+<p>Then pointers to individual objects can be accessed by:
+</p>
+<div class="sourceCode"><pre>  A &lt;- OUP$get_Analytical()
+  FD &lt;- OUP$get_FiniteDifference()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
+</pre></div>
+<p>Then methods of individual objects can be called by, for example:
+</p>
+<div class="sourceCode"><pre>  A$Drift()
+  FD$Drift()
+  ML$LogLikelihood()
+  MC$ForwardPaths()
+</pre></div>
+<p>OUP will have pointers to A, FD, ML and MC.  A, FD, ML and MC will each
+have a pointer to OUP. Thus A, FD, ML and MC can follow the pointers to
+synchronize with each other. For example,rho, mu and sigma estimated in ML
+will be propagated to the other objects:
+</p>
+<div class="sourceCode"><pre>  ML$Estimates()
+  A$Option()
+</pre></div>
+<p>Alternately, each object can be instantiated individually:
+</p>
+<div class="sourceCode"><pre>  A &lt;- Analytical$new()
+  FD &lt;- FiniteDifference$new()
+  ML &lt;- MaximumLikelihood$new()
+  MC &lt;- MonteCarlo$new()
+</pre></div>
+<p>In this case, A, FD, ML and MC will not have pointers and will not
+synchronize. To estimate rho, mu and sigma and calculate option prices
+would require:
+</p>
+<div class="sourceCode"><pre>  estimates &lt;- ML$Estimates()
+  rho &lt;- estimates$rho
+  mu &lt;- estimates$mu
+  sigma &lt;- estimates$sigma
+  A$Option(rho=rho,mu=mu,sigma=sigma)
+</pre></div>
+<p>The functions all return named lists and estimates is a list of rho, mu and
+sigma.  The functions will also accept named lists as arguments:
+</p>
+<div class="sourceCode"><pre>  estimates &lt;- ML$Estimates()
+  rho &lt;- estimates[1]
+  mu &lt;- estimates[2]
+  sigma &lt;- estimates[3]
+  A$Option(rho=rho,mu=mu,sigma=sigma)
+</pre></div>
+<p>The single brackets assign named lists to the left-hand variables. If a
+function is called with a named list as an argument, it strips the names
+before using the numbers in its calculations.  As a general rule, named lists
+as arguments do not work.  If you wish to use numbers for the arguments you
+should use double brackets:
+</p>
+<div class="sourceCode"><pre>  estimates &lt;- ML$Estimates()
+  rho &lt;- estimates$[[1]]
+  mu &lt;- estimates$[[2]]
+  sigma &lt;- estimates$[[3]]
+  A$Option(rho,mu,sigma)
+</pre></div>
+<p>This will strip the name and the variables on the left-hand side are just
+numbers.  The arguments do not have to be accompanied by their names, as in
+rho=rho, where the first rho is the name and the second rho is the variable.
+They can also be entered by their position, with rho first, mu second and
+sigma third.
+</p>
+<p>These examples will both print a table of option prices and draw a plot.
+The plot is optional:
+</p>
+<div class="sourceCode"><pre>  A$Option(plotit=FALSE)
+</pre></div>
+<p>The table of numbers is also optional:
+</p>
+<div class="sourceCode"><pre>  options &lt;- A$Option()
+</pre></div>
+<p>or:
+</p>
+<div class="sourceCode"><pre>  A$set_oup_params(rho=rho,mu=mu,sigma=sigma)
+  A$PlotOption()
+</pre></div>
+<p>Most methods have a corresponding plot routine. By design, the plot routines
+do not take parameters as arguments, which must be set separately.
+</p>
+<p>If rho, mu or sigma is changed in one method, it is changed for all methods.
+If a data frame is read, it is available to all methods. For example, a
+time series may be entered to estimate parameters and then used to calculate
+the goodness-of-fit:
+</p>
+<div class="sourceCode"><pre>  df &lt;- read.csv("data/OUP_SimulatedData.csv")
+  ML$Estimates(df=df,taucol=1,zcol=3)
+  ML$GoodnessOfFit()
+</pre></div>
+<p>If the state variable is changed in the Analytical object, it may also
+change in the FiniteDifference object. Plot information is also shared across
+objects.  This complicated communication allows code to be split into modules.
+</p>
+<p>The communication within each module is also complicated.  The modules are
+reactive.  In other words, don't calculate anything twice.  There is a cache
+of inputs and a cache of outputs, managed by set/get functions.  In the
+diagram to follow, A are arguments, I are inputs, O are outputs, S is a set
+function and G is a get function.
+</p>
+<div class="sourceCode"><pre>                A
+       cache    |    cache
+  G &lt;--  I  &lt;-&gt; S --&gt;  O
+  |             |
+  I             I
+</pre></div>
+<p>Arguments enter the set function which validates the arguments and compares
+the arguments to the input cache.  If there is a change, the input cache is
+set and all outputs in the output cache which depend on that argument are
+set to NULL.  Finally, the set function returns the new input cache.  The
+get function will return the input cache without checking or changes.
+</p>
+<p>Once the arguments are set, other functions can be called.  In the diagram
+below, C is a calculation function called without arguments.
+</p>
+<div class="sourceCode"><pre>        |    cache
+  G --&gt; C &lt;-&gt;  O
+        |
+        O
+</pre></div>
+<p>The calculation function gets the input cache and checks the output cache.
+If the output cache is NULL, outputs are calculated, the cache is set and
+then returned.  If the output cache is not NULL, it is returned.  Thus a
+calculation function calculates once and then acts like a get function.
+</p>
+<p>For convenience, arguments can be entered directly into the calculation
+functions.
+</p>
+<div class="sourceCode"><pre>        A
+        |    cache
+  S &lt;-&gt; C &lt;-&gt;  O
+        |
+        O
+</pre></div>
+<p>A calculation function sends the arguments to the set function which does
+its work and returns the input cache.  Then the calculation function checks
+the output cache, does its work and returns the output cache.
+</p>
+<p>Most calculation functions have a corresponding plot function.  There is a
+complicated relationship between them.  In the R console, you probably
+want calculations.  In RShiny, you get the plots.  In the R console, the
+calculation functions are in charge and in RShiny, the plot functions
+are in charge.
+</p>
+<p>In the diagrams below, P is a plot function and T is a flag set to true and
+F is the same flag set to false.  By default, the flag is set to T.  There
+are three possibilities if the calculation functions are in charge.
+</p>
+<div class="sourceCode"><pre>  F        T
+  |        |              |
+  C        C --&gt; P        C --&gt; P
+  |        |     |        |     |
+  O        O    plot      O    plot
+</pre></div>
+<p>The flag is an argument to the calculation function.  If the calculation
+function is called with a false flag, it returns the output cache.  If
+the calculation function is called with a true flag, it returns the output
+cache and calls the plot function which returns a plot.
+</p>
+<p>To prevent a circular reference, the flag is always false if a plot function
+is in charge.
+</p>
+<div class="sourceCode"><pre>          |              |
+  C &lt;-F-&gt; P      C &lt;-F-&gt; P &lt;-F-&gt; C
+          |              |
+         plot           plots
+</pre></div>
+<p>The plot function calls the calculation function with a false flag, gets the
+output cache and returns a plot.  Some plot functions manage more than one
+calculation function and return several different types of plots.
+</p>
+<p>In summary, methods include set, get, calculation and plot functions.  Help
+for a method is in the help for its object:
+</p>
+<div class="sourceCode"><pre>  ?Analytical
+  ?FiniteDifference
+  ?MaximumLikelihood
+  ?MonteCarlo
+</pre></div>
+<p>These and a more complete html help can be accessed by:
+</p>
+<div class="sourceCode"><pre>  OUPHelp()
+</pre></div>
+<p>Scripts to demonstrate the methods are in files in the 'demo' directory. To
+see a list of the demos, type:
+</p>
+<div class="sourceCode"><pre>  demo()
+</pre></div>
+<p>To run the 'A_Density' demo, type:
+</p>
+<div class="sourceCode"><pre>  demo(A_Density)
+</pre></div>
+<p>or type:
+</p>
+<div class="sourceCode"><pre>  source('demo/A_Density.R',echo=TRUE)
+</pre></div>
+<p>or, open the A_Density.R file in RStudio and Source it from the menu.
+</p>
+<p>Available data sets for Maximum Likelihood estimation have their own help.
+Type one of the categories:
+</p>
+<div class="sourceCode"><pre>  ?Agric_
+  ?Climate_
+  ?Ecosys_
+  ?Finance_
+  ?OUP_
+</pre></div>
+<p>and then select from the drop-down list.
+</p>
+<p>Examples in R6 don't work the same as in S3 and S4 modules.  There is only
+one example for an R6 object, not one for each method in the object.
+To run examples, the devtools::run_examples() works, but the R command
+example(&quot;OUProcess&quot;) doesn't.  You can copy commands to the clipboard,
+paste into the console and press Enter. Examples in this help and a simple
+example at the bottom can be run in this way.
+</p>
+<p>But really, the examples are included to pass CRAN tests.  Start with
+RShiny.  Then if you decide to work in the console, run the demos.
+</p>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-OUProcess-new"><code>OUProcess$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-OUProcess-get_Analytical"><code>OUProcess$get_Analytical()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-OUProcess-get_FiniteDifference"><code>OUProcess$get_FiniteDifference()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-OUProcess-get_MaximumLikelihood"><code>OUProcess$get_MaximumLikelihood()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-OUProcess-get_MonteCarlo"><code>OUProcess$get_MonteCarlo()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-OUProcess-send_oup_params"><code>OUProcess$send_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-OUProcess-send_x_stoch_args"><code>OUProcess$send_x_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-OUProcess-send_plot_info"><code>OUProcess$send_plot_info()</code></a>
+</p>
+</li></ul>
+
+
+<hr>
+<a id="method-OUProcess-new"></a>
+
+
+
+<h4>Method <code>new()</code></h4>
+
+<p>Create an OUProcess object as a container for other objects
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$new()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>A new OUProcess object
+</p>
+
+
+
+<h5>Examples</h5>
+
+<div class="r example copy">
+<pre>  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  FD &lt;- OUP$get_FiniteDifference()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
+  ML$Estimates()
+  MC$get_oup_params()
+  A$Option()
+  FD$TerminalValue_Mitscherlich(plotit=FALSE)
+  FD$Option()
+</pre>
+</div>
+
+
+<hr>
+<a id="method-OUProcess-get_Analytical"></a>
+
+
+
+<h4>Method <code>get_Analytical()</code></h4>
+
+<p>Pointer to Analytical object
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$get_Analytical()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>pointer
+</p>
+
+
+<hr>
+<a id="method-OUProcess-get_FiniteDifference"></a>
+
+
+
+<h4>Method <code>get_FiniteDifference()</code></h4>
+
+<p>Pointer to FiniteDifference object
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$get_FiniteDifference()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>pointer
+</p>
+
+
+<hr>
+<a id="method-OUProcess-get_MaximumLikelihood"></a>
+
+
+
+<h4>Method <code>get_MaximumLikelihood()</code></h4>
+
+<p>Pointer to MaximumLikelihood object
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$get_MaximumLikelihood()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>pointer
+</p>
+
+
+<hr>
+<a id="method-OUProcess-get_MonteCarlo"></a>
+
+
+
+<h4>Method <code>get_MonteCarlo()</code></h4>
+
+<p>Pointer to MonteCarlo object
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$get_MonteCarlo()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>pointer
+</p>
+
+
+<hr>
+<a id="method-OUProcess-send_oup_params"></a>
+
+
+
+<h4>Method <code>send_oup_params()</code></h4>
+
+<p>Send OUP parameters
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$send_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+<hr>
+<a id="method-OUProcess-send_x_stoch_args"></a>
+
+
+
+<h4>Method <code>send_x_stoch_args()</code></h4>
+
+<p>send x as a stochastic state and its arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$send_x_stoch_args(
+  s = NULL,
+  x = NULL,
+  r = NULL,
+  phi = NULL,
+  who = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>vector of m times -inf&lt;s&lt;t</p>
+</dd>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+<hr>
+<a id="method-OUProcess-send_plot_info"></a>
+
+
+
+<h4>Method <code>send_plot_info()</code></h4>
+
+<p>Send information for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>OUProcess$send_plot_info(
+  type = NULL,
+  pmax = NULL,
+  ptmax = NULL,
+  fontfamily = NULL,
+  fontsize = NULL,
+  fileformat = NULL,
+  filewidth = NULL,
+  fileheight = NULL,
+  theme = NULL,
+  opaque = NULL,
+  walls = NULL,
+  floor = NULL,
+  labels = NULL,
+  who = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3 and 4 for 3D</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum vertical axis for transition density plot</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum vertical axis for passage time density plot</p>
+</dd>
+<dt><code>fontfamily</code></dt><dd><p>font family for plot labels</p>
+</dd>
+<dt><code>fontsize</code></dt><dd><p>font size for plot labels</p>
+</dd>
+<dt><code>fileformat</code></dt><dd><p>'png' or 'svg'</p>
+</dd>
+<dt><code>filewidth</code></dt><dd><p>pixel width of 2D plot, pixel width and height of 3D plot</p>
+</dd>
+<dt><code>fileheight</code></dt><dd><p>pixel height of 2D plot</p>
+</dd>
+<dt><code>theme</code></dt><dd><p>'light' or 'dark'</p>
+</dd>
+<dt><code>opaque</code></dt><dd><p>transparent to opaque background 0.0&lt;=opaque&lt;=1.0</p>
+</dd>
+<dt><code>walls</code></dt><dd><p>3D walls TRUE or FALSE</p>
+</dd>
+<dt><code>floor</code></dt><dd><p>3D floor TRUE or FALSE</p>
+</dd>
+<dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+
+<h3>Examples</h3>
+
+<pre><code class='language-R'>
+## ------------------------------------------------
+## Method `OUProcess$new`
+## ------------------------------------------------
+
+  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  FD &lt;- OUP$get_FiniteDifference()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
+  ML$Estimates()
+  MC$get_oup_params()
+  A$Option()
+  FD$TerminalValue_Mitscherlich(plotit=FALSE)
+  FD$Option()
+</code></pre>
+
+</main>
+
+</div>
+</body></html>
