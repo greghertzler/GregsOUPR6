@@ -2432,29 +2432,28 @@ NULL
 
 #' Water in Farm Dams in the Riverina of New South Wales
 #'
-#' Matlab generated water volumes in a 4000 cubic metre dam with tree
-#'  windbreaks to suppress evaporation, and a merino sheep flock size of
-#'  2000 dry sheep equivalents.
+#' Stock water management to improve drought resilience in intensive-use grazing landscapes.
+#' MatLab simulated water volumes for a 4,000 cubic metre dam.
 #'
 #' \itemize{
 #'   \item Run Days: time variable in daily increments
 #'   \item Baseline: water volumes in cubic metres without a windbreak
-#'   \item TwentyPct scenario: water volumes in cubic metres with a windbreak
-#'    to suppress evaporation by 20%
-#'   \item FortyPct scenario: water volumes in cubic metres with a windbreak
-#'    to suppress evaporation by 40%
+#'   \item TwentyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 20%
+#'   \item FortyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 40%
 #' }
 #'
 #' @docType data
 #' @keywords datasets
 #' @name Agric_NSW_FarmDamsRiverina
 #' @format csv file with 19313 rows and 4 columns
-#' @author { Tim Capon \email{tim.capon.csiro.au}, Helena Clayton \email{helena.clayton@anu.edu.au}, Sally Thompson \email{sally.thompson@uwa.edu.au}, Greg Hertzler \email{ghertzlerau@gmail.com}, Philip Graham \email{phil@gramadvisory.com.au}, David Lindemayer \email{david.lindemayer@anu.edu} }
+#' @author Helena Clayton, Sally Thompson, Tim Capon, Greg Hertzler, Philip Graham, and David Lindenmayer, 2026
+#' @source corresponding author: Tim Capon \email{tim.capon.csiro.au}
 NULL
 
 #' Farm Adaptation at Cootamundra, New South Wales
 #'
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S)
+#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
+#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2468,12 +2467,14 @@ NULL
 #' @keywords datasets
 #' @name Agric_NSW_GMCootamundra
 #' @format csv file with 50 rows and 5 columns
+#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
 #' Farm Adaptation at Narrendera, New South Wales
 #'
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S)
+#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
+#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2487,12 +2488,14 @@ NULL
 #' @keywords datasets
 #' @name Agric_NSW_GMNarrendera
 #' @format csv file with 50 rows and 5 columns
+#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
 #' Farm Adaptation at Temora, New South Wales
 #'
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S)
+#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
+#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2506,12 +2509,14 @@ NULL
 #' @keywords datasets
 #' @name Agric_NSW_GMTemora
 #' @format csv file with 50 rows and 5 columns
+#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
 #' Soil Health with Stubble Management
 #'
-#' CSIRO Harden Long-Term Tillage Experiment
+#' CSIRO Harden Long-Term Tillage Experiment. v3. CSIRO. Data Collection.
+#' Soil nitrogen and water in the top 160 millimetres.
 #'
 #' \itemize{
 #'   \item Year: time variable in sporadic increments
@@ -2525,12 +2530,14 @@ NULL
 #' @keywords datasets
 #' @name Agric_NSW_SoilHealthHarden
 #' @format csv file with 30 rows and 5 columns
-#' @source https://data.csiro.au/collection/csiro:61293?q=population%20data&_st=keyword&_str=210&_si=7
+#' @author Kirkegaard, John; & Lilley, Julianne, 2023
+#' @source https://doi.org/10.25919/2jqe-mz45
 NULL
 
 #' Farm Adaptation at Clare, South Australia
 #'
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents
+#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
+#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2546,12 +2553,14 @@ NULL
 #' @keywords datasets
 #' @name Agric_SA_GMClare
 #' @format csv file with 108 rows and 7 columns
+#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
 #' Farm Adaptation at Hawker, South Australia
 #'
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents
+#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
+#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2567,12 +2576,14 @@ NULL
 #' @keywords datasets
 #' @name Agric_SA_GMHawker
 #' @format csv file with 108 rows and 7 columns
+#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
 #' Farm Adaptation at Orroroo, South Australia
 #'
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents
+#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
+#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2588,12 +2599,14 @@ NULL
 #' @keywords datasets
 #' @name Agric_SA_GMOrroroo
 #' @format csv file with 108 rows and 7 columns
+#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
 #' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
 NULL
 
-#' Waite Permanent Rotation Trial, South Australia
+#' Long Term Crop Rotations, South Australia
 #'
-#' Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993
+#' Waite Permanent Rotation Trial. v4. CSIRO. Data Collection.
+#' Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2632,12 +2645,13 @@ NULL
 #' @keywords datasets
 #' @name Agric_SA_WaiteRotationTrial
 #' @format csv file with 70 rows and 30 columns
-#' @source Sanderman, Jonathan; David, Rakesh; Moore, Andrew; Keith, Heather; & Farquharson, Ryan (2015): Waite Permanent Rotation Trial. v4. CSIRO. Data Collection. https://doi.org/10.4225/08/55E5165EC0D29
+#' @author Sanderman, Jonathan; David, Rakesh; Moore, Andrew; Keith, Heather; & Farquharson, Ryan, 2015
+#' @source https://doi.org/10.4225/08/55E5165EC0D29
 NULL
 
 #' Tree shelter belts in Tasmania
 #'
-#' CSIRO Perennial Prosperity Project
+#' CSIRO Perennial Prosperity Project.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2649,7 +2663,8 @@ NULL
 #' @keywords datasets
 #' @name Agric_Tas_TreeShelterBelts
 #' @format csv file with 52 rows and 3 columns
-#' @author { Tim Capon \email{tim.capon@csiro.au}, Daniel Mendham \email{daniel.mendham@csiro.au} }
+#' @author Tim Capon, Daniel Mendham, 2024
+#' @source corresponding author, Tim Capon \email{tim.capon@csiro.au}
 NULL
 
 #' European Union Emission Trading System
@@ -2674,8 +2689,8 @@ NULL
 
 #' Sea Level at Port Kembla
 #'
-#' Bureau of Meteorology Australian Baseline Sea Level Monitoring Project, with
-#' measurements smoothed to eliminate variability.
+#' Australian Baseline Sea Level Monitoring Project.
+#' Sea levels above Tide Guage Zero for 2023.
 #'
 #' \itemize{
 #'   \item Day in 2023: time variable in hourly increments
@@ -2691,12 +2706,14 @@ NULL
 #' @keywords datasets
 #' @name Climate_SeaLevel_PortKembla
 #' @format csv file with 7985 rows and 5 columns
+#' @author Bureau of Meteorology
 #' @source http://www.bom.gov.au/oceanography/projects/abslmp/data/data.shtml
 NULL
 
 #' Sunspot Numbers
 #'
-#' World Data Center SILSO, Royal Observatory of Belgium
+#' International Sunspot Number V2.0.
+#' Sunspot numbers and groups of sunspot numbers.
 #'
 #' \itemize{
 #'   \item DecimalYear: time variable in daily increments
@@ -2707,12 +2724,13 @@ NULL
 #' @keywords datasets
 #' @name Climate_Sunspots
 #' @format csv file with 3316 rows and 2 columns
+#' @author Royal Observatory of Belgium
 #' @source https://doi.org/10.24414/qnza-ac80
 NULL
 
 #' Maximum daily temperatures at Cape Otway
 #'
-#' Bureau of Meteorology, raw (unhomogenized) data.
+#' Raw (unhomogenized) data.
 #'
 #' \itemize{
 #'   \item Year: time variable in daily increments
@@ -2723,12 +2741,13 @@ NULL
 #' @keywords datasets
 #' @name Climate_TempsMax_CapeOtway
 #' @format csv file with 8888 rows and 2 columns
+#' @author Bureau of Meteorology
 #' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 090015
 NULL
 
 #' Maximum daily temperatures at Darwin
 #'
-#' Bureau of Meteorology, raw (Unhomogenized) data.
+#' Raw (Unhomogenized) data.
 #'
 #' \itemize{
 #'   \item Year: time variable in daily increments
@@ -2739,12 +2758,13 @@ NULL
 #' @keywords datasets
 #' @name Climate_TempsMax_Darwin
 #' @format csv file with 9127 rows and 2 columns
+#' @author Bureau of Meteorology
 #' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 014040
 NULL
 
 #' Maximum daily temperatures at Tennant Creek
 #'
-#' Bureau of Meteorology, raw (Unhomogenized) data.
+#' Raw (Unhomogenized) data.
 #'
 #' \itemize{
 #'   \item Year: time variable in daily increments
@@ -2755,12 +2775,14 @@ NULL
 #' @keywords datasets
 #' @name Climate_TempsMax_TennantCreek
 #' @format csv file with 9115 rows and 2 columns
+#' @author Bureau of Meteorology
 #' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 015135
 NULL
 
 #' Albatross Egg Counts
 #'
-#' The Australian Threatened Species Index 2024
+#' The Australian Threatened Species Index, 2024.
+#' Nesting egg counts of three Albatross species in Tasmania.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2773,12 +2795,14 @@ NULL
 #' @keywords datasets
 #' @name Ecosys_Albatross
 #' @format csv file with 60 rows and 4 columns
+#' @author Australian Government, Department of Climate Change, Energy, the Environment and Water
 #' @source https://tsx.org.au/tsx2024
 NULL
 
 #' Water Supply for Irrigated Agriculture in Eastern Australia
 #'
-#' CSIRO Agricultural water supply data for national ecosystem services accounts.
+#' National data for Australia's ecosystem services: irrigated agricultural water supply (250 m resolution): 2000-01 to 2022-23. v7. CSIRO. Data Collection.
+#' Regions aggregated for Eastern Australia.
 #'
 #' \itemize{
 #'   \item Fin Year: time variable for financial year 1 July to 30 June
@@ -2789,13 +2813,14 @@ NULL
 #' @keywords datasets
 #' @name Ecosys_IrrigationWaterSupply
 #' @format csv file with 13 rows and 2 columns
+#' @author Liu, Ning; Smith, Greg; Evans, David; Tetreault Campbell, Sally; Pascoe, Sean; & Schmidt, Becky, 2024
 #' @source https://doi.org/10.25919/7jj7-8826
 NULL
 
 #' Kangaroo Population and Harvest in South Australia
 #'
-#' Government of South Australia, Department of Environment, population surveys and
-#'  meat processor records of harvest aggregated across all regions of South Australia.
+#' Population surveys and meat processor records of harvest.
+#' Regions are aggregated for all of South Australia.
 #'
 #' \itemize{
 #'   \item Year: time variable
@@ -2811,12 +2836,14 @@ NULL
 #' @keywords datasets
 #' @name Ecosys_Kangaroos
 #' @format csv file with 46 rows and 7 columns
+#' @author Government of South Australia, Department of Environment
 #' @source https://www.environment.sa.gov.au/topics/animals-and-plants/sustainable-use-of-animals-and-plants/kangaroo-conservation-and-management/quotas-harvest-data
 NULL
 
 #' Southern Bluefin Tuna in Australian Waters
 #'
-#' CSIRO Fisheries Biomass Provisioning Services
+#' National data for Australia's ecosystem services: fisheries biomass provisioning services (2000-01 to 2020-21). v9. CSIRO. Data Collection.
+#' Souther Bluefin Tuna aggregated for all of Australia.
 #'
 #' \itemize{
 #'   \item Fin Year: time variable for financial year 1 July to 30 June
@@ -2829,12 +2856,14 @@ NULL
 #' @keywords datasets
 #' @name Ecosys_SouthernBluefinTuna
 #' @format csv file with 22 rows and 4 columns
+#' @author Pascoe, Sean; Liu, Ning; Scheufele, Gabriela; Tetreault Campbell, Sally; & Schmidt, Becky, 2024
 #' @source https://doi.org/10.25919/nzrp-6702
 NULL
 
 #' Sydney Drinking Water Catchment
 #'
-#' WaterNSW WaterInsight, Water Storage from August 2015 to July 2025
+#' WaterNSW, WaterInsight.
+#' Drinking Water Storage from August 2015 to July 2025.
 #'
 #' \itemize{
 #'   \item Day: time variable for days from August 2015
@@ -2857,12 +2886,14 @@ NULL
 #' @keywords datasets
 #' @name Ecosys_SydneyWater
 #' @format csv file with 120 rows and 14 columns
+#' @author WaterNSW
 #' @source https://waterinsights.waternsw.com.au/12964-sydney-drinking-water-catchment/storage
 NULL
 
 #' Tropical Rock Lobster in Australian Waters
 #'
-#' CSIRO Fisheries Biomass Provisioning Services
+#' National data for Australia's ecosystem services: fisheries biomass provisioning services (2000-01 to 2020-21). v9. CSIRO. Data Collection.
+#' Tropical Rock Lobster aggregated for all of Australia
 #'
 #' \itemize{
 #'   \item Fin Year: time variable for financial year 1 July to 30 June
@@ -2875,11 +2906,13 @@ NULL
 #' @keywords datasets
 #' @name Ecosys_TropicalRockLobsters
 #' @format csv file with 22 rows and 4 columns
+#' @author Pascoe, Sean; Liu, Ning; Scheufele, Gabriela; Tetreault Campbell, Sally; & Schmidt, Becky, 2024
 #' @source https://doi.org/10.25919/nzrp-6702
 NULL
 
 #' Metals and Energy Commodities
 #'
+#' London Bullion Market Association, World Gold Council, GoldHub, Perth Mint and International Monetary Fund prices.
 #' Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
 #'
 #' \itemize{
@@ -2924,8 +2957,7 @@ NULL
 
 #' US Dollars per Australian Dollar
 #'
-#' Daily exchange rates from 1 July 2024 to 30 June 2025,
-#'  with AUD as the base currency and USD as the quote currency
+#' Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base currency and USD as the quote currency.
 #'
 #' \itemize{
 #'   \item Day: time variable in days since 1 July 2024
