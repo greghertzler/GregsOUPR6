@@ -1,0 +1,59 @@
+<!DOCTYPE html><html><head><title>R: Sample sizes for the Ornstein-Uhlenbeck Process</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>OUP_SampleSize</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Sample sizes for the Ornstein-Uhlenbeck Process</h2>
+
+<h3>Description</h3>
+
+<p>Monte-Carlo simulation to demonstrate the effect of sample size on discovering the
+parameters of the Ornstein-Uhlenbeck Process.
+</p>
+
+
+<h3>Format</h3>
+
+<p>csv file with 501 rows and 4 columns
+</p>
+
+
+<h3>Details</h3>
+
+
+<ul>
+<li><p> year: time variable in annual increments for all sample paths
+</p>
+</li>
+<li><p> small: 5 observations
+</p>
+</li>
+<li><p> medium: 50 observations
+</p>
+</li>
+<li><p> large: 500 observations
+</p>
+</li></ul>
+
+<p>The first 5 and the first 50 observations are the same as those of 500 simulated
+observations.  More observations get closer to the true parameters of rho=0.5,
+mu=15 and sigma=50.
+</p>
+
+</main>
+
+</div>
+</body></html>

@@ -1,0 +1,1197 @@
+<!DOCTYPE html><html><head><title>R: R6 Class implementing Maximum Likelihood estimation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>MaximumLikelihood</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>R6 Class implementing Maximum Likelihood estimation</h2>
+
+<h3>Description</h3>
+
+<p>Maximum Likelihood estimation of the Ornstein-Uhlenbeck Process, using a
+robust estimation algorithm and with testing for simple hypotheses.
+</p>
+
+
+<h3>Methods:</h3>
+
+<div class="sourceCode"><pre>rho, mu and sigma random
+  LogLikelihood
+  Estimates
+  GoodnessOfFit
+  LikelihoodRatioTest
+</pre></div>
+
+
+<h3>Plots:</h3>
+
+<div class="sourceCode"><pre>  PlotTimeSeries
+  PlotEstimates
+</pre></div>
+
+
+<h3>Arguments of functions:</h3>
+
+<div class="sourceCode"><pre>  All arguments are optional in all functions.
+  rho:    rate parameter 0&lt;=rho&lt;inf
+  mu:     location parameter -inf&lt;mu&lt;inf
+  sigma:  scale parameter -inf&lt;sigma&lt;inf
+  tau:    vector of observed times -inf&lt;tau&lt;inf
+  z:      vector of observed states -inf&lt;z&lt;inf
+  df:     data frame containing columns for tau and z
+  taucol: index of a column containing tau
+  zcol:   index of a column containing z
+  rhor:   constant to fix the rate parameter 0&lt;=rhor&lt;inf
+  mur:    constant to fix the location parameter -inf&lt;mur&lt;inf
+  sigmar: constant to fix scale parameter -inf&lt;sigmar&lt;inf
+  rhos:   starting value for the rate parameter 0&lt;=rhos&lt;inf
+  mus:    starting value for the location parameter -inf&lt;mus&lt;inf
+  sigmas: starting value the scale parameter -inf&lt;sigmas&lt;inf
+  lnLu:   unrestricted log likelihood -inf&lt;lnLu&lt;=0
+  alphau: identifies distribution of lnLu 1&lt;=alphau&lt;=2
+  lnLr:   restricted log likelihood -inf&lt;lnLr&lt;=lnLu
+  alpha: identifies distribution of lnLu 1&lt;=alpha&lt;=2
+  m1:     number of observations 0&lt;m1=m-1
+</pre></div>
+
+
+<h3>Using the methods:</h3>
+
+<p>Demonstration scripts are in files in the 'demo' directory. Identify a
+formula and in the console type:
+</p>
+<div class="sourceCode"><pre>  demo(ML_FormulaName), or
+  demo(ML_PlotFormulaName).
+</pre></div>
+
+
+<h3>Discussion:</h3>
+
+<p>The Nelder-Mead algorithm is used to maximize a Log Likelihood derived from
+the Transition Density of the Ornstein-Uhlenbeck Process. The original
+algorithm is designed to minimize and has been called the amoeba algorithm.
+If spread across a bumpy surface, the amoeba pulls itself over bumps and out
+of hollows and flows down to the lowest level.  There it contracts around
+its center.  If spread across a flat surface, the amoeba shrinks without
+flowing.  Once the amoeba contracts or shrinks, it is spread across the
+surface opposite from where is came.  Again it flows, contracts and shrinks.
+Spreading, flowing, contracting and shrinking continue until the amoeba
+contracts around the same point or shrinks at the same level at least twice.
+</p>
+<p>In this implementation, the Nelder-Mead algorithm has been modified in five
+ways.
+</p>
+
+<ol>
+<li><p> It is modified to maximize;
+</p>
+</li>
+<li><p> It can set parameters rho, mu and/or sigma to constants for simple
+hypothesis tests;
+</p>
+</li>
+<li><p> It has a tie-breaking condition to prevent cycling or freezing;
+</p>
+</li>
+<li><p> It can accelerate over long distances for searching flat likelihoods;
+</p>
+</li>
+<li><p> It checks for log likelihoods greater than zero to prevent errors in
+case the data is faked or artificially smoothed.
+</p>
+</li></ol>
+
+<p>Once the unrestricted estimates are found, the arguments for restricting the
+parameters can be set for simple hypothesis tests. By default, starting
+values are calculated from the data and are then updated automatically. The
+arguments for starting values should seldom be needed.
+</p>
+<p>Data are entered as a data frame with columns for tau, a vector of times, and
+z, a vector of states. Arguments taucol and zcol are columns to extract from
+a data frame containing many columns.
+</p>
+<p>To read a csv file into a data frame, create a MaximumLikelihood object,
+estimate parameters and test the goodness-of-fit:
+</p>
+<div class="sourceCode"><pre>  df &lt;- read.csv("data/ML_OUP_SimulatedData.csv")
+  ML &lt;- MaximumLikelihood$new()
+  ML$Estimates(df)
+  ML$GoodnessOfFit()
+</pre></div>
+<p>In this example, the 'data' directory is one level below the working
+directory. The taucol and zcol arguments are optional and will default to 1
+and 2. Continue on by restricting a parameter and performing a likelihood
+ratio test:
+</p>
+<div class="sourceCode"><pre>  ML$Estimates(rhor=0.5)
+  ML$LikelihoodRatioTest()
+</pre></div>
+<p>The available data sets are documented. To see the documentation, type:
+</p>
+<div class="sourceCode"><pre>  ?
+</pre></div>
+<p>and then select from the drop-down list.
+</p>
+<p>Examples in R6 don't work the same way as other R modules.  There is only
+one example for an R6 object, not one for each function in the object.
+To run examples, the devtools::run_examples() works, but the R command
+example(&quot;MaximumLikelihood&quot;) doesn't.  You can copy commands to the clipboard,
+paste into the console and press Enter. Examples in this help and a simple
+example at the bottom can be run in this way.  A better alternative is demo().
+</p>
+<p>A better alternative is demo(), but this works sometimes, sometimes not.
+If you don't see the demos for this package, go to Files and demo.  You will
+see the demo names and then type something like demo(ML_Estimates).
+</p>
+
+
+<h3>Methods</h3>
+
+
+
+<h4>Public methods</h4>
+
+
+<ul>
+<li> <p><a href="#method-MaximumLikelihood-new"><code>MaximumLikelihood$new()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-set_oup_params"><code>MaximumLikelihood$set_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-set_oup_params_restr"><code>MaximumLikelihood$set_oup_params_restr()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-set_oup_params_start"><code>MaximumLikelihood$set_oup_params_start()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-set_oup_stats"><code>MaximumLikelihood$set_oup_stats()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-set_timeseries"><code>MaximumLikelihood$set_timeseries()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-set_timeseries_info"><code>MaximumLikelihood$set_timeseries_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-set_plot_info"><code>MaximumLikelihood$set_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_all"><code>MaximumLikelihood$get_all()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_oup_params"><code>MaximumLikelihood$get_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_oup_params_unrestr"><code>MaximumLikelihood$get_oup_params_unrestr()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_oup_params_restr"><code>MaximumLikelihood$get_oup_params_restr()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_oup_params_start"><code>MaximumLikelihood$get_oup_params_start()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_oup_stats"><code>MaximumLikelihood$get_oup_stats()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_timeseries"><code>MaximumLikelihood$get_timeseries()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_timeseries_info"><code>MaximumLikelihood$get_timeseries_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_plot_info"><code>MaximumLikelihood$get_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_plot_colors"><code>MaximumLikelihood$get_plot_colors()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-LogLikelihood"><code>MaximumLikelihood$LogLikelihood()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-Estimates"><code>MaximumLikelihood$Estimates()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-GoodnessOfFit"><code>MaximumLikelihood$GoodnessOfFit()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-LikelihoodRatioTest"><code>MaximumLikelihood$LikelihoodRatioTest()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-PlotTimeSeries"><code>MaximumLikelihood$PlotTimeSeries()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-PlotEstimates"><code>MaximumLikelihood$PlotEstimates()</code></a>
+</p>
+</li></ul>
+
+
+<hr>
+<a id="method-MaximumLikelihood-new"></a>
+
+
+
+<h4>Method <code>new()</code></h4>
+
+<p>Create a MaximumLikelihood object
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$new(OUP = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>OUP</code></dt><dd><p>pointer set by the OUProcess object</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>A new MaximumLikelihood object
+</p>
+
+
+
+<h5>Examples</h5>
+
+<div class="r example copy">
+<pre>  ML &lt;- MaximumLikelihood$new()
+  ML$Estimates()
+  ML$GoodnessOfFit()
+  ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
+  ML$LikelihoodRatioTest()
+</pre>
+</div>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_oup_params"></a>
+
+
+
+<h4>Method <code>set_oup_params()</code></h4>
+
+<p>Set OUP parameters
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$set_oup_params(
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rho,mu,sigma)
+Set OUP parameter restrictions
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_oup_params_restr"></a>
+
+
+
+<h4>Method <code>set_oup_params_restr()</code></h4>
+
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$set_oup_params_restr(rhor = NULL, mur = NULL, sigmar = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rhor</code></dt><dd><p>rate parameter 0&lt;=rhor&lt;inf</p>
+</dd>
+<dt><code>mur</code></dt><dd><p>location parameter -inf&lt;mur&lt;inf</p>
+</dd>
+<dt><code>sigmar</code></dt><dd><p>scale parameter -inf&lt;sigmar&lt;inf</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rhor,mur,sigmar)
+Set OUP parameter starting values
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_oup_params_start"></a>
+
+
+
+<h4>Method <code>set_oup_params_start()</code></h4>
+
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$set_oup_params_start(rhos = NULL, mus = NULL, sigmas = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rhos</code></dt><dd><p>rate parameter 0&lt;=rhos&lt;inf</p>
+</dd>
+<dt><code>mus</code></dt><dd><p>location parameter -inf&lt;mus&lt;inf</p>
+</dd>
+<dt><code>sigmas</code></dt><dd><p>scale parameter -inf&lt;sigmas&lt;inf</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rhos,mus,sigmas)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_oup_stats"></a>
+
+
+
+<h4>Method <code>set_oup_stats()</code></h4>
+
+<p>Set OUP statistics for estimation and hypothesis tests
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$set_oup_stats(
+  lnLu = NULL,
+  alphau = NULL,
+  lnLr = NULL,
+  alphar = NULL,
+  m1 = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>lnLu</code></dt><dd><p>unrestricted log likelihood -inf&lt;lnLu&lt;=0</p>
+</dd>
+<dt><code>alphau</code></dt><dd><p>identifies the distribution of lnLu, 0.5&lt;=alphau&lt;=1</p>
+</dd>
+<dt><code>lnLr</code></dt><dd><p>restricted log likelihood -inf&lt;lnLr&lt;=lnLu</p>
+</dd>
+<dt><code>alphar</code></dt><dd><p>identifies the distribution of lnLr, 0.5&lt;=alphar&lt;=1</p>
+</dd>
+<dt><code>m1</code></dt><dd><p>number of observations 0&lt;m1</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(lnLu,alphau,lnLr,alphar,m1)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_timeseries"></a>
+
+
+
+<h4>Method <code>set_timeseries()</code></h4>
+
+<p>Set time series data for time tau and state z
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$set_timeseries(df = NULL, taucol = NULL, zcol = NULL)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>df</code></dt><dd><p>data frame containing columns for tau and z</p>
+</dd>
+<dt><code>taucol</code></dt><dd><p>index of a column containing tau</p>
+</dd>
+<dt><code>zcol</code></dt><dd><p>index a column containing z</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>dataframe(tau,z)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_timeseries_info"></a>
+
+
+
+<h4>Method <code>set_timeseries_info()</code></h4>
+
+<p>Set information for plotting times series and estimates
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$set_timeseries_info(
+  tbeg = NULL,
+  tend = NULL,
+  dataname = NULL,
+  timename = NULL,
+  statename = NULL,
+  estimation = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>dataname</code></dt><dd><p>name for the data</p>
+</dd>
+<dt><code>timename</code></dt><dd><p>name for time</p>
+</dd>
+<dt><code>statename</code></dt><dd><p>name for state</p>
+</dd>
+<dt><code>estimation</code></dt><dd><p>description of estimation</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(tbeg,Ixbeg,tend,Ixend,datename,timename,statename,estimation)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_plot_info"></a>
+
+
+
+<h4>Method <code>set_plot_info()</code></h4>
+
+<p>Set information for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$set_plot_info(
+  fontfamily = NULL,
+  fontsize = NULL,
+  fileformat = NULL,
+  filewidth = NULL,
+  fileheight = NULL,
+  theme = NULL,
+  opaque = NULL,
+  labels = NULL,
+  who = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>fontfamily</code></dt><dd><p>font family for plot labels</p>
+</dd>
+<dt><code>fontsize</code></dt><dd><p>font size for plot labels</p>
+</dd>
+<dt><code>fileformat</code></dt><dd><p>'png' or 'svg'</p>
+</dd>
+<dt><code>filewidth</code></dt><dd><p>pixel width of 2D plot, pixel width and height of 3D plot</p>
+</dd>
+<dt><code>fileheight</code></dt><dd><p>pixel height of 2D plot</p>
+</dd>
+<dt><code>theme</code></dt><dd><p>'light' or 'dark'</p>
+</dd>
+<dt><code>opaque</code></dt><dd><p>transparent to opaque background 0.0&lt;=opaque&lt;=1.0</p>
+</dd>
+<dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(font,file,theme)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_all"></a>
+
+
+
+<h4>Method <code>get_all()</code></h4>
+
+<p>Get all arguments, time series and information
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_all()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(oup_params,oup_params_unrestr,oup_params_restr,oup_params_start,oup_stats,timeseries,timeseries_info,plot_info)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_oup_params"></a>
+
+
+
+<h4>Method <code>get_oup_params()</code></h4>
+
+<p>Get OUP parameters
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_oup_params()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rho,mu,sigma)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_oup_params_unrestr"></a>
+
+
+
+<h4>Method <code>get_oup_params_unrestr()</code></h4>
+
+<p>Get OUP parameters unrestricted estimates
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_oup_params_unrestr()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rhohat,muhat,sigmahat)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_oup_params_restr"></a>
+
+
+
+<h4>Method <code>get_oup_params_restr()</code></h4>
+
+<p>Get OUP parameter restrictions
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_oup_params_restr()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rhor,mur,sigmar)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_oup_params_start"></a>
+
+
+
+<h4>Method <code>get_oup_params_start()</code></h4>
+
+<p>Get OUP parameter starting values
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_oup_params_start()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rhos,mus,sigmas)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_oup_stats"></a>
+
+
+
+<h4>Method <code>get_oup_stats()</code></h4>
+
+<p>Get OUP statistics for estimation and hypothesis tests
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_oup_stats()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(lnLu,alphau,lnLr,alphar,m1)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_timeseries"></a>
+
+
+
+<h4>Method <code>get_timeseries()</code></h4>
+
+<p>Get time series data for time tau and state z
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_timeseries()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>dataframe(tau,z)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_timeseries_info"></a>
+
+
+
+<h4>Method <code>get_timeseries_info()</code></h4>
+
+<p>Get information for times series
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_timeseries_info()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(tbeg,Ixbeg,tend,Ixend,datename,timename,statename,estimation)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_plot_info"></a>
+
+
+
+<h4>Method <code>get_plot_info()</code></h4>
+
+<p>Get information for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_plot_info()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(font,file,theme,labels)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_plot_colors"></a>
+
+
+
+<h4>Method <code>get_plot_colors()</code></h4>
+
+<p>Get colors for plotting
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$get_plot_colors()</pre></div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-LogLikelihood"></a>
+
+
+
+<h4>Method <code>LogLikelihood()</code></h4>
+
+<p>Calculate the log likelihood of estimates
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$LogLikelihood(
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  df = NULL,
+  taucol = NULL,
+  zcol = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>df</code></dt><dd><p>data frame containing columns for tau and z</p>
+</dd>
+<dt><code>taucol</code></dt><dd><p>index of a column containing tau</p>
+</dd>
+<dt><code>zcol</code></dt><dd><p>index of a column containing z</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(lnL)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-Estimates"></a>
+
+
+
+<h4>Method <code>Estimates()</code></h4>
+
+<p>Calculate unrestricted or restricted maximum likelihood estimates
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$Estimates(
+  df = NULL,
+  taucol = NULL,
+  zcol = NULL,
+  rhor = NULL,
+  mur = NULL,
+  sigmar = NULL,
+  rhos = NULL,
+  mus = NULL,
+  sigmas = NULL,
+  plotit = TRUE
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>df</code></dt><dd><p>data frame containing columns for tau and z</p>
+</dd>
+<dt><code>taucol</code></dt><dd><p>index of a column containing tau</p>
+</dd>
+<dt><code>zcol</code></dt><dd><p>index of a column containing z</p>
+</dd>
+<dt><code>rhor</code></dt><dd><p>constant to fix the rate parameter 0&lt;=rhor&lt;inf</p>
+</dd>
+<dt><code>mur</code></dt><dd><p>constant to fix the location parameter -inf&lt;mur&lt;inf</p>
+</dd>
+<dt><code>sigmar</code></dt><dd><p>constant to fix scale parameter -inf&lt;sigmar&lt;inf</p>
+</dd>
+<dt><code>rhos</code></dt><dd><p>starting value for the rate parameter 0&lt;=rhos&lt;inf</p>
+</dd>
+<dt><code>mus</code></dt><dd><p>starting value for the location parameter -inf&lt;mus&lt;inf</p>
+</dd>
+<dt><code>sigmas</code></dt><dd><p>starting value the scale parameter -inf&lt;sigmas&lt;inf</p>
+</dd>
+<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(rhohat,muhat,sigmahat,lnLu,ku,alphau,m1) or list(rhor,mur,sigmar,lnLr,kr,alphar,m1)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-GoodnessOfFit"></a>
+
+
+
+<h4>Method <code>GoodnessOfFit()</code></h4>
+
+<p>Calculate the goodness of fit compared with invariant and scaled brownian motion estimates
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$GoodnessOfFit(
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  df = NULL,
+  taucol = NULL,
+  zcol = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>df</code></dt><dd><p>data frame containing columns for tau and z</p>
+</dd>
+<dt><code>taucol</code></dt><dd><p>index of a column containing tau</p>
+</dd>
+<dt><code>zcol</code></dt><dd><p>index a column containing z</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(Inv,SBM) with Inv=list(R2,Pval) and SBM=list(R2,Pval)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-LikelihoodRatioTest"></a>
+
+
+
+<h4>Method <code>LikelihoodRatioTest()</code></h4>
+
+<p>Test for significant difference between two likelihoods
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$LikelihoodRatioTest(
+  lnLu = NULL,
+  lnLr = NULL,
+  alphau = NULL,
+  m1 = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>lnLu</code></dt><dd><p>unrestricted log likelihood -inf&lt;lnLu&lt;=0</p>
+</dd>
+<dt><code>lnLr</code></dt><dd><p>restricted log likelihood -inf&lt;lnLr&lt;=lnLu</p>
+</dd>
+<dt><code>alphau</code></dt><dd><p>identifies distribution of LnLu 0.5&lt;=alphau&lt;=1</p>
+</dd>
+<dt><code>m1</code></dt><dd><p>number of observations 0&lt;m1=m-1</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(R2,Pval)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-PlotTimeSeries"></a>
+
+
+
+<h4>Method <code>PlotTimeSeries()</code></h4>
+
+<p>Plot time series
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$PlotTimeSeries(
+  df = NULL,
+  taucol = NULL,
+  zcol = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>df</code></dt><dd><p>data frame containing columns for tau and z</p>
+</dd>
+<dt><code>taucol</code></dt><dd><p>index of a column containing tau</p>
+</dd>
+<dt><code>zcol</code></dt><dd><p>index a column containing z</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-PlotEstimates"></a>
+
+
+
+<h4>Method <code>PlotEstimates()</code></h4>
+
+<p>Plot time series with estimated means and variances
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r"><pre>MaximumLikelihood$PlotEstimates(
+  tbeg = NULL,
+  tend = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL
+)</pre></div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+
+
+<h3>Examples</h3>
+
+<pre><code class='language-R'>
+## ------------------------------------------------
+## Method `MaximumLikelihood$new`
+## ------------------------------------------------
+
+  ML &lt;- MaximumLikelihood$new()
+  ML$Estimates()
+  ML$GoodnessOfFit()
+  ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
+  ML$LikelihoodRatioTest()
+</code></pre>
+
+</main>
+
+</div>
+</body></html>
