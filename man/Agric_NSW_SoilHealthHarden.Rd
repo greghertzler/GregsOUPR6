@@ -12,7 +12,6 @@ https://doi.org/10.25919/2jqe-mz45
 }
 \description{
 CSIRO Harden Long-Term Tillage Experiment. v3. CSIRO. Data Collection.
-Soil nitrogen and water in the top 160 millimetres.
 }
 \details{
 \itemize{
@@ -22,6 +21,8 @@ Soil nitrogen and water in the top 160 millimetres.
 \item W Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
 \item W Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
 }
+
+Soil nitrogen and water in the top 160 millimetres.
 }
 \author{
 Kirkegaard, John; & Lilley, Julianne, 2023

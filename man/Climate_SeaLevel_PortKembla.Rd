@@ -12,7 +12,6 @@ http://www.bom.gov.au/oceanography/projects/abslmp/data/data.shtml
 }
 \description{
 Australian Baseline Sea Level Monitoring Project.
-Sea levels above Tide Guage Zero for 2023.
 }
 \details{
 \itemize{
@@ -22,6 +21,8 @@ Sea levels above Tide Guage Zero for 2023.
 \item Air Temperature: degrees Celsius
 \item Barometric Pressure: hPa
 }
+
+Sea levels above Tide Guage Zero for 2023.
 
 This is radically smoothed data.  Do not use this data for decisions under uncertainty.
 }

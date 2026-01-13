@@ -12,7 +12,6 @@ https://doi.org/10.4225/08/55E5165EC0D29
 }
 \description{
 Waite Permanent Rotation Trial. v4. CSIRO. Data Collection.
-Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993.
 }
 \details{
 \itemize{
@@ -47,6 +46,8 @@ Experimental crop yields and pasture dry matter for permanent rotations from 192
 \item Plt 17 W Carbon: continuous Wheat, Carbon in milligrams per hectare
 \item Plt 29 P Carbon: continuous Pasture, Carbon in milligrams per hectare
 }
+
+Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993.
 }
 \author{
 Sanderman, Jonathan; David, Rakesh; Moore, Andrew; Keith, Heather; & Farquharson, Ryan, 2015

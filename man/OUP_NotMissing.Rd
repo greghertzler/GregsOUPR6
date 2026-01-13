@@ -8,7 +8,7 @@
 csv file with 366 rows and 6 columns
 }
 \description{
-Simulated data to demonstrate that observations are never 'missing'.
+Monte Carlo simulation to demonstrate that observations are never 'missing'.
 }
 \details{
 \itemize{

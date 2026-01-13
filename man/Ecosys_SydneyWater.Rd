@@ -12,7 +12,6 @@ https://waterinsights.waternsw.com.au/12964-sydney-drinking-water-catchment/stor
 }
 \description{
 WaterNSW, WaterInsight.
-Drinking Water Storage from August 2015 to July 2025.
 }
 \details{
 \itemize{
@@ -31,6 +30,8 @@ Drinking Water Storage from August 2015 to July 2025.
 \item Fitzroy: Fitzroy Falls Dam volume in gigalitres
 \item Year: time variable as decimal year
 }
+
+Drinking Water Storage from August 2015 to July 2025.
 }
 \author{
 WaterNSW

@@ -12,7 +12,6 @@ https://www.environment.sa.gov.au/topics/animals-and-plants/sustainable-use-of-a
 }
 \description{
 Population surveys and meat processor records of harvest.
-Regions are aggregated for all of South Australia.
 }
 \details{
 \itemize{
@@ -24,6 +23,8 @@ Regions are aggregated for all of South Australia.
 \item Euro Pop: Estimated population of European Kangaroos in 1000 head
 \item Euro Harvest: Number of European Kangaroos commercially harvested in 1000 head
 }
+
+Regions are aggregated for all of South Australia.
 }
 \author{
 Government of South Australia, Department of Environment

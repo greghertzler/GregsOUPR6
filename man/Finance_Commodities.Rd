@@ -12,7 +12,6 @@ https://files.marketindex.com.au/files/workbooks/commodities-workbook.xlsx
 }
 \description{
 London Bullion Market Association, World Gold Council, GoldHub, Perth Mint and International Monetary Fund prices.
-Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
 }
 \details{
 \itemize{
@@ -25,5 +24,7 @@ Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
 \item Brent: Brent Crude in USD/bbl
 \item Year: time variable as decimal year
 }
+
+Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
 }
 \keyword{datasets}

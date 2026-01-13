@@ -12,7 +12,6 @@ https://doi.org/10.25919/nzrp-6702
 }
 \description{
 National data for Australia's ecosystem services: fisheries biomass provisioning services (2000-01 to 2020-21). v9. CSIRO. Data Collection.
-Tropical Rock Lobster aggregated for all of Australia
 }
 \details{
 \itemize{
@@ -21,6 +20,8 @@ Tropical Rock Lobster aggregated for all of Australia
 \item GVP: Gross value product in dollars as market price times catch
 \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
 }
+
+Regions are aggregated for all of Australia
 }
 \author{
 Pascoe, Sean; Liu, Ning; Scheufele, Gabriela; Tetreault Campbell, Sally; & Schmidt, Becky, 2024

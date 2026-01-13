@@ -12,7 +12,6 @@ corresponding author: Tim Capon \email{tim.capon.csiro.au}
 }
 \description{
 Stock water management to improve drought resilience in intensive-use grazing landscapes.
-MatLab simulated water volumes for a 4,000 cubic metre dam.
 }
 \details{
 \itemize{
@@ -21,6 +20,8 @@ MatLab simulated water volumes for a 4,000 cubic metre dam.
 \item TwentyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 20\%
 \item FortyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 40\%
 }
+
+MatLab simulated water volumes for a 4,000 cubic metre dam.
 }
 \author{
 Helena Clayton, Sally Thompson, Tim Capon, Greg Hertzler, Philip Graham, and David Lindenmayer, 2026

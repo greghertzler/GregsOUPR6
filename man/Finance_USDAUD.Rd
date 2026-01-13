@@ -3,7 +3,7 @@
 \docType{data}
 \name{Finance_USDAUD}
 \alias{Finance_USDAUD}
-\title{US Dollars per Australian Dollar}
+\title{Exchange Rates}
 \format{
 csv file with 258 rows and 7 columns
 }
@@ -11,7 +11,7 @@ csv file with 258 rows and 7 columns
 https://finance.yahoo.com/quote (search for AUDUSD=X)
 }
 \description{
-Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base currency and USD as the quote currency.
+US Dollars per Australian Dollar
 }
 \details{
 \itemize{
@@ -23,5 +23,7 @@ Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base curr
 \item Adj Close: Same as Close for exchange rates
 \item Year: time variable as decimal year
 }
+
+Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base currency and USD as the quote currency.
 }
 \keyword{datasets}

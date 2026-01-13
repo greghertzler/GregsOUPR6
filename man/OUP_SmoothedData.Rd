@@ -8,8 +8,7 @@
 csv file with 177 rows and 11 columns
 }
 \description{
-Simulated and smoothed data to demonstrate the effect of smoothing on
-parameter estimates.
+Monte Carlo simulation to demonstrate the effect of smoothing on parameter estimates.
 }
 \details{
 \itemize{

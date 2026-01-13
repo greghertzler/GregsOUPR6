@@ -11,13 +11,15 @@ csv file with 8888 rows and 2 columns
 http://www.bom.gov.au/climate/data/?ref=ftr, Station number 090015
 }
 \description{
-Raw (unhomogenized) data.
+Climate Data Online
 }
 \details{
 \itemize{
 \item Year: time variable in daily increments
 \item Max: maximum temperature in degrees centigrade
 }
+
+Raw (unhomogenized) data.
 }
 \author{
 Bureau of Meteorology

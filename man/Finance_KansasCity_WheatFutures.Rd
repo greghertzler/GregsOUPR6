@@ -3,7 +3,7 @@
 \docType{data}
 \name{Finance_KansasCity_WheatFutures}
 \alias{Finance_KansasCity_WheatFutures}
-\title{Kansas City Hard Red Wheat Futures}
+\title{Futures Prices}
 \format{
 csv file with 250 rows and 8 columns
 }
@@ -11,7 +11,7 @@ csv file with 250 rows and 8 columns
 https://finance.yahoo.com/quote (search for KE=F)
 }
 \description{
-Daily futures for September 2025 maturity from 1 July 2024 to 30 June 2025
+Kansas City Hard Red Wheat Futures
 }
 \details{
 \itemize{
@@ -24,5 +24,7 @@ Daily futures for September 2025 maturity from 1 July 2024 to 30 June 2025
 \item Volume: Daily number of trades
 \item Year: time variable as decimal year
 }
+
+Daily futures for September 2025 maturity from 1 July 2024 to 30 June 2025
 }
 \keyword{datasets}

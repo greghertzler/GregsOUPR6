@@ -12,7 +12,6 @@ https://tsx.org.au/tsx2024
 }
 \description{
 The Australian Threatened Species Index, 2024.
-Nesting egg counts of three Albatross species in Tasmania.
 }
 \details{
 \itemize{
@@ -21,6 +20,8 @@ Nesting egg counts of three Albatross species in Tasmania.
 \item Black-browed Albatross: egg count
 \item Grey-headed Albatross: egg count
 }
+
+Nesting egg counts of three Albatross species in Tasmania.
 }
 \author{
 Australian Government, Department of Climate Change, Energy, the Environment and Water

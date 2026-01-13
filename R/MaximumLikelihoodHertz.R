@@ -2289,7 +2289,7 @@ NULL
 
 #' Observation intervals of different lengths and the Ornstein-Uhlenbeck Process
 #'
-#' Simulated data to demonstrate that observations are never 'missing'.
+#' Monte Carlo simulation to demonstrate that observations are never 'missing'.
 #'
 #' \itemize{
 #'   \item Day: time variable in days
@@ -2389,8 +2389,7 @@ NULL
 
 #' Smoothed sample paths for the Ornstein-Uhlenbeck Process
 #'
-#' Simulated and smoothed data to demonstrate the effect of smoothing on
-#'  parameter estimates.
+#' Monte Carlo simulation to demonstrate the effect of smoothing on parameter estimates.
 #'
 #' \itemize{
 #'   \item year: time variable in annual increments
@@ -2433,7 +2432,6 @@ NULL
 #' Water in Farm Dams in the Riverina of New South Wales
 #'
 #' Stock water management to improve drought resilience in intensive-use grazing landscapes.
-#' MatLab simulated water volumes for a 4,000 cubic metre dam.
 #'
 #' \itemize{
 #'   \item Run Days: time variable in daily increments
@@ -2441,6 +2439,8 @@ NULL
 #'   \item TwentyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 20%
 #'   \item FortyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 40%
 #' }
+#'
+#' MatLab simulated water volumes for a 4,000 cubic metre dam.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2453,7 +2453,6 @@ NULL
 #' Farm Adaptation at Cootamundra, New South Wales
 #'
 #' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2462,6 +2461,8 @@ NULL
 #'   \item SSSSC GM: Gross margins per hectare for SSSSC rotation
 #'   \item S GM: Gross margins per hectare for continuous S
 #' }
+#'
+#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' @docType data
 #' @keywords datasets
@@ -2474,7 +2475,6 @@ NULL
 #' Farm Adaptation at Narrendera, New South Wales
 #'
 #' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2483,6 +2483,8 @@ NULL
 #'   \item SSSSC GM: Gross margins per hectare for SSSSC rotation
 #'   \item S GM: Gross margins per hectare for continuous S
 #' }
+#'
+#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' @docType data
 #' @keywords datasets
@@ -2495,7 +2497,6 @@ NULL
 #' Farm Adaptation at Temora, New South Wales
 #'
 #' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2504,6 +2505,8 @@ NULL
 #'   \item SSSSC GM: Gross margins per hectare for SSSSC rotation
 #'   \item S GM: Gross margins per hectare for continuous S
 #' }
+#'
+#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 #'
 #' @docType data
 #' @keywords datasets
@@ -2516,7 +2519,6 @@ NULL
 #' Soil Health with Stubble Management
 #'
 #' CSIRO Harden Long-Term Tillage Experiment. v3. CSIRO. Data Collection.
-#' Soil nitrogen and water in the top 160 millimetres.
 #'
 #' \itemize{
 #'   \item Year: time variable in sporadic increments
@@ -2525,6 +2527,8 @@ NULL
 #'   \item W Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
 #'   \item W Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
 #' }
+#'
+#' Soil nitrogen and water in the top 160 millimetres.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2537,7 +2541,6 @@ NULL
 #' Farm Adaptation at Clare, South Australia
 #'
 #' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2548,6 +2551,8 @@ NULL
 #'   \item Wheat GM: Wheat gross margins per hectare
 #'   \item Sheep GM: Sheep gross margins per hectare
 #' }
+#'
+#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2560,7 +2565,6 @@ NULL
 #' Farm Adaptation at Hawker, South Australia
 #'
 #' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2571,6 +2575,8 @@ NULL
 #'   \item Wheat GM: Wheat gross margins per hectare
 #'   \item Sheep GM: Sheep gross margins per hectare
 #' }
+#'
+#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2583,7 +2589,6 @@ NULL
 #' Farm Adaptation at Orroroo, South Australia
 #'
 #' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2594,6 +2599,8 @@ NULL
 #'   \item Wheat GM: Wheat gross margins per hectare
 #'   \item Sheep GM: Sheep gross margins per hectare
 #' }
+#'
+#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2606,7 +2613,6 @@ NULL
 #' Long Term Crop Rotations, South Australia
 #'
 #' Waite Permanent Rotation Trial. v4. CSIRO. Data Collection.
-#' Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2641,6 +2647,8 @@ NULL
 #'   \item Plt 29 P Carbon: continuous Pasture, Carbon in milligrams per hectare
 #' }
 #'
+#' Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993.
+#'
 #' @docType data
 #' @keywords datasets
 #' @name Agric_SA_WaiteRotationTrial
@@ -2659,6 +2667,8 @@ NULL
 #'   \item Without trees: sheep gross margins per paddock without tree shelter belt
 #' }
 #'
+#' Simulated effects of shelter belts with prices and costs for sheep production.
+#'
 #' @docType data
 #' @keywords datasets
 #' @name Agric_Tas_TreeShelterBelts
@@ -2667,9 +2677,9 @@ NULL
 #' @source corresponding author, Tim Capon \email{tim.capon@csiro.au}
 NULL
 
-#' European Union Emission Trading System
+#' Price of Carbon
 #'
-#' Daily price of Carbon Permits from 1 January 2021 to 31 December 2025
+#' European Union Emission Trading System
 #'
 #' \itemize{
 #'   \item Year: time variable as decimal year
@@ -2679,6 +2689,8 @@ NULL
 #'   \item Close: Price at market close in EUR/tonne
 #'   \item Day: time variable in days since 1 January 2021
 #' }
+#'
+#' Daily price of Carbon Permits from 1 January 2021 to 31 December 2025
 #'
 #' @docType data
 #' @keywords datasets
@@ -2690,7 +2702,6 @@ NULL
 #' Sea Level at Port Kembla
 #'
 #' Australian Baseline Sea Level Monitoring Project.
-#' Sea levels above Tide Guage Zero for 2023.
 #'
 #' \itemize{
 #'   \item Day in 2023: time variable in hourly increments
@@ -2699,6 +2710,8 @@ NULL
 #'   \item Air Temperature: degrees Celsius
 #'   \item Barometric Pressure: hPa
 #' }
+#'
+#' Sea levels above Tide Guage Zero for 2023.
 #'
 #' This is radically smoothed data.  Do not use this data for decisions under uncertainty.
 #'
@@ -2713,12 +2726,13 @@ NULL
 #' Sunspot Numbers
 #'
 #' International Sunspot Number V2.0.
-#' Sunspot numbers and groups of sunspot numbers.
 #'
 #' \itemize{
 #'   \item DecimalYear: time variable in daily increments
 #'   \item Average: Simple average of the daily total sunspot number over all days of each calendar month.
 #' }
+#'
+#' Sunspot numbers and groups of sunspot numbers, averaged by month.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2730,12 +2744,14 @@ NULL
 
 #' Maximum daily temperatures at Cape Otway
 #'
-#' Raw (unhomogenized) data.
+#' Climate Data Online
 #'
 #' \itemize{
 #'   \item Year: time variable in daily increments
 #'   \item Max: maximum temperature in degrees centigrade
 #' }
+#'
+#' Raw (unhomogenized) data.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2747,12 +2763,14 @@ NULL
 
 #' Maximum daily temperatures at Darwin
 #'
-#' Raw (Unhomogenized) data.
+#' Climate Data Online
 #'
 #' \itemize{
 #'   \item Year: time variable in daily increments
 #'   \item Max: maximum temperature in degrees centigrade
 #' }
+#'
+#' Raw (Unhomogenized) data.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2764,12 +2782,14 @@ NULL
 
 #' Maximum daily temperatures at Tennant Creek
 #'
-#' Raw (Unhomogenized) data.
+#' Climate Data Online
 #'
 #' \itemize{
 #'   \item Year: time variable in daily increments
 #'   \item Max: maximum temperature in degrees centigrade
 #' }
+#'
+#' Raw (Unhomogenized) data.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2782,7 +2802,6 @@ NULL
 #' Albatross Egg Counts
 #'
 #' The Australian Threatened Species Index, 2024.
-#' Nesting egg counts of three Albatross species in Tasmania.
 #'
 #' \itemize{
 #'   \item Year: time variable in annual increments
@@ -2790,6 +2809,8 @@ NULL
 #'   \item Black-browed Albatross: egg count
 #'   \item Grey-headed Albatross: egg count
 #' }
+#'
+#' Nesting egg counts of three Albatross species in Tasmania.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2802,12 +2823,13 @@ NULL
 #' Water Supply for Irrigated Agriculture in Eastern Australia
 #'
 #' National data for Australia's ecosystem services: irrigated agricultural water supply (250 m resolution): 2000-01 to 2022-23. v7. CSIRO. Data Collection.
-#' Regions aggregated for Eastern Australia.
 #'
 #' \itemize{
 #'   \item Fin Year: time variable for financial year 1 July to 30 June
 #'   \item WaterSupply: irrigation water supplied in Australia in megalitres
 #' }
+#'
+#' Regions are aggregated for Eastern Australia.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2820,7 +2842,6 @@ NULL
 #' Kangaroo Population and Harvest in South Australia
 #'
 #' Population surveys and meat processor records of harvest.
-#' Regions are aggregated for all of South Australia.
 #'
 #' \itemize{
 #'   \item Year: time variable
@@ -2831,6 +2852,8 @@ NULL
 #'   \item Euro Pop: Estimated population of European Kangaroos in 1000 head
 #'   \item Euro Harvest: Number of European Kangaroos commercially harvested in 1000 head
 #' }
+#'
+#' Regions are aggregated for all of South Australia.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2843,7 +2866,6 @@ NULL
 #' Southern Bluefin Tuna in Australian Waters
 #'
 #' National data for Australia's ecosystem services: fisheries biomass provisioning services (2000-01 to 2020-21). v9. CSIRO. Data Collection.
-#' Souther Bluefin Tuna aggregated for all of Australia.
 #'
 #' \itemize{
 #'   \item Fin Year: time variable for financial year 1 July to 30 June
@@ -2851,6 +2873,8 @@ NULL
 #'   \item GVP: Gross value product in dollars as market price times catch
 #'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
 #' }
+#'
+#' Regions are aggregated for all of Australia.
 #'
 #' @docType data
 #' @keywords datasets
@@ -2863,7 +2887,6 @@ NULL
 #' Sydney Drinking Water Catchment
 #'
 #' WaterNSW, WaterInsight.
-#' Drinking Water Storage from August 2015 to July 2025.
 #'
 #' \itemize{
 #'   \item Day: time variable for days from August 2015
@@ -2882,6 +2905,8 @@ NULL
 #'   \item Year: time variable as decimal year
 #' }
 #'
+#' Drinking Water Storage from August 2015 to July 2025.
+#'
 #' @docType data
 #' @keywords datasets
 #' @name Ecosys_SydneyWater
@@ -2893,7 +2918,6 @@ NULL
 #' Tropical Rock Lobster in Australian Waters
 #'
 #' National data for Australia's ecosystem services: fisheries biomass provisioning services (2000-01 to 2020-21). v9. CSIRO. Data Collection.
-#' Tropical Rock Lobster aggregated for all of Australia
 #'
 #' \itemize{
 #'   \item Fin Year: time variable for financial year 1 July to 30 June
@@ -2901,6 +2925,8 @@ NULL
 #'   \item GVP: Gross value product in dollars as market price times catch
 #'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
 #' }
+#'
+#' Regions are aggregated for all of Australia
 #'
 #' @docType data
 #' @keywords datasets
@@ -2913,7 +2939,6 @@ NULL
 #' Metals and Energy Commodities
 #'
 #' London Bullion Market Association, World Gold Council, GoldHub, Perth Mint and International Monetary Fund prices.
-#' Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
 #'
 #' \itemize{
 #'   \item Day: time variable in days since 1 January 2009
@@ -2926,6 +2951,8 @@ NULL
 #'   \item Year: time variable as decimal year
 #' }
 #'
+#' Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
+#'
 #' @docType data
 #' @keywords datasets
 #' @name Finance_Commodities
@@ -2933,9 +2960,9 @@ NULL
 #' @source https://files.marketindex.com.au/files/workbooks/commodities-workbook.xlsx
 NULL
 
-#' Kansas City Hard Red Wheat Futures
+#' Futures Prices
 #'
-#' Daily futures for September 2025 maturity from 1 July 2024 to 30 June 2025
+#' Kansas City Hard Red Wheat Futures
 #'
 #' \itemize{
 #'   \item Day: time variable in days since 1 July 2024
@@ -2948,6 +2975,8 @@ NULL
 #'   \item Year: time variable as decimal year
 #' }
 #'
+#' Daily futures for September 2025 maturity from 1 July 2024 to 30 June 2025
+#'
 #' @docType data
 #' @keywords datasets
 #' @name Finance_KansasCity_WheatFutures
@@ -2955,9 +2984,9 @@ NULL
 #' @source https://finance.yahoo.com/quote (search for KE=F)
 NULL
 
-#' US Dollars per Australian Dollar
+#' Exchange Rates
 #'
-#' Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base currency and USD as the quote currency.
+#' US Dollars per Australian Dollar
 #'
 #' \itemize{
 #'   \item Day: time variable in days since 1 July 2024
@@ -2968,6 +2997,8 @@ NULL
 #'   \item Adj Close: Same as Close for exchange rates
 #'   \item Year: time variable as decimal year
 #' }
+#'
+#' Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base currency and USD as the quote currency.
 #'
 #' @docType data
 #' @keywords datasets

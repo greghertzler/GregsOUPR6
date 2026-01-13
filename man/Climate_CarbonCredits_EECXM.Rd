@@ -3,7 +3,7 @@
 \docType{data}
 \name{Climate_CarbonCredits_EECXM}
 \alias{Climate_CarbonCredits_EECXM}
-\title{European Union Emission Trading System}
+\title{Price of Carbon}
 \format{
 csv file with 1519 rows and 6 columns
 }
@@ -11,7 +11,7 @@ csv file with 1519 rows and 6 columns
 https://seekingalpha.com/symbol/EECXM
 }
 \description{
-Daily price of Carbon Permits from 1 January 2021 to 31 December 2025
+European Union Emission Trading System
 }
 \details{
 \itemize{
@@ -22,5 +22,7 @@ Daily price of Carbon Permits from 1 January 2021 to 31 December 2025
 \item Close: Price at market close in EUR/tonne
 \item Day: time variable in days since 1 January 2021
 }
+
+Daily price of Carbon Permits from 1 January 2021 to 31 December 2025
 }
 \keyword{datasets}

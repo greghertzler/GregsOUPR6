@@ -12,7 +12,6 @@ https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-techn
 }
 \description{
 Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 }
 \details{
 \itemize{
@@ -22,6 +21,8 @@ APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 \item SSSSC GM: Gross margins per hectare for SSSSC rotation
 \item S GM: Gross margins per hectare for continuous S
 }
+
+APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
 }
 \author{
 Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013

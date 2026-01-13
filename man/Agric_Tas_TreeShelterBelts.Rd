@@ -19,6 +19,8 @@ CSIRO Perennial Prosperity Project.
 \item With trees: sheep gross margins per paddock with tree shelter belt
 \item Without trees: sheep gross margins per paddock without tree shelter belt
 }
+
+Simulated effects of shelter belts with prices and costs for sheep production.
 }
 \author{
 Tim Capon, Daniel Mendham, 2024
