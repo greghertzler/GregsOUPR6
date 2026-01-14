@@ -4,7 +4,8 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-df<-read.csv("data/OUP_ObservationInterval.csv")
+filePath <- paste0(myDataPath(),"OUP_ObservationInterval.csv")
+df<-read.csv(filePath)
 # plot by day
 ML$PlotTimeSeries(df,taucol=1,zcol=2)
 # plot by year

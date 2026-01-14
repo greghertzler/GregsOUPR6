@@ -8,7 +8,8 @@ ML$Estimates(plotit=FALSE)
 # restricted estimates
 ML$Estimates(rhor=0.5,mur=-15,plotit=FALSE)
 # other data
-df<-read.csv("data/OUP_NotMissing.csv")
+filePath <- paste0(myDataPath(),"OUP_NotMissing.csv")
+df<-read.csv(filePath)
 ML$Estimates(df=df,plotit=FALSE)
 # other columns in data
 ML$Estimates(df=df,taucol=1,zcol=3,plotit=FALSE)

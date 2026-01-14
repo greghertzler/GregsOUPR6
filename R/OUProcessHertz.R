@@ -502,4 +502,32 @@ OUPHelp = function()
 #' @examples
 #'   OUPRibbonHelp()
 OUPRibbonHelp = function() { utils::browseURL(system.file("ribbonhelp/OUP_Help.html",package="GregsOUPR6")) }
+# name and paths ----
+#' Function to return package name
+#'
+#' @description
+#' Return package name
+#' @return package name
+#' @export
+#' @examples
+#'   myName()
+myName = function() { return("GregsOUPR6") }
+#' Function to return package path
+#'
+#' @description
+#' Return package path
+#' @return package path
+#' @export
+#' @examples
+#'   myPath()
+myPath = function() { return(find.package("GregsOUPR6")) }
+#' Finction to return data path
+#'
+#' @description
+#' Return path to package data
+#' @return data path
+#' @export
+#' @examples
+#'   myDataPath()
+myDataPath = function() { return(paste0(find.package("GregsOUPR6"),"/data/"))}
 

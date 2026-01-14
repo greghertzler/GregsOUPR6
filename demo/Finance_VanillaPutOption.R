@@ -6,7 +6,8 @@ OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
 # Read data and estimate
-df<-read.csv("data/Finance_KansasCity_WheatFutures.csv")
+filePath <- paste0(myDataPath(),"Finance_KansasCity_WheatFutures.csv")
+df<-read.csv(filePath)
 # 2D plots
 A$set_plot_info(type=2)
 # Ornstein-Uhlenbeck Process

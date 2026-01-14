@@ -4,7 +4,8 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-df<-read.csv("data/OUP_Convergence.csv")
+filePath <- paste0(myDataPath(),"OUP_Convergence.csv")
+df<-read.csv(filePath)
 # rho = 0.1
 ML$Estimates()
 ML$Estimates(df=df)

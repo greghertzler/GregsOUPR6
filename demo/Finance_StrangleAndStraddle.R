@@ -7,7 +7,8 @@ A <- OUP$get_Analytical()
 FD <- OUP$get_FiniteDifference()
 ML <- OUP$get_MaximumLikelihood()
 # Read data and estimate
-df<-read.csv("data/Finance_KansasCity_WheatFutures.csv")
+filePath <- paste0(myDataPath(),"Finance_KansasCity_WheatFutures.csv")
+df<-read.csv(filePath)
 ML$Estimates(df=df,tau=1,z=5,plotit=FALSE)
 # Analytical strangle
 Aput <- A$Option(s=seq(from=0,to=60,by=0.6),x=seq(from=500,to=600,by=1),t=60,y=540,r=0.0002,phi=-1)[[1]]

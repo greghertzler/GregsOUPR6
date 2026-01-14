@@ -6,7 +6,8 @@ OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
 # read data
-df<-read.csv("data/Ecosys_Kangaroos.csv")
+filePath <- paste0(myDataPath(),"Ecosys_Kangaroos.csv")
+df<-read.csv(filePath)
 # Euro Kangaroos Visiting Times
 oup_params <- ML$Estimates(df,taucol=1,zcol=6)
 stddev <- oup_params[[3]]/(2*oup_params[[1]])^0.5

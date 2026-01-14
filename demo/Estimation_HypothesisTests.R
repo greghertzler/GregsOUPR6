@@ -4,7 +4,8 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read simulated data
-df<-read.csv("data/OUP_Convergence.csv")
+filePath <- paste0(myDataPath(),"OUP_Convergence.csv")
+df<-read.csv(filePath)
 # estimate for rho=0.1
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$GoodnessOfFit()
@@ -15,12 +16,14 @@ ML$GoodnessOfFit()
 ML$Estimates(df,taucol=1,zcol=4,plotit=FALSE)
 ML$GoodnessOfFit()
 # read experimental data
-df<-read.csv("data/Agric_NSW_SoilHealthHarden.csv")
+filePath <- paste0(myDataPath(),"Agric_NSW_SoilHealthHarden.csv")
+df<-read.csv(filePath)
 # estimate for nitrogen burn
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$GoodnessOfFit()
 # read commodities data
-df<-read.csv("data/Finance_Commodities.csv")
+filePath <- paste0(myDataPath(),"Finance_Commodities.csv")
+df<-read.csv(filePath)
 # estimate for West Texas intermediate
 ML$Estimates(df=df,taucol=1,zcol=7,plotit=FALSE)
 ML$GoodnessOfFit()
@@ -42,7 +45,8 @@ ML$LikelihoodRatioTest()
 ML$Estimates(sigmar=0.533,plotit=FALSE)
 ML$LikelihoodRatioTest()
 # infinite upper bound on sigma with stationary process
-df<-read.csv("data/Agric_NSW_SoilHealthHarden.csv")
+filePath <- paste0(myDataPath(),"Agric_NSW_SoilHealthHarden.csv")
+df<-read.csv(filePath)
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$Estimates(sigmar=99999,plotit=FALSE)
 ML$LikelihoodRatioTest()

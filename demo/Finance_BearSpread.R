@@ -9,7 +9,8 @@ ML <- OUP$get_MaximumLikelihood()
 # 2D plots
 A$set_plot_info(type=2)
 # Read data and estimate
-df<-read.csv("data/Finance_Commodities.csv")
+filePath <- paste0(myDataPath(),"Finance_Commodities.csv")
+df<-read.csv(filePath)
 ML$Estimates(df=df,tau=8,z=6)
 # Analytical bear spread
 puthi <- A$Option(s=seq(from=2025,to=2026,by=0.01),x=seq(from=0,to=150,by=1.5),t=2025,y=70,phi=-1)[[1]]
