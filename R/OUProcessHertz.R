@@ -1,4 +1,5 @@
 library(R6)
+library(tools)
 
 # roxygen ----
 #' R6 Class implementing OUProcess, a container to synchronize OUP objects.
@@ -502,7 +503,7 @@ OUPHelp = function()
 #' @examples
 #'   OUPRibbonHelp()
 OUPRibbonHelp = function() { utils::browseURL(system.file("ribbonhelp/OUP_Help.html",package="GregsOUPR6")) }
-# name and paths ----
+# name, paths and data ----
 #' Function to return package name
 #'
 #' @description
@@ -521,7 +522,7 @@ myName = function() { return("GregsOUPR6") }
 #' @examples
 #'   myPath()
 myPath = function() { return(find.package("GregsOUPR6")) }
-#' Finction to return data path
+#' Function to return data path
 #'
 #' @description
 #' Return path to package data
@@ -530,4 +531,33 @@ myPath = function() { return(find.package("GregsOUPR6")) }
 #' @examples
 #'   myDataPath()
 myDataPath = function() { return(paste0(find.package("GregsOUPR6"),"/data/"))}
+#' Function to return list of data files
+#'
+#' @description
+#' Print list of data files
+#' @return list
+#' @export
+#' @examples
+#'   myListData()
+myListData = function() {
+  datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+  filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
+  return(filelist)
+}
+#' Function to read and return data
+#'
+#' @description
+#' Read internal data and return dataframe
+#' @return dataframe
+#' @export
+#' @examples
+#'   myReadData("MyData")
+myReadData = function(file) {
+  datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+  filepath <- paste0(tools::file_path_sans_ext(paste0(datapath,file)),".csv")
+  df <- NULL
+  if(file.exists(filepath)) { df <- read.csv(filepath,fileEncoding="UTF-8-BOM") }
+  else { message(paste0(file," not found.")) }
+  return(df)
+}
 

@@ -4,8 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-filePath <- paste0(myDataPath(),"OUP_SmoothedData.csv")
-df<-read.csv(filePath)
+df<-myReadData("OUP_SmoothedData")
 # estimate for raw data
 ML$Estimates(df,taucol=1,zcol=2)
 # estimate for one smoothing

@@ -4,8 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-filePath <- paste0(myDataPath(),"OUP_SampleSize.csv")
-df<-read.csv(filePath)
+df<-myReadData("OUP_SampleSize")
 # estimate for small
 ML$Estimates(df,taucol=1,zcol=2)
 # estimate for medium

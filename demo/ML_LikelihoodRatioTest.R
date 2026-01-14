@@ -6,8 +6,7 @@ ML <- MaximumLikelihood$new()
 # default data comparing unrestricted and true parameters
 ML$LikelihoodRatioTest()
 # other data comparing unrestricted and true parameters
-filePath <- paste0(myDataPath(),"OUP_NotMissing.csv")
-df<-read.csv(filePath)
+df<-myReadData("OUP_NotMissing")
 ML$Estimates(df=df,plotit=FALSE)
 ML$Estimates(rhor=0.5,mur=-15,sigmar=15,plotit=FALSE)
 ML$LikelihoodRatioTest()

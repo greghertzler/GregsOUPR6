@@ -17,8 +17,7 @@ ML$GoodnessOfFit()
 ML$Estimates(rhor=0,plotit=FALSE)
 ML$GoodnessOfFit()
 # other data
-filePath <- paste0(myDataPath(),"OUP_NotMissing.csv")
-df<-read.csv(filePath)
+df<-myReadData("OUP_NotMissing")
 ML$Estimates(df=df,plotit=FALSE)
 ML$GoodnessOfFit()
 # other columns in data
