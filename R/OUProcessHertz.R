@@ -511,8 +511,8 @@ OUPRibbonHelp = function() { utils::browseURL(system.file("ribbonhelp/OUP_Help.h
 #' @return package name
 #' @export
 #' @examples
-#'   myName()
-myName = function() { return("GregsOUPR6") }
+#'   OUPName()
+OUPName = function() { return("GregsOUPR6") }
 #' Function to return package path
 #'
 #' @description
@@ -520,8 +520,8 @@ myName = function() { return("GregsOUPR6") }
 #' @return package path
 #' @export
 #' @examples
-#'   myPath()
-myPath = function() { return(find.package("GregsOUPR6")) }
+#'   OUPPath()
+OUPPath = function() { return(find.package("GregsOUPR6")) }
 #' Function to return data path
 #'
 #' @description
@@ -529,8 +529,8 @@ myPath = function() { return(find.package("GregsOUPR6")) }
 #' @return data path
 #' @export
 #' @examples
-#'   myDataPath()
-myDataPath = function() { return(paste0(find.package("GregsOUPR6"),"/data/"))}
+#'   OUPDataPath()
+OUPDataPath = function() { return(paste0(find.package("GregsOUPR6"),"/data/"))}
 #' Function to return list of data files
 #'
 #' @description
@@ -538,8 +538,8 @@ myDataPath = function() { return(paste0(find.package("GregsOUPR6"),"/data/"))}
 #' @return list
 #' @export
 #' @examples
-#'   myListData()
-myListData = function() {
+#'   OUPListData()
+OUPListData = function() {
   datapath <- paste0(find.package("GregsOUPR6"),"/data/")
   filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
   return(filelist)
@@ -551,8 +551,8 @@ myListData = function() {
 #' @return dataframe
 #' @export
 #' @examples
-#'   myReadData("MyData")
-myReadData = function(file) {
+#'   OUPReadData("MyData")
+OUPReadData = function(file) {
   datapath <- paste0(find.package("GregsOUPR6"),"/data/")
   filepath <- paste0(tools::file_path_sans_ext(paste0(datapath,file)),".csv")
   df <- NULL

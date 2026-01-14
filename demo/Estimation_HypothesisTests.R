@@ -4,7 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read simulated data
-df<-myReadData("OUP_Convergence")
+df<-OUPReadData("OUP_Convergence")
 # estimate for rho=0.1
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$GoodnessOfFit()
@@ -15,12 +15,12 @@ ML$GoodnessOfFit()
 ML$Estimates(df,taucol=1,zcol=4,plotit=FALSE)
 ML$GoodnessOfFit()
 # read experimental data
-df<-myReadData("Agric_NSW_SoilHealthHarden")
+df<-OUPReadData("Agric_NSW_SoilHealthHarden")
 # estimate for nitrogen burn
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$GoodnessOfFit()
 # read commodities data
-df<-myReadData("Finance_Commodities")
+df<-OUPReadData("Finance_Commodities")
 # estimate for West Texas intermediate
 ML$Estimates(df=df,taucol=1,zcol=7,plotit=FALSE)
 ML$GoodnessOfFit()
@@ -42,7 +42,7 @@ ML$LikelihoodRatioTest()
 ML$Estimates(sigmar=0.533,plotit=FALSE)
 ML$LikelihoodRatioTest()
 # infinite upper bound on sigma with stationary process
-df<-myReadData("Agric_NSW_SoilHealthHarden")
+df<-OUPReadData("Agric_NSW_SoilHealthHarden")
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$Estimates(sigmar=99999,plotit=FALSE)
 ML$LikelihoodRatioTest()

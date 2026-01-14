@@ -4,7 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-df<-myReadData("OUP_SmoothedData")
+df<-OUPReadData("OUP_SmoothedData")
 # estimate for raw data
 ML$Estimates(df,taucol=1,zcol=2)
 # estimate for one smoothing

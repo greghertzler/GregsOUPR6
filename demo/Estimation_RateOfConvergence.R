@@ -4,7 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-df<-myReadData("OUP_Convergence")
+df<-OUPReadData("OUP_Convergence")
 # rho = 0.1
 ML$Estimates()
 ML$Estimates(df=df)

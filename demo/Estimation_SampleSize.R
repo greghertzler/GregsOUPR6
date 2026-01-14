@@ -4,7 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-df<-myReadData("OUP_SampleSize")
+df<-OUPReadData("OUP_SampleSize")
 # estimate for small
 ML$Estimates(df,taucol=1,zcol=2)
 # estimate for medium

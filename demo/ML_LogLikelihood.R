@@ -8,7 +8,7 @@ ML$LogLikelihood()
 # other parameters
 ML$LogLikelihood(rho=0.4,mu=-10,sigma=25)
 # other data
-df<-myReadData("OUP_NotMissing")
+df<-OUPReadData("OUP_NotMissing")
 ML$LogLikelihood(rho=0.5,mu=-15,sigma=15,df=df)
 # other columns in data
 ML$LogLikelihood(df=df,taucol=1,zcol=3)

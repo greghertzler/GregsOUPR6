@@ -4,7 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read data
-df<-myReadData("OUP_NotMissing")
+df<-OUPReadData("OUP_NotMissing")
 # estimate for equal observation intervals
 ML$Estimates(df,taucol=1,zcol=2)
 # estimate for unequal observation intervals

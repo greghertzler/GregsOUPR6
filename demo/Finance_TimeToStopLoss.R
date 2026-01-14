@@ -6,7 +6,7 @@ OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
 # Read data and estimate
-df<-myReadData("Finance_KansasCity_WheatFutures")
+df<-OUPReadData("Finance_KansasCity_WheatFutures")
 ML$Estimates(df=df,tau=1,z=5)
 A$set_t_stoch_args(k=525,x=575)
 A$axes_t_stoch()
