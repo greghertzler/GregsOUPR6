@@ -688,9 +688,16 @@ number of argument sets
 \subsection{Method \code{undo_undo()}}{
 Replace current arguments from undo list
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$undo_undo()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Analytical$undo_undo(updn = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{updn}}{positive to move up, negative to move down}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 c(index of this argument set, number of argument sets)
 }

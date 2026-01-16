@@ -2163,18 +2163,30 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             V_yieldindex_args=private$V_yieldindex_args,
             V_info=private$V_info)))
         n <- n+1
+        private$undoIx <- n
       }
 
       return(n)
     },
     #' @description
     #' Replace current arguments from undo list
+    #' @param updn    positive to move up, negative to move down
     #' @return c(index of this argument set, number of argument sets)
-    undo_undo = function()
+    undo_undo = function(updn=NULL)
     {
+      if(is.null(updn)) { updn <- -1 }
       n <- length(private$undo_args)
-      this_Ix <- private$undoIx
-      these_undo <- private$undo_args[[this_Ix]]
+      if(updn > 0)
+      {
+        undoIx <- private$undoIx+1
+        if(undoIx > n) { undoIx <- 1 }
+      }
+      else
+      {
+        undoIx <- undoIx-1
+        if(undoIx < 1) { undoIx <- n }
+      }
+      these_undo <- private$undo_args[[undoIx]]
       oup <- these_undo[[1]]
       x_stoch <- these_undo[[2]]
       V_linear <- these_undo[[3]]
@@ -2201,11 +2213,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       self$set_V_transcendental_args(V_transcendental[[1]],V_transcendental[[2]],V_transcendental[[3]],V_transcendental[[4]],V_transcendental[[5]])
       self$set_V_yieldindex_args(V_yieldindex[[1]],V_yieldindex[[2]],V_yieldindex[[3]],V_yieldindex[[4]],V_yieldindex[[5]])
       self$set_V_info(V_info[[1]],V_info[[2]])
-      next_Ix <- this_Ix+1
-      if(next_Ix > n) { next_Ix <- 1 }
-      private$undoIx <- next_Ix
+      private$undoIx <- undoIx
 
-      return(c(this_Ix,n))
+      return(c(undoIx,n))
     },
     # public calculate methods ----
     #' @description

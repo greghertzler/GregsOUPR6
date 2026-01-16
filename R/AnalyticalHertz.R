@@ -1638,18 +1638,30 @@ Analytical <- R6::R6Class("Analytical",
             x_stoch_args=private$x_stoch_args,
             t_stoch_args=private$t_stoch_args)))
         n <- n+1
+        private$undoIx <- n
       }
 
       return(n)
     },
     #' @description
     #' Replace current arguments from undo list
+    #' @param updn    positive to move up, negative to move down
     #' @return c(index of this argument set, number of argument sets)
-    undo_undo = function()
+    undo_undo = function(updn=NULL)
     {
+      if(is.null(updn)) { updn <- -1 }
       n <- length(private$undo_args)
-      this_Ix <- private$undoIx
-      these_undo <- private$undo_args[[this_Ix]]
+      if(updn > 0)
+      {
+        undoIx <- private$undoIx+1
+        if(undoIx > n) { undoIx <- 1 }
+      }
+      else
+      {
+        undoIx <- undoIx-1
+        if(undoIx < 1) { undoIx <- n }
+      }
+      these_undo <- private$undo_args[[undoIx]]
       oup <- these_undo[[1]]
       z_stoch <- these_undo[[2]]
       y_stoch <- these_undo[[3]]
@@ -1660,11 +1672,9 @@ Analytical <- R6::R6Class("Analytical",
       self$set_y_stoch_args(y_stoch[[1]],y_stoch[[2]],y_stoch[[3]],y_stoch[[4]],y_stoch[[5]],y_stoch[[6]])
       self$set_x_stoch_args(x_stoch[[1]],x_stoch[[2]],x_stoch[[3]],x_stoch[[4]],x_stoch[[5]],x_stoch[[6]],x_stoch[[7]],x_stoch[[8]])
       self$set_t_stoch_args(t_stoch[[1]],t_stoch[[2]],t_stoch[[3]],t_stoch[[4]],t_stoch[[5]],t_stoch[[6]],t_stoch[[7]])
-      next_Ix <- this_Ix+1
-      if(next_Ix > n) { next_Ix <- 1 }
-      private$undoIx <- next_Ix
+      private$undoIx <- undoIx
 
-      return(c(this_Ix,n))
+      return(c(undoIx,n))
     },
     # public calculate methods ----
     #' @description
