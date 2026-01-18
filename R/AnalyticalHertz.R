@@ -4347,8 +4347,8 @@ Analytical <- R6::R6Class("Analytical",
         zview <- list(title=zaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview, zaxis=zview,aspectratio=list(x=1,y=1,z=1))
         Oholdline <- list(color=red$e,width=10)
-        Oexerciseline <- list(color=red$e,width=8)
-        Ohatline <- list(dash="dash",color=ylw$e,width=8)
+        Oexerciseline <- list(color=red$e,width=10)
+        Ohatline <- list(dash="dash",color=ylw$d,width=10)
         Oscarfline <- list(color=red$a,width=10)
         gradient <- list(c(0,red$c),c(1,red$c))
         rise <- list(x=0,y=-300,z=0)
@@ -4366,16 +4366,16 @@ Analytical <- R6::R6Class("Analytical",
       # OUP_A_Envelope3DScarf and OUP_A_Envelope3DMittens
         else if(type < 6.5)
         {
-          if(phi <= 0) {
-            Oscarf <- private$Oscarfneg
+          if(phi > 0) {
+            Oscarf <- private$Oscarfpos
             if(is.null(Oscarf)) { Oscarf <- private$OUPOptionDtZero() }
-            sscarf <- t-private$sscarfneg
+            sscarf <- private$sscarfpos
           }
           else
           {
-            Oscarf <- private$Oscarfpos
+            Oscarf <- private$Oscarfneg
             if(is.null(Oscarf)) { Oscarf <- private$OUPOptionDtZero() }
-            sscarf <- t-private$sscarfpos
+            sscarf <- private$sscarfneg
           }
           Oscarf <- Oscarf[,Ixbeg:Ixend]
           sscarf <- sscarf[,Ixbeg:Ixend]
@@ -4730,9 +4730,11 @@ Analytical <- R6::R6Class("Analytical",
           obhat <- vector("double",n)
           obhold <- vector("double",n)
           obexercise <- vector("double",n)
+          obinterest <- vector("double",n)
           ophat <- vector("double",n)
           ophold <- vector("double",n)
           opexercise <- vector("double",n)
+          opinterest <- vector("double",n)
           zero <- rep(0,n)
           coordinatesobhat <- vector("double",n)
           coordinatesophat <- vector("double",n)
@@ -4768,10 +4770,13 @@ Analytical <- R6::R6Class("Analytical",
                 obexercise[j] <- obhat[j]
                 ophold[j] <- NA
                 opexercise[j] <- ophat[j]
+                obinterest[j] <- NA
+                opinterest[j] <- NA
                 if(j > 1)
                 {
                   obhat[j] <- obhat[j-1]
                   ophat[j] <- ophat[j-1]
+                  opinterest[j] <- obhat[j]-ophat[j]
                 }
               }
               else
@@ -4780,7 +4785,9 @@ Analytical <- R6::R6Class("Analytical",
                 obexercise[j] <- NA
                 ophold[j] <- ophat[j]
                 opexercise[j] <- NA
-              }
+                obinterest[j] <- NA
+                opinterest[j] <- NA
+             }
             }
           }
           else
@@ -4794,10 +4801,13 @@ Analytical <- R6::R6Class("Analytical",
                 obexercise[j] <- obhat[j]
                 ophold[j] <- NA
                 opexercise[j] <- ophat[j]
+                obinterest[j] <- NA
+                opinterest[j] <- NA
                 if(j < n)
                 {
                   obhat[j] <- obhat[j+1]
                   ophat[j] <- ophat[j+1]
+                  obinterest[j] <- obhat[j]-ophat[j]
                 }
               }
               else
@@ -4806,6 +4816,8 @@ Analytical <- R6::R6Class("Analytical",
                 obexercise[j] <- NA
                 ophold[j] <- ophat[j]
                 opexercise[j] <- NA
+                obinterest[j] <- NA
+                opinterest[j] <- NA
               }
               j <- j-1
             }
@@ -4813,11 +4825,13 @@ Analytical <- R6::R6Class("Analytical",
           holdmesh <- MeshVertical(x,shat,ophold,obhold)
           exercisemesh <- MeshVertical(x,shat,opexercise,obexercise)
           obholdline <- list(color=red$c,width=10)
-          obexerciseline <- list(color=red$c,width=8)
+          obexerciseline <- list(color=red$b,width=8)
           obhatline <- list(dash="dash",color=ylw$c,width=8)
+          obinterestline <- list(color=ylw$b,width=8)
           opholdline <- list(color=red$c,width=10)
           opexerciseline <- list(color=red$c,width=8)
           ophatline <- list(dash="dash",color=ylw$c,width=8)
+          opinterestline <- list(color=ylw$b,width=8)
           zeroline <- list(color=red$c,width=8)
           opgradient <- list(c(0,red$c),c(1,red$c))
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Obligation3DEnvelope")
@@ -4826,9 +4840,11 @@ Analytical <- R6::R6Class("Analytical",
             add_trace(.,type="scatter3d",x=x,y=shat,z=obhat,mode="lines",line=obhatline,hoverinfo="text",text=coordinatesobhat) %>%
             add_trace(.,type="scatter3d",x=x,y=shat,z=obhold,mode="lines",line=obholdline,hoverinfo="text",text=coordinatesobhat) %>%
             add_trace(.,type="scatter3d",x=x,y=shat,z=obexercise,mode="lines",line=obexerciseline,hoverinfo="text",text=coordinatesobhat) %>%
+            add_trace(.,type="scatter3d",x=x,y=shat,z=obinterest,mode="lines",line=obinterestline,hoverinfo="text",text=coordinatesobhat) %>%
             add_trace(.,type="scatter3d",x=x,y=shat,z=ophat,mode="lines",line=ophatline,hoverinfo="text",text=coordinatesophat) %>%
             add_trace(.,type="scatter3d",x=x,y=shat,z=ophold,mode="lines",line=opholdline,hoverinfo="text",text=coordinatesophat) %>%
             add_trace(.,type="scatter3d",x=x,y=shat,z=opexercise,mode="lines",line=opexerciseline,hoverinfo="text",text=coordinatesophat) %>%
+            add_trace(.,type="scatter3d",x=x,y=shat,z=opinterest,mode="lines",line=opinterestline,hoverinfo="text",text=coordinatesobhat) %>%
             add_trace(.,type="scatter3d",x=x,y=shat,z=zero,mode="lines",line=zeroline,hoverinfo="text",text=coordinateszero) %>%
             add_trace(.,type="mesh3d",x=holdmesh$xvertex,y=holdmesh$yvertex,z=holdmesh$zvertex,i=holdmesh$ivertex,j=holdmesh$jvertex,k=holdmesh$kvertex,intensity=holdmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=opgradient,reversescale=reverse,opacity=0.7,hoverinfo="text",text=coordinatesophat) %>%
             add_trace(.,type="mesh3d",x=exercisemesh$xvertex,y=exercisemesh$yvertex,z=exercisemesh$zvertex,i=exercisemesh$ivertex,j=exercisemesh$jvertex,k=exercisemesh$kvertex,intensity=exercisemesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=opgradient,reversescale=reverse,opacity=0.7,hoverinfo="text",text=coordinatesophat)
@@ -7292,7 +7308,7 @@ Analytical <- R6::R6Class("Analytical",
           }
         }
         private$Oscarfneg <- Oscarf
-        private$sscarfneg <- sscarf
+        private$sscarfneg <- t-sscarf
       }
       return(Oscarf)
     },

@@ -67,6 +67,7 @@ ML_PlotEstimates
 ML_PlotTimeSeries
 PlotInfo   customizing plots
 Resilience_Recovery
+Proof_DecisionThreshold
 Finance_VanillaCallOption
 Finance_VanillaPutOption
 Finance_PutCallParity
