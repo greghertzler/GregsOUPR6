@@ -336,8 +336,16 @@ or type:
 
 or, open the A_Density.R file in RStudio and Source it from the menu.
 
+But really, the most convenient way is to use the command:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDemoList()
+  OUPDemoRun(2)
+}\if{html}{\out{</div>}}
+
+Entering the demos by number in the list saves typing.
+
 Available data sets for Maximum Likelihood estimation have their own help.
-Type one of the categories:
+Type:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  ?Agric_
   ?Climate_
@@ -347,6 +355,15 @@ Type one of the categories:
 }\if{html}{\out{</div>}}
 
 and then select from the drop-down list.
+
+The easiest way to query and read the data without changing the working
+directory is:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDataList()
+  OUPDataRead(10)
+}\if{html}{\out{</div>}}
+
+Entering data by number in the list saves typing.
 
 Examples in R6 don't work the same as in S3 and S4 modules.  There is only
 one example for an R6 object, not one for each method in the object.

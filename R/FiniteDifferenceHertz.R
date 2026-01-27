@@ -179,7 +179,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       plottype <- list(type=3)
       plotfont <- list(family="Cambria",size=14)
       plotfile <- list(format="png",width=640,height=480)
-      plottheme <- list(name="dark",opaque=1.0)
+      plottheme <- list(name="light",opaque=0.0)
+      if(Sys.getenv("RSTUDIO") == "1")
+      {
+        if(rstudioapi::getThemeInfo()$dark) { plottheme <- list(name="dark",opaque=1.0) }
+      }
       plot3D <- list(walls=TRUE,floor=TRUE)
       private$plot_info <- list(plottype=plottype,plotfont=plotfont,plotfile=plotfile,plottheme=plottheme,plot3D=plot3D,plotlabels=TRUE)
       private$plot_colors <- private$rainbow(plottheme$name,plottheme$opaque)

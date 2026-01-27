@@ -6,7 +6,7 @@ ML <- MaximumLikelihood$new()
 # default data comparing unrestricted and true parameters
 ML$LikelihoodRatioTest()
 # other data comparing unrestricted and true parameters
-df<-OUPReadData("OUP_NotMissing")
+df<-OUPDataRead("OUP_NotMissing")
 ML$Estimates(df=df,plotit=FALSE)
 ML$Estimates(rhor=0.5,mur=-15,sigmar=15,plotit=FALSE)
 ML$LikelihoodRatioTest()

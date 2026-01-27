@@ -38,7 +38,9 @@ A$PlotDensity()
 FD$set_plot_info(filewidth=140,fileheight=200)
 A$PlotDensity()
 # change theme, transparent background
-A$set_plot_info(theme="light",opaque=0.0)
+dklt <- A$get_plot_info()$plottheme$name
+if(dklt == "dark") { A$set_plot_info(theme="light",opaque=0.0) }
+if(dklt == "light") { A$set_plot_info(theme="dark",opaque=1.0) }
 A$PlotDensity()
 # transparent walls and floor
 A$set_plot_info(walls=FALSE,floor=FALSE)

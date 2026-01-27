@@ -300,8 +300,15 @@ library(tools)
 #'
 #' or, open the A_Density.R file in RStudio and Source it from the menu.
 #'
+#' But really, the most convenient way is to use the command:
+#'
+#'       OUPDemoList()
+#'       OUPDemoRun(2)
+#'
+#' Entering the demos by number in the list saves typing.
+#'
 #' Available data sets for Maximum Likelihood estimation have their own help.
-#'  Type one of the categories:
+#'  Type:
 #'
 #'       ?Agric_
 #'       ?Climate_
@@ -310,6 +317,14 @@ library(tools)
 #'       ?OUP_
 #'
 #'  and then select from the drop-down list.
+#'
+#' The easiest way to query and read the data without changing the working
+#'  directory is:
+#'
+#'       OUPDataList()
+#'       OUPDataRead(10)
+#'
+#' Entering data by number in the list saves typing.
 #'
 #' Examples in R6 don't work the same as in S3 and S4 modules.  There is only
 #'  one example for an R6 object, not one for each method in the object.
@@ -503,7 +518,7 @@ OUPHelp = function()
 #' @examples
 #'   OUPRibbonHelp()
 OUPRibbonHelp = function() { utils::browseURL(system.file("ribbonhelp/OUP_Help.html",package="GregsOUPR6")) }
-# name, paths and data ----
+# name, path, data and demos ----
 #' Function to return package name
 #'
 #' @description
@@ -538,8 +553,8 @@ OUPDataPath = function() { return(paste0(find.package("GregsOUPR6"),"/data/"))}
 #' @return list
 #' @export
 #' @examples
-#'   OUPListData()
-OUPListData = function() {
+#'   OUPDataList()
+OUPDataList = function() {
   datapath <- paste0(find.package("GregsOUPR6"),"/data/")
   filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
   return(filelist)
@@ -551,13 +566,85 @@ OUPListData = function() {
 #' @return dataframe
 #' @export
 #' @examples
-#'   OUPReadData("MyData")
-OUPReadData = function(file) {
-  datapath <- paste0(find.package("GregsOUPR6"),"/data/")
-  filepath <- paste0(tools::file_path_sans_ext(paste0(datapath,file)),".csv")
+#'   OUPDataRead("MyData")
+OUPDataRead = function(file="MyData") {
   df <- NULL
-  if(file.exists(filepath)) { df <- read.csv(filepath,fileEncoding="UTF-8-BOM") }
+  if(is.character(file))
+  {
+    datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+    filepath <- paste0(tools::file_path_sans_ext(paste0(datapath,file)),".csv")
+    if(file.exists(filepath))
+    {
+      message(file)
+      df <- read.csv(filepath,fileEncoding="UTF-8-BOM")
+    }
+    else { message(paste0(file," not found.  Try entering by number in the list.")) }
+  }
+  else if(is.numeric(file))
+  {
+    datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+    filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
+    m <- length(filelist)
+    if(m > 0)
+    {
+      i <- as.integer(file)
+      if(i < 1) { i <- 1 }
+      else if(i > m) { i <- m }
+      filename <- paste0(filelist[i],".csv")
+      filepath <- paste0(datapath,filename)
+      message(filelist[i])
+      df <- read.csv(filepath,fileEncoding="UTF-8-BOM")
+    }
+    else { message("no data files.") }
+  }
   else { message(paste0(file," not found.")) }
+
   return(df)
+}
+#' Function to return list of demos
+#'
+#' @description
+#' Print list of demos
+#' @return list
+#' @export
+#' @examples
+#'   OUPDemoList()
+OUPDemoList = function() {
+  demopath <- paste0(find.package("GregsOUPR6"),"/demo/")
+  filelist <- tools::file_path_sans_ext(list.files(demopath,pattern=".R"))
+  return(filelist)
+}
+#' Function to run demo
+#'
+#' @description
+#' Run a demo
+#' @return demo results
+#' @export
+#' @examples
+#'   OUPDemoRun("A_Drift")
+OUPDemoRun = function(demo="A_Drift") {
+  if(is.character(demo))
+  {
+    demopath <- paste0(find.package("GregsOUPR6"),"/demo/")
+    filepath <- paste0(tools::file_path_sans_ext(paste0(demopath,demo)),".R")
+    if(file.exists(filepath)) { source(filepath, echo = TRUE) }
+    else { message(paste0(demo," not found.  Try entering by number in the list.")) }
+  }
+  else if(is.numeric(demo))
+  {
+    demopath <- paste0(find.package("GregsOUPR6"),"/demo/")
+    filelist <- tools::file_path_sans_ext(list.files(demopath,pattern=".R"))
+    m <- length(filelist)
+    if(m > 0)
+    {
+      i <- as.integer(demo)
+      if(i < 1) { i <- 1 }
+      else if(i > m) { i <- m }
+      filepath <- paste0(demopath,filelist[i],".R")
+      source(filepath, echo = TRUE)
+    }
+    else { message("no demos found.") }
+  }
+  else { message(paste0(demo," not found.")) }
 }
 

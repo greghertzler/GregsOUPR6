@@ -14,8 +14,8 @@ ML$PlotTimeSeries(title="Title",xaxis="xAxis",yaxis="yAxis")
 # revert to time series info
 ML$PlotTimeSeries()
 # find some data to plot
-OUPListData()
+OUPDataList()
 # read some data into data frame
-df<-OUPReadData("Ecosys_Kangaroos")
+df<-OUPDataRead("Ecosys_Kangaroos")
 # plot time as first column, state as second column
 ML$PlotTimeSeries(df)

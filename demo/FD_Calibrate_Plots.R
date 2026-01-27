@@ -5,7 +5,6 @@ library(plotly)
 # R6 objects
 FD <- FiniteDifference$new()
 A <- Analytical$new()
-ML <- MaximumLikelihood$new()
 
 # plotly preliminaries
 plot_info <- FD$get_plot_info()
@@ -47,8 +46,9 @@ x <- seq(from=-200,to=200,by=4)
 m <- length(s)
 n <- length(x)
 coordinates <- matrix("",m,n)
-FDopt <- FD$Option(s=s,x=x,plotit=FALSE)[[1]]
-Aopt <- A$Option(s=s,x=x,t=10,plotit=FALSE)[[1]]
+FD$TerminalValue_Kinked(Vmax=10000,plotit=FALSE)
+FDopt <- FD$Option(s=s,x=x,mu=-15,plotit=FALSE)[[1]]
+Aopt <- A$Option(s=s,x=x,t=10,mu=-15,plotit=FALSE)[[1]]
 err <- FDopt-Aopt
 message(paste("Max over: ",max(err),"  Max under: ",min(err)))
 for(i in 1:m)

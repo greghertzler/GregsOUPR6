@@ -42,7 +42,7 @@ ML$LikelihoodRatioTest()
 ML$Estimates(sigmar=0.533,plotit=FALSE)
 ML$LikelihoodRatioTest()
 # infinite upper bound on sigma with stationary process
-df<-OUPReadData("Agric_NSW_SoilHealthHarden")
+df<-OUPDataRead("Agric_NSW_SoilHealthHarden")
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$Estimates(sigmar=99999,plotit=FALSE)
 ML$LikelihoodRatioTest()

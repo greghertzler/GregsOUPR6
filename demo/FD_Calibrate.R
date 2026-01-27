@@ -7,8 +7,9 @@ A <- Analytical$new()
 # calibrate finite difference against analytical
 s <- seq(from=10,to=0,by=-0.1)
 x <- seq(from=-200,to=200,by=4)
-FDopt <- FD$Option(s=s,x=x,plotit=FALSE)[[1]]
-Aopt <- A$Option(s=s,x=x,t=10,plotit=FALSE)[[1]]
+FD$TerminalValue_Kinked(Vmax=10000,plotit=FALSE)
+FDopt <- FD$Option(s=s,x=x,mu=-15,plotit=FALSE)[[1]]
+Aopt <- A$Option(s=s,x=x,t=10,mu=-15,plotit=FALSE)[[1]]
 err <- FDopt-Aopt
 message(paste("Max over: ",max(err),"  Max under: ",min(err)))
 # narrow x

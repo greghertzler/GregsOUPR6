@@ -6,7 +6,7 @@ OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
 # Read data and estimate
-df<-OUPReadData("Finance_KansasCity_WheatFutures")
+df<-OUPDataRead("Finance_KansasCity_WheatFutures")
 ML$Estimates(df=df,tau=1,z=5,plotit=FALSE)
 # 2D plots
 A$set_plot_info(type=2)

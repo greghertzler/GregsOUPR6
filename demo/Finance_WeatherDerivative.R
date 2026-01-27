@@ -8,7 +8,7 @@ ML <- OUP$get_MaximumLikelihood()
 # 2D plots
 FD$set_plot_info(type=2)
 # Read data and estimate
-df<-OUPReadData("Agric_SA_GMOrroroo")
+df<-OUPDataRead("Agric_SA_GMOrroroo")
 ML$Estimates(df=df,tau=1,z=3)
 # Ornstein-Uhlenbeck Process
 FD$set_x_stoch_args(s=seq(from=2025,to=2026,by=0.01),x=seq(from=0,to=500,by=5))

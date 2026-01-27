@@ -49,6 +49,7 @@ FD_PlotDrift
 FD_PlotOption
 FD_PlotOptionEnvelope
 FD_PlotTerminalValue
+FD_TerminalValue_Butterfly
 FD_TerminalValue_Degenerate
 FD_TerminalValue_Gompertz
 FD_TerminalValue_Kinked
@@ -66,15 +67,23 @@ ML_LogLikelihood
 ML_PlotEstimates
 ML_PlotTimeSeries
 PlotInfo   customizing plots
+CaseStudy_Albatross   Wandering Albatross recovery
+CaseStudy_FarmDams   time to destocking
+CaseStudy_Fisheries   ecosystem services of Southern Bluefin Tuna
+CaseStudy_Carbon   ACCU's for Jarrah forest
+CaseStudy_YieldIndex   Index insurance for wheat
 Resilience_Recovery
-Proof_DecisionThreshold
+Resilience_Tipping
+Adoption_EntryOption
+Policies_ResourceRent
 Finance_VanillaCallOption
 Finance_VanillaPutOption
 Finance_PutCallParity
 Finance_StrangleAndStraddle
 Finance_BearSpread
 Finance_WeatherDerivative
-Finance_YieldIndexInsurance
+Finance_OtherOptions
+Finance_ContractsToDeliver
 Finance_TimeToStopLoss
 Estimation_RateOfConvergence
 Estimation_ObservationInterval
@@ -82,3 +91,4 @@ Estimation_NoMissingObservations
 Estimation_SmoothedData
 Estimation_SampleSize
 Estimation_HypothesisTests
+Proof_DecisionThreshold   graphical proof
