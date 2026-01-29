@@ -4,7 +4,7 @@
 # R6 object
 ML <- MaximumLikelihood$new()
 # read simulated data
-df<-OUPReadData("OUP_Convergence")
+df<-OUPDataRead("OUP_Convergence")
 # estimate for rho=0.1
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$GoodnessOfFit()
@@ -15,12 +15,12 @@ ML$GoodnessOfFit()
 ML$Estimates(df,taucol=1,zcol=4,plotit=FALSE)
 ML$GoodnessOfFit()
 # read experimental data
-df<-OUPReadData("Agric_NSW_SoilHealthHarden")
+df<-OUPDataRead("Agric_NSW_SoilHealthHarden")
 # estimate for nitrogen burn
 ML$Estimates(df=df,taucol=1,zcol=2,plotit=FALSE)
 ML$GoodnessOfFit()
 # read commodities data
-df<-OUPReadData("Finance_Commodities")
+df<-OUPDataRead("Finance_Commodities")
 # estimate for West Texas intermediate
 ML$Estimates(df=df,taucol=1,zcol=7,plotit=FALSE)
 ML$GoodnessOfFit()

@@ -5,7 +5,7 @@
 ML <- MaximumLikelihood$new()
 # read data
 datapath<-OUPDataPath()  # this is a path to your data directory
-filepath<-paste0(path,"MyData.csv")  # this is your filepath
+filepath<-paste0(datapath,"MyData.csv")  # this is your filepath
 filepath
 df<-read.csv(filepath)
 # estimate

@@ -17,7 +17,7 @@ ML$GoodnessOfFit()
 ML$Estimates(rhor=0,plotit=FALSE)
 ML$GoodnessOfFit()
 # other data
-df<-myDataRead("OUP_NotMissing")
+df<-OUPDataRead("OUP_NotMissing")
 ML$Estimates(df=df,plotit=FALSE)
 ML$GoodnessOfFit()
 # other columns in data

@@ -9,7 +9,6 @@ A$set_plot_info(type=2)
 A$Option(rho=0,phi=1)
 A$Option(mu=0)
 # Ornstein-Uhlenbeck Process
-A$default_read()
-A$Option(phi=1)
+A$Option(rho=0.5,mu=15,phi=1)
 # Stationary process
 A$Option(rho=99)
