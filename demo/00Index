@@ -69,12 +69,15 @@ ML_PlotTimeSeries
 PlotInfo   customizing plots
 CaseStudy_Albatross   Wandering Albatross recovery
 CaseStudy_FarmDams   time to destocking
+CaseStudy_Agriculture  adaptation to climate change
 CaseStudy_Fisheries   ecosystem services of Southern Bluefin Tuna
 CaseStudy_Carbon   ACCU's for Jarrah forest
 CaseStudy_YieldIndex   Index insurance for wheat
 Resilience_Recovery
 Resilience_Tipping
 Adoption_EntryOption
+Adoption_Obligation
+Adoption_ExitOption
 Policies_ResourceRent
 Finance_VanillaCallOption
 Finance_VanillaPutOption

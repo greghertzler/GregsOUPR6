@@ -557,6 +557,7 @@ OUPDataPath = function() { return(paste0(find.package("GregsOUPR6"),"/data/"))}
 OUPDataList = function() {
   datapath <- paste0(find.package("GregsOUPR6"),"/data/")
   filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
+  message("OUPDataRead('name') or OUPDataRead(number)")
   return(filelist)
 }
 #' Function to read and return data
@@ -612,6 +613,7 @@ OUPDataRead = function(file="MyData") {
 OUPDemoList = function() {
   demopath <- paste0(find.package("GregsOUPR6"),"/demo/")
   filelist <- tools::file_path_sans_ext(list.files(demopath,pattern=".R"))
+  message("OUPDemoRun('name') or OUPDemoRun(number)")
   return(filelist)
 }
 #' Function to run demo
