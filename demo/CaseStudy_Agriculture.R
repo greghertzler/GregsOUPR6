@@ -5,6 +5,7 @@
 OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
+A$set_plot_info(labels=FALSE)
 SAoup <- matrix(0.0,6,5)
 SAdec <- matrix(0.0,6,4)
 NSWoup <- matrix(0.0,6,5)
