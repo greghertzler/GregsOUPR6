@@ -78,7 +78,13 @@ Resilience_Tipping
 Adoption_EntryOption
 Adoption_Obligation
 Adoption_ExitOption
+Policies_NoExit
+Policies_NoEntry
+Policies_Bankruptcy
 Policies_ResourceRent
+Policies_Disaster
+Policies_Taxes
+Policies_Stabilisation
 Finance_VanillaCallOption
 Finance_VanillaPutOption
 Finance_PutCallParity
