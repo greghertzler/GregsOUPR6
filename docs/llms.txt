@@ -13,8 +13,7 @@ Version:
 1.4.5.0 (Stochastic Process.Modules.Help.Bugs)  
 
 Code:  
-GregsOUP package contains an RShiny app, R6 objects and
-Rcpp/RcppParallel modules.  
+GregsOUPR6 package contains R6 objects and Rcpp/RcppParallel modules.  
 
 This document:  
 <https://greghertzler.github.io/GregsOUPR6/>  
