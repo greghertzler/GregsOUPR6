@@ -1,0 +1,188 @@
+# Package index
+
+## General
+
+- [`OUPShiny()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  [`OUPHelpList()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  [`OUPHelpView()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  [`OUPDataList()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  [`OUPDataHelp()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  [`OUPDataRead()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  [`OUPDemoList()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  [`OUPDemoRun()`](https://greghertzler.github.io/GregsOUPR6/reference/General.md)
+  : GregsOUPR6 package implementing Real Options for Adoption and
+  Resilience.
+
+## R6 Objects
+
+- [`OUProcess`](https://greghertzler.github.io/GregsOUPR6/reference/OUProcess.md)
+  : R6 class implementing a container to synchronize OUP objects.
+- [`Analytical`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical.md)
+  : R6 class implementing Analytical formulas for the Ornstein-Uhlenbeck
+  Process
+- [`FiniteDifference`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference.md)
+  : R6 class implementing a Finite Difference method for the
+  Ornstein-Uhlenbeck Process.
+- [`MaximumLikelihood`](https://greghertzler.github.io/GregsOUPR6/reference/MaximumLikelihood.md)
+  : R6 class implementing Maximum Likelihood estimation of the
+  Ornstein-Uhlenbeck Process.
+- [`MonteCarlo`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo.md)
+  : R6 class implementing Monte Carlo simulation of the
+  Ornstein-Uhlenbeck Process
+
+## Rcpp/RcppParallel Modules
+
+### Analytical
+
+- [`RcppOUPADrift()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPADiffusion()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAMean()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAVariance()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPADensity()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAProbability()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPADoubleIntegral()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAOption()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAOptionEnvelope()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAdOOdsZero()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPADecisionThreshold()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAObligation()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAPassageTimeModeMedianMean()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAPassageTimePercentiles()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAPassageTimeDensity()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  [`RcppOUPAPassageTimeProbability()`](https://greghertzler.github.io/GregsOUPR6/reference/Analytical_Rcpp.md)
+  : Analytical_Rcpp functions for calculating an Ornstein-Uhlenbeck
+  Process
+
+### Finite Difference
+
+- [`RcppOUPFDDrift()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDDiffusion()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Linear()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Degenerate()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Stepped()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Kinked()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Butterfly()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Mitscherlich()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Gompertz()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Logistic()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_Transcendental()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDTerminalValue_YieldIndex()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDOption()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDOptionEnvelope()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  [`RcppOUPFDDecisionThreshold()`](https://greghertzler.github.io/GregsOUPR6/reference/FiniteDifference_Rcpp.md)
+  : FiniteDifference_Rcpp functions for numerical solutions of an
+  Ornstein-Uhlenbeck Process
+
+### Maximum Likelihood
+
+- [`RcppOUPMLLogLikelihood()`](https://greghertzler.github.io/GregsOUPR6/reference/MaximumLikelihood_Rcpp.md)
+  [`RcppOUPMLNMStart()`](https://greghertzler.github.io/GregsOUPR6/reference/MaximumLikelihood_Rcpp.md)
+  [`RcppOUPMLNelderMead()`](https://greghertzler.github.io/GregsOUPR6/reference/MaximumLikelihood_Rcpp.md)
+  [`RcppOUPMLGoodnessOfFit()`](https://greghertzler.github.io/GregsOUPR6/reference/MaximumLikelihood_Rcpp.md)
+  [`RcppOUPMLLikelihoodRatioTest()`](https://greghertzler.github.io/GregsOUPR6/reference/MaximumLikelihood_Rcpp.md)
+  : MaximumLikelihood_Rcpp functions to estimate an Ornstein-Uhlenbeck
+  Process
+
+### Monte Carlo
+
+- [`RcppOUPMCMinMax()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCStandardNormal()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCForwardPathRungeKutta()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBackwardPathRungeKutta()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBoundedPathRungeKutta()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCForwardPathIntegralEquation()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBackwardPathIntegralEquation()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBoundedPathIntegralEquation()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCForwardCountY()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBackwardCountX()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCForwardCountT()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBoundedCountT()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCHeatCountZ()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  : MonteCarlo_Rcpp functions for simulating an Ornstein-Uhlenbeck
+  Process
+
+### Optional Packages
+
+- [`RcppParallelInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
+  [`RcppsitmoInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
+  : Optional packages for parallel processing
+
+## Data
+
+### Ornstein-Uhlenbeck Process
+
+- [`MyData`](https://greghertzler.github.io/GregsOUPR6/reference/MyData.md)
+  : Default data for the Ornstein-Uhlenbeck Process
+- [`OUP_Convergence`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_Convergence.md)
+  : Rates of convergence for the Ornstein-Uhlenbeck Process
+- [`OUP_NotMissing`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_NotMissing.md)
+  : Observation intervals of different lengths and the
+  Ornstein-Uhlenbeck Process
+- [`OUP_ObservationInterval`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_ObservationInterval.md)
+  : Observation intervals and the Ornstein-Uhlenbeck Process
+- [`OUP_SampleSize`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_SampleSize.md)
+  : Sample sizes for the Ornstein-Uhlenbeck Process
+- [`OUP_SmoothedData`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_SmoothedData.md)
+  : Smoothed sample paths for the Ornstein-Uhlenbeck Process
+
+### Agriculture
+
+- [`Agric_NSW_FarmDamsRiverina`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_NSW_FarmDamsRiverina.md)
+  : Water in Farm Dams in the Riverina of New South Wales
+- [`Agric_NSW_GMCootamundra`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_NSW_GMCootamundra.md)
+  : Farm Adaptation at Cootamundra, New South Wales
+- [`Agric_NSW_GMNarrendera`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_NSW_GMNarrendera.md)
+  : Farm Adaptation at Narrendera, New South Wales
+- [`Agric_NSW_GMTemora`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_NSW_GMTemora.md)
+  : Farm Adaptation at Temora, New South Wales
+- [`Agric_NSW_SoilHealthHarden`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_NSW_SoilHealthHarden.md)
+  : Soil Health with Stubble Management
+- [`Agric_SA_GMClare`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_SA_GMClare.md)
+  : Farm Adaptation at Clare, South Australia
+- [`Agric_SA_GMHawker`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_SA_GMHawker.md)
+  : Farm Adaptation at Hawker, South Australia
+- [`Agric_SA_GMOrroroo`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_SA_GMOrroroo.md)
+  : Farm Adaptation at Orroroo, South Australia
+- [`Agric_SA_WaiteRotationTrial`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_SA_WaiteRotationTrial.md)
+  : Long Term Crop Rotations, South Australia
+- [`Agric_Tas_TreeShelterBelts`](https://greghertzler.github.io/GregsOUPR6/reference/Agric_Tas_TreeShelterBelts.md)
+  : Tree shelter belts in Tasmania
+
+### Climate
+
+- [`Climate_CarbonCredits_EECXM`](https://greghertzler.github.io/GregsOUPR6/reference/Climate_CarbonCredits_EECXM.md)
+  : Price of Carbon
+- [`Climate_SeaLevel_PortKembla`](https://greghertzler.github.io/GregsOUPR6/reference/Climate_SeaLevel_PortKembla.md)
+  : Sea Level at Port Kembla
+- [`Climate_Sunspots`](https://greghertzler.github.io/GregsOUPR6/reference/Climate_Sunspots.md)
+  : Sunspot Numbers
+- [`Climate_TempsMax_CapeOtway`](https://greghertzler.github.io/GregsOUPR6/reference/Climate_TempsMax_CapeOtway.md)
+  : Maximum daily temperatures at Cape Otway
+- [`Climate_TempsMax_Darwin`](https://greghertzler.github.io/GregsOUPR6/reference/Climate_TempsMax_Darwin.md)
+  : Maximum daily temperatures at Darwin
+- [`Climate_TempsMax_TennantCreek`](https://greghertzler.github.io/GregsOUPR6/reference/Climate_TempsMax_TennantCreek.md)
+  : Maximum daily temperatures at Tennant Creek
+
+### Ecosystem
+
+- [`Ecosys_Albatross`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_Albatross.md)
+  : Albatross Egg Counts
+- [`Ecosys_IrrigationWaterSupply`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_IrrigationWaterSupply.md)
+  : Water Supply for Irrigated Agriculture in Eastern Australia
+- [`Ecosys_Kangaroos`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_Kangaroos.md)
+  : Kangaroo Population and Harvest in South Australia
+- [`Ecosys_SouthernBluefinTuna`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_SouthernBluefinTuna.md)
+  : Southern Bluefin Tuna in Australian Waters
+- [`Ecosys_SydneyWater`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_SydneyWater.md)
+  : Sydney Drinking Water Catchment
+- [`Ecosys_TropicalRockLobsters`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_TropicalRockLobsters.md)
+  : Tropical Rock Lobster in Australian Waters
+
+### Finance
+
+- [`Finance_Commodities`](https://greghertzler.github.io/GregsOUPR6/reference/Finance_Commodities.md)
+  : Metals and Energy Commodities
+- [`Finance_KansasCity_WheatFutures`](https://greghertzler.github.io/GregsOUPR6/reference/Finance_KansasCity_WheatFutures.md)
+  : Futures Prices
+- [`Finance_USDAUD`](https://greghertzler.github.io/GregsOUPR6/reference/Finance_USDAUD.md)
+  : Exchange Rates

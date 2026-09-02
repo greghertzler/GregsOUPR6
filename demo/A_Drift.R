@@ -4,8 +4,9 @@
 # R6 object
 A <- Analytical$new()
 # type 'g' to print numbers
-g <- A$Drift(plotit=FALSE)
-# print and plot
+g <- A$Drift()
+# automatic plot with calculations
+A$set_flags(plotit=TRUE)
 g <- A$Drift()
 # new drift
 g <- A$Drift(rho=1.0,mu=15)

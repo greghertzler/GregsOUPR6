@@ -1,0 +1,265 @@
+# MaximumLikelihood_Rcpp functions to estimate an Ornstein-Uhlenbeck Process
+
+Calculations for the R6 class 'MaximumLikelihood', with sequential and
+parallel processing.
+
+## Usage
+
+``` r
+RcppOUPMLLogLikelihood(tau,z,rho,mu,sigma)
+
+RcppOUPMLNMStart(tau,z,rhor,mur,sigmar,rhos,mus,sigmas)
+
+RcppOUPMLNelderMead(tau,z,theta,steps)
+
+RcppOUPMLGoodnessOfFit(tau,z,lnL,alpha)
+
+RcppOUPMLLikelihoodRatioTest(lnL,alpha,m,lnLr)
+```
+
+## Arguments
+
+- tau:
+
+  vector of times
+
+- z:
+
+  vector of states
+
+- rho:
+
+  rate parameter 0\<=rho\<inf
+
+- mu:
+
+  location parameter -inf\<mu\<inf
+
+- sigma:
+
+  scale parameter -inf\<sigma\<inf
+
+- rhor:
+
+  optional constant to fix the rate parameter 0\<=rhor\<inf
+
+- mur:
+
+  optional constant to fix the location parameter -inf\<mur\<inf
+
+- sigmar:
+
+  optional constant to fix scale parameter -inf\<sigmar\<inf
+
+- rhos:
+
+  optional starting value for the rate parameter 0\<=rhos\<inf
+
+- mus:
+
+  optional starting value for the location parameter -inf\<mus\<inf
+
+- sigmas:
+
+  optional starting value the scale parameter -inf\<sigmas\<inf
+
+- theta:
+
+  vector containing rho, mu and sigma
+
+- steps:
+
+  vector of 0's or 1's, 0 for fixed, 1 for variable
+
+- lnL:
+
+  log likelihood of estimates lnL\<0
+
+- alpha:
+
+  identifies the distribution of lnL 0.5\<alpha\<1
+
+- m:
+
+  number of times t in the data set
+
+- lnLr:
+
+  the log likelihood for restricted parameters lnLr\<=lnL
+
+## Value
+
+logL(4) \<- RcppOUPMLLogLikelihood()
+
+start(2,4) \<- RcppOUPMLNMStart()
+
+theta(3) \<- RcppOUPMLNelderMead()
+
+gof(2,6) \<- RcppOUPMLGoodnessOfFit()
+
+lrt(2) \<- RcppOUPMLLikelihoodRatioTest()
+
+## Notes on Values
+
+Return values are vectors and matrices allocated in Rcpp. The dimensions
+are shown for information. Of course, do not include them in R calls.
+For example:
+
+    logL <- RcppOUPMLLogLikelihood(tau,z,rho,mu,sigma)
+
+The return value:
+
+    logL(4)
+
+is a vector containing the LogLikelihood, NA, alpha and m-1, subset in R
+as:
+
+    logL <- RcppOUPMLLogLikelihood(tau,z,rho,mu,sigma)
+    lnL <- logL[1]
+    k <- logL[2]
+    alpha <- logL[3]
+    m1 <- logL[4]
+
+The return value:
+
+    nmstart(2,4)
+
+is a matrix containing the starting theta, starting steps, length of tau
+and number of non-zero steps. Each non-zero step identifies a free
+parameter in theta. Subset in R as:
+
+    nmstart <- RcppOUPMLNMStart(tau,z,rhor,mur,sigmar,rhos,mus,sigmas)
+    thetas <- nmstart[1,1:3]
+    stepss <- nmstart[2,1:3]
+    m <- nmstart[1,4]
+    nk <- nmstart[2,4]
+
+The return value:
+
+    theta(3)
+
+is a vector containing the estimated parameters, subset in R as:
+
+    theta <- RcppOUPMLNelderMead(tau,z,thetas,steps)
+    rho <- theta[1]
+    mu <- theta[2]
+    sigma <- theta[3]
+
+The return value:
+
+    gof(2,6)
+
+is a matrix containing two vectors for Invariant and Scaled Brownian
+Motion comparisons. In R, the results are combined into four lists:
+
+    gof <- RcppOUPMLGoodnessOfFit(tau,z,lnL,alpha)
+    theta_i <- list(rhor=gof[1,1],mu=gof[1,2],sigma=gof[1,3],lnLr=gof[1,4],k=gof[1,5],alphar=gof[1,6],m1=gof[1,7])
+    Inv <- list(R2=gof[1,8],PVal=gof[1,9])
+    theta_s <- list(rhor=gof[2,1],mur=gof[2,2],sigma=gof[2,3],lnLr=gof[2,4],k=gof[2,5],alphar=gof[2,6],m1=gof[2,7])
+    SBM <- list(R2=gof[2,8],Pval=gof[2,9])
+
+The return value:
+
+    lrt(2)
+
+is a vector containing R2 and Pval, subset in R as:
+
+    lrt <- RcppOUPMLLikelihoodRatioTest(lnL,alpha,m,lnLr)
+    R2 <- lrt[1]
+    PVal <- lrt[2]
+
+## Discussion
+
+First, maximum likelihood estimation was implemented in R6 as a
+single-threaded application. Then the R6 code was translated into Rcpp
+sequential code and, where possible, into RcppParallel code. The
+Nelder-Mead algorithm and the Likelihood Ratio Test are hopelessly
+sequential. The Log Likelihood and the Goodness of Fit test are amenable
+to parallel processing. Therefore, functions for maximum likelihood
+estimation use both sequential and parallel processing. The R6
+single-threaded code was archived.
+
+Below are microbenchmark median times for estimating the
+Ornstein-Uhlenbeck Process with 19,312 observations on an i7 CPU with 12
+threads running at a maximum speed of 4.5 GHz.
+
+    Unit: milliseconds             R6      R6+      R6+Rcpp+
+              function  single-thread     Rcpp  RcppParallel
+    --------------------------------------------------------
+              Estimate        3951.54  2386.59        144.35
+
+R6 single-thread takes almost 4 seconds. R6+Rcpp, with sequential
+processing for both the Nelder-Mead algorithm and the Log Likelihood
+function, calculates 1.6 times faster. R6+Rcpp+RcppParallel, with
+parallel processing of the Log Likelihood function, calculates
+calculates 16.5 times faster than R6+Rcpp and 27.4 times faster than R6
+single-thread. Times increase linearly with sample size. The median time
+for estimating with 59,256 observations is 0.45198 seconds.
+
+RccpParallel uses Intel's Threading Building Blocks (TBB) on the CPU.
+Unlike parallel processing on a GPU or accelerator, memory isn't copied
+and there is very little overhead. On small problems, both the parallel
+and sequential code calculate within a clock tick.
+
+RcppParallel is an optional package. If it is installed, it will be
+used. Function RcppParallelInstalled() will enquire whether code is
+compiled with RcppParallel or has fallen back to Rcpp.
+
+## From the Console
+
+These functions are available in R, the RStudio console and RShiny apps.
+For example, an estimation of unrestricted parameters would be:
+
+    df <- OUPDataRead("OUP_Convergence")
+    tau <- df[[1]]
+    z <- df[[2]]
+    nmstart <- RcppOUPMLNMStart(tau,z)
+    thetas <- nmstart[1,1:3]
+    steps <- nmstart[2,1:3]
+    theta <- RcppOUPMLNelderMead(tau,z,thetas,steps)
+
+Good starting values are calculated from the data in RcppOUPMLNMStart(),
+or starting values can be chosen some other way. Both thetas and steps
+are called by reference and modified within RcppOUPMLNelderMead().
+Calling RcppOUPMLNelderMead() again, will start from where it left off
+with thetas and steps. This can be used to iterate over similar data
+sets without calling RcppOUPMLNMStart() each time.
+
+Calling functions directly from the console is slightly faster than
+calling them indirectly through R6 objects. Here are microbenchmark
+median times for the data set with 19,312 observations:
+
+    Unit: milliseconds       R6+Rcpp+  Console Rcpp+
+               function  RcppParallel   RcppParallel
+    -----------------------------------------
+          LogLikelihood       0.56320        0.48475
+                NMStart       0.40560        0.11865
+             NelderMead     144.35000      143.42000
+          GoodnessOfFit       1.45590        1.19890
+    LikelihoodRatioTest       0.13540        0.00440
+
+The extra times taken by the R6 object are fractions of a millisecond.
+For a small time penalty, the R6 object is more convenient. All inputs
+are optional and are coordinated across functions. Enter an input once
+and calculate several outputs. The R6 object is reactive. In other
+words, it stores the inputs and outputs and maps inputs to outputs. If
+an input changes, dependent outputs are nullified and will be
+recalculated, as requested, but nothing is calculated twice. The console
+stores outputs in the global environment, but there is no map to inputs
+and outputs can be stale. Another advantage of the R6 object is
+predefined plots with Plotly. The same simulation can plotted different
+ways without recalculation.
+
+The overhead of setting up RcppParallel means that small problems will
+calculate more slowly. But small problems calculate in microseconds,
+anyway.
+
+Sequential calculations are reproducible, but parallel calculations are
+not. Two runs of the same problem will agree to about 12 significant
+digits, but disagree thereafter. For exact arithmetic, order doesn't
+matter. For floating-point arithmetic, it does. For example, a Log
+Likelihood is rounded to 15 digits as Log Likelihoods for each
+observation are added. Changing the order changes the rounding and may
+give slightly different answers. The TBB scheduler determines the order.
+
+Potentially, the functions could be imported into other packages.

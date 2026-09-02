@@ -3,6 +3,8 @@
 # Type 'demo(FD_TerminalValue_Logistic)'
 # R6 object
 FD <- FiniteDifference$new()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 V <- FD$TerminalValue_Logistic()
 V <- FD$TerminalValue_Logistic(xi=-10,vr=0.2)
 V <- FD$TerminalValue_Logistic(xi=-10,vr=0.2,Vmax=6,Vmin=-6)

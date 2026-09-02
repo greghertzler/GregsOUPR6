@@ -3,8 +3,9 @@
 # Type 'demo(Policies_ResourceRent)'
 # R6 object
 A <- Analytical$new()
-# Prohibition
-A$set_plot_info(type=2)
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
+# prohibition
 A$set_x_stoch_args(phi=1)
 # zero interest rate
 A$Obligation(r=0)

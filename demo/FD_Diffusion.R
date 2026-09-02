@@ -3,9 +3,10 @@
 # Type 'demo(FD_Diffusion)'
 # R6 object
 FD <- FiniteDifference$new()
-# type 'h2' to print numbers
-h2 <- FD$Diffusion(plotit=FALSE)
-# print and plot
+# calculate no plot
+h2 <- FD$Diffusion()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 h2 <- FD$Diffusion()
 # new diffusion
 h2 <- FD$Diffusion(sigma=-30)
@@ -18,5 +19,5 @@ h2 <- FD$Diffusion()
 FD$set_oup_params(sigma=45)
 FD$PlotDiffusion(title="My Title")
 # other plot type
-FD$PlotDiffusion(title="type=2",type=2)
-FD$PlotDiffusion(title="type=3 (default)",type=3)
+FD$PlotDiffusion(title="type=-1",type=-1)
+FD$PlotDiffusion(title="type=0 (default)",type=0)

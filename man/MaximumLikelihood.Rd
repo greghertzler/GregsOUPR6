@@ -2,12 +2,12 @@
 % Please edit documentation in R/MaximumLikelihoodHertz.R
 \name{MaximumLikelihood}
 \alias{MaximumLikelihood}
-\title{R6 Class implementing Maximum Likelihood estimation}
+\title{R6 class implementing Maximum Likelihood estimation of the Ornstein-Uhlenbeck Process.}
 \description{
-Maximum Likelihood estimation of the Ornstein-Uhlenbeck Process, using a
-robust estimation algorithm and with testing for simple hypotheses.
+Maximum Likelihood estimation using a modified Nelder-Mead algorithm with testing
+for simple hypotheses.
 }
-\section{Methods:}{
+\section{Formulas and Methods:}{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{rho, mu and sigma random
   LogLikelihood
   Estimates
@@ -39,20 +39,56 @@ robust estimation algorithm and with testing for simple hypotheses.
   mus:    starting value for the location parameter -inf<mus<inf
   sigmas: starting value the scale parameter -inf<sigmas<inf
   lnLu:   unrestricted log likelihood -inf<lnLu<=0
-  alphau: identifies distribution of lnLu 1<=alphau<=2
+  alphau: identifies distribution of lnLu 0<=alphau<=1
   lnLr:   restricted log likelihood -inf<lnLr<=lnLu
-  alpha: identifies distribution of lnLu 1<=alpha<=2
+  alphar: identifies distribution of lnLr 0<=alphar<=1
   m1:     number of observations 0<m1=m-1
 }\if{html}{\out{</div>}}
 }
 
-\section{Using the methods:}{
-Demonstration scripts are in files in the 'demo' directory. Identify a
-formula and in the console type:
+\section{Usage:}{
+The MaximumLikelihood object must first be instantiated before its methods
+are called.  There are two ways.  The first way instantiates the OUProcess
+object and calls a function to get a pointer:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  demo(ML_FormulaName), or
-  demo(ML_PlotFormulaName).
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
+  A <- OUP$get_Analytical()
+  FD <- OUP$get_FiniteDifference()
+  ML <- OUP$get_MaximumLikelihood()
+  MC <- OUP$get_MonteCarlo()
 }\if{html}{\out{</div>}}
+
+The MaximumLikelihood object will coordinate arguments to functions with the
+Analytical, FiniteDifference and MonteCarlo objects.  The second way
+instantiates the MaximumLikelihood object by itself with no coordination:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  ML <- MaximumLikelihood$new()
+}\if{html}{\out{</div>}}
+
+Once the object is instantiated, its methods can be called, to estimate the
+parameters of the Ornstein-Uhlenbeck Process, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  ML$Estimate()
+}\if{html}{\out{</div>}}
+
+The plot methods can be used to customize the plots, with a title, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  ML$PlotEstimates(title="My Estimates")
+}\if{html}{\out{</div>}}
+
+Other functions and methods are called in the same way.  To see all the
+possibilities and, in particular, how to read in data, check out the demos below.
+}
+
+\section{Demos:}{
+Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDemoList()
+  OUPDemoRun(<number of demo in list>)
+}\if{html}{\out{</div>}}
+
+Entering the demos by number in the list saves typing.
 }
 
 \section{Discussion:}{
@@ -63,7 +99,7 @@ If spread across a bumpy surface, the amoeba pulls itself over bumps and out
 of hollows and flows down to the lowest level.  There it contracts around
 its center.  If spread across a flat surface, the amoeba shrinks without
 flowing.  Once the amoeba contracts or shrinks, it is spread across the
-surface opposite from where is came.  Again it flows, contracts and shrinks.
+surface opposite from where it came.  Again it flows, contracts and shrinks.
 Spreading, flowing, contracting and shrinking continue until the amoeba
 contracts around the same point or shrinks at the same level at least twice.
 
@@ -81,7 +117,7 @@ case the data is faked or artificially smoothed.
 
 Once the unrestricted estimates are found, the arguments for restricting the
 parameters can be set for simple hypothesis tests. By default, starting
-values are calculated from the data and are then updated automatically. The
+values are calculated from the data and can be updated automatically. The
 arguments for starting values should seldom be needed.
 
 Data are entered as a data frame with columns for tau, a vector of times, and
@@ -91,294 +127,236 @@ a data frame containing many columns.
 To read a csv file into a data frame, create a MaximumLikelihood object,
 estimate parameters and test the goodness-of-fit:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  df <- read.csv("data/ML_OUP_SimulatedData.csv")
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  df <- read.csv("data/MyData.csv")
   ML <- MaximumLikelihood$new()
   ML$Estimates(df)
   ML$GoodnessOfFit()
 }\if{html}{\out{</div>}}
 
-In this example, the 'data' directory is one level below the working
-directory. The taucol and zcol arguments are optional and will default to 1
-and 2. Continue on by restricting a parameter and performing a likelihood
-ratio test:
+In this example, the 'data' directory is in the working directory. The taucol
+and zcol arguments are optional and will default to 1 and 2. Continue on by
+restricting a parameter and performing a likelihood ratio test:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  ML$Estimates(rhor=0.5)
   ML$LikelihoodRatioTest()
 }\if{html}{\out{</div>}}
 
-The available data sets are documented. To see the documentation, type:
+You can also list and read from available data sets using:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ OUPDataList()
+ df <- OUPDataRead(27)
 }\if{html}{\out{</div>}}
 
-and then select from the drop-down list.
+Number 27 in the list is the data set "OUP_Convergence".  The available data
+sets are documented. Type one of the following categories:
 
-Examples in R6 don't work the same way as other R modules.  There is only
-one example for an R6 object, not one for each function in the object.
-To run examples, the devtools::run_examples() works, but the R command
-example("MaximumLikelihood") doesn't.  You can copy commands to the clipboard,
-paste into the console and press Enter. Examples in this help and a simple
-example at the bottom can be run in this way.  A better alternative is demo().
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?Agric_
+  ?Climate_
+  ?Ecosys_
+  ?Finance_
+  ?OUP_
+}\if{html}{\out{</div>}}
 
-A better alternative is demo(), but this works sometimes, sometimes not.
-If you don't see the demos for this package, go to Files and demo.  You will
-see the demo names and then type something like demo(ML_Estimates).
+and then select from the drop-down list.  Or use the function:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDataHelp(27)
+}\if{html}{\out{</div>}}
 }
 
-\examples{
-
-## ------------------------------------------------
-## Method `MaximumLikelihood$new`
-## ------------------------------------------------
-
-  ML <- MaximumLikelihood$new()
-  ML$Estimates()
-  ML$GoodnessOfFit()
-  ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
-  ML$LikelihoodRatioTest()
-}
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-MaximumLikelihood-new}{\code{MaximumLikelihood$new()}}
-\item \href{#method-MaximumLikelihood-set_oup_params}{\code{MaximumLikelihood$set_oup_params()}}
-\item \href{#method-MaximumLikelihood-set_oup_params_restr}{\code{MaximumLikelihood$set_oup_params_restr()}}
-\item \href{#method-MaximumLikelihood-set_oup_params_start}{\code{MaximumLikelihood$set_oup_params_start()}}
-\item \href{#method-MaximumLikelihood-set_oup_stats}{\code{MaximumLikelihood$set_oup_stats()}}
-\item \href{#method-MaximumLikelihood-set_timeseries}{\code{MaximumLikelihood$set_timeseries()}}
-\item \href{#method-MaximumLikelihood-set_timeseries_info}{\code{MaximumLikelihood$set_timeseries_info()}}
-\item \href{#method-MaximumLikelihood-set_plot_info}{\code{MaximumLikelihood$set_plot_info()}}
-\item \href{#method-MaximumLikelihood-get_all}{\code{MaximumLikelihood$get_all()}}
-\item \href{#method-MaximumLikelihood-get_oup_params}{\code{MaximumLikelihood$get_oup_params()}}
-\item \href{#method-MaximumLikelihood-get_oup_params_unrestr}{\code{MaximumLikelihood$get_oup_params_unrestr()}}
-\item \href{#method-MaximumLikelihood-get_oup_params_restr}{\code{MaximumLikelihood$get_oup_params_restr()}}
-\item \href{#method-MaximumLikelihood-get_oup_params_start}{\code{MaximumLikelihood$get_oup_params_start()}}
-\item \href{#method-MaximumLikelihood-get_oup_stats}{\code{MaximumLikelihood$get_oup_stats()}}
-\item \href{#method-MaximumLikelihood-get_timeseries}{\code{MaximumLikelihood$get_timeseries()}}
-\item \href{#method-MaximumLikelihood-get_timeseries_info}{\code{MaximumLikelihood$get_timeseries_info()}}
-\item \href{#method-MaximumLikelihood-get_plot_info}{\code{MaximumLikelihood$get_plot_info()}}
-\item \href{#method-MaximumLikelihood-get_plot_colors}{\code{MaximumLikelihood$get_plot_colors()}}
-\item \href{#method-MaximumLikelihood-LogLikelihood}{\code{MaximumLikelihood$LogLikelihood()}}
-\item \href{#method-MaximumLikelihood-Estimates}{\code{MaximumLikelihood$Estimates()}}
-\item \href{#method-MaximumLikelihood-GoodnessOfFit}{\code{MaximumLikelihood$GoodnessOfFit()}}
-\item \href{#method-MaximumLikelihood-LikelihoodRatioTest}{\code{MaximumLikelihood$LikelihoodRatioTest()}}
-\item \href{#method-MaximumLikelihood-PlotTimeSeries}{\code{MaximumLikelihood$PlotTimeSeries()}}
-\item \href{#method-MaximumLikelihood-PlotEstimates}{\code{MaximumLikelihood$PlotEstimates()}}
-}
+  \itemize{
+    \item \href{#method-MaximumLikelihood-initialize}{\code{MaximumLikelihood$new()}}
+    \item \href{#method-MaximumLikelihood-set_oup_params}{\code{MaximumLikelihood$set_oup_params()}}
+    \item \href{#method-MaximumLikelihood-set_oup_params_restr}{\code{MaximumLikelihood$set_oup_params_restr()}}
+    \item \href{#method-MaximumLikelihood-set_oup_params_start}{\code{MaximumLikelihood$set_oup_params_start()}}
+    \item \href{#method-MaximumLikelihood-set_timeseries}{\code{MaximumLikelihood$set_timeseries()}}
+    \item \href{#method-MaximumLikelihood-set_timeseries_info}{\code{MaximumLikelihood$set_timeseries_info()}}
+    \item \href{#method-MaximumLikelihood-set_plot_info}{\code{MaximumLikelihood$set_plot_info()}}
+    \item \href{#method-MaximumLikelihood-set_flags}{\code{MaximumLikelihood$set_flags()}}
+    \item \href{#method-MaximumLikelihood-get_all}{\code{MaximumLikelihood$get_all()}}
+    \item \href{#method-MaximumLikelihood-get_oup_params}{\code{MaximumLikelihood$get_oup_params()}}
+    \item \href{#method-MaximumLikelihood-get_oup_params_restr}{\code{MaximumLikelihood$get_oup_params_restr()}}
+    \item \href{#method-MaximumLikelihood-get_oup_params_start}{\code{MaximumLikelihood$get_oup_params_start()}}
+    \item \href{#method-MaximumLikelihood-get_timeseries}{\code{MaximumLikelihood$get_timeseries()}}
+    \item \href{#method-MaximumLikelihood-get_timeseries_info}{\code{MaximumLikelihood$get_timeseries_info()}}
+    \item \href{#method-MaximumLikelihood-get_plot_info}{\code{MaximumLikelihood$get_plot_info()}}
+    \item \href{#method-MaximumLikelihood-get_plot_colors}{\code{MaximumLikelihood$get_plot_colors()}}
+    \item \href{#method-MaximumLikelihood-get_flags}{\code{MaximumLikelihood$get_flags()}}
+    \item \href{#method-MaximumLikelihood-LogLikelihood}{\code{MaximumLikelihood$LogLikelihood()}}
+    \item \href{#method-MaximumLikelihood-Estimates}{\code{MaximumLikelihood$Estimates()}}
+    \item \href{#method-MaximumLikelihood-GoodnessOfFit}{\code{MaximumLikelihood$GoodnessOfFit()}}
+    \item \href{#method-MaximumLikelihood-LikelihoodRatioTest}{\code{MaximumLikelihood$LikelihoodRatioTest()}}
+    \item \href{#method-MaximumLikelihood-PlotTimeSeries}{\code{MaximumLikelihood$PlotTimeSeries()}}
+    \item \href{#method-MaximumLikelihood-PlotEstimates}{\code{MaximumLikelihood$PlotEstimates()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MaximumLikelihood-new"></a>}}
-\if{latex}{\out{\hypertarget{method-MaximumLikelihood-new}{}}}
-\subsection{Method \code{new()}}{
-Create a MaximumLikelihood object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$new(OUP = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-MaximumLikelihood-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-MaximumLikelihood-initialize}{}}}
+\subsection{\code{MaximumLikelihood$new()}}{
+  Create a MaximumLikelihood object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$new(OUP = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{OUP}}{pointer set by the OUProcess object}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new MaximumLikelihood object
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{OUP}}{pointer set by the OUProcess object}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new MaximumLikelihood object
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{  ML <- MaximumLikelihood$new()
-  ML$Estimates()
-  ML$GoodnessOfFit()
-  ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
-  ML$LikelihoodRatioTest()
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-set_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_oup_params}{}}}
-\subsection{Method \code{set_oup_params()}}{
-Set OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_oup_params(
+\subsection{\code{MaximumLikelihood$set_oup_params()}}{
+  Set OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$set_oup_params(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{who}}{identifier for object sending the parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(rho,mu,sigma)
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
 Set OUP parameter restrictions
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-set_oup_params_restr"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_oup_params_restr}{}}}
-\subsection{Method \code{set_oup_params_restr()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_oup_params_restr(rhor = NULL, mur = NULL, sigmar = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rhor}}{rate parameter 0<=rhor<inf}
-
-\item{\code{mur}}{location parameter -inf<mur<inf}
-
-\item{\code{sigmar}}{scale parameter -inf<sigmar<inf}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(rhor,mur,sigmar)
+\subsection{\code{MaximumLikelihood$set_oup_params_restr()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$set_oup_params_restr(rhor = NULL, mur = NULL, sigmar = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rhor}}{rate parameter 0<=rhor<inf}
+      \item{\code{mur}}{location parameter -inf<mur<inf}
+      \item{\code{sigmar}}{scale parameter -inf<sigmar<inf}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rhor,mur,sigmar)
 Set OUP parameter starting values
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-set_oup_params_start"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_oup_params_start}{}}}
-\subsection{Method \code{set_oup_params_start()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_oup_params_start(rhos = NULL, mus = NULL, sigmas = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$set_oup_params_start()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$set_oup_params_start(rhos = NULL, mus = NULL, sigmas = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rhos}}{rate parameter 0<=rhos<inf}
+      \item{\code{mus}}{location parameter -inf<mus<inf}
+      \item{\code{sigmas}}{scale parameter -inf<sigmas<inf}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rhos,mus,sigmas)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rhos}}{rate parameter 0<=rhos<inf}
-
-\item{\code{mus}}{location parameter -inf<mus<inf}
-
-\item{\code{sigmas}}{scale parameter -inf<sigmas<inf}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(rhos,mus,sigmas)
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MaximumLikelihood-set_oup_stats"></a>}}
-\if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_oup_stats}{}}}
-\subsection{Method \code{set_oup_stats()}}{
-Set OUP statistics for estimation and hypothesis tests
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_oup_stats(
-  lnLu = NULL,
-  alphau = NULL,
-  lnLr = NULL,
-  alphar = NULL,
-  m1 = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{lnLu}}{unrestricted log likelihood -inf<lnLu<=0}
-
-\item{\code{alphau}}{identifies the distribution of lnLu, 0.5<=alphau<=1}
-
-\item{\code{lnLr}}{restricted log likelihood -inf<lnLr<=lnLu}
-
-\item{\code{alphar}}{identifies the distribution of lnLr, 0.5<=alphar<=1}
-
-\item{\code{m1}}{number of observations 0<m1}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(lnLu,alphau,lnLr,alphar,m1)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-set_timeseries"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_timeseries}{}}}
-\subsection{Method \code{set_timeseries()}}{
-Set time series data for time tau and state z
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_timeseries(df = NULL, taucol = NULL, zcol = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$set_timeseries()}}{
+  Set time series data for time tau and state z
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$set_timeseries(df = NULL, taucol = NULL, zcol = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{df}}{data frame containing columns for tau and z}
+      \item{\code{taucol}}{index of a column containing tau}
+      \item{\code{zcol}}{index a column containing z}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    dataframe(tau,z)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{df}}{data frame containing columns for tau and z}
-
-\item{\code{taucol}}{index of a column containing tau}
-
-\item{\code{zcol}}{index a column containing z}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-dataframe(tau,z)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-set_timeseries_info"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_timeseries_info}{}}}
-\subsection{Method \code{set_timeseries_info()}}{
-Set information for plotting times series and estimates
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_timeseries_info(
+\subsection{\code{MaximumLikelihood$set_timeseries_info()}}{
+  Set information for plotting times series and estimates
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$set_timeseries_info(
   tbeg = NULL,
   tend = NULL,
   dataname = NULL,
   timename = NULL,
   statename = NULL,
   estimation = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{dataname}}{name for the data}
+      \item{\code{timename}}{name for time}
+      \item{\code{statename}}{name for state}
+      \item{\code{estimation}}{description of estimation}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(tbeg,Ixbeg,tend,Ixend,datename,timename,statename,estimation)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{dataname}}{name for the data}
-
-\item{\code{timename}}{name for time}
-
-\item{\code{statename}}{name for state}
-
-\item{\code{estimation}}{description of estimation}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(tbeg,Ixbeg,tend,Ixend,datename,timename,statename,estimation)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-set_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_plot_info}{}}}
-\subsection{Method \code{set_plot_info()}}{
-Set information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$set_plot_info(
+\subsection{\code{MaximumLikelihood$set_plot_info()}}{
+  Set information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -388,210 +366,230 @@ Set information for plotting
   opaque = NULL,
   labels = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{fontfamily}}{font family for plot labels}
+      \item{\code{fontsize}}{font size for plot labels}
+      \item{\code{fileformat}}{'png' or 'svg'}
+      \item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
+      \item{\code{fileheight}}{pixel height of 2D plot}
+      \item{\code{theme}}{'light' or 'dark'}
+      \item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
+      \item{\code{labels}}{title and parameters TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(font,file,theme,labels)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{fontfamily}}{font family for plot labels}
-
-\item{\code{fontsize}}{font size for plot labels}
-
-\item{\code{fileformat}}{'png' or 'svg'}
-
-\item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
-
-\item{\code{fileheight}}{pixel height of 2D plot}
-
-\item{\code{theme}}{'light' or 'dark'}
-
-\item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
-
-\item{\code{labels}}{title and parameters TRUE or FALSE}
-
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MaximumLikelihood-set_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-MaximumLikelihood-set_flags}{}}}
+\subsection{\code{MaximumLikelihood$set_flags()}}{
+  Set flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$set_flags(plotit = NULL, copyit = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{plotit}}{automatic plot after calculation TRUE or FALSE}
+      \item{\code{copyit}}{copy to clipboard TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(font,file,theme)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_all"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_all}{}}}
-\subsection{Method \code{get_all()}}{
-Get all arguments, time series and information
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_all()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_all()}}{
+  Get all arguments, time series and information
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_all()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(oup_params,oup_params_restr,oup_params_start,timeseries,timeseries_info,plot_info)
+  }
 }
 
-\subsection{Returns}{
-list(oup_params,oup_params_unrestr,oup_params_restr,oup_params_start,oup_stats,timeseries,timeseries_info,plot_info)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_oup_params}{}}}
-\subsection{Method \code{get_oup_params()}}{
-Get OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_oup_params()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_oup_params()}}{
+  Get OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_oup_params()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
+  }
 }
 
-\subsection{Returns}{
-list(rho,mu,sigma)
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MaximumLikelihood-get_oup_params_unrestr"></a>}}
-\if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_oup_params_unrestr}{}}}
-\subsection{Method \code{get_oup_params_unrestr()}}{
-Get OUP parameters unrestricted estimates
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_oup_params_unrestr()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-list(rhohat,muhat,sigmahat)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_oup_params_restr"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_oup_params_restr}{}}}
-\subsection{Method \code{get_oup_params_restr()}}{
-Get OUP parameter restrictions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_oup_params_restr()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_oup_params_restr()}}{
+  Get OUP parameter restrictions
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_oup_params_restr()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rhor,mur,sigmar)
+  }
 }
 
-\subsection{Returns}{
-list(rhor,mur,sigmar)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_oup_params_start"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_oup_params_start}{}}}
-\subsection{Method \code{get_oup_params_start()}}{
-Get OUP parameter starting values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_oup_params_start()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_oup_params_start()}}{
+  Get OUP parameter starting values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_oup_params_start()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rhos,mus,sigmas)
+  }
 }
 
-\subsection{Returns}{
-list(rhos,mus,sigmas)
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MaximumLikelihood-get_oup_stats"></a>}}
-\if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_oup_stats}{}}}
-\subsection{Method \code{get_oup_stats()}}{
-Get OUP statistics for estimation and hypothesis tests
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_oup_stats()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-list(lnLu,alphau,lnLr,alphar,m1)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_timeseries"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_timeseries}{}}}
-\subsection{Method \code{get_timeseries()}}{
-Get time series data for time tau and state z
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_timeseries()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_timeseries()}}{
+  Get time series data for time tau and state z
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_timeseries()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    dataframe(tau,z)
+  }
 }
 
-\subsection{Returns}{
-dataframe(tau,z)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_timeseries_info"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_timeseries_info}{}}}
-\subsection{Method \code{get_timeseries_info()}}{
-Get information for times series
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_timeseries_info()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_timeseries_info()}}{
+  Get information for times series
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_timeseries_info()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(tbeg,tend,datename,timename,statename,estimation)
+  }
 }
 
-\subsection{Returns}{
-list(tbeg,Ixbeg,tend,Ixend,datename,timename,statename,estimation)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_plot_info}{}}}
-\subsection{Method \code{get_plot_info()}}{
-Get information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_plot_info()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_plot_info()}}{
+  Get information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_plot_info()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(font,file,theme,labels)
+  }
 }
 
-\subsection{Returns}{
-list(font,file,theme,labels)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-get_plot_colors"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_plot_colors}{}}}
-\subsection{Method \code{get_plot_colors()}}{
-Get colors for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$get_plot_colors()}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$get_plot_colors()}}{
+  Get colors for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_plot_colors()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(red,ylw,grn,cyn,blu,mgn,gry,background,font)
+  }
 }
 
-\subsection{Returns}{
-list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MaximumLikelihood-get_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-MaximumLikelihood-get_flags}{}}}
+\subsection{\code{MaximumLikelihood$get_flags()}}{
+  Get flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$get_flags()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-LogLikelihood"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-LogLikelihood}{}}}
-\subsection{Method \code{LogLikelihood()}}{
-Calculate the log likelihood of estimates
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$LogLikelihood(
+\subsection{\code{MaximumLikelihood$LogLikelihood()}}{
+  Calculate the log likelihood of estimates
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$LogLikelihood(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   df = NULL,
   taucol = NULL,
   zcol = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{df}}{data frame containing columns for tau and z}
+      \item{\code{taucol}}{index of a column containing tau}
+      \item{\code{zcol}}{index of a column containing z}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma,lnL,k,alpha,m1)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{df}}{data frame containing columns for tau and z}
-
-\item{\code{taucol}}{index of a column containing tau}
-
-\item{\code{zcol}}{index of a column containing z}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(lnL)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-Estimates"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-Estimates}{}}}
-\subsection{Method \code{Estimates()}}{
-Calculate unrestricted or restricted maximum likelihood estimates
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$Estimates(
+\subsection{\code{MaximumLikelihood$Estimates()}}{
+  Calculate unrestricted or restricted maximum likelihood estimates
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$Estimates(
   df = NULL,
   taucol = NULL,
   zcol = NULL,
@@ -600,115 +598,106 @@ Calculate unrestricted or restricted maximum likelihood estimates
   sigmar = NULL,
   rhos = NULL,
   mus = NULL,
-  sigmas = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  sigmas = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{df}}{data frame containing columns for tau and z}
+      \item{\code{taucol}}{index of a column containing tau}
+      \item{\code{zcol}}{index of a column containing z}
+      \item{\code{rhor}}{constant to fix the rate parameter 0<=rhor<inf}
+      \item{\code{mur}}{constant to fix the location parameter -inf<mur<inf}
+      \item{\code{sigmar}}{constant to fix scale parameter -inf<sigmar<inf}
+      \item{\code{rhos}}{starting value for the rate parameter 0<=rhos<inf}
+      \item{\code{mus}}{starting value for the location parameter -inf<mus<inf}
+      \item{\code{sigmas}}{starting value the scale parameter -inf<sigmas<inf}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rhohat,muhat,sigmahat,lnLu,ku,alphau,m1) or list(rhor,mur,sigmar,lnLr,kr,alphar,m1)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{df}}{data frame containing columns for tau and z}
-
-\item{\code{taucol}}{index of a column containing tau}
-
-\item{\code{zcol}}{index of a column containing z}
-
-\item{\code{rhor}}{constant to fix the rate parameter 0<=rhor<inf}
-
-\item{\code{mur}}{constant to fix the location parameter -inf<mur<inf}
-
-\item{\code{sigmar}}{constant to fix scale parameter -inf<sigmar<inf}
-
-\item{\code{rhos}}{starting value for the rate parameter 0<=rhos<inf}
-
-\item{\code{mus}}{starting value for the location parameter -inf<mus<inf}
-
-\item{\code{sigmas}}{starting value the scale parameter -inf<sigmas<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(rhohat,muhat,sigmahat,lnLu,ku,alphau,m1) or list(rhor,mur,sigmar,lnLr,kr,alphar,m1)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-GoodnessOfFit"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-GoodnessOfFit}{}}}
-\subsection{Method \code{GoodnessOfFit()}}{
-Calculate the goodness of fit compared with invariant and scaled brownian motion estimates
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$GoodnessOfFit(
+\subsection{\code{MaximumLikelihood$GoodnessOfFit()}}{
+  Compare maximum likeliood estimates with invariant and scaled brownian motion estimates
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$GoodnessOfFit(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   df = NULL,
   taucol = NULL,
   zcol = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{df}}{data frame containing columns for tau and z}
+      \item{\code{taucol}}{index of a column containing tau}
+      \item{\code{zcol}}{index of a column containing z}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(theta,theta_i,theta_s,Inv,SBM) with Inv=list(R2,Pval) and SBM=list(R2,Pval)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{df}}{data frame containing columns for tau and z}
-
-\item{\code{taucol}}{index of a column containing tau}
-
-\item{\code{zcol}}{index a column containing z}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(Inv,SBM) with Inv=list(R2,Pval) and SBM=list(R2,Pval)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-LikelihoodRatioTest"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-LikelihoodRatioTest}{}}}
-\subsection{Method \code{LikelihoodRatioTest()}}{
-Test for significant difference between two likelihoods
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$LikelihoodRatioTest(
-  lnLu = NULL,
-  lnLr = NULL,
-  alphau = NULL,
-  m1 = NULL
-)}\if{html}{\out{</div>}}
+\subsection{\code{MaximumLikelihood$LikelihoodRatioTest()}}{
+  Test for significant difference between restricted and unrestricted likelihoods
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$LikelihoodRatioTest(
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  df = NULL,
+  taucol = NULL,
+  zcol = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{df}}{data frame containing columns for tau and z}
+      \item{\code{taucol}}{index of a column containing tau}
+      \item{\code{zcol}}{index of a column containing z}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(theta_u,theta,R2,Pval)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{lnLu}}{unrestricted log likelihood -inf<lnLu<=0}
-
-\item{\code{lnLr}}{restricted log likelihood -inf<lnLr<=lnLu}
-
-\item{\code{alphau}}{identifies distribution of LnLu 0.5<=alphau<=1}
-
-\item{\code{m1}}{number of observations 0<m1=m-1}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(R2,Pval)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-PlotTimeSeries"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-PlotTimeSeries}{}}}
-\subsection{Method \code{PlotTimeSeries()}}{
-Plot time series
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$PlotTimeSeries(
+\subsection{\code{MaximumLikelihood$PlotTimeSeries()}}{
+  Plot time series
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$PlotTimeSeries(
   df = NULL,
   taucol = NULL,
   zcol = NULL,
@@ -717,66 +706,58 @@ Plot time series
   title = NULL,
   xaxis = NULL,
   yaxis = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{df}}{data frame containing columns for tau and z}
+      \item{\code{taucol}}{index of a column containing tau}
+      \item{\code{zcol}}{index a column containing z}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{df}}{data frame containing columns for tau and z}
-
-\item{\code{taucol}}{index of a column containing tau}
-
-\item{\code{zcol}}{index a column containing z}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MaximumLikelihood-PlotEstimates"></a>}}
 \if{latex}{\out{\hypertarget{method-MaximumLikelihood-PlotEstimates}{}}}
-\subsection{Method \code{PlotEstimates()}}{
-Plot time series with estimated means and variances
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MaximumLikelihood$PlotEstimates(
+\subsection{\code{MaximumLikelihood$PlotEstimates()}}{
+  Plot time series with estimated means and variances
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MaximumLikelihood$PlotEstimates(
   tbeg = NULL,
   tend = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 }

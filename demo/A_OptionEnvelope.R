@@ -4,8 +4,9 @@
 # R6 object
 A <- Analytical$new()
 # type 'Ohat' to print numbers
-Ohat <- A$OptionEnvelope(plotit=FALSE)
-# print and plot
+Ohat <- A$OptionEnvelope()
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 Ohat <- A$OptionEnvelope()
 # new option
 Ohat <- A$OptionEnvelope(y=-15,rho=0.1,mu=15,sigma=25)
@@ -24,7 +25,5 @@ A$set_x_stoch_args(s=seq(from=10,to=20,by=0.1),y=15)
 A$PlotOptionEnvelope(title="My Title")
 # other plot types
 A$set_oup_params(rho=0.1)
-A$PlotOptionEnvelope(title="type=4",type=4)
-A$PlotOptionEnvelope(title="type=5",type=5)
-A$PlotOptionEnvelope(title="type=6",type=6)
-A$PlotOptionEnvelope(title="type=3 (default)",type=3)
+A$PlotOptionEnvelope(title="type=1",type=1)
+A$PlotOptionEnvelope(title="type=0 (default)",type=0)

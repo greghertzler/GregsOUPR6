@@ -4,21 +4,23 @@
 # R6 object
 A <- Analytical$new()
 # type 'H2' to print numbers
-H2 <- A$Variance(plotit=FALSE)
-# print and plot
 H2 <- A$Variance()
-# new variance
-H2 <- A$Variance(sigma=-30)
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
+H2 <- A$Variance()
+# new Variance
+H2 <- A$Variance(rho=1,sigma=10)
 # t vector manually
-H2 <- A$Variance(t=seq(from=0,to=20,by=0.2))
+H2 <- A$Variance(t=seq(from=0,to=3,by=0.03))
 # horizontal axis automatically
 A$axes_y_stoch()
 H2 <- A$Variance()
 # using set and plot
-A$set_oup_params(sigma=25)
+A$set_oup_params(rho=0.3)
+A$set_y_stoch_args(t=seq(from=0,to=10,by=0.1))
 A$PlotVariance(title="My Title")
 # plot types
-A$PlotVariance(title="type=4 (click on p in the legend)",type=4)
-A$PlotVariance(title="type=5 (click on P in the legend)",type=5)
-A$PlotVariance(title="type=2",type=2)
-A$PlotVariance(title="type=3 (default)",type=3)
+A$PlotVariance(title="type=-1",type=-1)
+A$PlotVariance(title="type=1 (click p in legend)",type=1)
+A$PlotVariance(title="type=2 (click P in legend)",type=2)
+A$PlotVariance(title="type=0 (default)",type=0)

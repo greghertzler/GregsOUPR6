@@ -3,6 +3,8 @@
 # Type 'demo(Estimation_SmoothedData)'
 # R6 object
 ML <- MaximumLikelihood$new()
+# automatic plots with calculation
+ML$set_flags(plotit=TRUE)
 # read data
 df<-OUPDataRead("OUP_SmoothedData")
 # estimate for raw data

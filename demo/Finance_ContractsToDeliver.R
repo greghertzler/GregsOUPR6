@@ -5,13 +5,15 @@
 OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
-# Read data and estimate
+# automatically plot with calculations
+A$set_flags(plotit=TRUE)
+# read data and estimate
 df<-OUPDataRead("Agric_SA_WaiteRotationTrial")
-ML$Estimates(df=df,tau=1,z=10)
+ML$Estimates(df=df,taucol=1,zcol=10)
 # expected dry matter
 A$Mean(t=seq(from=0,to=1,by=0.01),s=0,x=8717.63)
 # design contract with exit
-A$DecisionThreshold(y=5522,phi=1,plotit=FALSE)
+A$DecisionThreshold(y=5522,phi=1)
 A$axes_x_stoch()
 A$PlotDecisionThreshold()
 # exit option

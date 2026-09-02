@@ -6,9 +6,11 @@ OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 FD <- OUP$get_FiniteDifference()
 ML <- OUP$get_MaximumLikelihood()
-# Read data and estimate
+# automatically plot with calculations
+A$set_flags(plotit=TRUE)
+# read data and estimate
 df<-OUPDataRead("Finance_KansasCity_WheatFutures")
-ML$Estimates(df=df,tau=1,z=5,plotit=FALSE)
+ML$Estimates(df=df,taucol=1,zcol=5)
 # Analytical strangle
 Aput <- A$Option(s=seq(from=0,to=60,by=0.6),x=seq(from=500,to=600,by=1),t=60,y=540,r=0.0002,phi=-1)[[1]]
 Acall <- A$Option(phi=1)[[1]]

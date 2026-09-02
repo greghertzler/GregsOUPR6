@@ -3,6 +3,8 @@
 # Type 'demo(FD_TerminalValue_YieldIndex)'
 # R6 object
 FD <- FiniteDifference$new()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 V <- FD$TerminalValue_YieldIndex()
 V <- FD$TerminalValue_YieldIndex(xo=-25,xi=-10,xm=5)
 V <- FD$TerminalValue_YieldIndex(xo=-25,xi=-25,xm=5,Vmax=9,Vmin=-1)

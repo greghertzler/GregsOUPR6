@@ -1,15 +1,16 @@
 library(R6)
 library(plotly)
 library(stringr)
+library(clipr)
 
 # roxygen ----
-#' R6 Class implementing Maximum Likelihood estimation
+#' @title R6 class implementing Maximum Likelihood estimation of the Ornstein-Uhlenbeck Process.
 #'
 #' @description
-#' Maximum Likelihood estimation of the Ornstein-Uhlenbeck Process, using a
-#'  robust estimation algorithm and with testing for simple hypotheses.
+#' Maximum Likelihood estimation using a modified Nelder-Mead algorithm with testing
+#'  for simple hypotheses.
 #'
-#' @details # Methods:
+#' @details # Formulas and Methods:
 #'     rho, mu and sigma random
 #'       LogLikelihood
 #'       Estimates
@@ -37,17 +38,48 @@ library(stringr)
 #'       mus:    starting value for the location parameter -inf<mus<inf
 #'       sigmas: starting value the scale parameter -inf<sigmas<inf
 #'       lnLu:   unrestricted log likelihood -inf<lnLu<=0
-#'       alphau: identifies distribution of lnLu 1<=alphau<=2
+#'       alphau: identifies distribution of lnLu 0<=alphau<=1
 #'       lnLr:   restricted log likelihood -inf<lnLr<=lnLu
-#'       alpha: identifies distribution of lnLu 1<=alpha<=2
+#'       alphar: identifies distribution of lnLr 0<=alphar<=1
 #'       m1:     number of observations 0<m1=m-1
 #'
-#' @details # Using the methods:
-#' Demonstration scripts are in files in the 'demo' directory. Identify a
-#'  formula and in the console type:
+#' @details # Usage:
+#' The MaximumLikelihood object must first be instantiated before its methods
+#'  are called.  There are two ways.  The first way instantiates the OUProcess
+#'  object and calls a function to get a pointer:
 #'
-#'       demo(ML_FormulaName), or
-#'       demo(ML_PlotFormulaName).
+#'       OUP <- OUProcess$new()
+#'       A <- OUP$get_Analytical()
+#'       FD <- OUP$get_FiniteDifference()
+#'       ML <- OUP$get_MaximumLikelihood()
+#'       MC <- OUP$get_MonteCarlo()
+#'
+#' The MaximumLikelihood object will coordinate arguments to functions with the
+#'  Analytical, FiniteDifference and MonteCarlo objects.  The second way
+#'  instantiates the MaximumLikelihood object by itself with no coordination:
+#'
+#'       ML <- MaximumLikelihood$new()
+#'
+#' Once the object is instantiated, its methods can be called, to estimate the
+#'  parameters of the Ornstein-Uhlenbeck Process, for example:
+#'
+#'       ML$Estimate()
+#'
+#' The plot methods can be used to customize the plots, with a title, for example:
+#'
+#'       ML$PlotEstimates(title="My Estimates")
+#'
+#' Other functions and methods are called in the same way.  To see all the
+#'  possibilities and, in particular, how to read in data, check out the demos below.
+#'
+#' @details # Demos:
+#' Demonstration scripts are in files in the 'demo' directory. The most
+#'  convenient way to list and run demos are the commands:
+#'
+#'       OUPDemoList()
+#'       OUPDemoRun(<number of demo in list>)
+#'
+#' Entering the demos by number in the list saves typing.
 #'
 #' @details # Discussion:
 #' The Nelder-Mead algorithm is used to maximize a Log Likelihood derived from
@@ -57,7 +89,7 @@ library(stringr)
 #'  of hollows and flows down to the lowest level.  There it contracts around
 #'  its center.  If spread across a flat surface, the amoeba shrinks without
 #'  flowing.  Once the amoeba contracts or shrinks, it is spread across the
-#'  surface opposite from where is came.  Again it flows, contracts and shrinks.
+#'  surface opposite from where it came.  Again it flows, contracts and shrinks.
 #'  Spreading, flowing, contracting and shrinking continue until the amoeba
 #'  contracts around the same point or shrinks at the same level at least twice.
 #'
@@ -73,7 +105,7 @@ library(stringr)
 #'
 #' Once the unrestricted estimates are found, the arguments for restricting the
 #'  parameters can be set for simple hypothesis tests. By default, starting
-#'  values are calculated from the data and are then updated automatically. The
+#'  values are calculated from the data and can be updated automatically. The
 #'  arguments for starting values should seldom be needed.
 #'
 #' Data are entered as a data frame with columns for tau, a vector of times, and
@@ -83,35 +115,35 @@ library(stringr)
 #' To read a csv file into a data frame, create a MaximumLikelihood object,
 #'  estimate parameters and test the goodness-of-fit:
 #'
-#'       df <- read.csv("data/ML_OUP_SimulatedData.csv")
+#'       df <- read.csv("data/MyData.csv")
 #'       ML <- MaximumLikelihood$new()
 #'       ML$Estimates(df)
 #'       ML$GoodnessOfFit()
 #'
-#' In this example, the 'data' directory is one level below the working
-#'  directory. The taucol and zcol arguments are optional and will default to 1
-#'  and 2. Continue on by restricting a parameter and performing a likelihood
-#'  ratio test:
+#' In this example, the 'data' directory is in the working directory. The taucol
+#'  and zcol arguments are optional and will default to 1 and 2. Continue on by
+#'  restricting a parameter and performing a likelihood ratio test:
 #'
 #'       ML$Estimates(rhor=0.5)
 #'       ML$LikelihoodRatioTest()
 #'
-#' The available data sets are documented. To see the documentation, type:
+#' You can also list and read from available data sets using:
 #'
-#'       ?
+#'      OUPDataList()
+#'      df <- OUPDataRead(27)
 #'
-#'  and then select from the drop-down list.
+#' Number 27 in the list is the data set "OUP_Convergence".  The available data
+#'  sets are documented. Type one of the following categories:
 #'
-#' Examples in R6 don't work the same way as other R modules.  There is only
-#'  one example for an R6 object, not one for each function in the object.
-#'  To run examples, the devtools::run_examples() works, but the R command
-#'  example("MaximumLikelihood") doesn't.  You can copy commands to the clipboard,
-#'  paste into the console and press Enter. Examples in this help and a simple
-#'  example at the bottom can be run in this way.  A better alternative is demo().
+#'       ?Agric_
+#'       ?Climate_
+#'       ?Ecosys_
+#'       ?Finance_
+#'       ?OUP_
 #'
-#' A better alternative is demo(), but this works sometimes, sometimes not.
-#'  If you don't see the demos for this package, go to Files and demo.  You will
-#'  see the demo names and then type something like demo(ML_Estimates).
+#'  and then select from the drop-down list.  Or use the function:
+#'
+#'       OUPDataHelp(27)
 
 # class ----
 MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
@@ -121,6 +153,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
   # cloneable = TRUE,
 #' @import plotly
 #' @import stringr
+#' @importFrom clipr clipr_available write_clip
 #' @export
   #public members ----
   public = list(
@@ -129,27 +162,19 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' Create a MaximumLikelihood object
     #' @param OUP pointer set by the OUProcess object
     #' @return A new MaximumLikelihood object
-    #' @examples
-    #'   ML <- MaximumLikelihood$new()
-    #'   ML$Estimates()
-    #'   ML$GoodnessOfFit()
-    #'   ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
-    #'   ML$LikelihoodRatioTest()
     initialize = function(OUP=NULL)
     {
       # pointer to container object ----
       if(!is.null(OUP) && class(OUP)[[1]] == "OUProcess") { private$OUP <- OUP }
       # arguments ----
       private$oup_params <- list(rho=0.459755421,mu=-22.8712176,sigma=13.7350886)
-      private$oup_params_unrestr <- list(rhohat=0.459755421,muhat=-22.8712176,sigmahat=13.7350886)
       private$oup_params_restr <- list(rhor=0.5,mur=-15,sigmar=15)
       private$oup_params_start <- list(rhos=0.5,mus=-15,sigmas=15)
       # time series ----
-      private$oup_stats <- list(lnLu=-447.788922,alphau=0.974685404,lnLr=-449.338874,alphar=0.972555599,m1=175)
       tau <- c(20,20.05,20.1,20.15,20.2,20.25,20.3,20.35,20.55,20.6,20.65,20.7,20.75,20.8,20.95,21,21.05,21.1,21.15,21.2,21.25,21.3,21.35,21.4,21.45,21.5,21.55,21.6,21.65,21.7,21.75,21.8,21.85,21.9,21.95,22,22.05,22.1,22.15,22.2,22.25,22.3,22.35,22.4,22.45,22.5,22.55,22.6,22.65,22.7,22.75,22.8,22.85,22.9,22.95,23,23.05,23.45,23.5,23.55,23.6,23.65,23.7,23.75,23.8,23.85,23.9,23.95,24.1,24.15,24.2,24.25,24.3,24.35,24.4,24.45,24.5,24.6,24.65,24.75,24.8,24.95,25,25.05,25.1,25.15,25.2,25.25,25.3,25.35,25.4,25.45,25.5,25.55,25.6,25.95,26,26.05,26.1,26.15,26.2,26.25,26.3,26.35,26.4,26.45,26.5,26.55,26.6,26.65,26.7,26.75,26.85,26.9,26.95,27,27.05,27.1,27.15,27.2,27.25,27.3,27.35,27.4,27.45,27.5,27.55,27.6,27.65,27.7,27.75,27.8,27.85,27.9,27.95,28,28.05,28.1,28.15,28.2,28.25,28.3,28.35,28.4,28.45,28.5,28.55,28.6,28.65,28.7,28.75,28.8,28.85,28.9,28.95,29,29.05,29.1,29.15,29.2,29.25,29.3,29.35,29.4,29.45,29.5,29.55,29.6,29.65,29.7,29.75,29.8,29.85,29.9,29.95,30)
       z <- c(30,27.49,24.08,23.45,24.72,21.5,22.15,21.05,27.9,27.71,33.01,30.55,32.42,26.43,24.37,23.22,17.02,17.89,20.04,17.9,19.52,16.78,16.13,16.91,13.92,15.02,13.04,8.19,10.62,12.04,10.39,11.94,14.62,6.61,1.7,1.71,-0.22,-2.69,1.69,-2.98,0.19,3.36,-0.3,-1.24,-4.35,-5.14,-14.63,-14.25,-19.83,-20.51,-20.98,-17.14,-18.94,-21.53,-25.73,-23.74,-24.57,-20.15,-22.54,-20.45,-17.59,-19.29,-21.85,-23.17,-23.8,-27.92,-26.87,-24.97,-17.32,-13.92,-13.49,-11.5,-9.23,-10.3,-9.54,-7.25,-4.04,-9.64,-9.42,-7.87,-6.86,-6.68,-9.03,-20.15,-19.21,-20.75,-21.07,-17.12,-9.99,-12.91,-12.19,-11.42,-8.96,-13.32,-17.8,-21.72,-26.66,-29.16,-28.77,-28.06,-22.83,-24.47,-29.79,-31.28,-34.05,-36.76,-38.97,-39.09,-32.89,-32.89,-31.25,-32.98,-36.19,-36.12,-40.74,-40.57,-42.75,-40.7,-38.5,-38.91,-40.66,-45.96,-48.73,-49.76,-48.19,-47.9,-47.73,-43.19,-41.62,-41.96,-42.98,-44.98,-41.98,-40.65,-36.21,-33.61,-33.73,-29.53,-34.07,-37.05,-33.84,-29.71,-29.24,-30.83,-26.19,-28.73,-30.27,-32.39,-30.3,-25.83,-29.39,-27.64,-25.63,-23.81,-23.34,-18.32,-16.53,-13.82,-13.74,-13.28,-16.98,-13,-13.03,-14.26,-16.94,-15.62,-13.54,-19.63,-14.06,-17.23,-17.6,-19.67,-19.87,-20.65,-14.42,-10.23)
       private$timeseries <- data.frame(tau=tau,z=z)
-      private$timeseries_info <- list(tbeg=20,Ixbeg=1,tend=30,Ixend=176,dataname="Default",timename="time",statename="state",estimation="Unrestricted")
+      private$timeseries_info <- list(tbeg=20,tend=30,dataname="Default",timename="time",statename="state",estimation="Unrestricted")
       # plot info ----
       plotfont <- list(family="Cambria",size=14)
       plotfile <- list(format="png",width=640,height=480)
@@ -159,7 +184,12 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         if(rstudioapi::getThemeInfo()$dark) { plottheme <- list(name="dark",opaque=1.0) }
       }
       private$plot_info <- list(plotfont=plotfont,plotfile=plotfile,plottheme=plottheme,plotlabels=TRUE)
+      # flags ----
+      private$flags <- list(plotit=FALSE,copyit=FALSE)
+      # plot globals ----
       private$plot_colors <- private$rainbow(plottheme$name,plottheme$opaque)
+      private$modebar_2D <- list(list("zoom2d","pan2d","resetScale2d"),list("toImage"))
+      private$modebar_3D <- list(list("zoom3d","pan3d","orbitRotation","tableRotation"),list("resetCameraDefault3d","resetCameraLastSave3d"),list("hoverClosest3d"),list("toImage"))
     },
     # public set methods ----
     #' @description
@@ -167,11 +197,11 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' @param rho   rate parameter 0<=rho<inf
     #' @param mu    location parameter -inf<mu<inf
     #' @param sigma scale parameter -inf<sigma<inf
-    #' @param who   identifier for object sending the parameters
+    #' @param who   object id of sender
     #' @return list(rho,mu,sigma)
     set_oup_params = function(rho=NULL,mu=NULL,sigma=NULL,who=NULL)
     {
-      if(is.null(who) & !is.null(private$OUP)) { private$OUP$send_oup_params(rho,mu,sigma,"ML")}
+      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_oup_params(rho,mu,sigma,"ML") }
       if(!is.null(rho))
       {
         sca <- private$extract_scalar(rho)
@@ -185,8 +215,10 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           if(sca != private$oup_params$rho)
           {
             private$oup_params$rho <- sca
-            private$loglikely <- NULL
+            private$theta <- NULL
+            private$theta_l <- NULL
             private$goodness <- NULL
+            private$likelyratio <- NULL
           }
         }
         else { message("rho not set.")}
@@ -199,9 +231,11 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           if(sca != private$oup_params$mu)
           {
             private$oup_params$mu <- sca
-            private$loglikely <- NULL
+            private$theta <- NULL
+            private$theta_l <- NULL
             private$goodness <- NULL
-          }
+            private$likelyratio <- NULL
+         }
         }
         else { message("mu not set.")}
       }
@@ -213,9 +247,11 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           if(sca != private$oup_params$sigma)
           {
             private$oup_params$sigma <- sca
-            private$loglikely <- NULL
+            private$theta <- NULL
+            private$theta_l <- NULL
             private$goodness <- NULL
-          }
+            private$likelyratio <- NULL
+        }
         }
         else { message("sigma not set.")}
       }
@@ -229,19 +265,19 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     set_oup_params_restr = function(rhor=NULL,mur=NULL,sigmar=NULL)
     {
       rhosca <- private$extract_scalar(rhor)
-      if(!is.null(rhor) & is.null(rhosca)) { message("rhor not set.")}
+      if(!is.null(rhor) && is.null(rhosca)) { message("rhor not set.")}
       musca <- private$extract_scalar(mur)
-      if(!is.null(mur) & is.null(musca)) { message("mur not set.")}
+      if(!is.null(mur) && is.null(musca)) { message("mur not set.")}
       sigmasca <- private$extract_scalar(sigmar)
-      if(!is.null(sigmar) & is.null(sigmasca)) { message("sigmar not set.")}
+      if(!is.null(sigmar) && is.null(sigmasca)) { message("sigmar not set.")}
       rhoparam <- private$oup_params_restr[[1]]
       muparam <- private$oup_params_restr[[2]]
       sigmaparam <- private$oup_params_restr[[3]]
       hit <- FALSE
-      if(!is.null(rhosca) & is.null(rhoparam) | is.null(rhosca) & !is.null(rhoparam)) { hit <- TRUE }
-      else if(!is.null(musca) & is.null(muparam) | is.null(musca) & !is.null(muparam)) { hit <- TRUE }
-      else if(!is.null(sigmasca) & is.null(sigmaparam) | is.null(sigmasca) & !is.null(sigmaparam)) { hit <- TRUE }
-      else if(!is.null(rhosca) && (rhosca <= 0 & rhoparam > 0 | rhosca > 0 & rhosca != rhoparam)) { hit <- TRUE }
+      if(!is.null(rhosca) && is.null(rhoparam) || is.null(rhosca) && !is.null(rhoparam)) { hit <- TRUE }
+      else if(!is.null(musca) && is.null(muparam) || is.null(musca) && !is.null(muparam)) { hit <- TRUE }
+      else if(!is.null(sigmasca) && is.null(sigmaparam) || is.null(sigmasca) && !is.null(sigmaparam)) { hit <- TRUE }
+      else if(!is.null(rhosca) && (rhosca <= 0 && rhoparam > 0 || rhosca > 0 && rhosca != rhoparam)) { hit <- TRUE }
       else if(!is.null(musca) && musca != muparam) { hit <- TRUE }
       else if(!is.null(sigmasca) && sigmasca != sigmaparam) { hit <- TRUE }
       if(hit == TRUE)
@@ -299,121 +335,6 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       return(private$oup_params_start)
     },
     #' @description
-    #' Set OUP statistics for estimation and hypothesis tests
-    #' @param lnLu   unrestricted log likelihood -inf<lnLu<=0
-    #' @param alphau identifies the distribution of lnLu, 0.5<=alphau<=1
-    #' @param lnLr   restricted log likelihood -inf<lnLr<=lnLu
-    #' @param alphar identifies the distribution of lnLr, 0.5<=alphar<=1
-    #' @param m1     number of observations 0<m1
-    #' @return list(lnLu,alphau,lnLr,alphar,m1)
-    set_oup_stats = function(lnLu=NULL,alphau=NULL,lnLr=NULL,alphar=NULL,m1=NULL)
-    {
-      if(!is.null(lnLu) & !is.null(lnLr))
-      {
-        lnLu <- private$extract_scalar(lnLu)
-        lnLr <- private$extract_scalar(lnLr)
-        if(!is.null(lnLu) & !is.null(lnLr))
-        {
-          if(lnLu < lnLr) { message("lnLu < lnLr.  lnLu and lnLr not set.") }
-          else if(lnLu > 0) { message("lnLu > 0.  lnLu and lnLr not set.") }
-          else if(lnLr > 0) { message("lnLr > 0.  lnLu and lnLr not set.") }
-          else
-          {
-            private$oup_stats$lnLu <- lnLu
-            private$oup_stats$lnLr <- lnLr
-            private$likelyratio <- NULL
-          }
-        }
-        else { message("lnLu and lnLr not set.") }
-      }
-      else if(!is.null(lnLu))
-      {
-        lnLu <- private$extract_scalar(lnLu)
-        if(!is.null(lnLu))
-        {
-          lnL <- private$oup_stats[[3]]
-          if(!is.null(lnL) && lnLu < lnL) { message("new lnLu < existing lnLr.  lnLu not set.") }
-          else
-          {
-            private$oup_stats$lnLu <- lnLu
-            private$likelyratio <- NULL
-          }
-        }
-        else { message("lnLu not set.") }
-      }
-      else if(!is.null(lnLr))
-      {
-        lnLr <- private$extract_scalar(lnLr)
-        if(!is.null(lnLr))
-        {
-          lnL <- private$oup_stats[[1]]
-          if(!is.null(lnL) && lnLr > lnL) { message("new lnLr > existing lnLu.  lnLr not set.") }
-          else
-          {
-            private$oup_stats$lnLr <- lnLr
-            private$likelyratio <- NULL
-          }
-        }
-        else { message("lnLr not set.") }
-      }
-      if(!is.null(alphau))
-      {
-        sca <- private$extract_scalar(alphau)
-        if(!is.null(sca))
-        {
-          if(sca < 0.5)
-          {
-            message("alphau < 0.5 set to 0.5.")
-            sca <- 0.5
-          }
-          if(sca > 1)
-          {
-            message("alphau > 1 set to 1.")
-            sca <- 1
-          }
-          private$oup_stats$alphau <- sca
-          private$likelyratio <- NULL
-        }
-        else { message("alphau not set.") }
-      }
-      if(!is.null(alphar))
-      {
-        sca <- private$extract_scalar(alphar)
-        if(!is.null(sca))
-        {
-          if(sca < 0.5)
-          {
-            message("alphar < 0.5 set to 0.5.")
-            sca <- 0.5
-          }
-          if(sca > 1)
-          {
-            message("alphar > 1 set to 1.")
-            sca <- 1
-          }
-          private$oup_stats$alphar <- sca
-          private$likelyratio <- NULL
-        }
-        else { message("alphar not set.") }
-      }
-      if(!is.null(m1))
-      {
-        sca <- private$extract_scalar(m1)
-        if(!is.null(sca))
-        {
-          if(sca < 1)
-          {
-            message("m1 < 1 set to 1.")
-            sca <- 1
-          }
-          private$oup_stats$m1 <- sca
-          private$likelyratio <- NULL
-        }
-        else { message("m1 not set.") }
-      }
-      return(private$oup_stats)
-    },
-    #' @description
     #' Set time series data for time tau and state z
     #' @param df     data frame containing columns for tau and z
     #' @param taucol index of a column containing tau
@@ -434,7 +355,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
               OK <- TRUE
               tc <- private$extract_scalar(taucol)
               zc <- private$extract_scalar(zcol)
-              if(!is.null(tc) & !is.null(zc))
+              if(!is.null(tc) && !is.null(zc))
               {
                 tc <- as.integer(tc)
                 zc <- as.integer(zc)
@@ -464,7 +385,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
                   OK <- FALSE
                 }
               }
-              else if(is.null(tc) & is.null(zc))
+              else if(is.null(tc) && is.null(zc))
               {
                 tc <- 1
                 zc <- 2
@@ -512,13 +433,14 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
               }
               if(OK == TRUE)
               {
+                dataname <- df$dfname[1]
                 df <- data.frame(df[,c(tc,zc)])
                 df <- cleandata(df)
                 nrows <- nrow(df)
                 if(nrows > 2)
                 {
                   i <- 1
-                  while(i < nrows & OK == TRUE)
+                  while(i < nrows && OK == TRUE)
                   {
                     if(df[i+1,1] <= df[i,1])
                     {
@@ -532,15 +454,15 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
                     framenames <- colnames(df)
                     private$timeseries <- NULL
                     private$timeseries <- df[,c(1,2)]
-                    private$timeseries_info <- list(tbeg=df[1,1],Ixbeg=1,tend=df[nrows,1],Ixend=nrows,dataname=framenames[2],timename=framenames[1],statename=framenames[2],estimation=NULL)
-                    private$oup_params_unrestr <- list(rhohat=NULL,muhat=NULL,sigmahat=NULL)
+                    private$timeseries_info <- list(tbeg=df[1,1],tend=df[nrows,1],dataname=dataname,timename=framenames[1],statename=framenames[2],estimation=NULL)
                     private$oup_params_restr <- list(rhor=NULL,mur=NULL,sigmar=NULL)
                     private$oup_params_start <- list(rhos=NULL,mus=NULL,sigmas=NULL)
-                    private$oup_stats <- list(lnLu=NULL,alphau=NULL,lnLr=NULL,alphar=NULL,m1=NULL)
-                    private$loglikely <- NULL
+                    private$theta <- NULL
+                    private$theta_l <- NULL
                     private$theta_u <- NULL
                     private$theta_r <- NULL
                     private$goodness <- NULL
+                    private$likelyratio <- NULL
                   }
                   else { message("tau and z were not set.") }
                 }
@@ -572,7 +494,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       }
       else
       {
-        if(!is.null(taucol) | !is.null(zcol))
+        if(!is.null(taucol) || !is.null(zcol))
         {
           message("no data frame,")
           message("tau and z not set.")
@@ -595,92 +517,32 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       m <- length(tau)
       if(!is.null(tbeg))
       {
-        if(tbeg == -Inf)
-        {
-          private$timeseries_info$tbeg <- tau[1]
-          private$timeseries_info$Ixbeg <- 1
-        }
-        else if(tbeg == Inf)
-        {
-          private$timeseries_info$tbeg <- tau[m]
-          private$timeseries_info$Ixbeg <- m
-        }
+        if(tbeg == -Inf) { private$timeseries_info$tbeg <- tau[1] }
+        else if(tbeg == Inf) { private$timeseries_info$tbeg <- tau[m] }
         else
         {
           sca <- private$extract_scalar(tbeg)
           if(!is.null(sca))
           {
-            if(sca < tau[1])
-            {
-              private$timeseries_info$tbeg <- tau[1]
-              private$timeseries_info$Ixbeg <- 1
-            }
-            else if(sca > tau[m])
-            {
-              private$timeseries_info$tbeg <- tau[m]
-              private$timeseries_info$Ixbeg <- m
-            }
-            else
-            {
-              hit <- FALSE
-              i <- 0
-              while(i < m & hit == FALSE)
-              {
-                i <- i+1
-                if(sca <= tau[i])
-                {
-                  hit <- TRUE
-                  private$timeseries_info$tbeg <- tau[i]
-                  private$timeseries_info$Ixbeg <- i
-                }
-              }
-            }
+            if(sca < tau[1]) { private$timeseries_info$tbeg <- tau[1] }
+            else if(sca > tau[m]) { private$timeseries_info$tbeg <- tau[m] }
+            else { private$timeseries_info$tbeg <- sca }
           }
           else { message("beg not set.") }
         }
       }
       if(!is.null(tend))
       {
-        if(tend == Inf)
-        {
-          private$timeseries_info$tend <- tau[m]
-          private$timeseries_info$Ixend <- m
-        }
-        else if(tend == -Inf)
-        {
-          private$timeseries_info$tend <- private$timeseries_info$tbeg
-          private$timeseries_info$Ixend <- private$timeseries_info$Ixbeg
-        }
+        if(tend == Inf) { private$timeseries_info$tend <- tau[m] }
+        else if(tend == -Inf) { private$timeseries_info$tend <- private$timeseries_info$tbeg }
         else
         {
           sca <- private$extract_scalar(tend)
           if(!is.null(sca))
           {
-            if(sca > tau[m])
-            {
-              private$timeseries_info$tend <- tau[m]
-              private$timeseries_info$Ixend <- m
-            }
-            else if(sca < private$timeseries_info$tbeg)
-            {
-              private$timeseries_info$tend <- private$timeseries_info$tbeg
-              private$timeseries_info$Ixend <- private$timeseries_info$Ixbeg
-            }
-            else
-            {
-              hit <- FALSE
-              i <- m+1
-              while(i > 1 & hit == FALSE)
-              {
-                i <- i-1
-                if(sca >= tau[i])
-                {
-                  hit <- TRUE
-                  private$timeseries_info$tend <- tau[i]
-                  private$timeseries_info$Ixend <- i
-                }
-              }
-            }
+            if(sca > tau[m]) { private$timeseries_info$tend <- tau[m] }
+            else if(sca < private$timeseries_info$tbeg) {  private$timeseries_info$tend <- private$timeseries_info$tbeg }
+            else { private$timeseries_info$tend <- sca }
           }
           else { message("end not set.") }
         }
@@ -721,11 +583,11 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' @param theme      'light' or 'dark'
     #' @param opaque     transparent to opaque background 0.0<=opaque<=1.0
     #' @param labels     title and parameters TRUE or FALSE
-    #' @param who        identifier for object sending the parameters
-    #' @return list(font,file,theme)
+    #' @param who        object id of sender
+    #' @return list(font,file,theme,labels)
     set_plot_info = function(fontfamily=NULL,fontsize=NULL,fileformat=NULL,filewidth=NULL,fileheight=NULL,theme=NULL,opaque=NULL,labels=NULL,who=NULL)
     {
-      if(is.null(who) & !is.null(private$OUP)) { private$OUP$send_plot_info(NULL,NULL,NULL,fontfamily,fontsize,fileformat,filewidth,fileheight,theme,opaque,NULL,NULL,labels,"ML")}
+      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_plot_info(fontfamily,fontsize,fileformat,filewidth,fileheight,theme,opaque,NULL,NULL,labels,"ML") }
       if(!is.null(fontfamily))
       {
         chr <- private$extract_character(fontfamily)
@@ -743,7 +605,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         chr <- private$extract_character(fileformat)
         if(!is.null(chr))
         {
-          if(chr == "png" | chr == "svg") { private$plot_info$plotfile$format <- chr }
+          if(chr == "png" || chr == "svg") { private$plot_info$plotfile$format <- chr }
           else
           {
             message("fileformat must be 'png' or 'svg'.")
@@ -764,14 +626,14 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         if(!is.null(sca)) { private$plot_info$plotfile$height <- sca }
         else { message("fileheight not set.") }
       }
-      if(!is.null(theme) | !is.null(opaque))
+      if(!is.null(theme) || !is.null(opaque))
       {
         if(!is.null(theme))
         {
           chr <- private$extract_character(theme)
           if(!is.null(chr))
           {
-            if(chr == "light" | chr == "dark") { private$plot_info$plottheme$name <- chr }
+            if(chr == "light" || chr == "dark") { private$plot_info$plottheme$name <- chr }
             else
             {
               message("theme not set.")
@@ -809,17 +671,38 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       }
       return(private$plot_info)
     },
+    #' @description
+    #' Set flags for plotting and copying
+    #' @param plotit automatic plot after calculation TRUE or FALSE
+    #' @param copyit copy to clipboard TRUE or FALSE
+    #' @param who    object id of sender
+    #' @return list(plotit,copyit)
+    set_flags = function(plotit=NULL,copyit=NULL,who=NULL)
+    {
+      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_flags(plotit,copyit,"ML") }
+      if(!is.null(plotit))
+      {
+        bool <- private$extract_boolean(plotit)
+        if(!is.null(bool)) { private$flags$plotit <- bool  }
+        else { message("plotit not set.") }
+      }
+      if(!is.null(copyit))
+      {
+        bool <- private$extract_boolean(copyit)
+        if(!is.null(bool)) { private$flags$copyit <- bool  }
+        else { message("copyit not set.") }
+      }
+      return(private$flags)
+    },
     # public get methods ----
     #' @description
     #' Get all arguments, time series and information
-    #' @return list(oup_params,oup_params_unrestr,oup_params_restr,oup_params_start,oup_stats,timeseries,timeseries_info,plot_info)
+    #' @return list(oup_params,oup_params_restr,oup_params_start,timeseries,timeseries_info,plot_info)
     get_all = function()
     {
       all <- list(oup_params = private$oup_params,
         oup_params_restr = private$oup_params_restr,
-        oup_params_unrestr = private$oup_params_unrestr,
         oup_params_start = private$oup_params_start,
-        oup_stats = private$oup_stats,
         timeseries = private$timeseries,
         timeseries_info = private$timeseries_info,
         plot_info = private$plot_info)
@@ -830,10 +713,6 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' @return list(rho,mu,sigma)
     get_oup_params = function() { return(private$oup_params) },
     #' @description
-    #' Get OUP parameters unrestricted estimates
-    #' @return list(rhohat,muhat,sigmahat)
-    get_oup_params_unrestr = function() { return(private$oup_params_unrestr) },
-    #' @description
     #' Get OUP parameter restrictions
     #' @return list(rhor,mur,sigmar)
     get_oup_params_restr = function() { return(private$oup_params_restr) },
@@ -842,16 +721,12 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' @return list(rhos,mus,sigmas)
     get_oup_params_start = function() { return(private$oup_params_start) },
     #' @description
-    #' Get OUP statistics for estimation and hypothesis tests
-    #' @return list(lnLu,alphau,lnLr,alphar,m1)
-    get_oup_stats = function() { return(private$oup_stats) },
-    #' @description
     #' Get time series data for time tau and state z
     #' @return dataframe(tau,z)
     get_timeseries = function() { return(private$timeseries) },
     #' @description
     #' Get information for times series
-    #' @return list(tbeg,Ixbeg,tend,Ixend,datename,timename,statename,estimation)
+    #' @return list(tbeg,tend,datename,timename,statename,estimation)
     get_timeseries_info = function() { return(private$timeseries_info) },
     #' @description
     #' Get information for plotting
@@ -859,8 +734,12 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     get_plot_info = function() { return(private$plot_info) },
     #' @description
     #' Get colors for plotting
-    #' @return list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+    #' @return list(red,ylw,grn,cyn,blu,mgn,gry,background,font)
     get_plot_colors = function() { return(private$plot_colors) },
+    #' @description
+    #' Get flags for plotting and copying
+    #' @return list(plotit,copyit)
+    get_flags = function() { return(private$flags) },
     # public calculate methods ----
     #' @description
     #' Calculate the log likelihood of estimates
@@ -870,7 +749,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' @param df     data frame containing columns for tau and z
     #' @param taucol index of a column containing tau
     #' @param zcol   index of a column containing z
-    #' @return list(lnL)
+    #' @return list(rho,mu,sigma,lnL,k,alpha,m1)
     LogLikelihood = function(rho=NULL,mu=NULL,sigma=NULL,df=NULL,taucol=NULL,zcol=NULL)
     {
       # set / get ----
@@ -881,14 +760,28 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       sigma <- private$oup_params[[3]]
       tau <- private$timeseries[[1]]
       z <- private$timeseries[[2]]
+      copyit <- private$flags[[2]]
       # calculate ----
-      loglikely <- private$loglikely
-      if(is.null(loglikely))
+      self$set_timeseries_info(NULL,NULL,NULL,NULL,NULL,"LogLikely")
+      theta <- private$theta_l
+      if(is.null(theta))
       {
-        loglikely <- private$OUPLogLikelihood(tau,z,rho,mu,sigma)
-        private$loglikely <- loglikely
+        logL <- RcppOUPMLLogLikelihood(tau,z,rho,mu,sigma)
+        theta <- list(rho=rho,mu=mu,sigma=sigma,lnL=logL[1],k=logL[2],alpha=logL[3],m1=logL[4])
+        private$theta_l <- theta
       }
-      return(list(lnL=loglikely))
+      private$theta <- theta
+      # copy ----
+      if(copyit == TRUE)
+      {
+        dataname <- private$timeseries_info[[3]]
+        timename <- private$timeseries_info[[4]]
+        statename <- private$timeseries_info[[5]]
+        estimation <- private$timeseries_info[[6]]
+        clip <- rbind(c("Maximum Likelihood",""),c("Log Likelihood",""),c("File:",dataname),c("Time:",timename),c("State:",statename),c("rho",theta[1]),c("mu",theta[2]),c("sigma",theta[3]),c("lnL",theta[4]),c("k",theta[5]),c("alpha",theta[6]),c("m1",theta[7]))
+        private$CopyToClipboard(clip)
+      }
+      return(theta)
     },
     #' @description
     #' Calculate unrestricted or restricted maximum likelihood estimates
@@ -901,9 +794,8 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     #' @param rhos    starting value for the rate parameter 0<=rhos<inf
     #' @param mus     starting value for the location parameter -inf<mus<inf
     #' @param sigmas  starting value the scale parameter -inf<sigmas<inf
-    #' @param plotit  TRUE or FALSE
     #' @return list(rhohat,muhat,sigmahat,lnLu,ku,alphau,m1) or list(rhor,mur,sigmar,lnLr,kr,alphar,m1)
-    Estimates = function(df=NULL,taucol=NULL,zcol=NULL,rhor=NULL,mur=NULL,sigmar=NULL,rhos=NULL,mus=NULL,sigmas=NULL,plotit=TRUE)
+    Estimates = function(df=NULL,taucol=NULL,zcol=NULL,rhor=NULL,mur=NULL,sigmar=NULL,rhos=NULL,mus=NULL,sigmas=NULL)
     {
       # set / get ----
       self$set_timeseries(df,taucol,zcol)
@@ -913,77 +805,82 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       rhos <- private$oup_params_start[[1]]
       mus <- private$oup_params_start[[2]]
       sigmas <- private$oup_params_start[[3]]
-      if(is.null(rhor) & is.null(mur) & is.null(sigmar)) { theta <- private$theta_u }
+      if(is.null(rhor) && is.null(mur) && is.null(sigmar))
+      {
+        self$set_timeseries_info(NULL,NULL,NULL,NULL,NULL,"Unrestricted")
+        theta <- private$theta_u
+      }
       else
       {
+        self$set_timeseries_info(NULL,NULL,NULL,NULL,NULL,"Restricted")
         self$set_oup_params_restr(rhor,mur,sigmar)
         rhor <- private$oup_params_restr[[1]]
         mur <- private$oup_params_restr[[2]]
         sigmar <- private$oup_params_restr[[3]]
         theta <- private$theta_r
       }
+      plotit <- private$flags[[1]]
+      copyit <- private$flags[[2]]
       # calculate ----
       if(is.null(theta))
       {
-        nmstart <- private$OUPNMStart(rhor,mur,sigmar,rhos,mus,sigmas,tau,z)
-        nm <- private$NelderMead(nmstart[[1]],nmstart[[2]],tau,z,nmstart[[4]])
-        # reset and set ----
-        rho <- nm[[1]][1]
-        mu <- nm[[1]][2]
-        sigma <- nm[[1]][3]
-        lnL <- nm[[2]]
-        nk <- nmstart[[3]]
-        m1 <- nmstart[[4]]-1
-        alpha <- 0
-        i <- 0
-        while(i < m1)
+        nmstart <- RcppOUPMLNMStart(tau,z,rhor,mur,sigmar,rhos,mus,sigmas)
+        nk <- nmstart[2,4]
+        nm <- RcppOUPMLNelderMead(tau,z,nmstart[1,1:3],nmstart[2,1:3])
+        rho <- nm[1]
+        mu <- nm[2]
+        sigma <- nm[3]
+        logL <- RcppOUPMLLogLikelihood(tau,z,rho,mu,sigma)
+        lnL <- logL[1]
+        alpha <- logL[3]
+        m1 <-logL[4]
+      # reset and set ----
+        if(nmstart[2,1] != 0 && nmstart[2,2] != 0 && nmstart[2,3] != 0)
         {
-          i <- i+1
-          alpha <- alpha+1+exp(-2*rho*(tau[i+1]-tau[i]))
-        }
-        alpha <- 0.5*alpha/m1
-        if(nmstart[[2]][1] != 0 & nmstart[[2]][2] != 0 & nmstart[[2]][3] != 0)
-        {
-          self$set_oup_stats(lnLu=lnL,alphau=alpha,NULL,NULL,m1=m1)
-          self$set_timeseries_info(NULL,NULL,NULL,NULL,NULL,"Unrestricted")
           private$oup_params_start$rhos <- rho
           private$oup_params_start$mus <- mu
           private$oup_params_start$sigmas <- sigma
           theta <- list(rhohat=rho,muhat=mu,sigmahat=sigma,lnLu=lnL,ku=nk,alphau=alpha,m1=m1)
           private$theta_u <- theta
-          private$oup_params_unrestr <- list(rhohat=rho,muhat=mu,sigmahat=sigma)
         }
         else
         {
-          self$set_oup_stats(NULL,NULL,lnLr=lnL,alphar=alpha,m1=m1)
-          self$set_timeseries_info(NULL,NULL,NULL,NULL,NULL,"Restricted")
-          if(nmstart[[2]][1] != 0) { theta <- list(rhobar=rho) }
+          if(nmstart[2,1] != 0) { theta <- list(rhobar=rho) }
           else { theta <- list(rhor=rho) }
-          if(nmstart[[2]][2] != 0) { theta <- append(theta,list(mubar=mu)) }
+          if(nmstart[2,2] != 0) { theta <- append(theta,list(mubar=mu)) }
           else { theta <- append(theta,list(mur=mu)) }
-          if(nmstart[[2]][3] != 0) { theta <- append(theta,list(sigmabar=sigma)) }
+          if(nmstart[2,3] != 0) { theta <- append(theta,list(sigmabar=sigma)) }
           else { theta <- append(theta,list(sigmar=sigma)) }
           theta <- append(theta,list(lnLr=lnL,kr=nk,alphar=alpha,m1=m1))
           private$theta_r <- theta
         }
       }
       self$set_oup_params(rho=theta[[1]],mu=theta[[2]],sigma=theta[[3]])
-      private$loglikely <- NULL
-      private$goodness <- NULL
-      # plot ----
-      if(plotit == TRUE) { print(self$PlotEstimates(NULL,NULL,NULL)) }
-
+      private$theta <- theta
+      # plot or copy ----
+      if(plotit == TRUE) { print(self$PlotEstimates()) }
+      else if(copyit == TRUE)
+      {
+        names <- names(theta)
+        theta <- unname(theta)
+        dataname <- private$timeseries_info[[3]]
+        timename <- private$timeseries_info[[4]]
+        statename <- private$timeseries_info[[5]]
+        estimation <- private$timeseries_info[[6]]
+        clip <- rbind(c("Maximum Likelihood",""),c("Estimates",""),c("File:",dataname),c("Time:",timename),c("State:",statename),c(estimation,""),c(names[1],theta[1]),c(names[2],theta[2]),c(names[3],theta[3]),c(names[4],theta[4]),c(names[5],theta[5]),c(names[6],theta[6]),c(names[7],theta[7]))
+        private$CopyToClipboard(clip)
+      }
       return(theta)
     },
     #' @description
-    #' Calculate the goodness of fit compared with invariant and scaled brownian motion estimates
+    #' Compare maximum likeliood estimates with invariant and scaled brownian motion estimates
     #' @param rho    rate parameter 0<=rho<inf
     #' @param mu     location parameter -inf<mu<inf
     #' @param sigma  scale parameter -inf<sigma<inf
     #' @param df     data frame containing columns for tau and z
     #' @param taucol index of a column containing tau
-    #' @param zcol   index a column containing z
-    #' @return list(Inv,SBM) with Inv=list(R2,Pval) and SBM=list(R2,Pval)
+    #' @param zcol   index of a column containing z
+    #' @return list(theta,theta_i,theta_s,Inv,SBM) with Inv=list(R2,Pval) and SBM=list(R2,Pval)
     GoodnessOfFit = function(rho=NULL,mu=NULL,sigma=NULL,df=NULL,taucol=NULL,zcol=NULL)
     {
       # set / get ----
@@ -994,105 +891,96 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       sigma <- private$oup_params[[3]]
       tau <- private$timeseries[[1]]
       z <- private$timeseries[[2]]
+      copyit <- private$flags[[2]]
       # calculate ----
       goodness <- private$goodness
       if(is.null(goodness))
       {
-        # unrestricted
-        lnLu <- private$OUPLogLikelihood(tau,z,rho,mu,sigma)
-        m <- length(tau)
-        alpha <- 0
-        for(i in 1:(m-1)) { alpha <- alpha+1+exp(-2*rho*(tau[i+1]-tau[i])) }
-        alpha <- 0.5*alpha/(m-1)
-        # invariant
-        ave <- 0
-        for(i in 1:(m-1)) { ave <- ave+z[i+1] }
-        ave <- ave/(m-1)
-        sumsq <- 0
-        for(i in 1:(m-1)) { sumsq <- sumsq+(z[i+1]-ave)^2 }
-        sumsq <- sumsq/(m-1)
-        lnLr <- -0.5*(m-1)*(log(2*3.14159265358979*sumsq)+1)
-        Upsilon2 <- 2*(lnLu-lnLr)
-        if(Upsilon2 < 0)
+        theta <- private$theta #last estimate (user, unrestricted or restricted)
+        if(is.null(theta))
         {
-          Upsilon2 <- 0
-          message("parameters rho, mu and sigma may not fit the data.")
-          message(paste(sep="","Inv:  lnLr=",lnLr," is greater than lnL=",lnLu,"."))
+          logL <- RcppOUPMLLogLikelihood(tau,z,rho,mu,sigma)
+          theta <- list(rho=rho,mu=mu,sigma=sigma,lnL=logL[1],k=logL[2],alpha=logL[3],m1=logL[4])
+          private$theta_l <- theta
+          private$theta <- theta
         }
-        R2 <- 1-exp(-log(2)*0.5*Upsilon2/(alpha*(m-1)))
-        Pval <- private$GammaBigRatio(alpha*(m-1),0.5*Upsilon2)
-        Inv <- list(R2=R2,Pval=Pval)
-        # scaled brownian motion
-        sumsq <- 0
-        sumlntau <- 0
-        for(i in 1:(m-1))
-        {
-          sumsq <- sumsq+(z[i+1]-z[i])^2/(tau[i+1]-tau[i])
-          sumlntau <- sumlntau + log(tau[i+1]-tau[i])
-        }
-        sumsq <- sumsq/(m-1)
-        lnLr <- -0.5*(m-1)*(log(2*3.14159265358979*sumsq)+1)-0.5*sumlntau
-        Upsilon2 <- 2*(lnLu-lnLr)
-        if(Upsilon2 < 0)
-        {
-          Upsilon2 <- 0
-          message("parameters rho, mu and sigma may not fit the data.")
-          message(paste(sep="","SBM:  lnLr=",lnLr," is greater than lnL=",lnLu,"."))
-        }
-        R2 <- 1-exp(-log(2)*0.5*Upsilon2/(alpha*(m-1)))
-        Pval <- private$GammaBigRatio(alpha*(m-1),0.5*Upsilon2)
-        SBM <- list(R2=R2,Pval=Pval)
-        goodness <- list(Inv=Inv,SBM=SBM)
+        gof <- RcppOUPMLGoodnessOfFit(tau,z,theta[[4]],theta[[6]])
+        theta_i <- list(rhor=gof[1,1],mu=gof[1,2],sigma=gof[1,3],lnLr=gof[1,4],k=gof[1,5],alphar=gof[1,6],m1=gof[1,7])
+        Inv <- list(R2=gof[1,8],PVal=gof[1,9])
+        theta_s <- list(rhor=gof[2,1],mur=gof[2,2],sigma=gof[2,3],lnLr=gof[2,4],k=gof[2,5],alphar=gof[2,6],m1=gof[2,7])
+        SBM <- list(R2=gof[2,8],Pval=gof[2,9])
+        goodness <- list(theta=theta,theta_i=theta_i,theta_s=theta_s,Inv=Inv,SBM=SBM)
         private$goodness <- goodness
+      }
+      # copy ----
+      if(copyit == TRUE)
+      {
+        theta <- goodness[[1]]
+        theta_i <- goodness[[2]]
+        theta_s <- goodness[[3]]
+        Inv <- goodness[[4]]
+        SBM <- goodness[[5]]
+        dataname <- private$timeseries_info[[3]]
+        timename <- private$timeseries_info[[4]]
+        statename <- private$timeseries_info[[5]]
+        estimation <- private$timeseries_info[[6]]
+        clip <- rbind(c("Maximum Likelihood",rep("",3)),c("Goodness of Fit",rep("",3)),c("File:",dataname,rep("",2)),c("Time:",timename,rep("",2)),c("State:",statename,rep("",2)),c("Inv R2",Inv[[1]],rep("",2)),c("Inv 1-P",Inv[[2]],rep("",2)),c("SBM R2",SBM[[1]],rep("",2)),c("SBM 1-P",SBM[[2]],rep("",2)),c("",estimation,"Invariant","Scaled BM"),c("rho",theta[1],theta_i[1],theta_s[1]),c("mu",theta[2],theta_i[2],theta_s[2]),c("sigma",theta[3],theta_i[3],theta_s[3]),c("lnL",theta[4],theta_i[4],theta_s[4]),c("k",theta[5],theta_i[5],theta_s[5]),c("alpha",theta[6],theta_i[6],theta_s[6]),c("m1",theta[7],theta_i[7],theta_s[7]))
+        private$CopyToClipboard(clip)
       }
       return(goodness)
     },
     #' @description
-    #' Test for significant difference between two likelihoods
-    #' @param lnLu   unrestricted log likelihood -inf<lnLu<=0
-    #' @param lnLr   restricted log likelihood -inf<lnLr<=lnLu
-    #' @param alphau identifies distribution of LnLu 0.5<=alphau<=1
-    #' @param m1     number of observations 0<m1=m-1
-    #' @return list(R2,Pval)
-    LikelihoodRatioTest = function(lnLu=NULL,lnLr=NULL,alphau=NULL,m1=NULL)
+    #' Test for significant difference between restricted and unrestricted likelihoods
+    #' @param rho    rate parameter 0<=rho<inf
+    #' @param mu     location parameter -inf<mu<inf
+    #' @param sigma  scale parameter -inf<sigma<inf
+    #' @param df     data frame containing columns for tau and z
+    #' @param taucol index of a column containing tau
+    #' @param zcol   index of a column containing z
+    #' @return list(theta_u,theta,R2,Pval)
+    LikelihoodRatioTest = function(rho=NULL,mu=NULL,sigma=NULL,df=NULL,taucol=NULL,zcol=NULL)
     {
       # set / get ----
-      self$set_oup_stats(lnLu,alphau,lnLr,NULL,m1)
-      lnLu <- private$oup_stats[[1]]
-      alpha <- private$oup_stats[[2]]
-      lnLr <- private$oup_stats[[3]]
-      m1 <- private$oup_stats[[5]]
-      likelyratio <- private$likelyratio
+      oup_params <- self$set_oup_params(rho,mu,sigma)
+      self$set_timeseries(df,taucol,zcol)
+      copyit <- private$flags[[2]]
       # calculate ----
+      likelyratio <- private$likelyratio
+      estimation <- private$timeseries_info[[6]]
       if(is.null(likelyratio))
       {
-        if(is.null(lnLu) | is.null(alpha) | is.null(m1))
+        theta <- private$theta #last estimate (loglikely, unrestricted or restricted)
+        if(is.null(theta))
         {
-          message("no unrestricted log likelihood.")
-          R2 <- 1
-          Pval <- 0
+          theta <- self$LogLikelihood()
+          estimation <- private$timeseries_info[[6]]
         }
-        else if(is.null(lnLr) | is.null(m1))
+        theta_u <- private$theta_u
+        if(is.null(theta_u))
         {
-          message("no restricted log likelihood.")
-          R2 <- 0
-          Pval <- 1
+          theta_u <- self$Estimates()
+          private$theta <- theta
+          private$timeseries_info[[6]] <- estimation
         }
-        else if(lnLu-lnLr < 0)
-        {
-          message("lnLu is less than lnLr.")
-          R2 <- 0
-          Pval <- 0
-        }
-        else
-        {
-          Upsilon2 <- 2*(lnLu-lnLr)
-          if(Upsilon2 < 0) { Upsilon2 <- 0 }
-          R2 <- 1-exp(-log(2)*0.5*Upsilon2/(alpha*m1))
-          Pval <- private$GammaBigRatio(alpha*m1,0.5*Upsilon2)
-        }
-        likelyratio <- list(R2=R2,Pval=Pval)
+        lnLu <- theta_u[[4]]
+        alpha <- theta_u[[6]]
+        m <- theta_u[[7]]+1
+        lnLr <- theta[[4]]
+        lrt <- RcppOUPMLLikelihoodRatioTest(lnLu,alpha,m,lnLr)
+        likelyratio <- list(theta_u=theta_u,theta=theta,R2=lrt[1],Pval=lrt[2])
         private$likelyratio <- likelyratio
+      }
+      # copy ----
+      if(copyit == TRUE)
+      {
+        R2 <- likelyratio[[3]]
+        Pval <- likelyratio[[4]]
+        dataname <- private$timeseries_info[[3]]
+        timename <- private$timeseries_info[[4]]
+        statename <- private$timeseries_info[[5]]
+        estimation <- private$timeseries_info[[6]]
+        clip <- rbind(c("Maximum Likelihood",rep("",2)),c("Likelihood Ratio Test",rep("",2)),c("File:",dataname,""),c("Time:",timename,""),c("State:",statename,""),c("R2",R2,""),c("1-P",Pval,""),c("","Unrestricted",estimation),c("rho",theta_u[1],theta[1]),c("mu",theta_u[2],theta[2]),c("sigma",theta_u[3],theta[3]),c("lnL",theta_u[4],theta[4]),c("k",theta_u[5],theta[5]),c("alpha",theta_u[6],theta[6]),c("m1",theta_u[7],theta[7]))
+        private$CopyToClipboard(clip)
       }
       return(likelyratio)
     },
@@ -1115,18 +1003,32 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       self$set_timeseries_info(tbeg,tend,NULL,NULL,NULL,NULL)
       tau <- private$timeseries[[1]]
       z <- private$timeseries[[2]]
-      Ixbeg <- private$timeseries_info[[2]]
-      Ixend <- private$timeseries_info[[4]]
-      dataname <- private$timeseries_info[[5]]
-      timename <- private$timeseries_info[[6]]
-      statename <- private$timeseries_info[[7]]
+      tbeg <- private$timeseries_info[[1]]
+      tend <- private$timeseries_info[[2]]
+      dataname <- private$timeseries_info[[3]]
+      timename <- private$timeseries_info[[4]]
+      statename <- private$timeseries_info[[5]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
       labels <- private$plot_info$plotlabels
       gry <- private$plot_colors$gry
       background <- private$plot_colors$background
-      tauplot <- tau[Ixbeg:Ixend]
-      zplot <- z[Ixbeg:Ixend]
+      copyit <- private$flags[[2]]
+      m <- length(tau)
+      Inx <- index(tau,tbeg,tend)
+      Ixbeg <- Inx[[1]]
+      Ixend <- Inx[[2]]
+      if(Ixbeg > 1 || Ixend < m)
+      {
+        tau <- tau[Ixbeg:Ixend]
+        z <- z[Ixbeg:Ixend]
+      }
+      # copy ----
+      if(copyit == TRUE)
+      {
+        clip <- rbind(c("Maximum Likelihood",""),c("Time Series",""),c("File:",dataname),c(timename,statename),cbind(tau,z))
+        private$CopyToClipboard(clip)
+      }
       # plot ----
       # OUP_ML_TimeSeries2D
       if(labels == TRUE)
@@ -1150,10 +1052,9 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       zmarker <- list(color=gry$e,size=8)
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_ML_TimeSeries2D")
       fig <- plot_ly()  %>%
-        add_trace(.,type="scatter",x=tauplot,y=zplot,name="<i>z</i>",mode="lines+markers",line=zline,marker=zmarker) %>%
-        config(.,toImageButtonOptions=imageoptions) %>%
+        add_trace(.,type="scattergl",x=tau,y=z,mode="lines+markers",line=zline,marker=zmarker) %>%
+        config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
         layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
-
       return(fig)
     },
     #' @description
@@ -1168,17 +1069,17 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     {
       # set / get ----
       self$set_timeseries_info(tbeg,tend,NULL,NULL,NULL,NULL)
-      Ixbeg <- private$timeseries_info[[2]]
-      Ixend <- private$timeseries_info[[4]]
-      dataname <- private$timeseries_info[[5]]
-      timename <- private$timeseries_info[[6]]
-      statename <- private$timeseries_info[[7]]
-      estimation <- private$timeseries_info[[8]]
       tau <- private$timeseries[[1]]
       z <- private$timeseries[[2]]
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
+      tbeg <- private$timeseries_info[[1]]
+      tend <- private$timeseries_info[[2]]
+      dataname <- private$timeseries_info[[3]]
+      timename <- private$timeseries_info[[4]]
+      statename <- private$timeseries_info[[5]]
+      estimation <- private$timeseries_info[[6]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
       labels <- private$plot_info$plotlabels
@@ -1188,10 +1089,18 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       mgn <- private$plot_colors$mgn
       gry <- private$plot_colors$gry
       background <- private$plot_colors$background
-      tauplot <- tau[Ixbeg:Ixend]
-      taumv <- tau[Ixbeg:(Ixend-1)]
-      zplot <- z[Ixbeg:Ixend]
-      m <- length(tauplot)
+      copyit <- private$flags[[2]]
+      m <- length(tau)
+      Inx <- index(tau,tbeg,tend)
+      Ixbeg <- Inx[[1]]
+      Ixend <- Inx[[2]]
+      if(Ixbeg > 1 || Ixend < m)
+      {
+        tau <- tau[Ixbeg:Ixend]
+        z <- z[Ixbeg:Ixend]
+        m <- length(tau)
+      }
+      taumv <- tau[1:(m-1)]
       # calculate ----
       mean <- vector("double",m-1)
       variance <- vector("double",m-1)
@@ -1200,21 +1109,31 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       {
         for(i in 1:(m-1))
         {
-          mean[i] <- zplot[i]
-          variance[i] <- sigma^2*(tauplot[i+1]-tauplot[i])
+          mean[i] <- z[i]
+          variance[i] <- sigma^2*(tau[i+1]-tau[i])
           if(abs(sigma) < 0.0000000001) { resid[i] <- 0 }
-          else { resid[i] <- (zplot[i+1]-mean[i])/variance[i]^0.5 }
+          else { resid[i] <- (z[i+1]-mean[i])/variance[i]^0.5 }
         }
       }
       else
       {
         for(i in 1:(m-1))
         {
-          mean[i] <- mu+(zplot[i]-mu)*exp(-rho*(tauplot[i+1]-tauplot[i]))
-          variance[i] <- sigma^2/(2*rho)*(1-exp(-2*rho*(tauplot[i+1]-tauplot[i])))
+          mean[i] <- mu+(z[i]-mu)*exp(-rho*(tau[i+1]-tau[i]))
+          variance[i] <- sigma^2/(2*rho)*(1-exp(-2*rho*(tau[i+1]-tau[i])))
           if(abs(sigma) < 0.0000000001) { resid[i] <- 0 }
-          else { resid[i] <- (zplot[i+1]-mean[i])/variance[i]^0.5 }
+          else { resid[i] <- (z[i+1]-mean[i])/variance[i]^0.5 }
         }
+      }
+      # copy ----
+      if(copyit == TRUE)
+      {
+        theta <- private$theta
+        if(is.null(theta)) { theta <- self$LogLikelihood() }
+        names <- names(theta)
+        theta <- unname(theta)
+        clip <- rbind(c("Maximum Likelihood",""),c("Estimates",""),c("File:",dataname),c("Time:",timename),c("State:",statename),c(estimation,""),c(names[1],theta[1]),c(names[2],theta[2]),c(names[3],theta[3]),c(names[4],theta[4]),c(names[5],theta[5]),c(names[6],theta[6]),c(names[7],theta[7]))
+        private$CopyToClipboard(clip)
       }
       # plot ----
       # OUP_ML_Estimates2D
@@ -1225,7 +1144,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       if(labels == TRUE)
       {
         syms <- paste(sep="",bsml,"(",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),")",esml)
-        if(is.null(title)) { title <- estimation }
+        if(is.null(title)) { title <- paste(sep=":  ",dataname,estimation) }
         if(is.null(xaxis)) { xaxis <- paste(sep="",bsym,"<i>t</i>",esym," (",timename,")<br>",syms) }
         else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
       }
@@ -1248,13 +1167,13 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       residline <- list(color=red$e,width=2,dash="dot")
       residmarker <- list(color=red$d,size=6,symbol="x")
       imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_ML_Estimates2D")
-      legendpos <- list(orientation="h",x=1.0,y=1.05,xanchor="right")
+      legendpos <- list(orientation="h",x=0.5,y=1.0,xanchor="center")
       fig <- plot_ly()  %>%
-        add_trace(.,type="scatter",x=tauplot,y=zplot,name="<i>z</i>",mode="markers",marker=zmarker,hoverinfo="x+y") %>%
-        add_trace(.,type="scatter",x=taumv,y=mean,name="<i>G</i>",mode="lines+markers",line=meanline,marker=meanmarker,hoverinfo="x+y") %>%
-        add_trace(.,type="scatter",x=taumv,y=variance,name="<i>H</i><sup>2</sup>",mode="lines+markers",line=varianceline,marker=variancemarker,visible="legendonly",hoverinfo="x+y") %>%
-        add_trace(.,type="scatter",x=taumv,y=resid,name="<i>v</i>",mode="lines+markers",line=residline,marker=residmarker,visible="legendonly",hoverinfo="x+y") %>%
-        config(.,toImageButtonOptions=imageoptions) %>%
+        add_trace(.,type="scattergl",x=tau,y=z,name="<i>z</i>",mode="markers",marker=zmarker) %>%
+        add_trace(.,type="scattergl",x=taumv,y=mean,name="<i>G</i>",mode="lines+markers",line=meanline,marker=meanmarker) %>%
+        add_trace(.,type="scattergl",x=taumv,y=variance,name="<i>H</i><sup>2</sup>",mode="lines+markers",line=varianceline,marker=variancemarker,visible="legendonly") %>%
+        add_trace(.,type="scattergl",x=taumv,y=resid,name="<i>v</i>",mode="lines+markers",line=residline,marker=residmarker,visible="legendonly") %>%
+        config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
         layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
       return(fig)
@@ -1264,21 +1183,24 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
   private = list(
     # private pointers ----
     OUP = NULL,
-    # private input fields ----
+    # private attributes ----
     oup_params = NULL,
-    oup_params_unrestr = NULL,
     oup_params_restr = NULL,
     oup_params_start = NULL,
-    oup_stats = NULL,
     timeseries = NULL,
     timeseries_info = NULL,
     plot_info = NULL,
+    flags = NULL,
     # private output fields ----
-    loglikely = NULL,
+    theta = NULL,
+    theta_l = NULL,
     theta_u = NULL,
     theta_r = NULL,
     goodness = NULL,
     likelyratio = NULL,
+    # private globals ----
+    modebar_2D = NULL,
+    modebar_3D = NULL,
     # private colors ----
     plot_colors = NULL,
     rainbow = function(name,opaque)
@@ -1316,8 +1238,13 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       if(!is.null(input))
       {
         if(is.list(input)) { input <- input[[1]] }
-        if(is.numeric(input[1]) & is.finite(input[1]) & !is.na(input[1])) { sca <- input[1] }
-        else { message(paste(sep="",input," is not a real number:")) }
+        if(is.numeric(input[1]))
+        {
+          input[1] <- as.numeric(input[1])
+          if(!any(is.na(input[1]))) { sca <- input[1] }
+          else { message(paste(sep="",input[1]," is not a real number:")) }
+        }
+        else { message(paste(sep="",input[1]," is not a real number:")) }
       }
       return(sca)
     },
@@ -1330,10 +1257,15 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         OK <- TRUE
         n <- length(input)
         i <- 0
-        while(i < n & OK == TRUE)
+        while(i < n && OK == TRUE)
         {
           i <- i+1
-          if(!is.numeric(input[i]) | is.infinite(input[i]) | is.na(input[i])) { OK <- FALSE }
+          if(is.numeric(input[i]))
+          {
+            input[i] <- as.numeric(input[i])
+            if(any(is.na(input[i]))) { OK <- FALSE }
+          }
+          else { OK <- FALSE}
         }
         if(OK == TRUE)
         {
@@ -1350,11 +1282,18 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       chr <- NULL
       if(!is.null(input))
       {
-        # if(is.list(input)) { input <- input[[1]] }
-        if(is.character(input)) { chr <- input[1] }
-        else { message(paste("non-character input:",input)) }
+        if(is.list(input)) { input <- input[[1]] }
+        if(!is.numeric(input[1])) { chr <- as.character(input[1]) }
+        else { message(paste(sep="",input[1]," is a number.")) }
       }
       return(chr)
+    },
+    extract_integer = function(input)
+    {
+      int <- NULL
+      sca <- extract_scalar(input)
+      if(!is.null(sca)) { int <- as.integer(sca) }
+      return(int)
     },
     extract_boolean = function(input)
     {
@@ -1362,7 +1301,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       if(!is.null(input))
       {
         if(is.list(input)) { input <- input[[1]] }
-        if(input[1] == TRUE | input[1] == FALSE) { bool <- input[1] }
+        if(input[1] == TRUE || input[1] == FALSE) { bool <- input[1] }
         else { message(paste("non-boolean input:",input)) }
       }
       return(bool)
@@ -1384,68 +1323,68 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
               red <- octal2decimal(str_sub(rgb,2,3))
               grn <- octal2decimal(str_sub(rgb,4,5))
               blu <- octal2decimal(str_sub(rgb,6,7))
-              if(!is.null(red) & !is.null(grn) & !is.null(blu)) { clr <- paste(sep="","rgb(",red,",",grn,",",blu,")") }
+              if(!is.null(red) && !is.null(grn) && !is.null(blu)) { clr <- paste(sep="","rgb(",red,",",grn,",",blu,")") }
               else { message("unrecognized hexadecimal color:",rgb)}
             }
             else if(n > 9)
             {
-              if(tolower(str_sub(rgb,1,4)) == "rgb(" & str_sub(rgb,n,n) == ")")
+              if(tolower(str_sub(rgb,1,4)) == "rgb(" && str_sub(rgb,n,n) == ")")
               {
                 OK <- TRUE
                 hit <- FALSE
                 k <- 4
                 j <- k
-                while(OK == TRUE & hit == FALSE & k < n)
+                while(OK == TRUE && hit == FALSE && k < n)
                 {
                   k <- k+1
                   token <- str_sub(rgb,k,k)
-                  if(token == "," | token == ")")
+                  if(token == "," || token == ")")
                   {
                     hit <- TRUE
                     if(k-j == 1) { OK <- FALSE }
                   }
-                  else if(token != "0" & token != "1" & token != "2" & token != "3" & token != "4" & token != "5" & token != "6" & token != "7" & token != "8" & token != "9") { OK <- FALSE }
+                  else if(token != "0" && token != "1" && token != "2" && token != "3" && token != "4" && token != "5" && token != "6" && token != "7" && token != "8" && token != "9") { OK <- FALSE }
                 }
                 if(OK == TRUE)
                 {
                   red <- as.integer(str_sub(rgb,j+1,k-1))
-                  if(red >= 0 & red <= 255)
+                  if(red >= 0 && red <= 255)
                   {
                     hit <- FALSE
                     j <- k
-                    while(OK == TRUE & hit == FALSE & k < n)
+                    while(OK == TRUE && hit == FALSE && k < n)
                     {
                       k <- k+1
                       token <- str_sub(rgb,k,k)
-                      if(token == "," | token == ")")
+                      if(token == "," || token == ")")
                       {
                         hit <- TRUE
                         if(k-j == 1) { OK <- FALSE }
                       }
-                      else if(token != "0" & token != "1" & token != "2" & token != "3" & token != "4" & token != "5" & token != "6" & token != "7" & token != "8" & token != "9") { OK <- FALSE }
+                      else if(token != "0" && token != "1" && token != "2" && token != "3" && token != "4" && token != "5" && token != "6" && token != "7" && token != "8" && token != "9") { OK <- FALSE }
                     }
                     if(OK == TRUE)
                     {
                       grn <- as.integer(str_sub(rgb,j+1,k-1))
-                      if(grn >= 0 & grn <= 255)
+                      if(grn >= 0 && grn <= 255)
                       {
                         hit <- FALSE
                         j <- k
-                        while(OK == TRUE & hit == FALSE & k < n)
+                        while(OK == TRUE && hit == FALSE && k < n)
                         {
                           k <- k+1
                           token <- str_sub(rgb,k,k)
-                          if(token == "," | token == ")")
+                          if(token == "," || token == ")")
                           {
                             hit <- TRUE
                             if(k-j == 1) { OK <- FALSE }
                           }
-                          else if(token != "0" & token != "1" & token != "2" & token != "3" & token != "4" & token != "5" & token != "6" & token != "7" & token != "8" & token != "9") { OK <- FALSE }
+                          else if(token != "0" && token != "1" && token != "2" && token != "3" && token != "4" && token != "5" && token != "6" && token != "7" && token != "8" && token != "9") { OK <- FALSE }
                         }
                         if(OK == TRUE)
                         {
                           blu <- as.integer(str_sub(rgb,j+1,k-1))
-                          if(blu >= 0 & blu <= 255) { clr <- paste(sep="","rgb(",red,",",grn,",",blu,")") }
+                          if(blu >= 0 && blu <= 255) { clr <- paste(sep="","rgb(",red,",",grn,",",blu,")") }
                           else { message(paste("blu in rgb color must be integer from 0 to 255:",rgb)) }
                         }
                         else { message(paste("blu in rgb color must be integer from 0 to 255:",rgb)) }
@@ -1477,7 +1416,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       if(n1 == n2)
       {
         j <- 0
-        while(j < n1 & allequal == TRUE )
+        while(j < n1 && allequal == TRUE )
         {
           j <- j+1
           if(abs(vec1[j]-vec2[j]) > tolerance) { allequal <- FALSE }
@@ -1569,7 +1508,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
               while(i < m)
               {
                 i <- i+1
-                if(is.finite(df[i,1]) & !is.na(df[i,1]) & is.finite(df[i,2]) & !is.na(df[i,2]))
+                if(is.finite(df[i,1]) && !is.na(df[i,1]) && is.finite(df[i,2]) && !is.na(df[i,2]))
                 {
                   ix <- ix+1
                   col1[ix] <- df[i,1]
@@ -1606,1407 +1545,77 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         return(data.frame(tau=NULL,z=NULL))
       }
     },
-    # private calculate methods ----
-    OUPNMStart = function(rhor,mur,sigmar,rhos,mus,sigmas,tau,z)
+    # private plot methods ----
+    index = function(x,beg,end)
     {
-      theta <- vector("double",3)
-      steps <- vector("double",3)
-      m <- length(tau)
-      nk <- 0
-      # sigma
-      if(!is.null(sigmar))
+      n <- length(x)
+      Ixbeg <- 1
+      Ixend <- n
+      if(!is.null(beg))
       {
-        steps[3] <- 0
-        theta[3] <- sigmar
-      }
-      else
-      {
-        steps[3] <- 1
-        nk <- nk+1
-        if(!is.null(sigmas))
-        {
-          theta[3] <- sigmas
-        }
+        if(beg == -Inf) { Ixbeg <- 1 }
+        else if(beg == Inf) { Ixbeg <- n }
         else
         {
-          theta[3] <- 0
-          for(i in 1:(m-1))
+          sca <- private$extract_scalar(beg)
+          if(!is.null(sca))
           {
-            theta[3] <- theta[3]+(z[i+1]-z[i])^2/(tau[i+1]-tau[i])
-          }
-          theta[3] <- (theta[3]/(m-1))^0.5
-        }
-      }
-      # mu
-      if(!is.null(mur))
-      {
-        steps[2] <- 0
-        theta[2] <- mur
-      }
-      else
-      {
-        steps[2] <- 1
-        nk <- nk+1
-        if(!is.null(mus))
-        {
-          theta[2] <- mus
-        }
-        else
-        {
-          theta[2] <- 0
-          for(i in 1:(m-1))
-          {
-            theta[2] <- theta[2]+z[i+1]
-          }
-          theta[2] <- theta[2]/(m-1)
-        }
-      }
-      # rho
-      if(!is.null(rhor))
-      {
-        steps[1] <- 0
-        if(rhor <= 0)
-        {
-          theta[1] <- 0
-          if(steps[2] == 1) { nk <- nk-1 }
-          steps[2] <- 0
-          theta[2] <- 0
-        }
-        else { theta[1] <- rhor }
-      }
-      else
-      {
-        steps[1] <- 1
-        nk <- nk+1
-        if(!is.null(rhos))
-        {
-          if(rhos <= 0) { theta[1] <- 0 }
-          else { theta[1] <- rhos }
-        }
-        else
-        {
-          scalrho <- 0
-          for(i in 1:(m-1))
-          {
-            scalrho <- scalrho+(z[i+1]-theta[2])^2
-          }
-          scalrho <- scalrho/(m-1)
-          if(scalrho > 0) { theta[1] <- theta[3]^2/scalrho/2 }
-          else { theta[1] <- 0 }
-        }
-      }
-      return(list(theta=theta,steps=steps,nk=nk,m=m))
-    },
-    NelderMead = function(theta,steps,tau,z,m)
-    {
-      # algorithm parameters
-      rho <- 1         # reflect
-      epsilon <- 2     # expand
-      mu <- 1.1        # move (not in the usual Nelder-Mead algorithm)
-      chi <- 0.5       # contract
-      sigma <- 0.5     # shrink
-      iota <- 5        # steps increment (not in the usual Nelder-Mead algorithm)
-      # iteration parameters
-      sigdig <- 12
-      cmax <- 9999
-      tensig <- 1/10^sigdig
-      message("Nelder-Mead,    0:0")
-      # cement constant thetas and create index of thetas in the simplex
-      k <- length(theta)
-      Ix <- vector("integer",k)
-      tj <- vector("double",k)
-      tbar <- vector("double",k)
-      tr <- vector("double",k)
-      te <- vector("double",k)
-      tm <- vector("double",k)
-      tc <- vector("double",k)
-      ts <- vector("double",k)
-      nk <- 0
-      for(i in 1:k)
-      {
-        if(steps[i] == 0)
-        {
-          tj[i] <- theta[i]
-          tbar[i] <- theta[i]
-          tr[i] <- theta[i]
-          te[i] <- theta[i]
-          tm[i] <- theta[i]
-          tc[i] <- theta[i]
-          ts[i] <- theta[i]
-        }
-        else
-        {
-          steps[i] <- theta[i]/iota
-          if(steps[i] < 0.1) {steps[i] <- 0.1}
-          nk <- nk+1
-          Ix[nk] <- i
-        }
-      }
-      # outer loop
-      LnL <- -private$OUPNMLnL(tau,z,m,theta)
-      if(nk > 0)
-      {
-        tplex <- matrix(0.0,nk,nk+1)
-        Lplex <- vector("double",nk+1)
-        Lprev <- 1.79769313486231E+308
-        sign <- -1
-        cnt <- 0
-        starts <- 0
-        while(abs(Lprev-LnL) > abs(LnL*tensig) & cnt < cmax)
-        {
-          starts <- starts+1
-          sign <- -1*sign
-          # initial simplex
-          for(i in 1:nk)
-          {
-            tplex[i,1] <- theta[Ix[i]]
-          }
-          Lplex[1] <- LnL
-          for(j in 2:(nk+1))
-          {
-            i <- 0
-            while(i < j-2)
-            {
-              i <- i+1
-              tplex[i,j] <- theta[Ix[i]]
-              tj[Ix[i]] <- tplex[i,j]
-            }
-            tplex[j-1,j] <- theta[Ix[j-1]]+sign*steps[Ix[j-1]]
-            tj[Ix[j-1]] <- tplex[j-1,j]
-            i <- j-1
-            while(i < nk)
-            {
-              i <- i+1
-              tplex[i,j] <- theta[Ix[i]]
-              tj[Ix[i]] <- tplex[i,j]
-            }
-            Lplex[j] <- -private$OUPNMLnL(tau,z,m,tj)
-          }
-          # inner loop
-          tdev <- 1.79769313486231E+308
-          Ldev <- 1.79769313486231E+308
-          while(tdev > tensig & Ldev > tensig & cnt < cmax)
-          {
-            #   minimum and maximum function values
-            Lmin <- Lplex[1]
-            jmin <- 1
-            Lmax <- Lplex[1]
-            jmax <- 1
-            for(j in 2:(nk+1))
-            {
-              if(Lplex[j] < Lmin)
-              {
-                Lmin <- Lplex[j]
-                jmin <- j
-              }
-              else if(Lplex[j] > Lmax)
-              {
-                Lmax <- Lplex[j]
-                jmax <- j
-              }
-            }
-            #  penultimate function value
-            Lpenult <- Lmin
-            for(j in 1:(nk+1))
-            {
-              if(Lpenult < Lplex[j] & Lplex[j] < Lmax)
-              {
-                Lpenult <- Lplex[j]
-              }
-            }
-            #   calculate centroid of all but Lmax
-            for(i in 1:nk)
-            {
-              tbar[Ix[i]] <- 0
-              j <- 0
-              while(j < jmax-1)
-              {
-                j <- j+1
-                tbar[Ix[i]] <- tbar[Ix[i]]+tplex[i,j]
-              }
-              j <- jmax
-              while(j < nk+1)
-              {
-                j <- j+1
-                tbar[Ix[i]] <- tbar[Ix[i]]+tplex[i,j]
-              }
-              tbar[Ix[i]] <- tbar[Ix[i]]/nk
-            }
-            Lbar <- -private$OUPNMLnL(tau,z,m,tbar)
-            #    calculate reflection of Lmax
-            for(i in 1:nk)
-            {
-              tr[Ix[i]] <- tbar[Ix[i]]+rho*(tbar[Ix[i]]-tplex[i,jmax])
-            }
-            Lr <- -private$OUPNMLnL(tau,z,m,tr)
-            #    expansion
-            if(Lr < Lmin)
-            {
-              for (i in 1:nk)
-              {
-                te[Ix[i]] <- tbar[Ix[i]]+epsilon*(tr[Ix[i]]-tbar[Ix[i]])
-              }
-              Le <- -private$OUPNMLnL(tau,z,m,te)
-              if(Le < Lr)
-              {
-                for(i in 1:nk)
-                {
-                  tplex[i,jmax] <- te[Ix[i]]
-                }
-                Lplex[jmax] <- Le
-              }
-              else
-              {
-                for(i in 1:nk)
-                {
-                  tplex[i,jmax] <- tr[Ix[i]]
-                }
-                Lplex[jmax] <- Lr
-              }
-            }
-            #    reflection
-            else if(Lmin <= Lr & Lr < Lpenult)
-            {
-              for(i in 1:nk)
-              {
-                tplex[i,jmax] <- tr[Ix[i]]
-                tm[Ix[i]] <- tbar[Ix[i]]+mu*(tplex[i,jmin]-tbar[Ix[i]])
-              }
-              Lplex[jmax] <- Lr
-              #    move minimum
-              Lm <- -private$OUPNMLnL(tau,z,m,tm)
-              if(Lm < Lplex[jmin])
-              {
-                for(i in 1:nk)
-                {
-                  tplex[i,jmin] <- tm[Ix[i]]
-                }
-                Lplex[jmin] <- Lm
-              }
-            }
-            #    outside contraction
-            else if(Lr < Lmax)
-            {
-              for(i in 1:nk)
-              {
-                tc[Ix[i]] <- tbar[Ix[i]]+chi*(tr[Ix[i]]-tbar[Ix[i]])
-              }
-              Lc <- -private$OUPNMLnL(tau,z,m,tc)
-              if(Lc < Lr)
-              {
-                for(i in 1:nk)
-                {
-                  tplex[i,jmax] <- tc[Ix[i]]
-                }
-                Lplex[jmax] <- Lc
-              }
-              #   shrink
-              else
-              {
-                j <- 0
-                while(j < jmin-1)
-                {
-                  j <- j+1
-                  for(i in 1:nk)
-                  {
-                    ts[Ix[i]] <- tplex[i,jmin]+sigma*(tplex[i,j]-tplex[i,jmin])
-                    tplex[i,j] <- ts[Ix[i]]
-                  }
-                  Lplex[j] <- -private$OUPNMLnL(tau,z,m,ts)
-                }
-                j <- jmin
-                while(j < nk+1)
-                {
-                  j <- j+1
-                  for(i in 1:nk)
-                  {
-                    ts[Ix[i]] <- tplex[i,jmin]+sigma*(tplex[i,j]-tplex[i,jmin])
-                    tplex[i,j] <- ts[Ix[i]]
-                  }
-                  Lplex[j] <- -private$OUPNMLnL(tau,z,m,ts)
-                }
-              }
-            }
-            #    inside contraction
+            if(sca < x[1]) { Ixbeg <- 1 }
+            else if(sca > x[n]) { Ixbeg <- n }
             else
             {
-              for(i in 1:nk)
-              {
-                tc[Ix[i]] <- tbar[Ix[i]]+chi*(tplex[i,jmax]-tbar[Ix[i]])
-              }
-              Lc <- -private$OUPNMLnL(tau,z,m,tc)
-              if(Lc < Lmax)
-              {
-                for(i in 1:nk)
-                {
-                  tplex[i,jmax] <- tc[Ix[i]]
-                }
-                Lplex[jmax] <- Lc
-              }
-              #   shrink
-              else
-              {
-                j <- 0
-                while(j < jmin-1)
-                {
-                  j <- j+1
-                  for(i in 1:nk)
-                  {
-                    ts[Ix[i]] <- tplex[i,jmin]+sigma*(tplex[i,j]-tplex[i,jmin])
-                    tplex[i,j] <- ts[Ix[i]]
-                  }
-                  Lplex[j] <- -private$OUPNMLnL(tau,z,m,ts)
-                }
-                j <- jmin
-                while(j < nk+1)
-                {
-                  j <- j+1
-                  for(i in 1:nk)
-                  {
-                    ts[Ix[i]] <- tplex[i,jmin]+sigma*(tplex[i,j]-tplex[i,jmin])
-                    tplex[i,j] <- ts[Ix[i]]
-                  }
-                  Lplex[j] <- -private$OUPNMLnL(tau,z,m,ts)
-                }
-              }
-            }
-            #   deviations
-            tdev <- 0
-            Ldev <- 0
-            for(j in 1:(nk+1))
-            {
-              for(i in 1:nk)
-              {
-                if(abs((tplex[i,j]-tbar[Ix[i]])/steps[Ix[i]]) > tdev)
-                {
-                  tdev <- abs((tplex[i,j]-tbar[Ix[i]])/steps[Ix[i]])
-                }
-              }
-              if(abs(Lplex[j]/Lbar-1) > Ldev)
-              {
-                Ldev <- abs(Lplex[j]/Lbar-1)
-              }
-            }
-            nstarts <- str_length(as.integer(starts))
-            ncnt <- str_length(as.integer(cnt))
-            back <- strrep("\b",nstarts+ncnt+2)
-            cnt <- cnt+1
-            message(paste(sep="",back,starts,":",cnt))
-          }
-          # new minimum
-          Lprev <- LnL
-          for(i in 1:nk)
-          {
-            theta[Ix[i]] <- tplex[i,jmin]
-            steps[Ix[i]] <- theta[Ix[i]]/iota
-            if(steps[i]< 0.1) {steps[i] <- 0.1}
-          }
-          LnL <- Lplex[jmin]
-        }
-      }
-      LnL <- -LnL
-      return(list(theta=theta,lnL=LnL))
-    },
-    OUPNMLnL = function(tau,z,m,theta)
-    {
-      LnL <- 0
-      if(abs(theta[3]) < 0.00001) { theta[3] <- 0.000001 }
-      if(abs(theta[1]) < 0.0000000001)
-      {
-        for(i in 1:(m-1))
-        {
-          mean <- z[i]
-          variance <- theta[3]^2*(tau[i+1]-tau[i])
-          lnu <- -0.5*log(2*3.14159265358979*variance)
-          v <- 0.5*(z[i+1]-mean)^2/variance
-          LnL <- LnL+lnu-v
-        }
-      }
-      else
-      {
-        for(i in 1:(m-1))
-        {
-          mean <- theta[2]+(z[i]-theta[2])*exp(-theta[1]*(tau[i+1]-tau[i]))
-          variance <- theta[3]^2/(2*theta[1])*(1-exp(-2*theta[1]*(tau[i+1]-tau[i])))
-          lnu <- -0.5*log(2*3.14159265358979*variance)
-          v <- 0.5*(z[i+1]-mean)^2/variance
-          LnL <- LnL+lnu-v
-        }
-      }
-      return(LnL)
-    },
-    OUPLogLikelihood = function(tau,z,rho,mu,sigma)
-    {
-      if(abs(sigma) < 0.000001) { sigma <- 0.000001 }
-      if(abs(rho) < 0.0000000001)
-      {
-        loglikelihood <- 0
-        m <- length(tau)
-        for(i in 1:(m-1))
-        {
-          mean <- z[i]
-          variance <- sigma^2*(tau[i+1]-tau[i])
-          lnu <- -0.5*log(2*3.14159265358979*variance)
-          v <- 0.5*(z[i+1]-mean)^2/variance
-          loglikelihood <- loglikelihood+lnu-v
-        }
-      }
-      else
-      {
-        loglikelihood <- 0
-        m <- length(tau)
-        for(i in 1:(m-1))
-        {
-          mean <- mu+(z[i]-mu)*exp(-rho*(tau[i+1]-tau[i]))
-          variance <- sigma^2/(2*rho)*(1-exp(-2*rho*(tau[i+1]-tau[i])))
-          lnu <- -0.5*log(2*3.14159265358979*variance)
-          v <- 0.5*(z[i+1]-mean)^2/variance
-          loglikelihood <- loglikelihood+lnu-v
-        }
-      }
-      return(loglikelihood)
-    },
-    GammaComplete = function(a)
-    {
-      # small to medium a
-      if(a < 50)
-      {
-        # split a into integer portion, p, and remainder, r
-        p <- floor(a)
-        r <- a - p
-        # check for a equal to zero or negative integer
-        if(r == 0 & p < 1) { gamma <- NaN }
-        else
-        {
-          # special cases
-          if(2*a-floor(2*a) == 0)
-          {
-            if(r == 0)
-            {
-              gamma <- 1
+              hit <- FALSE
               j <- 0
-              while(p-1-j > 1e-15)
+              while(j < n && hit == FALSE)
               {
                 j <- j+1
-                gamma <- gamma*j
+                if(sca <= x[j])
+                {
+                  hit <- TRUE
+                  Ixbeg <- j
+                }
               }
             }
+          }
+          else { message("beg not set.") }
+        }
+      }
+      if(!is.null(end))
+      {
+        if(end == Inf) { Ixend <- n }
+        else if(end == -Inf) { Ixend <- Ixbeg }
+        else
+        {
+          sca <- private$extract_scalar(end)
+          if(!is.null(sca))
+          {
+            if(sca > x[n]) { Ixend <- n }
+            else if(sca < x[Ixbeg]) { Ixend <- Ixbeg }
             else
             {
-              gamma <- 1.77245385090552
-              if(a > 0)
+              hit <- FALSE
+              j <- n+1
+              while(j > 1 && hit == FALSE)
               {
-                j <- -0.5
-                while(p-0.5-j > 1e-15)
+                j <- j-1
+                if(sca >= x[j])
                 {
-                  j <- j+1
-                  gamma <- gamma*j
-                }
-              }
-              else
-              {
-                j <- 0.5
-                while(j-(p+0.5) > 1e-15)
-                {
-                  j <- j-1
-                  gamma <- gamma/j
+                  hit <- TRUE
+                  Ixend <- j
                 }
               }
             }
           }
-          # other cases
-          else
-          {
-            sigdig <- 15
-            cmax <- 2000
-            # confluent hypergeometric in well-behaved region 1 < r < 2
-            dgm <- 1
-            gm <- dgm
-            cnt <- 0
-            while(cnt < cmax & 10^sigdig*dgm >= gm)
-            {
-              cnt <- cnt+1
-              dgm <- dgm*199/(r+1+cnt)
-              gm <- gm+dgm
-            }
-            gm <- 199^(r+1)/(r+1)*exp(-199)*gm
-            # factorial calculations (gm is gamma of r+1)
-            j <- r
-            while(p-1+r-j > 1e-15)
-            {
-              j <- j+1
-              gm <- gm*j
-            }
-            j <- 1+r
-            while(j-(p+r) > 1e-15)
-            {
-              j <- j-1
-              gm <- gm/j
-            }
-            gamma <- gm
-          }
+          else { message("end not set.") }
         }
       }
-      else
-      {
-        gamma <- exp(GammaLn(a))
-      }
-      return(gamma)
+      return(list(Ixbeg=Ixbeg,Ixend=Ixend))
     },
-    GammaLn = function(a)
+    # private clipboard methods ----
+    CopyToClipboard = function(clip)
     {
-      # positive a
-      if(a <= 0) { gammaln <- NaN }
-      # ln of GammaComplete for small to medium a
-      else if(a < 50) { gammaln <- log(GammaComplete(a)) }
-      # Poincaire expansion
-      else
-      {
-        B2k <- vector("double",16)
-        # absolute value of Bernoulli numbers (they alternate in sign)
-        B2k[1] <- 0.166666666666667
-        B2k[2] <- 3.33333333333333E-02
-        B2k[3] <- 2.38095238095238E-02
-        B2k[4] <- 3.33333333333333E-02
-        B2k[5] <- 7.57575757575758E-02
-        B2k[6] <- 0.253113553113553
-        B2k[7] <- 1.16666666666667
-        B2k[8] <- 7.0921568627451
-        B2k[9] <- 54.9711779448622
-        B2k[10] <- 529.124242424242
-        B2k[11] <- 6192.1231884058
-        B2k[12] <- 86580.2531135531
-        B2k[13] <- 1425517.16666667
-        B2k[14] <- 27298231.0678161
-        B2k[15] <- 601580873.900642
-        B2k[16] <- 15116315767.0922
-        gammaln <- (a-0.5)*log(a)-a+0.918938533204673
-        k <- 0
-        while(k < 15)
-        {
-          k <- k+1
-          dgm <- log(B2k[k])-log(2*k*(2*k-1))-(2*k-1)*log(a)
-          gammaln <- gammaln+exp(dgm)
-          k <- k+1
-          dgm <- log(B2k[k])-log(2*k*(2*k-1))-(2*k-1)*log(a)
-          gammaln <- gammaln-exp(dgm)
-        }
-      }
-      return(gammaln)
-    },
-    GammaSmallRatio = function(a,x)
-    {
-      # zero or negative a
-      if(a <= 0) { gammaratio <- NaN }
-      # degenerate solution
-      else if(x <= 0) { gammaratio <- 0 }
-      # series expansion using logs
-      else
-      {
-        s <- 15
-        n <- 30000
-        lnx <- log(x)
-        sumlnxlna <- 0
-        dgm <- 1
-        gm <- dgm
-        i <- 1
-        while(10^s*dgm >= gm & i <= n)
-        {
-          lnxlna <- lnx-log(i+a)
-          sumlnxlna <- sumlnxlna+lnxlna
-          dgm <- exp(sumlnxlna)
-          gm <- gm+dgm
-          i <- i+1
-        }
-        lngm <- -log(a)+a*lnx-x+log(gm)-GammaLn(a)
-        if(lngm <= -27.6310211159285) { gammaratio <- 0 }
-        else if(lngm >= -1e-12) { gammaratio <- 1 }
-        else { gammaratio <- exp(lngm) }
-      }
-      return(gammaratio)
-    },
-    GammaBigRatio = function(a,x)
-    {
-      # zero or negative a
-      if(a <= 0) { gammaratio <- NaN }
-      # degenerate solution
-      else if(x <= 0) { gammaratio <- 1 }
-      # by subtraction
-      else { gammaratio <- 1-GammaSmallRatio(a, x) }
-      return(gammaratio)
+      if(!is.null(private$OUP)) { OUP$CopyToClipboard(clip) }
+      else if(interactive() && clipr_available()) { write_clip(clip,row.names=FALSE,col.names=FALSE,quote=FALSE) }
     }
- )
-  # class end ----
+  )
 )
-# data roxygen ----
-
-#' My data for the Ornstein-Uhlenbeck Process
-#'
-#' Data to estimate parameters, rho, mu and sigma, where rho is the rate of convergence,
-#'  mu is the location and sigma is the scale.
-#'
-#' \itemize{
-#'   \item tau: time variable
-#'   \item z: state variable
-#' }
-#'
-#' The data must be in a .csv (Comma Separated Values) file.  The first column should
-#'  be times and the second column should be states of nature.  There can be more columns
-#'  for times and states if you wish.  There can be blank entries.  The data will be
-#'  cleaned and sorted by time before it is used.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name MyData
-#' @format csv file with at least 3 rows and 2 columns
-NULL
-
-#' Rates of convergence for the Ornstein-Uhlenbeck Process
-#'
-#' Monte-Carlo simulation to demonstrate different rates of convergence, rho.
-#'
-#' \itemize{
-#'   \item year: time variable in annual increments for all sample paths
-#'   \item z1-z5: sample paths in sets of three, each set with the same pseudo-random shocks but different rates of convergence
-#' }
-#'
-#' The rate of convergence, rho, determines the probability distribution of the
-#'  estimated parameters and the correlation between two sets of parameters in
-#'  hypothesis tests.  Small rho tends toward Brownian Motion, which does not
-#'  converge.  Large rho tends toward a stationary or ergodic process which has
-#'  converged every time it is observed.  In between is an Ornstein-Uhlenbeck
-#'  Process which converges but has not yet converged.
-#'
-#' Parameters for Browian Motion have an Erlang distribution.  Parameters for
-#'  a stationary or ergodic process have a Chi^2 distribution.  These distributions
-#'  are special cases of a Gamma distribution.  In general, parameters for the
-#'  Ornstein-Uhlenbeck Process have a Gamma distribution.
-#'
-#' The shape parameter, alpha, identifies the distribution with 0.5 <= alpha <=1. Chi^2
-#'  has alpha = 0.5.  Erlang has alpha = 1.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name OUP_Convergence
-#' @format csv file with 177 rows and 16 columns
-NULL
-
-#' Observation intervals of different lengths and the Ornstein-Uhlenbeck Process
-#'
-#' Monte Carlo simulation to demonstrate that observations are never 'missing'.
-#'
-#' \itemize{
-#'   \item Day: time variable in days
-#'   \item Equal: sample paths with equal observation intervals
-#'   \item Unequal: sample paths with unequal observation intervals
-#'   \item Average: sample paths filled in with the average of states of nature
-#'   \item Means: sample paths filled in with Means
-#'   \item Year: time variable as decimal year
-#' }
-#'
-#' An observation consists of the initial state, the initial time, the terminal state
-#'  and the terminal time.  The terminal time minus the initial time can differ among
-#'  observations because each observation has its own mean and variance.  Longer
-#'  observation intervals have smaller means and larger variances but, otherwise,
-#'  parameters estimated from unequal observation intervals are statistically
-#'  equivalent to parameters estimated from equal intervals.
-#'
-#' The usual time-series methods are special cases of estimating the Ornstein-Uhlenbeck
-#'  Process.  They estimate location, mu, and scale, sigma, but not the rate of
-#'  convergence, rho.  They eliminate rho by assuming weak stationarity.  The mean of
-#'  each observation is assumed to have converged and lost its connection to its
-#'  initial state.  The variance of each observation does not depend upon an initial
-#'  state and may still be converging.  Observations will have equal variances if
-#'  observation intervals are equal.
-#'
-#' For the Ornstein-Uhlenbeck Process, variances converge twice as fast as means.
-#'  If variances are still converging, so are means.  Observations over equal time
-#'  intervals will have equal variances but different means.  In other words, weak
-#'  stationarity does not exist.  Any assumption of stationarity is strong stationarity
-#'  in which both the means and variances have converged.
-#'
-#' Stationarity is an hypothesis to test, not an assumption to impose.  Goodness
-#'  of fit for the Ornstein-Uhlenbeck Process tests for stationarity, and also
-#'  for the other extreme of Brownian Motion.
-#'
-#' If you have a time series with measurements at sporadic times, don't fill in for
-#'  observations that aren't missing.  If you must, first estimate the parameters.
-#'  Then use the parameters to calculate means for the times of your choosing.
-#'  Means are the maximum likelihood estimates of unobserved states of nature.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name OUP_NotMissing
-#' @format csv file with 366 rows and 6 columns
-NULL
-
-#' Observation intervals and the Ornstein-Uhlenbeck Process
-#'
-#' Monte-Carlo simulation to demonstrate the effect of the observation interval on the
-#'  rate of convergence, rho, and the scale, sigma.
-#'
-#' \itemize{
-#'   \item Day: time variable in daily increments
-#'   \item z: sample paths with daily observations
-#'   \item Year: time variable as decimal year
-#' }
-#'
-#' Observation intervals are measured in two different units:  days and years.
-#'
-#' Both sets of estimates have the same rho(t-s), where rho is the rate of convergence and
-#'  t-s is the observation interval.  For observation intervals measured in days, t-s=1 and
-#'  rho=1/2.  For observation intervals measured in years, t-s=1/365 and rho=365/2.  Location
-#'   parameter, mu, is the same in both sets of estimates.  Scale parameter, sigma, is larger
-#'   if rho is larger because the asymptotic variance, sigma^2/2rho, is the same in both sets
-#'   of estimates.  If rho is 365 times bigger, sigma is 365^0.5 = 19.105 times bigger.
-#'
-#' Because rho(t-s) is the same, alpha = 0.5(1+exp(-rho(t-s))) is also the same, where alpha
-#'  identifies the probability distribution of the estimates.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name OUP_ObservationInterval
-#' @format csv file with 366 rows and 3 columns
-NULL
-
-#' Sample sizes for the Ornstein-Uhlenbeck Process
-#'
-#' Monte-Carlo simulation to demonstrate the effect of sample size on discovering the
-#'  parameters of the Ornstein-Uhlenbeck Process.
-#'
-#' \itemize{
-#'   \item year: time variable in annual increments for all sample paths
-#'   \item small: 5 observations
-#'   \item medium: 50 observations
-#'   \item large: 500 observations
-#' }
-#'
-#' The first 5 and the first 50 observations are the same as those of 500 simulated
-#'  observations.  More observations get closer to the true parameters of rho=0.5,
-#'  mu=15 and sigma=50.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name OUP_SampleSize
-#' @format csv file with 501 rows and 4 columns
-NULL
-
-#' Smoothed sample paths for the Ornstein-Uhlenbeck Process
-#'
-#' Monte Carlo simulation to demonstrate the effect of smoothing on parameter estimates.
-#'
-#' \itemize{
-#'   \item year: time variable in annual increments
-#'   \item Data: simulated sample path
-#'   \item G uno-G nueve: nine successively smoother paths
-#' }
-#'
-#' Simulated data is smoothed ten times.  First, the parameters are estimated
-#'  and the means calculated for each observation. Then the calculated means
-#'  are used, as if they are data, in a subsequent estimation. Means are
-#'  calculated again and used in the next estimation and so on ten times.
-#'  The true rate of convergence, rho, and location, mu, are recovered from
-#'  each estimation, but the scale, sigma, goes toward zero.
-#'
-#' By the eighth smoothing, the log of the likelihood becomes positive. Hence,
-#'  the likelihood, as the anti-log, becomes greater than one. In other words,
-#'  if the eighth and ninth smoothings were real samples, the probability of
-#'  observing them would be greater than 100%. Further smoothings would increase
-#'  this probability.  A small sigma is a tell-tale sign the data has been smoothed.
-#'  A positive log likelihood is a sure sign.
-#'
-#' This is the best possible smoothing method. The model used for the smoothing
-#'  is consistent with the data. Surprisingly, hypothesis tests and decision
-#'  thresholds are not greatly affected.  However, passage times are calculated
-#'  to be much larger and are completely unreliable.
-#'
-#' The best possible smoothing is unlikely. Any model used to smooth the data is
-#'  probably not the Ornstein-Uhlenbeck Process.  The estimates will be wrong
-#'  and the actual system will be much more uncertain. How much more uncertain
-#'  is uncertain.
-#'
-#' Always use the raw data.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name OUP_SmoothedData
-#' @format csv file with 177 rows and 11 columns
-NULL
-
-#' Water in Farm Dams in the Riverina of New South Wales
-#'
-#' Stock water management to improve drought resilience in intensive-use grazing landscapes.
-#'
-#' \itemize{
-#'   \item Run Days: time variable in daily increments
-#'   \item Baseline: water volumes in cubic metres without a windbreak
-#'   \item TwentyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 20%
-#'   \item FortyPct scenario: water volumes in cubic metres with a windbreak to suppress evaporation by 40%
-#' }
-#'
-#' MatLab simulated water volumes for a 4,000 cubic metre dam.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_NSW_FarmDamsRiverina
-#' @format csv file with 19313 rows and 4 columns
-#' @author Helena Clayton, Sally Thompson, Tim Capon, Greg Hertzler, Philip Graham, and David Lindenmayer, 2026
-#' @source corresponding author: Tim Capon \email{tim.capon.csiro.au}
-NULL
-
-#' Farm Adaptation at Cootamundra, New South Wales
-#'
-#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item CWWCWW GM: Gross margins per hectare for CWWCWW rotation
-#'   \item CWWSSS GM: Gross margins per hectare for CWWSSS rotation
-#'   \item SSSSC GM: Gross margins per hectare for SSSSC rotation
-#'   \item S GM: Gross margins per hectare for continuous S
-#' }
-#'
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_NSW_GMCootamundra
-#' @format csv file with 50 rows and 5 columns
-#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
-#' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
-NULL
-
-#' Farm Adaptation at Narrendera, New South Wales
-#'
-#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item CWWCWW GM: Gross margins per hectare for CWWCWW rotation
-#'   \item CWWSSS GM: Gross margins per hectare for CWWSSS rotation
-#'   \item SSSSC GM: Gross margins per hectare for SSSSC rotation
-#'   \item S GM: Gross margins per hectare for continuous S
-#' }
-#'
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_NSW_GMNarrendera
-#' @format csv file with 50 rows and 5 columns
-#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
-#' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
-NULL
-
-#' Farm Adaptation at Temora, New South Wales
-#'
-#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item CWWCWW GM: Gross margins per hectare for CWWCWW rotation
-#'   \item CWWSSS GM: Gross margins per hectare for CWWSSS rotation
-#'   \item SSSSC GM: Gross margins per hectare for SSSSC rotation
-#'   \item S GM: Gross margins per hectare for continuous S
-#' }
-#'
-#' APSIM generated gross margins for wheat (W), canola (C) and sheep (S).
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_NSW_GMTemora
-#' @format csv file with 50 rows and 5 columns
-#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
-#' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
-NULL
-
-#' Soil Health with Stubble Management
-#'
-#' CSIRO Harden Long-Term Tillage Experiment. v3. CSIRO. Data Collection.
-#'
-#' \itemize{
-#'   \item Year: time variable in sporadic increments
-#'   \item N Burn: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble burning
-#'   \item N Bash: kilograms per hectare of mineral soil nitrogen in the soil profile from 0 to 160 millimetres with stubble bashing
-#'   \item W Burn: millimetres of water in the soil profile from 0 to 160 millimetres with stubble burning
-#'   \item W Bash: millimetres of water in the soil profile from 0 to 160 millimetres with stubble bashing
-#' }
-#'
-#' Soil nitrogen and water in the top 160 millimetres.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_NSW_SoilHealthHarden
-#' @format csv file with 30 rows and 5 columns
-#' @author Kirkegaard, John; & Lilley, Julianne, 2023
-#' @source https://doi.org/10.25919/2jqe-mz45
-NULL
-
-#' Farm Adaptation at Clare, South Australia
-#'
-#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item Annual rain: Annual rainfall in millimetres
-#'   \item Apr-Oct rain: Growing season rainfall in millimetres
-#'   \item Wheat Yld: Wheat yield in tonnes per hectare
-#'   \item Sheep DSE: Dry-sheep equivalents per hectare
-#'   \item Wheat GM: Wheat gross margins per hectare
-#'   \item Sheep GM: Sheep gross margins per hectare
-#' }
-#'
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_SA_GMClare
-#' @format csv file with 108 rows and 7 columns
-#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
-#' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
-NULL
-
-#' Farm Adaptation at Hawker, South Australia
-#'
-#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item Annual rain: Annual rainfall in millimetres
-#'   \item Apr-Oct rain: Growing season rainfall in millimetres
-#'   \item Wheat Yld: Wheat yield in tonnes per hectare
-#'   \item Sheep DSE: Dry-sheep equivalents per hectare
-#'   \item Wheat GM: Wheat gross margins per hectare
-#'   \item Sheep GM: Sheep gross margins per hectare
-#' }
-#'
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_SA_GMHawker
-#' @format csv file with 108 rows and 7 columns
-#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
-#' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
-NULL
-
-#' Farm Adaptation at Orroroo, South Australia
-#'
-#' Will primary producers continue to adjust practices and technologies, change production systems or transform their industry – An application of real options.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item Annual rain: Annual rainfall in millimetres
-#'   \item Apr-Oct rain: Growing season rainfall in millimetres
-#'   \item Wheat Yld: Wheat yield in tonnes per hectare
-#'   \item Sheep DSE: Dry-sheep equivalents per hectare
-#'   \item Wheat GM: Wheat gross margins per hectare
-#'   \item Sheep GM: Sheep gross margins per hectare
-#' }
-#'
-#' APSIM generated Wheat yields and manually simulated dry-sheep equivalents.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_SA_GMOrroroo
-#' @format csv file with 108 rows and 7 columns
-#' @author Greg Hertzler, Todd Sanderson, Tim Capon, Peter Hayman, Ross Kingwell, Anthea McClintock, Jason Crean and Alan Randall, 2013
-#' @source https://nccarf.edu.au/will-primary-producers-continue-adjust-practices-and-technologies-change-production/
-NULL
-
-#' Long Term Crop Rotations, South Australia
-#'
-#' Waite Permanent Rotation Trial. v4. CSIRO. Data Collection.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item Plt 1-2 WF W: Wheat Fallow rotation, Wheat yields in kilograms per hectare
-#'   \item Plt 3-4 WPe W: Wheat Peas rotation, Wheat yields in kilograms her hectare
-#'   \item Plt 3-4 WPe Pe: Wheat Peas rotation, Pea yield in kilograms per hectare
-#'   \item Plt 5-7 WPF W: Wheat Pasture Fallow rotation, Wheat yield in kilograms per hectare
-#'   \item Plt 5-7 WPF P: Wheat Pasture Fallow rotation, Pasture dry matter in kilograms per hectare
-#'   \item Plt 8-10 WOF W: Wheat Oats Fallow rotation, Wheat yield in kilograms per hectare
-#'   \item Plt 8-10 WOF O: Wheat Oats Fallow rotation, Oat yield in kilograms per hectare
-#'   \item Plt 11-16 WWPPPP W: Wheatx2 Pasturex4 rotation, Wheat yield in kilograms per hectare
-#'   \item Plt 11-16 WWPPPP P: Wheatx2 Pasturex4 rotation, Pasture dry matter in kilograms per hectare
-#'   \item Plt 17 W W: continuous Wheat, Wheat yield in kilograms per hectare
-#'   \item Plt 18-20 WPP W: Wheat Pasturex2 rotation, Wheat yield in kilograms per hectare
-#'   \item Plt 18-20 WPP P: Wheat Pasturex2 rotation, Pasture dry matter in kilograms per hectare
-#'   \item Plt 21-23 WBPe W: Wheat Barley Peas rotation, Wheat yield in kilograms per hectare
-#'   \item Plt 21-23 WBPe B: Wheat Barley Peas rotation, Barley yield in kilograms per hectare
-#'   \item Plt 21-23 WBPe Pe: Wheat Barley Peas rotation, Pea yield in kilograms per hectare
-#'   \item Plt 24-27 WOPF W: Wheat Oats Pasture Fallow rotation, Wheat yield in kilograms per hectare
-#'   \item Plt 24-27 WOPF O: Wheat Oats Pasture Fallow rotation, Oat yield in kilograms per hectare
-#'   \item Plt 24-27 WOPF P: Wheat Oats Pasture Fallow rotation, Pasture dry matter in kilograms per hectare
-#'   \item Plt 28-29 P P: continuous Pasture, Pasture dry matter in kilograms per hectare
-#'   \item Plt 30-33 WPPF W: Wheat Pasturex2 Fallow rotation, Wheat yield in kilograms per hectare
-#'   \item Plt 30-33 WPPF W: Wheat Pasturex2 Fallow rotation, Pasture dry matter in kilograms per hectare
-#'   \item Plt 34-35 WF W: Wheat Fallow rotation, Wheat yield in kilograms per hectare
-#'   \item Annual Rain: Annual rainfall in millimetres
-#'   \item Apr-Oct Rain: April through October rainfall in millimetres
-#'   \item Plt 1 WF Carbon: Wheat Fallow rotation, Carbon in milligrams per hectare
-#'   \item Plt 10 WOF Carbon: Wheat Oats Fallow rotation, Carbon in milligrams per hectare
-#'   \item Plt 13 WWPPPP Carbon: Wheatx2 Pasturex4 rotation, Carbon in milligrams per hectare
-#'   \item Plt 17 W Carbon: continuous Wheat, Carbon in milligrams per hectare
-#'   \item Plt 29 P Carbon: continuous Pasture, Carbon in milligrams per hectare
-#' }
-#'
-#' Experimental crop yields and pasture dry matter for permanent rotations from 1925 to 1993.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_SA_WaiteRotationTrial
-#' @format csv file with 70 rows and 30 columns
-#' @author Sanderman, Jonathan; David, Rakesh; Moore, Andrew; Keith, Heather; & Farquharson, Ryan, 2015
-#' @source https://doi.org/10.4225/08/55E5165EC0D29
-NULL
-
-#' Tree shelter belts in Tasmania
-#'
-#' CSIRO Perennial Prosperity Project.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item With trees: sheep gross margins per paddock with tree shelter belt
-#'   \item Without trees: sheep gross margins per paddock without tree shelter belt
-#' }
-#'
-#' Simulated effects of shelter belts with prices and costs for sheep production.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Agric_Tas_TreeShelterBelts
-#' @format csv file with 52 rows and 3 columns
-#' @author Tim Capon, Daniel Mendham, 2024
-#' @source corresponding author, Tim Capon \email{tim.capon@csiro.au}
-NULL
-
-#' Price of Carbon
-#'
-#' European Union Emission Trading System
-#'
-#' \itemize{
-#'   \item Year: time variable as decimal year
-#'   \item Open: Price at market open in EUR/tonne
-#'   \item High: Daily high price in EUR/tonne
-#'   \item Low: Daily low price in EUR/tonne
-#'   \item Close: Price at market close in EUR/tonne
-#'   \item Day: time variable in days since 1 January 2021
-#' }
-#'
-#' Daily price of Carbon Permits from 1 January 2021 to 31 December 2025
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Climate_CarbonCredits_EECXM
-#' @format csv file with 1519 rows and 6 columns
-#' @source https://seekingalpha.com/symbol/EECXM
-NULL
-
-#' Sea Level at Port Kembla
-#'
-#' Australian Baseline Sea Level Monitoring Project.
-#'
-#' \itemize{
-#'   \item Day in 2023: time variable in hourly increments
-#'   \item Sea Level: metres above Tide Gauge Zero
-#'   \item Water Temperature: degrees Celsius
-#'   \item Air Temperature: degrees Celsius
-#'   \item Barometric Pressure: hPa
-#' }
-#'
-#' Sea levels above Tide Guage Zero for 2023.
-#'
-#' This is radically smoothed data.  Do not use this data for decisions under uncertainty.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Climate_SeaLevel_PortKembla
-#' @format csv file with 7985 rows and 5 columns
-#' @author Bureau of Meteorology
-#' @source http://www.bom.gov.au/oceanography/projects/abslmp/data/data.shtml
-NULL
-
-#' Sunspot Numbers
-#'
-#' International Sunspot Number V2.0.
-#'
-#' \itemize{
-#'   \item DecimalYear: time variable in daily increments
-#'   \item Average: Simple average of the daily total sunspot number over all days of each calendar month.
-#' }
-#'
-#' Sunspot numbers and groups of sunspot numbers, averaged by month.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Climate_Sunspots
-#' @format csv file with 3316 rows and 2 columns
-#' @author Royal Observatory of Belgium
-#' @source https://doi.org/10.24414/qnza-ac80
-NULL
-
-#' Maximum daily temperatures at Cape Otway
-#'
-#' Climate Data Online
-#'
-#' \itemize{
-#'   \item Year: time variable in daily increments
-#'   \item Max: maximum temperature in degrees centigrade
-#' }
-#'
-#' Raw (unhomogenized) data.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Climate_TempsMax_CapeOtway
-#' @format csv file with 8888 rows and 2 columns
-#' @author Bureau of Meteorology
-#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 090015
-NULL
-
-#' Maximum daily temperatures at Darwin
-#'
-#' Climate Data Online
-#'
-#' \itemize{
-#'   \item Year: time variable in daily increments
-#'   \item Max: maximum temperature in degrees centigrade
-#' }
-#'
-#' Raw (Unhomogenized) data.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Climate_TempsMax_Darwin
-#' @format csv file with 9127 rows and 2 columns
-#' @author Bureau of Meteorology
-#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 014040
-NULL
-
-#' Maximum daily temperatures at Tennant Creek
-#'
-#' Climate Data Online
-#'
-#' \itemize{
-#'   \item Year: time variable in daily increments
-#'   \item Max: maximum temperature in degrees centigrade
-#' }
-#'
-#' Raw (Unhomogenized) data.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Climate_TempsMax_TennantCreek
-#' @format csv file with 9115 rows and 2 columns
-#' @author Bureau of Meteorology
-#' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 015135
-NULL
-
-#' Albatross Egg Counts
-#'
-#' The Australian Threatened Species Index, 2024.
-#'
-#' \itemize{
-#'   \item Year: time variable in annual increments
-#'   \item Wandering Albatross: egg count
-#'   \item Black-browed Albatross: egg count
-#'   \item Grey-headed Albatross: egg count
-#' }
-#'
-#' Nesting egg counts of three Albatross species in Tasmania.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Ecosys_Albatross
-#' @format csv file with 60 rows and 4 columns
-#' @author Australian Government, Department of Climate Change, Energy, the Environment and Water
-#' @source https://tsx.org.au/tsx2024
-NULL
-
-#' Water Supply for Irrigated Agriculture in Eastern Australia
-#'
-#' National data for Australia's ecosystem services: irrigated agricultural water supply (250 m resolution): 2000-01 to 2022-23. v7. CSIRO. Data Collection.
-#'
-#' \itemize{
-#'   \item Fin Year: time variable for financial year 1 July to 30 June
-#'   \item WaterSupply: irrigation water supplied in Australia in megalitres
-#' }
-#'
-#' Regions are aggregated for Eastern Australia.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Ecosys_IrrigationWaterSupply
-#' @format csv file with 13 rows and 2 columns
-#' @author Liu, Ning; Smith, Greg; Evans, David; Tetreault Campbell, Sally; Pascoe, Sean; & Schmidt, Becky, 2024
-#' @source https://doi.org/10.25919/7jj7-8826
-NULL
-
-#' Kangaroo Population and Harvest in South Australia
-#'
-#' Population surveys and meat processor records of harvest.
-#'
-#' \itemize{
-#'   \item Year: time variable
-#'   \item Red Pop: Estimated population of Red Kangaroos in 1000 head
-#'   \item Red Harvest: Number of Red Kangaroos commercially harvested in 1000 head
-#'   \item Grey Pop: Estimated population of Western Grey Kangaroos in 1000 head
-#'   \item Grey Harvest: Number of Western Grey Kangaroos commercially harvested in 1000 head
-#'   \item Euro Pop: Estimated population of European Kangaroos in 1000 head
-#'   \item Euro Harvest: Number of European Kangaroos commercially harvested in 1000 head
-#' }
-#'
-#' Regions are aggregated for all of South Australia.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Ecosys_Kangaroos
-#' @format csv file with 46 rows and 7 columns
-#' @author Government of South Australia, Department of Environment
-#' @source https://www.environment.sa.gov.au/topics/animals-and-plants/sustainable-use-of-animals-and-plants/kangaroo-conservation-and-management/quotas-harvest-data
-NULL
-
-#' Southern Bluefin Tuna in Australian Waters
-#'
-#' National data for Australia's ecosystem services: fisheries biomass provisioning services (2000-01 to 2020-21). v9. CSIRO. Data Collection.
-#'
-#' \itemize{
-#'   \item Fin Year: time variable for financial year 1 July to 30 June
-#'   \item Catch: kilograms caught per year
-#'   \item GVP: Gross value product in dollars as market price times catch
-#'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
-#' }
-#'
-#' Regions are aggregated for all of Australia.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Ecosys_SouthernBluefinTuna
-#' @format csv file with 22 rows and 4 columns
-#' @author Pascoe, Sean; Liu, Ning; Scheufele, Gabriela; Tetreault Campbell, Sally; & Schmidt, Becky, 2024
-#' @source https://doi.org/10.25919/nzrp-6702
-NULL
-
-#' Sydney Drinking Water Catchment
-#'
-#' WaterNSW, WaterInsight.
-#'
-#' \itemize{
-#'   \item Day: time variable for days from August 2015
-#'   \item All: All Storage volume in gigalitres
-#'   \item Blue Mtns: Blue Mountains Dams volume in gigalitres
-#'   \item Nepean: Nepean Dam volume in gigalitres
-#'   \item Avon: Avon Dam volume in gigalitres
-#'   \item Wingecarribe: Wingecarribe Reservoir volume in gigalitres
-#'   \item Cordeaux: Cordeaux Dam volume in gigalitres
-#'   \item Cataract: Cataract Dam volume in gigalitres
-#'   \item Warragamba: Warragamba Dam volume in gigalitres
-#'   \item Woronora: Woronora Dam volume in gigalitres
-#'   \item Prospect: Prospect Reservoir volume in gigalitres
-#'   \item Tallowa: Tallowa Dam volume in gigalitres
-#'   \item Fitzroy: Fitzroy Falls Dam volume in gigalitres
-#'   \item Year: time variable as decimal year
-#' }
-#'
-#' Drinking Water Storage from August 2015 to July 2025.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Ecosys_SydneyWater
-#' @format csv file with 120 rows and 14 columns
-#' @author WaterNSW
-#' @source https://waterinsights.waternsw.com.au/12964-sydney-drinking-water-catchment/storage
-NULL
-
-#' Tropical Rock Lobster in Australian Waters
-#'
-#' National data for Australia's ecosystem services: fisheries biomass provisioning services (2000-01 to 2020-21). v9. CSIRO. Data Collection.
-#'
-#' \itemize{
-#'   \item Fin Year: time variable for financial year 1 July to 30 June
-#'   \item Catch: kilograms caught per year
-#'   \item GVP: Gross value product in dollars as market price times catch
-#'   \item EV: Exchange value in dollars as the value of ecosystem services as if a market existed
-#' }
-#'
-#' Regions are aggregated for all of Australia
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Ecosys_TropicalRockLobsters
-#' @format csv file with 22 rows and 4 columns
-#' @author Pascoe, Sean; Liu, Ning; Scheufele, Gabriela; Tetreault Campbell, Sally; & Schmidt, Becky, 2024
-#' @source https://doi.org/10.25919/nzrp-6702
-NULL
-
-#' Metals and Energy Commodities
-#'
-#' London Bullion Market Association, World Gold Council, GoldHub, Perth Mint and International Monetary Fund prices.
-#'
-#' \itemize{
-#'   \item Day: time variable in days since 1 January 2009
-#'   \item Gold: London Bullion Market fix at the Perth (Aus) Mint in USD/troy ounce
-#'   \item Silver: London Bullion Market fix in USD/troy ounce
-#'   \item Copper: London Metals Exchange spot price, Copper, Grade A, USD/tonne
-#'   \item Iron Ore: Cleared for Export Tianjin port, Iron Ore Fines 62% FE spot price in USD/tonne
-#'   \item WTI: West Texas Intermediate in USD/bbl
-#'   \item Brent: Brent Crude in USD/bbl
-#'   \item Year: time variable as decimal year
-#' }
-#'
-#' Closing prices on the first day of each month from 1 January 2009 to 1 May 2025.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Finance_Commodities
-#' @format csv file with 197 rows and 8 columns
-#' @source https://files.marketindex.com.au/files/workbooks/commodities-workbook.xlsx
-NULL
-
-#' Futures Prices
-#'
-#' Kansas City Hard Red Wheat Futures
-#'
-#' \itemize{
-#'   \item Day: time variable in days since 1 July 2024
-#'   \item Open: Price at market open in USD/ton
-#'   \item High: Daily high price in USD/ton
-#'   \item Low: Daily low price in USD/ton
-#'   \item Close: Price at market close in USD/ton
-#'   \item Adj Close: Same as Close for futures
-#'   \item Volume: Daily number of trades
-#'   \item Year: time variable as decimal year
-#' }
-#'
-#' Daily futures for September 2025 maturity from 1 July 2024 to 30 June 2025
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Finance_KansasCity_WheatFutures
-#' @format csv file with 250 rows and 8 columns
-#' @source https://finance.yahoo.com/quote (search for KE=F)
-NULL
-
-#' Exchange Rates
-#'
-#' US Dollars per Australian Dollar
-#'
-#' \itemize{
-#'   \item Day: time variable in days since 1 July 2024
-#'   \item Open: Rate at session open in USD/AUD
-#'   \item High: Daily high rate in USD/AUD
-#'   \item Low: Daily low rate in USD/AUD
-#'   \item Close: Rate at session close in USD/AUD
-#'   \item Adj Close: Same as Close for exchange rates
-#'   \item Year: time variable as decimal year
-#' }
-#'
-#' Daily exchange rates from 1 July 2024 to 30 June 2025, with AUD as the base currency and USD as the quote currency.
-#'
-#' @docType data
-#' @keywords datasets
-#' @name Finance_USDAUD
-#' @format csv file with 258 rows and 7 columns
-#' @source https://finance.yahoo.com/quote (search for AUDUSD=X)
-NULL

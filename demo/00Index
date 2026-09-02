@@ -1,103 +1,95 @@
-A_DecisionThreshold
-A_Density
-A_Diffusion
-A_DoubleIntegral
-A_Drift
-A_Mean
-A_MeanToConverge
-A_Obligation
-A_Option
-A_OptionEnvelope
-A_PassageTimeDensity
-A_PassageTimeMean
-A_PassageTimeMedian
-A_PassageTimeMode
-A_PassageTimePercentiles
-A_PassageTimeProbability
-A_PassageTimeVariance
-A_PlotDecisionThreshold
-A_PlotDensity
-A_PlotDiffusion
-A_PlotDoubleIntegral
-A_PlotDrift
-A_PlotMean
-A_PlotMeanToConverge
-A_PlotObligation
-A_PlotOption
-A_PlotOptionEnvelope
-A_PlotPassageTimeDensity
-A_PlotPassageTimeModeMedianMean
-A_PlotPassageTimePercentiles
-A_PlotPassageTimeProbability
-A_PlotPassageTimeVariance
-A_PlotProbability
-A_PlotVariance
-A_PlotVarianceToConverge
-A_Probability
-A_Variance
-A_VarianceToConverge
+A_DecisionThreshold   analytical decision threshold
+A_Density   analytical transition density
+A_Diffusion   analytical diffusion
+A_DoubleIntegral  analytical integral of transition probability
+A_Drift   analytical drift
+A_Mean   analytical mean
+A_Obligation   analytical obligation
+A_Option   analytical option
+A_OptionEnvelope  analytical option envelope
+A_PassageTimeDensity  analytical passage time density
+A_PassageTimeModeMedianMean   analytical passage time mode median and mean
+A_PassageTimePercentiles   analytical passage time percentiles
+A_PassageTimeProbability   analytical passage time probability
+A_Probability   analytical transition probability
+A_Variance   analytical variance
 FD_Calibrate_Plots   plots to accompany FD_Calibrate
-FD_Calibrate   set finite difference parameters to minimize errors
-FD_DecisionThreshold
-FD_Diffusion
-FD_Drift
-FD_Option
-FD_OptionEnvelope
-FD_PlotDecisionThreshold
-FD_PlotDiffusion
-FD_PlotDrift
-FD_PlotOption
-FD_PlotOptionEnvelope
-FD_PlotTerminalValue
-FD_TerminalValue_Butterfly
-FD_TerminalValue_Degenerate
-FD_TerminalValue_Gompertz
-FD_TerminalValue_Kinked
-FD_TerminalValue_Linear
-FD_TerminalValue_Logistic
-FD_TerminalValue_Mitscherlich
-FD_TerminalValue_Stepped
-FD_TerminalValue_Transcendental
-FD_TerminalValue_YieldIndex
-FD_TerminalValue   customise terminal value
-ML_Estimates
-ML_GoodnessOfFit
-ML_LikelihoodRatioTest
-ML_LogLikelihood
-ML_PlotEstimates
-ML_PlotTimeSeries
-PlotInfo   customizing plots
+FD_Calibrate   finite difference parameters to minimize errors
+FD_DecisionThreshold  finite difference decision threshold
+FD_Diffusion   finite difference diffusion
+FD_Drift   finite difference drift
+FD_Option   finite difference option
+FD_OptionEnvelope  finite difference option envelope
+FD_TerminalValue_Butterfly  finite difference butterfly terminal value
+FD_TerminalValue_Degenerate   finite difference degenerate terminal value
+FD_TerminalValue_Gompertz   finite difference Gompertz terminal value
+FD_TerminalValue_Kinked   finite difference kinked terminal value
+FD_TerminalValue_Linear   finite difference linear terminal value
+FD_TerminalValue_Logistic   finite difference logistic terminal value
+FD_TerminalValue_Mitscherlich  finite difference Mitscherlich terminal value
+FD_TerminalValue_Stepped   finite difference stepped terminal value
+FD_TerminalValue_Transcendental   finite difference transcendental terminal value
+FD_TerminalValue_YieldIndex   finite difference yield index terminal value
+FD_TerminalValue   finite difference custom terminal value
+ML_Estimates   maximum likelihood estimates
+ML_GoodnessOfFit   maximum likelihood goodness-of-fit
+ML_LikelihoodRatioTest   maximum likelihood likelihood ratio test
+ML_LogLikelihood   maximum likelihood log likelihood function
+MC_BackwardPaths   Monte Carlo backward paths
+MC_BoundedPaths   Monte Carlo bounded paths
+MC_Density   Monte Carlo transition density
+MC_DoubleIntegral   Monte Carlo integral of transition probability
+MC_FirstPassageTimeDensity  Monte Carlo first passage time density
+MC_FirstPassageTimeModeMedianMean  Monte Carlo first passage time mode median and mean
+MC_FirstPassageTimePercentiles   Monte Carlo first passage time percentiles
+MC_FirstPassageTimeProbability   Monte Carlo first passage time probability
+MC_ForwardPaths   Monte Carlo forward paths
+MC_Mean   Monte Carlo mean
+MC_Option   Monte Carlo option
+MC_Probability   Monte Carlo transition probability
+MC_Variance   Monte Carlo variance
+MC_VisitingTimeDensity   Monte Carlo visiting time density
+MC_VisitingTimeModeMedianMean   Monte Carlo visiting time mode median and mean
+MC_VisitingTimePercentiles   Monte Carlo visiting time percentiles
+MC_VisitingTimeProbability   Monte Carlo visiting time probability
+Rcpp_Analytical   Rcpp and RcppParallel analytical functions
+Rcpp_FiniteDifference   Rcpp finite difference method
+Rcpp_MaximumLikelihood   Rcpp and RcppParallel maximum likelihood estimation
+Rcpp_MonteCarlo  Rcpp and RcppParallel Monte Carlo simulations
+PlotInfo   plot information
+PlotItCopyIt   plotit and copyit flags
+CaseStudy_Agriculture  agricultural adaptation to climate change
 CaseStudy_Albatross   Wandering Albatross recovery
-CaseStudy_FarmDams   time to destocking
-CaseStudy_Agriculture  adaptation to climate change
+CaseStudy_Carbon   Australian Carbon Credit Units for Jarrah forest
+CaseStudy_FarmDams   farm dams and sheep destocking
 CaseStudy_Fisheries   ecosystem services of Southern Bluefin Tuna
-CaseStudy_Carbon   ACCU's for Jarrah forest
-CaseStudy_YieldIndex   Index insurance for wheat
-Resilience_Recovery
-Resilience_Tipping
-Adoption_EntryOption
-Adoption_Obligation
-Adoption_ExitOption
-Policies_NoExit
-Policies_NoEntry
-Policies_Bankruptcy
-Policies_ResourceRent
-Policies_Disaster
-Policies_Taxes
-Policies_Stabilisation
-Finance_VanillaCallOption
-Finance_VanillaPutOption
-Finance_PutCallParity
-Finance_StrangleAndStraddle
-Finance_BearSpread
-Finance_WeatherDerivative
-Finance_OtherOptions
-Finance_ContractsToDeliver
-Finance_TimeToStopLoss
-Estimation_RateOfConvergence
-Estimation_ObservationInterval
-Estimation_NoMissingObservations
-Estimation_SmoothedData
-Estimation_SampleSize
-Estimation_HypothesisTests
-Proof_DecisionThreshold   graphical proof
+CaseStudy_YieldIndex   index insurance for wheat
+Adoption_EntryOption   real options entry option
+Adoption_ExitOption   real options exit option
+Adoption_Obligation   real options investment
+Estimation_HypothesisTests   Ornstein-Uhlenbeck Process hypothesis tests
+Estimation_MyData   estimating user supplied data
+Estimation_NoMissingObservations   Ornstein-Uhlenbeck Process estimation without stationarity
+Estimation_ObservationInterval   Ornstein-Uhlenbeck Process parameters and the observation interval
+Estimation_RateOfConvergence   Ornstein-Uhlenbeck Process from brownian motion to stationary process
+Estimation_SampleSize   effects sample size
+Estimation_SmoothedData   artificially smoothed data
+Finance_BearSpread   Ornstein-Uhlenbeck Process bear spread
+Finance_ContractsToDeliver   Ornstein-Uhlenbeck Process contracts
+Finance_OtherOptions   Ornstein-Uhlenbeck Process exotic options
+Finance_PutCallParity   Ornstein-Uhlenbeck Process put-call parity
+Finance_StrangleAndStraddle   Ornstein-Uhlenbeck Process strangles and straddles
+Finance_TimeToStopLoss   Ornstein-Uhlenbeck Process first passage time to stop loss
+Finance_VanillaCallOption  Ornstein-Uhlenbeck Process call option from brownian motion to stationary process
+Finance_VanillaPutOption   Ornstein-Uhlenbeck Process put option from brownian motion to stationary process
+Finance_WeatherDerivative   Ornstein-Uhlenbeck Process weather derivatives and index insurance
+Policies_Bankruptcy  bankruptcy as a real option
+Policies_Disaster   disaster relief as a real option
+Policies_NoEntry   prohibitions and real options
+Policies_NoExit   obligations and real options
+Policies_ResourceRent   decision thresholds and resource rent
+Policies_Stabilisation   insurance as a real option
+Policies_Taxes   taxes as a real option
+Resilience_Recovery   visiting time percentiles for ecological recovery
+Resilience_TippingPoint   first passage time percentiles to tipping point
+Proof_DecisionThreshold   graphical proof of decision threshold

@@ -1,0 +1,32 @@
+# Observation intervals and the Ornstein-Uhlenbeck Process
+
+Monte-Carlo simulation to demonstrate the effect of the observation
+interval on the rate of convergence, rho, and the scale, sigma.
+
+## Format
+
+csv file with 366 rows and 3 columns
+
+## Details
+
+- Day: time variable in daily increments
+
+- z: sample paths with daily observations
+
+- Year: time variable as decimal year
+
+Observation intervals are measured in two different units: days and
+years.
+
+Both sets of estimates have the same rho(t-s), where rho is the rate of
+convergence and t-s is the observation interval. For observation
+intervals measured in days, t-s=1 and rho=1/2. For observation intervals
+measured in years, t-s=1/365 and rho=365/2. Location parameter, mu, is
+the same in both sets of estimates. Scale parameter, sigma, is larger if
+rho is larger because the asymptotic variance, sigma^2/2rho, is the same
+in both sets of estimates. If rho is 365 times bigger, sigma is 365^0.5
+= 19.105 times bigger.
+
+Because rho(t-s) is the same, alpha = 0.5(1+exp(-rho(t-s))) is also the
+same, where alpha identifies the probability distribution of the
+estimates.

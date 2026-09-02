@@ -7,22 +7,22 @@ ML <- MaximumLikelihood$new()
 ML$LikelihoodRatioTest()
 # other data comparing unrestricted and true parameters
 df<-OUPDataRead("OUP_NotMissing")
-ML$Estimates(df=df,plotit=FALSE)
-ML$Estimates(rhor=0.5,mur=-15,sigmar=15,plotit=FALSE)
+ML$Estimates(df=df)
+ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
 ML$LikelihoodRatioTest()
 # or doing it the more transparent way
-u <- ML$Estimates(df=df,plotit=FALSE)
-r <- ML$Estimates(rhor=0.5,mur=-15,sigmar=15,plotit=FALSE)
+u <- ML$Estimates(df=df)
+r <- ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
 ML$LikelihoodRatioTest(u$lnLu,r$lnLr,r$alphar,r$m1)
 # other columns in data
-ML$Estimates(df=df,taucol=1,zcol=3,plotit=FALSE)
-ML$Estimates(rhor=10,mur=-15,sigmar=67.08204,plotit=FALSE)
+ML$Estimates(df=df,taucol=1,zcol=3)
+ML$Estimates(rhor=10,mur=-15,sigmar=67.08204)
 ML$LikelihoodRatioTest()
 # 95% lower bound on sigma
-ML$Estimates(sigmar=35.00838,plotit=FALSE)
+ML$Estimates(sigmar=35.00838)
 ML$set_timeseries_info(estimation="P(sigma>35.01)=95%")
 ML$LikelihoodRatioTest()
-# with plots this time
+# with automatic plots this time
 ML$PlotTimeSeries(df=df,taucol=1,zcol=3)
 ML$Estimates()
 ML$Estimates(sigmar=35.00838)

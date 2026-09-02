@@ -3,7 +3,8 @@
 # Type 'demo(Policies_NoExit)'
 # R6 object
 A <- Analytical$new()
-A$set_plot_info(type=2)
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 # default
 A$DecisionThreshold(phi=-1)
 # salvage value

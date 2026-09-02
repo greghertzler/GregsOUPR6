@@ -11,5 +11,7 @@ ML$PlotTimeSeries(df,taucol=1,zcol=2)
 ML$PlotTimeSeries(df,taucol=3,zcol=2)
 # estimate by day
 ML$Estimates(df,taucol=1,zcol=2)
+ML$PlotEstimates()
 # estimate by year
 ML$Estimates(df=df,taucol=3,zcol=2)
+ML$PlotEstimates()

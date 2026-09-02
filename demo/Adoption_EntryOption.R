@@ -3,6 +3,8 @@
 # Type 'demo(Adoption_EntryOption)'
 # R6 object
 A <- Analytical$new()
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 # option envelope
 A$OptionEnvelope(phi=1)
 # entry decision

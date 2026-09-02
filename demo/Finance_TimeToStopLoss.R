@@ -5,9 +5,11 @@
 OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
-# Read data and estimate
+# automatically plot with calculations
+A$set_flags(plotit=TRUE)
+# read data and estimate
 df<-OUPDataRead("Finance_KansasCity_WheatFutures")
-ML$Estimates(df=df,tau=1,z=5)
+ML$Estimates(df=df,taucol=1,zcol=5)
 A$set_t_stoch_args(k=525,x=575)
 A$axes_t_stoch()
 # Low stop loss

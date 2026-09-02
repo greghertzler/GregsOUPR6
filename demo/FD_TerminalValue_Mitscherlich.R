@@ -3,6 +3,8 @@
 # Type 'demo(FD_TerminalValue_Mitscherlich)'
 # R6 object
 FD <- FiniteDifference$new()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 V <- FD$TerminalValue_Mitscherlich()
 V <- FD$TerminalValue_Mitscherlich(xo=-10,vr=0.1)
 V <- FD$TerminalValue_Mitscherlich(xo=-10,vr=0.1,Vmax=5,Vmin=-5)

@@ -5,6 +5,7 @@
 OUP <- OUProcess$new()
 A <- OUP$get_Analytical()
 ML <- OUP$get_MaximumLikelihood()
+# set up plots
 A$set_plot_info(labels=FALSE)
 # read data
 df <- OUPDataRead("Agric_NSW_FarmDamsRiverina")
@@ -16,12 +17,13 @@ x <- ML$get_oup_params()$mu
 k <- 600
 A$set_t_stoch_args(t=seq(from=0,to=900,by=9),k=k,x=x,z=seq(from=0,to=4000,by=40))
 A$PlotPassageTimePercentiles()
-A$PlotPassageTimePercentiles(type=2)
 # 20% scenario
-ML$Estimates(df=df,taucol=1,zcol=3,plotit=FALSE)
+ML$Estimates(df=df,taucol=1,zcol=3)
 x <- ML$get_oup_params()$mu
-A$PassageTimeMedian(x=x,plotit=FALSE)
+A$set_t_stoch_args(x=x)
+A$PlotPassageTimePercentiles()
 # 40% scenario
-ML$Estimates(df=df,taucol=1,zcol=4,plotit=FALSE)
+ML$Estimates(df=df,taucol=1,zcol=4,)
 x <- ML$get_oup_params()$mu
-A$PassageTimeMedian(x=x,plotit=FALSE)
+A$set_t_stoch_args(x=x)
+A$PlotPassageTimePercentiles()

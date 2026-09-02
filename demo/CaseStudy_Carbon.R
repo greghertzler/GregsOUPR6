@@ -5,6 +5,7 @@
 OUP <- OUProcess$new()
 FD <- OUP$get_FiniteDifference()
 ML <- OUP$get_MaximumLikelihood()
+# set up plots
 FD$set_plot_info(labels=FALSE)
 # read data
 df<-OUPDataRead("Climate_CarbonCredits_EECXM")
@@ -20,11 +21,11 @@ est25 <- 70.9525
 xo100 <- est100/ann100
 xo25 <- est25/ann25
 # entry 100 year
-FD$TerminalValue_Kinked(x=seq(from=-50,to=100,by=1.5),xo=xo100,vs=ann100,Vmax=10000,Vmin=-est100,plotit=FALSE)
-FD$DecisionThreshold()
+FD$TerminalValue_Kinked(x=seq(from=-50,to=100,by=1.5),xo=xo100,vs=ann100,Vmax=10000,Vmin=-est100)
+FD$PlotDecisionThreshold()
 # exit 100 year
-FD$TerminalValue_Kinked(xo=0,vs=-ann100,Vmin=0,plotit=FALSE)
-FD$DecisionThreshold()
+FD$TerminalValue_Kinked(xo=0,vs=-ann100,Vmin=0)
+FD$PlotDecisionThreshold()
 # entry 25 year
-FD$TerminalValue_Kinked(xo=xo25,vs=ann25,Vmin=-est25,plotit=FALSE)
-FD$DecisionThreshold()
+FD$TerminalValue_Kinked(xo=xo25,vs=ann25,Vmin=-est25)
+FD$PlotDecisionThreshold()

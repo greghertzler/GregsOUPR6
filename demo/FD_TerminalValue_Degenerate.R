@@ -3,6 +3,8 @@
 # Type 'demo(FD_TerminalValue_Degenerate)'
 # R6 object
 FD <- FiniteDifference$new()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 V <- FD$TerminalValue_Degenerate()
 V <- FD$TerminalValue_Degenerate(xo=-10)
 V <- FD$TerminalValue_Degenerate(xo=-10,Vmax=10,Vmin=5)

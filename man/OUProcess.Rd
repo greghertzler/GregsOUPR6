@@ -2,114 +2,18 @@
 % Please edit documentation in R/OUProcessHertz.R
 \name{OUProcess}
 \alias{OUProcess}
-\title{R6 Class implementing OUProcess, a container to synchronize OUP objects.}
+\title{R6 class implementing a container to synchronize OUP objects.}
 \description{
 The Analytical, FiniteDifference, MaximumLikelihood and MonteCarlo objects
 are a complete set of functions for maximum likelihood estimation and
 for the calculation of probabilities, option prices, visiting times, first
 passage times, decision thresholds and more--everything for a Real Options
-Analysis.
-Each object can be used by itself.  This object, OUProcess, will instantiate
-and synchronize the other objects.
+Analysis.  Each object can be used by itself.  This object, OUProcess, will
+instantiate and synchronize the other objects.
 }
-\section{Functions are categorized by:}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Solution methods,
-Stochastic variables and
-Random variables.
-}\if{html}{\out{</div>}}
-}
-
-\section{Solution methods include:}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Analytical formulas,
-Finite Difference method,
-Maximum Likelihood estimation, and
-Monte Carlo simulation.
-}\if{html}{\out{</div>}}
-}
-
-\section{Stochastic variables can be:}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{z, generic states of the system,
-y, future or forward states of the system,
-x, current or backward states of the system, and
-t, future or forward times.
-}\if{html}{\out{</div>}}
-}
-
-\section{Random variables can be::}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{rho, mu and sigma, the OUP parameters.
-}\if{html}{\out{</div>}}
-}
-
-\section{Analytical formulas:}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{z stochastic
-  Drift
-  Diffusion
-y stochastic
-  Mean
-  MeanToConverge
-  Variance
-  VarianceToConverge
-  Density
-  Probability
-  DoubleIntegral
-x stochastic
-  Option
-  OptionEnvelope
-  DecisionThreshold
-t stochastic
-  PassageTimeMode
-  PassageTimeMedian
-  PassageTimeMean
-  PassageTimeVariance
-  PassageTimePercentile
-  PassageTimeDensity
-  PassageTimeProbability
-}\if{html}{\out{</div>}}
-}
-
-\section{Finite Difference method:}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{x stochastic
-  Drift
-  Diffusion
-  TerminalValue_Linear
-  TerminalValue_Kinked
-  TerminalValue_Stepped
-  TerminalValue_Mitscherlich
-  TerminalValue_Gompertz
-  TerminalValue_Logistic
-  TerminalValue_Transcendental
-  TerminalValue_YieldIndex
-  TerminalValue
-  Option
-  OptionEnvelope
-  DecisionThreshold
-}\if{html}{\out{</div>}}
-}
-
-\section{Maximum Likelihood estimation:}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{rho, mu and sigma random
-  LogLikelihood
-  Estimates
-  GoodnessOfFit
-  LikelihoodRatioTest
-}\if{html}{\out{</div>}}
-}
-
-\section{Monte Carlo simulation:}{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{y stochastic
-  SamplePaths
-  BoundedSamplePaths
-  Probabilities
-x stochastic
-  Option
-t stochastic
-  PassageTimeProbabilities
-}\if{html}{\out{</div>}}
-}
-
-\section{Using the formulas and methods:}{
+\section{Usage:}{
 This object, OUProcess, and the Analytical, FiniteDifference,
-MaximumLikelihood and Monte-Carlo objects can be instantiated together
+MaximumLikelihood and MonteCarlo objects can be instantiated together
 by:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
@@ -123,17 +27,14 @@ Then pointers to individual objects can be accessed by:
   MC <- OUP$get_MonteCarlo()
 }\if{html}{\out{</div>}}
 
-Then methods of individual objects can be called by, for example:
+OUP has other public methods, but these are called by individual objects
+and won't do anything if called by a user.
+}
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  A$Drift()
-  FD$Drift()
-  ML$LogLikelihood()
-  MC$ForwardPaths()
-}\if{html}{\out{</div>}}
-
+\section{Discussion}{
 OUP will have pointers to A, FD, ML and MC.  A, FD, ML and MC will each
 have a pointer to OUP. Thus A, FD, ML and MC can follow the pointers to
-synchronize with each other. For example,rho, mu and sigma estimated in ML
+synchronize with each other. For example, rho, mu and sigma estimated in ML
 will be propagated to the other objects:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  ML$Estimates()
@@ -159,399 +60,253 @@ would require:
   A$Option(rho=rho,mu=mu,sigma=sigma)
 }\if{html}{\out{</div>}}
 
-The functions all return named lists and estimates is a list of rho, mu and
-sigma.  The functions will also accept named lists as arguments:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  estimates <- ML$Estimates()
-  rho <- estimates[1]
-  mu <- estimates[2]
-  sigma <- estimates[3]
-  A$Option(rho=rho,mu=mu,sigma=sigma)
-}\if{html}{\out{</div>}}
-
-The single brackets assign named lists to the left-hand variables. If a
-function is called with a named list as an argument, it strips the names
-before using the numbers in its calculations.  As a general rule, named lists
-as arguments do not work.  If you wish to use numbers for the arguments you
-should use double brackets:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  estimates <- ML$Estimates()
-  rho <- estimates$[[1]]
-  mu <- estimates$[[2]]
-  sigma <- estimates$[[3]]
-  A$Option(rho,mu,sigma)
-}\if{html}{\out{</div>}}
-
-This will strip the name and the variables on the left-hand side are just
-numbers.  The arguments do not have to be accompanied by their names, as in
-rho=rho, where the first rho is the name and the second rho is the variable.
-They can also be entered by their position, with rho first, mu second and
-sigma third.
-
-These examples will both print a table of option prices and draw a plot.
-The plot is optional:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  A$Option(plotit=FALSE)
-}\if{html}{\out{</div>}}
-
-The table of numbers is also optional:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  options <- A$Option()
-}\if{html}{\out{</div>}}
-
-or:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  A$set_oup_params(rho=rho,mu=mu,sigma=sigma)
-  A$PlotOption()
-}\if{html}{\out{</div>}}
-
-Most methods have a corresponding plot routine. By design, the plot routines
-do not take parameters as arguments, which must be set separately.
-
-If rho, mu or sigma is changed in one method, it is changed for all methods.
-If a data frame is read, it is available to all methods. For example, a
-time series may be entered to estimate parameters and then used to calculate
-the goodness-of-fit:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  df <- read.csv("data/OUP_SimulatedData.csv")
-  ML$Estimates(df=df,taucol=1,zcol=3)
-  ML$GoodnessOfFit()
-}\if{html}{\out{</div>}}
-
-If the state variable is changed in the Analytical object, it may also
-change in the FiniteDifference object. Plot information is also shared across
-objects.  This complicated communication allows code to be split into modules.
-
-The communication within each module is also complicated.  The modules are
-reactive.  In other words, don't calculate anything twice.  There is a cache
-of inputs and a cache of outputs, managed by set/get functions.  In the
-diagram to follow, A are arguments, I are inputs, O are outputs, S is a set
-function and G is a get function.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{                A
-       cache    |    cache
-  G <--  I  <-> S -->  O
-  |             |
-  I             I
-}\if{html}{\out{</div>}}
-
-Arguments enter the set function which validates the arguments and compares
-the arguments to the input cache.  If there is a change, the input cache is
-set and all outputs in the output cache which depend on that argument are
-set to NULL.  Finally, the set function returns the new input cache.  The
-get function will return the input cache without checking or changes.
-
-Once the arguments are set, other functions can be called.  In the diagram
-below, C is a calculation function called without arguments.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{        |    cache
-  G --> C <->  O
-        |
-        O
-}\if{html}{\out{</div>}}
-
-The calculation function gets the input cache and checks the output cache.
-If the output cache is NULL, outputs are calculated, the cache is set and
-then returned.  If the output cache is not NULL, it is returned.  Thus a
-calculation function calculates once and then acts like a get function.
-
-For convenience, arguments can be entered directly into the calculation
-functions.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{        A
-        |    cache
-  S <-> C <->  O
-        |
-        O
-}\if{html}{\out{</div>}}
-
-A calculation function sends the arguments to the set function which does
-its work and returns the input cache.  Then the calculation function checks
-the output cache, does its work and returns the output cache.
-
-Most calculation functions have a corresponding plot function.  There is a
-complicated relationship between them.  In the R console, you probably
-want calculations.  In RShiny, you get the plots.  In the R console, the
-calculation functions are in charge and in RShiny, the plot functions
-are in charge.
-
-In the diagrams below, P is a plot function and T is a flag set to true and
-F is the same flag set to false.  By default, the flag is set to T.  There
-are three possibilities if the calculation functions are in charge.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  F        T
-  |        |              |
-  C        C --> P        C --> P
-  |        |     |        |     |
-  O        O    plot      O    plot
-}\if{html}{\out{</div>}}
-
-The flag is an argument to the calculation function.  If the calculation
-function is called with a false flag, it returns the output cache.  If
-the calculation function is called with a true flag, it returns the output
-cache and calls the plot function which returns a plot.
-
-To prevent a circular reference, the flag is always false if a plot function
-is in charge.
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{          |              |
-  C <-F-> P      C <-F-> P <-F-> C
-          |              |
-         plot           plots
-}\if{html}{\out{</div>}}
-
-The plot function calls the calculation function with a false flag, gets the
-output cache and returns a plot.  Some plot functions manage more than one
-calculation function and return several different types of plots.
-
-In summary, methods include set, get, calculation and plot functions.  Help
-for a method is in the help for its object:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?Analytical
-  ?FiniteDifference
-  ?MaximumLikelihood
-  ?MonteCarlo
-}\if{html}{\out{</div>}}
-
-These and a more complete html help can be accessed by:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPHelp()
-}\if{html}{\out{</div>}}
-
-Scripts to demonstrate the methods are in files in the 'demo' directory. To
-see a list of the demos, type:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  demo()
-}\if{html}{\out{</div>}}
-
-To run the 'A_Density' demo, type:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  demo(A_Density)
-}\if{html}{\out{</div>}}
-
-or type:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  source('demo/A_Density.R',echo=TRUE)
-}\if{html}{\out{</div>}}
-
-or, open the A_Density.R file in RStudio and Source it from the menu.
-
-But really, the most convenient way is to use the command:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDemoList()
-  OUPDemoRun(2)
-}\if{html}{\out{</div>}}
-
-Entering the demos by number in the list saves typing.
-
-Available data sets for Maximum Likelihood estimation have their own help.
-Type:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  ?Agric_
-  ?Climate_
-  ?Ecosys_
-  ?Finance_
-  ?OUP_
-}\if{html}{\out{</div>}}
-
-and then select from the drop-down list.
-
-The easiest way to query and read the data without changing the working
-directory is:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDataList()
-  OUPDataRead(10)
-}\if{html}{\out{</div>}}
-
-Entering data by number in the list saves typing.
-
-Examples in R6 don't work the same as in S3 and S4 modules.  There is only
-one example for an R6 object, not one for each method in the object.
-To run examples, the devtools::run_examples() works, but the R command
-example("OUProcess") doesn't.  You can copy commands to the clipboard,
-paste into the console and press Enter. Examples in this help and a simple
-example at the bottom can be run in this way.
-
-But really, the examples are included to pass CRAN tests.  Start with
-RShiny.  Then if you decide to work in the console, run the demos.
+Upon initialization, OUP will ask if it is being instantiated by an RShiny
+app.  If so, it will store the session pointer and use it to coordinate
+clipboard access between RShiny and the A, FD, ML and MC objects.
 }
 
-\examples{
-
-## ------------------------------------------------
-## Method `OUProcess$new`
-## ------------------------------------------------
-
-  OUP <- OUProcess$new()
-  A <- OUP$get_Analytical()
-  FD <- OUP$get_FiniteDifference()
-  ML <- OUP$get_MaximumLikelihood()
-  MC <- OUP$get_MonteCarlo()
-  ML$Estimates()
-  MC$get_oup_params()
-  A$Option()
-  FD$TerminalValue_Mitscherlich(plotit=FALSE)
-  FD$Option()
-}
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-OUProcess-new}{\code{OUProcess$new()}}
-\item \href{#method-OUProcess-get_Analytical}{\code{OUProcess$get_Analytical()}}
-\item \href{#method-OUProcess-get_FiniteDifference}{\code{OUProcess$get_FiniteDifference()}}
-\item \href{#method-OUProcess-get_MaximumLikelihood}{\code{OUProcess$get_MaximumLikelihood()}}
-\item \href{#method-OUProcess-get_MonteCarlo}{\code{OUProcess$get_MonteCarlo()}}
-\item \href{#method-OUProcess-send_oup_params}{\code{OUProcess$send_oup_params()}}
-\item \href{#method-OUProcess-send_x_stoch_args}{\code{OUProcess$send_x_stoch_args()}}
-\item \href{#method-OUProcess-send_plot_info}{\code{OUProcess$send_plot_info()}}
-}
+  \itemize{
+    \item \href{#method-OUProcess-initialize}{\code{OUProcess$new()}}
+    \item \href{#method-OUProcess-get_Analytical}{\code{OUProcess$get_Analytical()}}
+    \item \href{#method-OUProcess-get_FiniteDifference}{\code{OUProcess$get_FiniteDifference()}}
+    \item \href{#method-OUProcess-get_MaximumLikelihood}{\code{OUProcess$get_MaximumLikelihood()}}
+    \item \href{#method-OUProcess-get_MonteCarlo}{\code{OUProcess$get_MonteCarlo()}}
+    \item \href{#method-OUProcess-send_oup_params}{\code{OUProcess$send_oup_params()}}
+    \item \href{#method-OUProcess-send_y_stoch_args}{\code{OUProcess$send_y_stoch_args()}}
+    \item \href{#method-OUProcess-send_x_stoch_args}{\code{OUProcess$send_x_stoch_args()}}
+    \item \href{#method-OUProcess-send_t_stoch_args}{\code{OUProcess$send_t_stoch_args()}}
+    \item \href{#method-OUProcess-send_plot_args}{\code{OUProcess$send_plot_args()}}
+    \item \href{#method-OUProcess-send_plot_info}{\code{OUProcess$send_plot_info()}}
+    \item \href{#method-OUProcess-send_flags}{\code{OUProcess$send_flags()}}
+    \item \href{#method-OUProcess-CopyToClipboard}{\code{OUProcess$CopyToClipboard()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-OUProcess-new"></a>}}
-\if{latex}{\out{\hypertarget{method-OUProcess-new}{}}}
-\subsection{Method \code{new()}}{
-Create an OUProcess object as a container for other objects
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-OUProcess-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-OUProcess-initialize}{}}}
+\subsection{\code{OUProcess$new()}}{
+  Create an OUProcess object as a container for other objects
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$new(session = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{session}}{session pointer to RShiny app}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new OUProcess object
+  }
 }
 
-\subsection{Returns}{
-A new OUProcess object
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{  OUP <- OUProcess$new()
-  A <- OUP$get_Analytical()
-  FD <- OUP$get_FiniteDifference()
-  ML <- OUP$get_MaximumLikelihood()
-  MC <- OUP$get_MonteCarlo()
-  ML$Estimates()
-  MC$get_oup_params()
-  A$Option()
-  FD$TerminalValue_Mitscherlich(plotit=FALSE)
-  FD$Option()
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OUProcess-get_Analytical"></a>}}
 \if{latex}{\out{\hypertarget{method-OUProcess-get_Analytical}{}}}
-\subsection{Method \code{get_Analytical()}}{
-Pointer to Analytical object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$get_Analytical()}\if{html}{\out{</div>}}
+\subsection{\code{OUProcess$get_Analytical()}}{
+  Pointer to Analytical object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$get_Analytical()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    pointer
+  }
 }
 
-\subsection{Returns}{
-pointer
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OUProcess-get_FiniteDifference"></a>}}
 \if{latex}{\out{\hypertarget{method-OUProcess-get_FiniteDifference}{}}}
-\subsection{Method \code{get_FiniteDifference()}}{
-Pointer to FiniteDifference object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$get_FiniteDifference()}\if{html}{\out{</div>}}
+\subsection{\code{OUProcess$get_FiniteDifference()}}{
+  Pointer to FiniteDifference object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$get_FiniteDifference()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    pointer
+  }
 }
 
-\subsection{Returns}{
-pointer
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OUProcess-get_MaximumLikelihood"></a>}}
 \if{latex}{\out{\hypertarget{method-OUProcess-get_MaximumLikelihood}{}}}
-\subsection{Method \code{get_MaximumLikelihood()}}{
-Pointer to MaximumLikelihood object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$get_MaximumLikelihood()}\if{html}{\out{</div>}}
+\subsection{\code{OUProcess$get_MaximumLikelihood()}}{
+  Pointer to MaximumLikelihood object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$get_MaximumLikelihood()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    pointer
+  }
 }
 
-\subsection{Returns}{
-pointer
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OUProcess-get_MonteCarlo"></a>}}
 \if{latex}{\out{\hypertarget{method-OUProcess-get_MonteCarlo}{}}}
-\subsection{Method \code{get_MonteCarlo()}}{
-Pointer to MonteCarlo object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$get_MonteCarlo()}\if{html}{\out{</div>}}
+\subsection{\code{OUProcess$get_MonteCarlo()}}{
+  Pointer to MonteCarlo object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$get_MonteCarlo()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    pointer
+  }
 }
 
-\subsection{Returns}{
-pointer
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OUProcess-send_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-OUProcess-send_oup_params}{}}}
-\subsection{Method \code{send_oup_params()}}{
-Send OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$send_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{OUProcess$send_oup_params()}}{
+  Function called by modules to coordinate parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$send_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OUProcess-send_y_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-OUProcess-send_y_stoch_args}{}}}
+\subsection{\code{OUProcess$send_y_stoch_args()}}{
+  Function called by modules to coordinate arguments for y as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$send_y_stoch_args(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  psi = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OUProcess-send_x_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-OUProcess-send_x_stoch_args}{}}}
-\subsection{Method \code{send_x_stoch_args()}}{
-send x as a stochastic state and its arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$send_x_stoch_args(
+\subsection{\code{OUProcess$send_x_stoch_args()}}{
+  Function called by modules to coordinate x as a stochastic state and its arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$send_x_stoch_args(
   s = NULL,
   x = NULL,
+  y = NULL,
   r = NULL,
   phi = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times -inf<s<t}
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for exit option, >0 for entry option}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{vector of m times -inf<s<t}
-
-\item{\code{x}}{vector of n states -inf<x<inf}
-
-\item{\code{r}}{discount rate -inf<r<inf}
-
-\item{\code{phi}}{<=0 for exit option, >0 for entry option}
-
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OUProcess-send_t_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-OUProcess-send_t_stoch_args}{}}}
+\subsection{\code{OUProcess$send_t_stoch_args()}}{
+  Function called by modules to coordinate t stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$send_t_stoch_args(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  omega = NULL,
+  Ppct = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{k}}{threshold -inf<k<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{omega}}{degree of irreversibility 0<=omega<=1}
+      \item{\code{Ppct}}{passage time probability for a percentile  0.01<=Ppct<=0.99}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OUProcess-send_plot_args"></a>}}
+\if{latex}{\out{\hypertarget{method-OUProcess-send_plot_args}{}}}
+\subsection{\code{OUProcess$send_plot_args()}}{
+  Function called by modules to coordinate arguments for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$send_plot_args(pmax = NULL, ptmax = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OUProcess-send_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-OUProcess-send_plot_info}{}}}
-\subsection{Method \code{send_plot_info()}}{
-Send information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OUProcess$send_plot_info(
-  type = NULL,
-  pmax = NULL,
-  ptmax = NULL,
+\subsection{\code{OUProcess$send_plot_info()}}{
+  Function called by modules to coordinate information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$send_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -563,41 +318,66 @@ Send information for plotting
   floor = NULL,
   labels = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{fontfamily}}{font family for plot labels}
+      \item{\code{fontsize}}{font size for plot labels}
+      \item{\code{fileformat}}{'png' or 'svg'}
+      \item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
+      \item{\code{fileheight}}{pixel height of 2D plot}
+      \item{\code{theme}}{'light' or 'dark'}
+      \item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
+      \item{\code{walls}}{3D walls TRUE or FALSE}
+      \item{\code{floor}}{3D floor TRUE or FALSE}
+      \item{\code{labels}}{title and parameters TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1 and 2 for 2D, 3 and 4 for 3D}
-
-\item{\code{pmax}}{maximum vertical axis for transition density plot}
-
-\item{\code{ptmax}}{maximum vertical axis for passage time density plot}
-
-\item{\code{fontfamily}}{font family for plot labels}
-
-\item{\code{fontsize}}{font size for plot labels}
-
-\item{\code{fileformat}}{'png' or 'svg'}
-
-\item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
-
-\item{\code{fileheight}}{pixel height of 2D plot}
-
-\item{\code{theme}}{'light' or 'dark'}
-
-\item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
-
-\item{\code{walls}}{3D walls TRUE or FALSE}
-
-\item{\code{floor}}{3D floor TRUE or FALSE}
-
-\item{\code{labels}}{title and parameters TRUE or FALSE}
-
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OUProcess-send_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-OUProcess-send_flags}{}}}
+\subsection{\code{OUProcess$send_flags()}}{
+  Function called by modules to coordinate flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$send_flags(plotit = NULL, copyit = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{plotit}}{automatic plot after calculation TRUE or FALSE}
+      \item{\code{copyit}}{copy to clipboard TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OUProcess-CopyToClipboard"></a>}}
+\if{latex}{\out{\hypertarget{method-OUProcess-CopyToClipboard}{}}}
+\subsection{\code{OUProcess$CopyToClipboard()}}{
+  Write to clipboard
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{OUProcess$CopyToClipboard(clip)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{clip}}{data frame, matrix or vector}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-}
+
 }

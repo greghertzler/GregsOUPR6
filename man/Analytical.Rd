@@ -2,21 +2,19 @@
 % Please edit documentation in R/AnalyticalHertz.R
 \name{Analytical}
 \alias{Analytical}
-\title{R6 Class implementing Analytical formulas for an Ornstein-Uhlenbeck Process}
+\title{R6 class implementing Analytical formulas for the Ornstein-Uhlenbeck Process}
 \description{
 A set of functions to calculate probabilities, option prices, visiting
 times, first passage times and decision thresholds--everything for
 simple exit and entry options in a Real Options Analysis.
 }
-\section{Formulas:}{
+\section{Formulas and Methods:}{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{z stochastic
   Drift
   Diffusion
 y stochastic
   Mean
-  MeanToConverge
   Variance
-  VarianceToConverge
   Density
   Probability
   DoubleIntegral
@@ -26,10 +24,7 @@ x stochastic
   DecisionThreshold
   Obligation
 t stochastic
-  PassageTimeMode
-  PassageTimeMedian
-  PassateTimeMean
-  PassageTimeVariance
+  PassageTimeModeMedianMean
   PassageTimePercentiles
   PassageTimeDensity
   PassageTimeProbability
@@ -40,9 +35,7 @@ t stochastic
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  PlotDrift
   PlotDiffusion
   PlotMean
-  PlotMeanToConverge
   PlotVariance
-  PlotVarianceToConverge
   PlotDensity
   PlotProbability
   PlotDoubleIntegral
@@ -51,7 +44,6 @@ t stochastic
   PlotDecisionThreshold
   PlotObligation
   PlotPassageTimeModeMedianMean
-  PlotPassageTimeVariance
   PlotPassageTimePercentiles
   PlotPassageTimeDensity
   PlotPassageTimeProbability
@@ -88,16 +80,53 @@ t stochastic
   s:      initial time -inf<s<inf
   x:      initial state -inf<x<inf
   omega:  degree of irreversibility 0<=omega<=1
+  Ppct:   passage time probability for a percentile 0.01<=Ppct<=0.99
 }\if{html}{\out{</div>}}
 }
 
-\section{Using the formulas:}{
-Demonstration scripts are files in the 'demo' directory. Identify a formula
-and in the console type:
+\section{Usage:}{
+The Analytical object must first be instantiated before its methods are called.
+There are two ways.  The first way instantiates the OUProcess object and
+calls a function to get a pointer:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  demo(A_FormulaName), or
-  demo(A_PlotFormulaName).
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
+  A <- OUP$get_Analytical()
+  FD <- OUP$get_FiniteDifference()
+  ML <- OUP$get_MaximumLikelihood()
+  MC <- OUP$get_MonteCarlo()
 }\if{html}{\out{</div>}}
+
+The Analytical object will coordinate arguments to functions with the
+FiniteDifference, MaximumLikelihood and MonteCarlo objects.  The second
+way instantiates the Analytical object by itself with no coordination:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  A <- Analytical$new()
+}\if{html}{\out{</div>}}
+
+Once the object is instantiated, its methods can be called, to calculate and
+plot a Decision Threshold, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  A$DecisionThreshold()
+}\if{html}{\out{</div>}}
+
+The plot methods can be used to customize the plots, with a title, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  A$PlotDecisionThreshold(title="My Decision")
+}\if{html}{\out{</div>}}
+
+Other functions and methods are called in the same way.  To see all the
+possibilities, check out the demos below.
+}
+
+\section{Demos:}{
+Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDemoList()
+  OUPDemoRun(<number of demo in list>)
+}\if{html}{\out{</div>}}
+
+Entering the demos by number in the list saves typing.
 }
 
 \section{Discussion:}{
@@ -114,239 +143,208 @@ Even if great care is taken, it is a good idea to calculate a solution in
 more than one way. This is one reason for analytical formulas.
 
 Another reason is to speed the calculations. Compared with the Finite
-Difference method, an analytical formula can calculate an option price
-up to 10,000 times quicker. Compared with Monte Carlo simulation, an
-analytical formula can calculate passage time probabilities up to
-100,000 times quicker.
+Difference method, an analytical formula can calculate option prices
+2 to 3 times quicker. Compared with Monte Carlo simulation, an
+analytical formula can calculate 800 to 1,000 times quicker.
 
 The bottom line of a real options analysis is the decision threshold
-and the mode, median and mean passage times. The many functions available
-are used in the calculations, but to go straight to the bottom line:
+and the time to crossing the decision threshold. The many functions available
+are used in the calculations, but they all accumulate to the bottom line:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  A <- Analytical$new()
   A$DecisionThreshold()
-  A$PassageTimeMean()
-  A$PassageTimeVariance()
-  A$PlotPassageTimePercentiles(type=1)
-  A$PlotPassageTimePercentiles(type=2)
+  A$PassageTimeModeMedianMean()
+  A$PassageTimePercentiles()
 }\if{html}{\out{</div>}}
 
-Perhaps a better measure of passage times are the percentiles. The mean
+Perhaps the better measure of passage times are the percentiles. The mean
 does not exist if rho is zero and the variance does not exist if rho is
 small. The mode and median always exist.  Percentiles, which include the
-median, always exist.
+median, always exist.  The formulas don't calculate the variance.
 
 The passage time calculations are challenging. For example, the passage
 time density is too complicated to explain in this short discussion.
 But don't be surprised if it is bi-modal or even negative. Care must be
 taken in interpreting passage times.
-
-Examples in R6 don't work the same way as other R modules.  There is only
-one example for an R6 object, not one for each function in the object.
-To run examples, the devtools::run_examples() works, but the R command
-example("Analytical") doesn't.  You can copy commands to the clipboard,
-paste into the console and press Enter. Examples in this help and a simple
-example at the bottom can be run in this way.
-
-A better alternative is demo(), but this works sometimes, sometimes not.
-If you don't see the demos for this package, go to Files and demo.  You will
-see the demo names and then type something like demo(A_DecisionThreshold).
 }
 
-\examples{
-
-## ------------------------------------------------
-## Method `Analytical$new`
-## ------------------------------------------------
-
-  A <- Analytical$new()
-  A$DecisionThreshold()
-}
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Analytical-new}{\code{Analytical$new()}}
-\item \href{#method-Analytical-set_oup_params}{\code{Analytical$set_oup_params()}}
-\item \href{#method-Analytical-set_z_stoch_args}{\code{Analytical$set_z_stoch_args()}}
-\item \href{#method-Analytical-set_y_stoch_args}{\code{Analytical$set_y_stoch_args()}}
-\item \href{#method-Analytical-set_x_stoch_args}{\code{Analytical$set_x_stoch_args()}}
-\item \href{#method-Analytical-set_t_stoch_args}{\code{Analytical$set_t_stoch_args()}}
-\item \href{#method-Analytical-set_plot_info}{\code{Analytical$set_plot_info()}}
-\item \href{#method-Analytical-get_all}{\code{Analytical$get_all()}}
-\item \href{#method-Analytical-get_oup_params}{\code{Analytical$get_oup_params()}}
-\item \href{#method-Analytical-get_z_stoch_args}{\code{Analytical$get_z_stoch_args()}}
-\item \href{#method-Analytical-get_y_stoch_args}{\code{Analytical$get_y_stoch_args()}}
-\item \href{#method-Analytical-get_x_stoch_args}{\code{Analytical$get_x_stoch_args()}}
-\item \href{#method-Analytical-get_t_stoch_args}{\code{Analytical$get_t_stoch_args()}}
-\item \href{#method-Analytical-get_plot_info}{\code{Analytical$get_plot_info()}}
-\item \href{#method-Analytical-get_plot_colors}{\code{Analytical$get_plot_colors()}}
-\item \href{#method-Analytical-axes_z_stoch}{\code{Analytical$axes_z_stoch()}}
-\item \href{#method-Analytical-axes_y_stoch}{\code{Analytical$axes_y_stoch()}}
-\item \href{#method-Analytical-axes_x_stoch}{\code{Analytical$axes_x_stoch()}}
-\item \href{#method-Analytical-axes_t_stoch}{\code{Analytical$axes_t_stoch()}}
-\item \href{#method-Analytical-sync_zyxt_stoch}{\code{Analytical$sync_zyxt_stoch()}}
-\item \href{#method-Analytical-undo_clear}{\code{Analytical$undo_clear()}}
-\item \href{#method-Analytical-undo_save}{\code{Analytical$undo_save()}}
-\item \href{#method-Analytical-undo_undo}{\code{Analytical$undo_undo()}}
-\item \href{#method-Analytical-Drift}{\code{Analytical$Drift()}}
-\item \href{#method-Analytical-Diffusion}{\code{Analytical$Diffusion()}}
-\item \href{#method-Analytical-Mean}{\code{Analytical$Mean()}}
-\item \href{#method-Analytical-MeanToConverge}{\code{Analytical$MeanToConverge()}}
-\item \href{#method-Analytical-Variance}{\code{Analytical$Variance()}}
-\item \href{#method-Analytical-VarianceToConverge}{\code{Analytical$VarianceToConverge()}}
-\item \href{#method-Analytical-Density}{\code{Analytical$Density()}}
-\item \href{#method-Analytical-Probability}{\code{Analytical$Probability()}}
-\item \href{#method-Analytical-DoubleIntegral}{\code{Analytical$DoubleIntegral()}}
-\item \href{#method-Analytical-Option}{\code{Analytical$Option()}}
-\item \href{#method-Analytical-OptionEnvelope}{\code{Analytical$OptionEnvelope()}}
-\item \href{#method-Analytical-DecisionThreshold}{\code{Analytical$DecisionThreshold()}}
-\item \href{#method-Analytical-Obligation}{\code{Analytical$Obligation()}}
-\item \href{#method-Analytical-PassageTimeMode}{\code{Analytical$PassageTimeMode()}}
-\item \href{#method-Analytical-PassageTimeMedian}{\code{Analytical$PassageTimeMedian()}}
-\item \href{#method-Analytical-PassageTimeMean}{\code{Analytical$PassageTimeMean()}}
-\item \href{#method-Analytical-PassageTimeVariance}{\code{Analytical$PassageTimeVariance()}}
-\item \href{#method-Analytical-PassageTimePercentiles}{\code{Analytical$PassageTimePercentiles()}}
-\item \href{#method-Analytical-PassageTimeDensity}{\code{Analytical$PassageTimeDensity()}}
-\item \href{#method-Analytical-PassageTimeProbability}{\code{Analytical$PassageTimeProbability()}}
-\item \href{#method-Analytical-PlotDrift}{\code{Analytical$PlotDrift()}}
-\item \href{#method-Analytical-PlotDiffusion}{\code{Analytical$PlotDiffusion()}}
-\item \href{#method-Analytical-PlotMean}{\code{Analytical$PlotMean()}}
-\item \href{#method-Analytical-PlotMeanToConverge}{\code{Analytical$PlotMeanToConverge()}}
-\item \href{#method-Analytical-PlotVariance}{\code{Analytical$PlotVariance()}}
-\item \href{#method-Analytical-PlotVarianceToConverge}{\code{Analytical$PlotVarianceToConverge()}}
-\item \href{#method-Analytical-PlotDensity}{\code{Analytical$PlotDensity()}}
-\item \href{#method-Analytical-PlotProbability}{\code{Analytical$PlotProbability()}}
-\item \href{#method-Analytical-PlotDoubleIntegral}{\code{Analytical$PlotDoubleIntegral()}}
-\item \href{#method-Analytical-PlotOption}{\code{Analytical$PlotOption()}}
-\item \href{#method-Analytical-PlotOptionEnvelope}{\code{Analytical$PlotOptionEnvelope()}}
-\item \href{#method-Analytical-PlotDecisionThreshold}{\code{Analytical$PlotDecisionThreshold()}}
-\item \href{#method-Analytical-PlotObligation}{\code{Analytical$PlotObligation()}}
-\item \href{#method-Analytical-PlotPassageTimeModeMedianMean}{\code{Analytical$PlotPassageTimeModeMedianMean()}}
-\item \href{#method-Analytical-PlotPassageTimeVariance}{\code{Analytical$PlotPassageTimeVariance()}}
-\item \href{#method-Analytical-PlotPassageTimePercentiles}{\code{Analytical$PlotPassageTimePercentiles()}}
-\item \href{#method-Analytical-PlotPassageTimeDensity}{\code{Analytical$PlotPassageTimeDensity()}}
-\item \href{#method-Analytical-PlotPassageTimeProbability}{\code{Analytical$PlotPassageTimeProbability()}}
-}
+  \itemize{
+    \item \href{#method-Analytical-initialize}{\code{Analytical$new()}}
+    \item \href{#method-Analytical-set_oup_params}{\code{Analytical$set_oup_params()}}
+    \item \href{#method-Analytical-set_z_stoch_args}{\code{Analytical$set_z_stoch_args()}}
+    \item \href{#method-Analytical-set_y_stoch_args}{\code{Analytical$set_y_stoch_args()}}
+    \item \href{#method-Analytical-set_x_stoch_args}{\code{Analytical$set_x_stoch_args()}}
+    \item \href{#method-Analytical-set_t_stoch_args}{\code{Analytical$set_t_stoch_args()}}
+    \item \href{#method-Analytical-set_plot_args}{\code{Analytical$set_plot_args()}}
+    \item \href{#method-Analytical-set_plot_info}{\code{Analytical$set_plot_info()}}
+    \item \href{#method-Analytical-set_plot_type}{\code{Analytical$set_plot_type()}}
+    \item \href{#method-Analytical-set_flags}{\code{Analytical$set_flags()}}
+    \item \href{#method-Analytical-get_all}{\code{Analytical$get_all()}}
+    \item \href{#method-Analytical-get_oup_params}{\code{Analytical$get_oup_params()}}
+    \item \href{#method-Analytical-get_z_stoch_args}{\code{Analytical$get_z_stoch_args()}}
+    \item \href{#method-Analytical-get_y_stoch_args}{\code{Analytical$get_y_stoch_args()}}
+    \item \href{#method-Analytical-get_x_stoch_args}{\code{Analytical$get_x_stoch_args()}}
+    \item \href{#method-Analytical-get_t_stoch_args}{\code{Analytical$get_t_stoch_args()}}
+    \item \href{#method-Analytical-get_plot_args}{\code{Analytical$get_plot_args()}}
+    \item \href{#method-Analytical-get_plot_info}{\code{Analytical$get_plot_info()}}
+    \item \href{#method-Analytical-get_plot_colors}{\code{Analytical$get_plot_colors()}}
+    \item \href{#method-Analytical-get_plot_types}{\code{Analytical$get_plot_types()}}
+    \item \href{#method-Analytical-get_flags}{\code{Analytical$get_flags()}}
+    \item \href{#method-Analytical-axes_z_stoch}{\code{Analytical$axes_z_stoch()}}
+    \item \href{#method-Analytical-axes_y_stoch}{\code{Analytical$axes_y_stoch()}}
+    \item \href{#method-Analytical-axes_x_stoch}{\code{Analytical$axes_x_stoch()}}
+    \item \href{#method-Analytical-axes_t_stoch}{\code{Analytical$axes_t_stoch()}}
+    \item \href{#method-Analytical-sync_zyxt_stoch}{\code{Analytical$sync_zyxt_stoch()}}
+    \item \href{#method-Analytical-undo_clear}{\code{Analytical$undo_clear()}}
+    \item \href{#method-Analytical-undo_save}{\code{Analytical$undo_save()}}
+    \item \href{#method-Analytical-undo_undo}{\code{Analytical$undo_undo()}}
+    \item \href{#method-Analytical-Drift}{\code{Analytical$Drift()}}
+    \item \href{#method-Analytical-Diffusion}{\code{Analytical$Diffusion()}}
+    \item \href{#method-Analytical-Mean}{\code{Analytical$Mean()}}
+    \item \href{#method-Analytical-Variance}{\code{Analytical$Variance()}}
+    \item \href{#method-Analytical-Density}{\code{Analytical$Density()}}
+    \item \href{#method-Analytical-Probability}{\code{Analytical$Probability()}}
+    \item \href{#method-Analytical-DoubleIntegral}{\code{Analytical$DoubleIntegral()}}
+    \item \href{#method-Analytical-Option}{\code{Analytical$Option()}}
+    \item \href{#method-Analytical-OptionEnvelope}{\code{Analytical$OptionEnvelope()}}
+    \item \href{#method-Analytical-DecisionThreshold}{\code{Analytical$DecisionThreshold()}}
+    \item \href{#method-Analytical-Obligation}{\code{Analytical$Obligation()}}
+    \item \href{#method-Analytical-PassageTimeModeMedianMean}{\code{Analytical$PassageTimeModeMedianMean()}}
+    \item \href{#method-Analytical-PassageTimePercentiles}{\code{Analytical$PassageTimePercentiles()}}
+    \item \href{#method-Analytical-PassageTimeDensity}{\code{Analytical$PassageTimeDensity()}}
+    \item \href{#method-Analytical-PassageTimeProbability}{\code{Analytical$PassageTimeProbability()}}
+    \item \href{#method-Analytical-PlotDrift}{\code{Analytical$PlotDrift()}}
+    \item \href{#method-Analytical-PlotDiffusion}{\code{Analytical$PlotDiffusion()}}
+    \item \href{#method-Analytical-PlotMean}{\code{Analytical$PlotMean()}}
+    \item \href{#method-Analytical-PlotVariance}{\code{Analytical$PlotVariance()}}
+    \item \href{#method-Analytical-PlotDensity}{\code{Analytical$PlotDensity()}}
+    \item \href{#method-Analytical-PlotProbability}{\code{Analytical$PlotProbability()}}
+    \item \href{#method-Analytical-PlotDoubleIntegral}{\code{Analytical$PlotDoubleIntegral()}}
+    \item \href{#method-Analytical-PlotOption}{\code{Analytical$PlotOption()}}
+    \item \href{#method-Analytical-PlotOptionEnvelope}{\code{Analytical$PlotOptionEnvelope()}}
+    \item \href{#method-Analytical-PlotDecisionThreshold}{\code{Analytical$PlotDecisionThreshold()}}
+    \item \href{#method-Analytical-PlotObligation}{\code{Analytical$PlotObligation()}}
+    \item \href{#method-Analytical-PlotPassageTimeModeMedianMean}{\code{Analytical$PlotPassageTimeModeMedianMean()}}
+    \item \href{#method-Analytical-PlotPassageTimePercentiles}{\code{Analytical$PlotPassageTimePercentiles()}}
+    \item \href{#method-Analytical-PlotPassageTimeDensity}{\code{Analytical$PlotPassageTimeDensity()}}
+    \item \href{#method-Analytical-PlotPassageTimeProbability}{\code{Analytical$PlotPassageTimeProbability()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-new}{}}}
-\subsection{Method \code{new()}}{
-Create an Analytical object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$new(OUP = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-Analytical-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-initialize}{}}}
+\subsection{\code{Analytical$new()}}{
+  Create an Analytical object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$new(OUP = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{OUP}}{pointer set by the OUProcess object}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new Analytical object
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{OUP}}{pointer set by the OUProcess object}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new Analytical object
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{  A <- Analytical$new()
-  A$DecisionThreshold()
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-set_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-set_oup_params}{}}}
-\subsection{Method \code{set_oup_params()}}{
-Set OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$set_oup_params()}}{
+  Set OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{who}}{identifier for object sending the parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(rho,mu,sigma)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-set_z_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-set_z_stoch_args}{}}}
-\subsection{Method \code{set_z_stoch_args()}}{
-Set z as a stochastic state
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$set_z_stoch_args(z = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$set_z_stoch_args()}}{
+  Set z as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_z_stoch_args(z = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{z}}{vector of n states -inf<z<inf}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(z)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{z}}{vector of n states -inf<z<inf}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(z)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-set_y_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-set_y_stoch_args}{}}}
-\subsection{Method \code{set_y_stoch_args()}}{
-Set y as a stochastic state and its arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$set_y_stoch_args(
+\subsection{\code{Analytical$set_y_stoch_args()}}{
+  Set y as a stochastic state and its arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_y_stoch_args(
   t = NULL,
   y = NULL,
   s = NULL,
   x = NULL,
   psi = NULL,
-  eps = NULL
-)}\if{html}{\out{</div>}}
+  eps = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
+      \item{\code{eps}}{proportion remaining after convergence 0<=eps<=1}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,y,s,x,psi,eps)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{y}}{vector of n states -inf<y<inf}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
-
-\item{\code{eps}}{proportion remaining after convergence 0<=eps<=1}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(t,y,s,x,psi,eps)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-set_x_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-set_x_stoch_args}{}}}
-\subsection{Method \code{set_x_stoch_args()}}{
-Set x as a stochastic state and its arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$set_x_stoch_args(
+\subsection{\code{Analytical$set_x_stoch_args()}}{
+  Set x as a stochastic state and its arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_x_stoch_args(
   s = NULL,
   x = NULL,
   t = NULL,
@@ -356,86 +354,99 @@ Set x as a stochastic state and its arguments
   b = NULL,
   c = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times -inf<s<t}
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{t}}{terminal time -inf<t<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for exit option, >0 for entry option}
+      \item{\code{b}}{lump-sum benefit for entry option}
+      \item{\code{c}}{lump-sum cost for exit option}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(s,x,t,y,r,phi)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{vector of m times -inf<s<t}
-
-\item{\code{x}}{vector of n states -inf<x<inf}
-
-\item{\code{t}}{terminal time -inf<t<inf}
-
-\item{\code{y}}{terminal state -inf<y<inf}
-
-\item{\code{r}}{discount rate -inf<r<inf}
-
-\item{\code{phi}}{<=0 for exit option, >0 for entry option}
-
-\item{\code{b}}{lump-sum benefit for entry option}
-
-\item{\code{c}}{lump-sum cost for exit option}
-
-\item{\code{who}}{identifier for object sending the parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(s,x,t,y,r,phi)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-set_t_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-set_t_stoch_args}{}}}
-\subsection{Method \code{set_t_stoch_args()}}{
-Set t stochastic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$set_t_stoch_args(
+\subsection{\code{Analytical$set_t_stoch_args()}}{
+  Set t stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_t_stoch_args(
   t = NULL,
   k = NULL,
   s = NULL,
   x = NULL,
   z = NULL,
   omega = NULL,
-  Ppct = NULL
-)}\if{html}{\out{</div>}}
+  Ppct = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{threshold -inf<k<inf}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{z}}{vector of n alternate initial states -inf<z<inf}
+      \item{\code{omega}}{degree of irreversibility 0<=omega<=1}
+      \item{\code{Ppct}}{passage time probability for a percentile  0.01<=Ppct<=0.99}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,k,s,x,z,omega)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{k}}{decision threshold -inf<k<inf}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of n alternate initial states -inf<z<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{Ppct}}{passage time probability for a percentile  0.01<=Ppct<=0.99}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Analytical-set_plot_args"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-set_plot_args}{}}}
+\subsection{\code{Analytical$set_plot_args()}}{
+  Set plot arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_plot_args(pmax = NULL, ptmax = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(pmax,ptmax)
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(t,k,s,x,z,omega)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-set_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-set_plot_info}{}}}
-\subsection{Method \code{set_plot_info()}}{
-Set information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$set_plot_info(
-  type = NULL,
-  pmax = NULL,
-  ptmax = NULL,
+\subsection{\code{Analytical$set_plot_info()}}{
+  Set information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -447,441 +458,497 @@ Set information for plotting
   floor = NULL,
   labels = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{fontfamily}}{font family for plot labels}
+      \item{\code{fontsize}}{font size for plot labels}
+      \item{\code{fileformat}}{'png' or 'svg'}
+      \item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
+      \item{\code{fileheight}}{pixel height of 2D plot}
+      \item{\code{theme}}{'light' or 'dark'}
+      \item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
+      \item{\code{walls}}{3D walls TRUE or FALSE}
+      \item{\code{floor}}{3D floor TRUE or FALSE}
+      \item{\code{labels}}{title and parameters TRUE or FALSE}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(type,font,file,theme,3D)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1 and 2 for 2D, 3 and 4 for 3D}
-
-\item{\code{pmax}}{maximum vertical axis for transition density plot}
-
-\item{\code{ptmax}}{maximum vertical axis for passage time density plot}
-
-\item{\code{fontfamily}}{font family for plot labels}
-
-\item{\code{fontsize}}{font size for plot labels}
-
-\item{\code{fileformat}}{'png' or 'svg'}
-
-\item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
-
-\item{\code{fileheight}}{pixel height of 2D plot}
-
-\item{\code{theme}}{'light' or 'dark'}
-
-\item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
-
-\item{\code{walls}}{3D walls TRUE or FALSE}
-
-\item{\code{floor}}{3D floor TRUE or FALSE}
-
-\item{\code{labels}}{title and parameters TRUE or FALSE}
-
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Analytical-set_plot_type"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-set_plot_type}{}}}
+\subsection{\code{Analytical$set_plot_type()}}{
+  Set plot types by group
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_plot_type(type = NULL, group = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{a number identifying the type for a group}
+      \item{\code{group}}{identifier for groups of similar plots}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(type,group)
+  }
 }
-\if{html}{\out{</div>}}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Analytical-set_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-set_flags}{}}}
+\subsection{\code{Analytical$set_flags()}}{
+  Set flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$set_flags(plotit = NULL, copyit = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{plotit}}{automatic plot after calculation TRUE or FALSE}
+      \item{\code{copyit}}{copy to clipboard TRUE or FALSE}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
-\subsection{Returns}{
-list(type,font,file,theme,3D)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_all"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_all}{}}}
-\subsection{Method \code{get_all()}}{
-Get all arguments, time series and information
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_all()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_all()}}{
+  Get all arguments and information
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_all()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(oup_params,z_stoch_args,y_stoch_args,x_stoch_args,t_stoch_args,plot_info)
+  }
 }
 
-\subsection{Returns}{
-list(oup_params,z_stoch_args,y_stoch_args,x_stoch_args,t_stoch_args,plot_info)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_oup_params}{}}}
-\subsection{Method \code{get_oup_params()}}{
-Get OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_oup_params()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_oup_params()}}{
+  Get OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_oup_params()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
+  }
 }
 
-\subsection{Returns}{
-list(rho,mu,sigma)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_z_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_z_stoch_args}{}}}
-\subsection{Method \code{get_z_stoch_args()}}{
-Get z as a stochastic state
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_z_stoch_args()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_z_stoch_args()}}{
+  Get z as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_z_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(z)
+  }
 }
 
-\subsection{Returns}{
-list(z)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_y_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_y_stoch_args}{}}}
-\subsection{Method \code{get_y_stoch_args()}}{
-Get y as a stochastic state and its arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_y_stoch_args()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_y_stoch_args()}}{
+  Get y as a stochastic state and its arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_y_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,y,s,x,psi,eps)
+  }
 }
 
-\subsection{Returns}{
-list(t,y,s,x,psi,eps)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_x_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_x_stoch_args}{}}}
-\subsection{Method \code{get_x_stoch_args()}}{
-Get x as a stochastic state and its arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_x_stoch_args()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_x_stoch_args()}}{
+  Get x as a stochastic state and its arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_x_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(s,x,t,y,r,phi)
+  }
 }
 
-\subsection{Returns}{
-list(s,x,t,y,r,phi)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_t_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_t_stoch_args}{}}}
-\subsection{Method \code{get_t_stoch_args()}}{
-Get t stochastic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_t_stoch_args()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_t_stoch_args()}}{
+  Get t stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_t_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,k,s,x,z,omega,Ppct)
+  }
 }
 
-\subsection{Returns}{
-list(t,k,s,x,z,omega,Ppct)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Analytical-get_plot_args"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-get_plot_args}{}}}
+\subsection{\code{Analytical$get_plot_args()}}{
+  Get plot arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_plot_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(pmax,ptmax)
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_plot_info}{}}}
-\subsection{Method \code{get_plot_info()}}{
-Get information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_plot_info()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_plot_info()}}{
+  Get information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_plot_info()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(type,font,file,theme,3D,labels)
+  }
 }
 
-\subsection{Returns}{
-list(type,font,file,theme,3D,labels)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-get_plot_colors"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-get_plot_colors}{}}}
-\subsection{Method \code{get_plot_colors()}}{
-Get colors for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$get_plot_colors()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$get_plot_colors()}}{
+  Get colors for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_plot_colors()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+  }
 }
 
-\subsection{Returns}{
-list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Analytical-get_plot_types"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-get_plot_types}{}}}
+\subsection{\code{Analytical$get_plot_types()}}{
+  Get current types for plot routines
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_plot_types()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    (list(types,descriptioon))
+  }
 }
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Analytical-get_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-get_flags}{}}}
+\subsection{\code{Analytical$get_flags()}}{
+  Get flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$get_flags()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-axes_z_stoch"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-axes_z_stoch}{}}}
-\subsection{Method \code{axes_z_stoch()}}{
-Scale axes for z stochastic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$axes_z_stoch()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$axes_z_stoch()}}{
+  Scale axes for z stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$axes_z_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
 }
 
-\subsection{Returns}{
-NULL
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-axes_y_stoch"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-axes_y_stoch}{}}}
-\subsection{Method \code{axes_y_stoch()}}{
-Scale axes for y stochastic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$axes_y_stoch()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$axes_y_stoch()}}{
+  Scale axes for y stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$axes_y_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
 }
 
-\subsection{Returns}{
-NULL
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-axes_x_stoch"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-axes_x_stoch}{}}}
-\subsection{Method \code{axes_x_stoch()}}{
-Scale axes for x stochastic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$axes_x_stoch()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$axes_x_stoch()}}{
+  Scale axes for x stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$axes_x_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
 }
 
-\subsection{Returns}{
-NULL
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-axes_t_stoch"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-axes_t_stoch}{}}}
-\subsection{Method \code{axes_t_stoch()}}{
-Scale axes for t stochastic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$axes_t_stoch()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$axes_t_stoch()}}{
+  Scale axes for t stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$axes_t_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
 }
 
-\subsection{Returns}{
-NULL
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-sync_zyxt_stoch"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-sync_zyxt_stoch}{}}}
-\subsection{Method \code{sync_zyxt_stoch()}}{
-Synchronize states
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$sync_zyxt_stoch()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$sync_zyxt_stoch()}}{
+  Synchronize states
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$sync_zyxt_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
 }
 
-\subsection{Returns}{
-NULL
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-undo_clear"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-undo_clear}{}}}
-\subsection{Method \code{undo_clear()}}{
-Clear undo list and save current arguments to list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$undo_clear()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$undo_clear()}}{
+  Clear undo list and save current arguments to list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$undo_clear()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    1
+  }
 }
 
-\subsection{Returns}{
-1
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-undo_save"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-undo_save}{}}}
-\subsection{Method \code{undo_save()}}{
-Save current arguments to undo list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$undo_save()}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$undo_save()}}{
+  Save current arguments to undo list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$undo_save()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    number of argument sets
+  }
 }
 
-\subsection{Returns}{
-number of argument sets
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-undo_undo"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-undo_undo}{}}}
-\subsection{Method \code{undo_undo()}}{
-Replace current arguments from undo list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$undo_undo(updn = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$undo_undo()}}{
+  Replace current arguments from undo list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$undo_undo(updn = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{updn}}{positive to move up, negative to move down}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    c(index of this argument set, number of argument sets)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{updn}}{positive to move up, negative to move down}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-c(index of this argument set, number of argument sets)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Drift"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Drift}{}}}
-\subsection{Method \code{Drift()}}{
-Calculate, plot and return drifts
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Drift(z = NULL, rho = NULL, mu = NULL, plotit = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$Drift()}}{
+  Calculate, plot and return drifts
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Drift(z = NULL, rho = NULL, mu = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{z}}{vector of n states}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(g(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{z}}{vector of n states}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(g(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Diffusion"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Diffusion}{}}}
-\subsection{Method \code{Diffusion()}}{
-Calculate, plot and return diffusions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Diffusion(z = NULL, sigma = NULL, plotit = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{Analytical$Diffusion()}}{
+  Calculate, plot and return diffusions
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Diffusion(z = NULL, sigma = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{z}}{vector of n states}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(h2(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{z}}{vector of n states}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(h2(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Mean"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Mean}{}}}
-\subsection{Method \code{Mean()}}{
-Calculate and plot means
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Mean(
+\subsection{\code{Analytical$Mean()}}{
+  Calculate and plot means and time for means to converge
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Mean(
   t = NULL,
   s = NULL,
   x = NULL,
   rho = NULL,
   mu = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  eps = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{eps}}{proportion remaining after convergence 0<=eps<=1}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(G(mx1),Gteps)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(G(mx1))
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-MeanToConverge"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-MeanToConverge}{}}}
-\subsection{Method \code{MeanToConverge()}}{
-Calculate and plot time for mean to converge
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$MeanToConverge(s = NULL, rho = NULL, eps = NULL, plotit = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{eps}}{proportion remaining after convergence 0<=eps<=1}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(Gteps)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Variance"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Variance}{}}}
-\subsection{Method \code{Variance()}}{
-Calculate and plot variances
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Variance(
+\subsection{\code{Analytical$Variance()}}{
+  Calculate and plot variances and time for variances to converge
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Variance(
   t = NULL,
   s = NULL,
   rho = NULL,
   sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  eps = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{eps}}{proportion remaining after convergence 0<=eps<=1}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(H2(mx1),H2teps)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(H2(mx1))
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-VarianceToConverge"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-VarianceToConverge}{}}}
-\subsection{Method \code{VarianceToConverge()}}{
-Calculate and plot time for variance to converge
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$VarianceToConverge(s = NULL, rho = NULL, eps = NULL, plotit = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{eps}}{proportion remaining after convergence 0<=eps<=1}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(H2teps)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Density"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Density}{}}}
-\subsection{Method \code{Density()}}{
-Calculate and plot transition densities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Density(
+\subsection{\code{Analytical$Density()}}{
+  Calculate and plot transition densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Density(
   t = NULL,
   y = NULL,
   s = NULL,
@@ -889,339 +956,291 @@ Calculate and plot transition densities
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(p(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{y}}{vector of n states -inf<y<inf}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(p(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Probability"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Probability}{}}}
-\subsection{Method \code{Probability()}}{
-Calculate and plot transition probabilities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Probability(
+\subsection{\code{Analytical$Probability()}}{
+  Calculate and plot transition probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Probability(
   t = NULL,
   y = NULL,
   s = NULL,
   x = NULL,
+  psi = NULL,
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  psi = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{y}}{vector of nstates -inf<y<inf}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(P(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{y}}{vector of nstates -inf<y<inf}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(P(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-DoubleIntegral"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-DoubleIntegral}{}}}
-\subsection{Method \code{DoubleIntegral()}}{
-Calculate and plot double integrals of transition densities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$DoubleIntegral(
+\subsection{\code{Analytical$DoubleIntegral()}}{
+  Calculate and plot double integrals of transition densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$DoubleIntegral(
   t = NULL,
   y = NULL,
   s = NULL,
   x = NULL,
+  psi = NULL,
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  psi = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(PP(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{y}}{vector of n states -inf<y<inf}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(PP(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Option"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Option}{}}}
-\subsection{Method \code{Option()}}{
-Calculate and plot option prices
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Option(
+\subsection{\code{Analytical$Option()}}{
+  Calculate and plot option prices
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Option(
   s = NULL,
   x = NULL,
   t = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times -inf<s<t}
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{t}}{terminal time -inf<t<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for exit option, >0 for entry option}
+      \item{\code{b}}{lump-sum benefit for entry option}
+      \item{\code{c}}{lump-sum cost for exit option}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(OO(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{vector of m times -inf<s<t}
-
-\item{\code{x}}{vector of n states -inf<x<inf}
-
-\item{\code{t}}{terminal time -inf<t<inf}
-
-\item{\code{y}}{terminal state -inf<y<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{r}}{discount rate -inf<r<inf}
-
-\item{\code{phi}}{<=0 for exit option, >0 for entry option}
-
-\item{\code{b}}{lump-sum benefit for entry option}
-
-\item{\code{c}}{lump-sum cost for exit option}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(O(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-OptionEnvelope"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-OptionEnvelope}{}}}
-\subsection{Method \code{OptionEnvelope()}}{
-Calculate and plot the envelope of option prices
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$OptionEnvelope(
+\subsection{\code{Analytical$OptionEnvelope()}}{
+  Calculate and plot the envelope of option prices
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$OptionEnvelope(
   x = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for exit option, >0 for entry option}
+      \item{\code{b}}{lump-sum benefit for entry option}
+      \item{\code{c}}{lump-sum cost for exit option}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(OOhat(1xn),shat(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states -inf<x<inf}
-
-\item{\code{y}}{terminal state -inf<y<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{r}}{discount rate -inf<r<inf}
-
-\item{\code{phi}}{<=0 for exit option, >0 for entry option}
-
-\item{\code{b}}{lump-sum benefit for entry option}
-
-\item{\code{c}}{lump-sum cost for exit option}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(Ohat(1xn),shat(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-DecisionThreshold"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-DecisionThreshold}{}}}
-\subsection{Method \code{DecisionThreshold()}}{
-Calculate and plot the decision threshold
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$DecisionThreshold(
+\subsection{\code{Analytical$DecisionThreshold()}}{
+  Calculate and plot the decision threshold
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$DecisionThreshold(
   x = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for exit option, >0 for entry option}
+      \item{\code{b}}{lump-sum benefit for entry option}
+      \item{\code{c}}{lump-sum cost for exit option}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(k,OO)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states -inf<x<inf}
-
-\item{\code{y}}{terminal state -inf<y<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{r}}{discount rate -inf<r<inf}
-
-\item{\code{phi}}{<=0 for exit option, >0 for entry option}
-
-\item{\code{b}}{lump-sum benefit for entry option}
-
-\item{\code{c}}{lump-sum cost for exit option}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(k,O)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-Obligation"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-Obligation}{}}}
-\subsection{Method \code{Obligation()}}{
-Calculate and plot obligations and prohibitions, ie. benefit/cost analysis
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$Obligation(
+\subsection{\code{Analytical$Obligation()}}{
+  Calculate and plot obligations and prohibitions, ie. benefit/cost analysis
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$Obligation(
   s = NULL,
   x = NULL,
   t = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  rho = NULL,
+  mu = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times -inf<s<t}
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{t}}{terminal time -inf<t<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for obligation, >0 for prohibition}
+      \item{\code{b}}{lump-sum benefit for entry option}
+      \item{\code{c}}{lump-sum cost for exit option}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(BC(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{vector of m times -inf<s<t}
-
-\item{\code{x}}{vector of n states -inf<x<inf}
-
-\item{\code{t}}{terminal time -inf<t<inf}
-
-\item{\code{y}}{terminal state -inf<y<inf}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{r}}{discount rate -inf<r<inf}
-
-\item{\code{phi}}{<=0 for obligation, >0 for prohibition}
-
-\item{\code{b}}{lump-sum benefit for entry option}
-
-\item{\code{c}}{lump-sum cost for exit option}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(BC(mxn))
-}
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-PassageTimeMode"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-PassageTimeMode}{}}}
-\subsection{Method \code{PassageTimeMode()}}{
-Calculate and plot passage time modes
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PassageTimeMode(
+\if{html}{\out{<a id="method-Analytical-PassageTimeModeMedianMean"></a>}}
+\if{latex}{\out{\hypertarget{method-Analytical-PassageTimeModeMedianMean}{}}}
+\subsection{\code{Analytical$PassageTimeModeMedianMean()}}{
+  Calculate and plot passage time modes, medians and means
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PassageTimeModeMedianMean(
   k = NULL,
   s = NULL,
   x = NULL,
@@ -1230,182 +1249,38 @@ Calculate and plot passage time modes
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{z}}{vector of alternate initial states -inf<z<inf}
+      \item{\code{omega}}{degree of irreversibility 0<=omega<=1}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(tmodemedianmean,tmodesmediansmeans(n),)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{k}}{decision threshold -inf<k<int}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of alternate initial states -inf<x<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(tmode(1xn),tmodes(mxn))
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-PassageTimeMedian"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-PassageTimeMedian}{}}}
-\subsection{Method \code{PassageTimeMedian()}}{
-Calculate and plot passage time medians
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PassageTimeMedian(
-  k = NULL,
-  s = NULL,
-  x = NULL,
-  z = NULL,
-  omega = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{k}}{decision threshold -inf<k<int}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of alternate initial states -inf<x<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(tmedian(1xn),tmedians(mxn))
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-PassageTimeMean"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-PassageTimeMean}{}}}
-\subsection{Method \code{PassageTimeMean()}}{
-Calculate and plot passage time means
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PassageTimeMean(
-  k = NULL,
-  s = NULL,
-  x = NULL,
-  z = NULL,
-  omega = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{k}}{decision threshold -inf<k<int}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of alternate initial states -inf<x<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(tmean(1xn),tmeans(mxn))
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-PassageTimeVariance"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-PassageTimeVariance}{}}}
-\subsection{Method \code{PassageTimeVariance()}}{
-Calculate and plot passage time variances
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PassageTimeVariance(
-  k = NULL,
-  s = NULL,
-  x = NULL,
-  z = NULL,
-  omega = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{k}}{decision threshold -inf<k<int}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of alternate initial states -inf<x<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-(tvariance(1xn),tvariances(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PassageTimePercentiles"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PassageTimePercentiles}{}}}
-\subsection{Method \code{PassageTimePercentiles()}}{
-Calculate and plot passage time percentiles
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PassageTimePercentiles(
+\subsection{\code{Analytical$PassageTimePercentiles()}}{
+  Calculate and plot passage time percentiles
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PassageTimePercentiles(
   k = NULL,
   s = NULL,
   x = NULL,
@@ -1415,46 +1290,39 @@ Calculate and plot passage time percentiles
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{z}}{vector of alternate initial states -inf<z<inf}
+      \item{\code{omega}}{degree of irreversibility 0<=omega<=1}
+      \item{\code{Ppct}}{passage time probability for a percentile 0.01<=Ppct<=0.99}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(tpercentile(3),tpercentiles(3xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{k}}{decision threshold -inf<k<int}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of alternate initial states -inf<x<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{Ppct}}{passage time probability for a percentile 0.01<=Ppct<=0.99}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(tpercentile(1xn),tpercentiles(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PassageTimeDensity"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PassageTimeDensity}{}}}
-\subsection{Method \code{PassageTimeDensity()}}{
-Calculate and plot passage time densities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PassageTimeDensity(
+\subsection{\code{Analytical$PassageTimeDensity()}}{
+  Calculate and plot passage time densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PassageTimeDensity(
   t = NULL,
   k = NULL,
   s = NULL,
@@ -1464,46 +1332,39 @@ Calculate and plot passage time densities
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{z}}{vector of alternate initial states -inf<z<inf}
+      \item{\code{omega}}{degree of irreversibility 0<=omega<=1}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(ptx(mx1),pt(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{k}}{decision threshold -inf<k<int}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of alternate initial states -inf<x<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(ptx(1xn),pt(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PassageTimeProbability"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PassageTimeProbability}{}}}
-\subsection{Method \code{PassageTimeProbability()}}{
-Calculate and plot passage time probabilities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PassageTimeProbability(
+\subsection{\code{Analytical$PassageTimeProbability()}}{
+  Calculate and plot passage time probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PassageTimeProbability(
   t = NULL,
   k = NULL,
   s = NULL,
@@ -1513,117 +1374,107 @@ Calculate and plot passage time probabilities
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{s}}{initial time -inf<s<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{z}}{vector of alternate initial states -inf<z<inf}
+      \item{\code{omega}}{degree of irreversibility 0<=omega<=1}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(Ptx(1xn),Pt(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{vector of m times s<=t<inf}
-
-\item{\code{k}}{decision threshold -inf<k<int}
-
-\item{\code{s}}{initial time -inf<s<inf}
-
-\item{\code{x}}{initial state -inf<x<inf}
-
-\item{\code{z}}{vector of alternate initial states -inf<x<inf}
-
-\item{\code{omega}}{degree of irreversibility 0<=omega<=1}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(Ptx(1xn),Pt(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotDrift"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotDrift}{}}}
-\subsection{Method \code{PlotDrift()}}{
-Plot drifts
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotDrift(
+\subsection{\code{Analytical$PlotDrift()}}{
+  Plot drifts
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotDrift(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   zbeg = NULL,
   zend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zbeg}}{begin value for state axis}
-
-\item{\code{zend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotDiffusion"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotDiffusion}{}}}
-\subsection{Method \code{PlotDiffusion()}}{
-Plot diffusions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotDiffusion(
+\subsection{\code{Analytical$PlotDiffusion()}}{
+  Plot diffusions
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotDiffusion(
   type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   zbeg = NULL,
   zend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 and 3 for 2D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zbeg}}{begin value for state axis}
-
-\item{\code{zend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotMean"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotMean}{}}}
-\subsection{Method \code{PlotMean()}}{
-Plot means
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotMean(
+\subsection{\code{Analytical$PlotMean()}}{
+  Plot means
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotMean(
   type = NULL,
   pmax = NULL,
   title = NULL,
@@ -1634,79 +1485,38 @@ Plot means
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1,...,2 or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum scale for vertical axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 3 for 2D, 4 and 5 for 3D}
-
-\item{\code{pmax}}{maximum scale for vertical axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{ybeg}}{begin value for state axis}
-
-\item{\code{yend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-PlotMeanToConverge"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-PlotMeanToConverge}{}}}
-\subsection{Method \code{PlotMeanToConverge()}}{
-Plot the mean to converge
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotMeanToConverge(
-  title = NULL,
-  xaxis = NULL,
-  yaxis = NULL,
-  tbeg = NULL,
-  tend = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotVariance"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotVariance}{}}}
-\subsection{Method \code{PlotVariance()}}{
-Plot variances
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotVariance(
+\subsection{\code{Analytical$PlotVariance()}}{
+  Plot variances
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotVariance(
   type = NULL,
   pmax = NULL,
   title = NULL,
@@ -1717,79 +1527,38 @@ Plot variances
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1,...,2 or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum scale for vertical axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 and 3 for 2D, 4 and 5 for 3D}
-
-\item{\code{pmax}}{maximum scale for vertical axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{ybeg}}{begin value for state axis}
-
-\item{\code{yend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-PlotVarianceToConverge"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-PlotVarianceToConverge}{}}}
-\subsection{Method \code{PlotVarianceToConverge()}}{
-Plot the variance to converge
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotVarianceToConverge(
-  title = NULL,
-  xaxis = NULL,
-  yaxis = NULL,
-  tbeg = NULL,
-  tend = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotDensity"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotDensity}{}}}
-\subsection{Method \code{PlotDensity()}}{
-Plot transition densities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotDensity(
+\subsection{\code{Analytical$PlotDensity()}}{
+  Plot transition densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotDensity(
   type = NULL,
   pmax = NULL,
   title = NULL,
@@ -1800,45 +1569,38 @@ Plot transition densities
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum scale for vertical axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 for 2D, 3, 4 and 5 for 3D}
-
-\item{\code{pmax}}{maximum scale for vertical axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{ybeg}}{begin value for state axis}
-
-\item{\code{yend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotProbability"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotProbability}{}}}
-\subsection{Method \code{PlotProbability()}}{
-Plot transition probabilities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotProbability(
+\subsection{\code{Analytical$PlotProbability()}}{
+  Plot transition probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotProbability(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -1848,43 +1610,37 @@ Plot transition probabilities
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 for 2D, 3, 4 and 5 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{ybeg}}{begin value for state axis}
-
-\item{\code{yend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotDoubleIntegral"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotDoubleIntegral}{}}}
-\subsection{Method \code{PlotDoubleIntegral()}}{
-Plot double integrals of transition densities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotDoubleIntegral(
+\subsection{\code{Analytical$PlotDoubleIntegral()}}{
+  Plot double integrals of transition densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotDoubleIntegral(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -1894,43 +1650,37 @@ Plot double integrals of transition densities
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 for 2D, 3, 4 and 5 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{ybeg}}{begin value for state axis}
-
-\item{\code{yend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotOption"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotOption}{}}}
-\subsection{Method \code{PlotOption()}}{
-Plot options
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotOption(
+\subsection{\code{Analytical$PlotOption()}}{
+  Plot options
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotOption(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -1940,43 +1690,37 @@ Plot options
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{sbeg}}{begin value for time axis}
+      \item{\code{send}}{end value for time axis}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 for 2D, 3, 4 and 5 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{sbeg}}{begin value for time axis}
-
-\item{\code{send}}{end value for time axis}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotOptionEnvelope"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotOptionEnvelope}{}}}
-\subsection{Method \code{PlotOptionEnvelope()}}{
-Plot the option envelope
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotOptionEnvelope(
+\subsection{\code{Analytical$PlotOptionEnvelope()}}{
+  Plot the option envelope
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotOptionEnvelope(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -1986,77 +1730,71 @@ Plot the option envelope
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{sbeg}}{begin value for time axis}
+      \item{\code{send}}{end value for time axis}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 3 for 2D, 4, 5 and 6 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{sbeg}}{begin value for time axis}
-
-\item{\code{send}}{end value for time axis}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotDecisionThreshold"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotDecisionThreshold}{}}}
-\subsection{Method \code{PlotDecisionThreshold()}}{
-Plot the decision threshold
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotDecisionThreshold(
+\subsection{\code{Analytical$PlotDecisionThreshold()}}{
+  Plot the decision threshold
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotDecisionThreshold(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotObligation"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotObligation}{}}}
-\subsection{Method \code{PlotObligation()}}{
-Plot obligations
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotObligation(
+\subsection{\code{Analytical$PlotObligation()}}{
+  Plot obligations
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotObligation(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2066,129 +1804,79 @@ Plot obligations
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{sbeg}}{begin value for time axis}
+      \item{\code{send}}{end value for time axis}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 for 2D, 3, 4, 5 and 6 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{sbeg}}{begin value for time axis}
-
-\item{\code{send}}{end value for time axis}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotPassageTimeModeMedianMean"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotPassageTimeModeMedianMean}{}}}
-\subsection{Method \code{PlotPassageTimeModeMedianMean()}}{
-Plot passage time modes, medians and means
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotPassageTimeModeMedianMean(
+\subsection{\code{Analytical$PlotPassageTimeModeMedianMean()}}{
+  Plot passage time modes, medians and means
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotPassageTimeModeMedianMean(
   type = NULL,
+  ptmax = NULL,
+  title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   zaxis = NULL,
-  ptmax = NULL,
-  title = NULL,
   tbeg = NULL,
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -3,...,2 or 'n','p','d' for next, previous, default}
+      \item{\code{ptmax}}{maximum scale for vertical axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1, 2, 3 and 4 for 2D, 5 and 6 for 3D}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{ptmax}}{maximum scale for vertical axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{zbeg}}{begin value for state axis}
-
-\item{\code{zend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Analytical-PlotPassageTimeVariance"></a>}}
-\if{latex}{\out{\hypertarget{method-Analytical-PlotPassageTimeVariance}{}}}
-\subsection{Method \code{PlotPassageTimeVariance()}}{
-Plot passage time variances
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotPassageTimeVariance(
-  type = NULL,
-  xaxis = NULL,
-  yaxis = NULL,
-  title = NULL,
-  zbeg = NULL,
-  zend = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 3 and 4 for 2D}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{zbeg}}{begin value for state axis}
-
-\item{\code{zend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotPassageTimePercentiles"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotPassageTimePercentiles}{}}}
-\subsection{Method \code{PlotPassageTimePercentiles()}}{
-Plot passage time lower, median and upper percentiles
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotPassageTimePercentiles(
+\subsection{\code{Analytical$PlotPassageTimePercentiles()}}{
+  Plot passage time lower, median and upper percentiles
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotPassageTimePercentiles(
   type = NULL,
   ptmax = NULL,
   title = NULL,
@@ -2199,45 +1887,38 @@ Plot passage time lower, median and upper percentiles
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -3,...,2 or 'n','p','d' for next, previous, default}
+      \item{\code{ptmax}}{maximum scale for vertical axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1, 2, 3 and 4 for 2D, 5 and 6 for 3D}
-
-\item{\code{ptmax}}{maximum scale for vertical axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{zbeg}}{begin value for state axis}
-
-\item{\code{zend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotPassageTimeDensity"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotPassageTimeDensity}{}}}
-\subsection{Method \code{PlotPassageTimeDensity()}}{
-Plot passage time densities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotPassageTimeDensity(
+\subsection{\code{Analytical$PlotPassageTimeDensity()}}{
+  Plot passage time densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotPassageTimeDensity(
   type = NULL,
   ptmax = NULL,
   title = NULL,
@@ -2248,45 +1929,38 @@ Plot passage time densities
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{ptmax}}{maximum scale for vertical axis}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1 and 2 for 2D, 3, 4 and 5 for 3D}
-
-\item{\code{ptmax}}{maximum scale for vertical axis}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{zbeg}}{begin value for state axis}
-
-\item{\code{zend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Analytical-PlotPassageTimeProbability"></a>}}
 \if{latex}{\out{\hypertarget{method-Analytical-PlotPassageTimeProbability}{}}}
-\subsection{Method \code{PlotPassageTimeProbability()}}{
-Plot passage time probabilities
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Analytical$PlotPassageTimeProbability(
+\subsection{\code{Analytical$PlotPassageTimeProbability()}}{
+  Plot passage time probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Analytical$PlotPassageTimeProbability(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2296,34 +1970,27 @@ Plot passage time probabilities
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1 or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1 and 2 for 2D, 3, 4 and 5 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{tbeg}}{begin value for time axis}
-
-\item{\code{tend}}{end value for time axis}
-
-\item{\code{zbeg}}{begin value for state axis}
-
-\item{\code{zend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 }

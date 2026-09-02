@@ -5,3 +5,4 @@
 A <- Analytical$new()
 # default
 A$DecisionThreshold(phi=1)
+A$PlotDecisionThreshold()

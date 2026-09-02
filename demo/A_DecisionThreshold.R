@@ -3,9 +3,10 @@
 # Type 'demo(A_DecisionThreshold)'
 # R6 object
 A <- Analytical$new()
-# no plot
-A$DecisionThreshold(plotit=FALSE)
-# print and plot
+# print only
+A$DecisionThreshold()
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 A$DecisionThreshold()
 # new option
 A$DecisionThreshold(y=-15,rho=0.1,mu=15,sigma=25)

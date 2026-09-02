@@ -1,0 +1,40 @@
+#!/bin/sh
+# configure — CRAN-safe conditional compilation for optional RcppParallel + sitmo
+# Works on Linux, macOS, and Windows (Rtools/MSYS2)
+
+echo "Configuring conditional compilation..."
+
+# --- Detect RcppParallel ---
+RCPP_PARALLEL_HOME=$(Rscript -e "cat(system.file(package='RcppParallel'))" 2>/dev/null)
+if [ -n "$RCPP_PARALLEL_HOME" ]; then
+    echo "  RcppParallel found at: $RCPP_PARALLEL_HOME"
+    PKG_CPPFLAGS="-DUSE_PARALLEL -I$RCPP_PARALLEL_HOME/include"
+    PKG_LIBS=$(Rscript -e "RcppParallel::RcppParallelLibs()")
+else
+    echo "  RcppParallel not found — building with Rcpp only."
+    PKG_CPPFLAGS="-DNO_PARALLEL"
+    PKG_LIBS=""
+fi
+
+# --- Detect sitmo ---
+SITMO_HOME=$(Rscript -e "cat(system.file(package='sitmo'))" 2>/dev/null)
+if [ -n "$SITMO_HOME" ]; then
+    echo "  sitmo found at: $SITMO_HOME"
+    PKG_CPPFLAGS="$PKG_CPPFLAGS -DUSE_SITMO -I$SITMO_HOME/include"
+else
+    echo "  sitmo not found — building with standard RNG only."
+    PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_SITMO"
+fi
+
+# Ensure src directory exists
+mkdir -p src
+
+# Write Makevars (Unix) and Makevars.win (Windows)
+{
+    echo "PKG_CPPFLAGS += $PKG_CPPFLAGS"
+    echo "PKG_LIBS += $PKG_LIBS"
+} > src/Makevars
+
+cp src/Makevars src/Makevars.win
+
+echo "Configuration complete."

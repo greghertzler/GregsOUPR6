@@ -1,4 +1,9 @@
-^renv$
-^renv\.lock$
-^.*\.Rproj$
+^GregsOUPR6\.Rproj$
 ^\.Rproj\.user$
+^\.positai$
+^\.claude$
+^src/Makevars$
+^src/Makevars\.win$
+^_pkgdown\.yml$
+^pkgdown$
+^docs$

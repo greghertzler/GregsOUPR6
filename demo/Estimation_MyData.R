@@ -3,10 +3,9 @@
 # Type 'demo(Estimation_MyData)'
 # R6 object
 ML <- MaximumLikelihood$new()
-# read data
-datapath<-OUPDataPath()  # this is a path to your data directory
-filepath<-paste0(datapath,"MyData.csv")  # this is your filepath
-filepath
-df<-read.csv(filepath)
+# read default data
+df<-OUPDataRead()
 # estimate
-ML$Estimates(df,taucol=1,zcol=2)
+ML$Estimates(df)
+# plot
+ML$PlotEstimates()

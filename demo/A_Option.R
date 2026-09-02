@@ -4,8 +4,9 @@
 # R6 object
 A <- Analytical$new()
 # type 'O' to print numbers
-O <- A$Option(plotit=FALSE)
-# calculate and plot
+O <- A$Option()
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 O <- A$Option()
 # new option
 O <- A$Option(y=-15,rho=0.1,mu=15,sigma=25)
@@ -23,7 +24,5 @@ A$set_oup_params(rho=0.8,mu=-5,sigma=50)
 A$set_x_stoch_args(t=5,s=seq(from=0,to=5,by=0.05),x=seq(from=-50,to=50,by=1),y=5)
 A$PlotOption(title="My Title")
 # plot types
-A$PlotOption(title="type=4",type=4)
-A$PlotOption(title="type=5",type=5)
-A$PlotOption(title="type=2",type=2)
-A$PlotOption(title="type=3 (default)",type=3)
+A$PlotOption(title="type=1",type=1)
+A$PlotOption(title="type=0 (default)",type=0)

@@ -3,7 +3,8 @@
 # Type 'demo(Policies_Bankruptcy)'
 # R6 object
 A <- Analytical$new()
-A$set_plot_info(type=2)
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 # entry with fixed costs
 A$DecisionThreshold(y=5,sigma=30,phi=1)
 A$undo_clear()

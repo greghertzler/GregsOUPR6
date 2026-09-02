@@ -3,6 +3,8 @@
 # Type 'demo(FD_TerminalValue_Gompertz)'
 # R6 object
 FD <- FiniteDifference$new()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 V <- FD$TerminalValue_Gompertz()
 V <- FD$TerminalValue_Gompertz(xi=0,vr=0.1)
 V <- FD$TerminalValue_Gompertz(xi=0,vr=0.1,Vmax=2,Vmin=1)

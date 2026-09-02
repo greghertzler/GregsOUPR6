@@ -3,6 +3,8 @@
 # Type 'demo(Policies_Stabilisation)'
 # R6 object
 A <- Analytical$new()
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 # no stabilisation
 A$DecisionThreshold(x=seq(from=0,to=100,by=1),mu=60,sigma=50,phi=1)
 # costless stabilisation

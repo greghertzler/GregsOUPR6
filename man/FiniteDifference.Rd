@@ -2,16 +2,15 @@
 % Please edit documentation in R/FiniteDifferenceHertz.R
 \name{FiniteDifference}
 \alias{FiniteDifference}
-\title{R6 Class implementing a Finite Difference method.}
+\title{R6 class implementing a Finite Difference method for the Ornstein-Uhlenbeck Process.}
 \description{
-A Finite Difference method for the Ornstein-Uhlenbeck Process--without boundary
-conditions on the state but with arbitrary terminal values--for the pricing of
-index insurance, perpetual options and sequential options. From the option
-prices, an option envelope and a decision threshold can be calculated.  Drift,
-diffusion and several possible terminal values are pre-programmed.  User-defined
-terminal values can also be entered.
+A Finite Difference method--without boundary conditions on the state but with
+arbitrary terminal values--for the pricing of index insurance, perpetual options
+and sequential options. From the option prices, an option envelope and a decision
+threshold can be calculated.  Drift, diffusion and several possible terminal values
+are pre-programmed.  User-defined terminal values can also be entered.
 }
-\section{Formulas and methods:}{
+\section{Formulas and Methods:}{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{x stochastic
   Drift
   Diffusion
@@ -64,25 +63,61 @@ terminal values can also be entered.
 }\if{html}{\out{</div>}}
 }
 
-\section{Using the formulas and methods:}{
-Demonstration scripts are in files in the 'demo' directory. Identify a
-formula and in the console type:
+\section{Usage:}{
+The FiniteDifference object must first be instantiated before its methods
+are called. There are two ways.  The first way instantiates the OUProcess
+object and calls a function to get a pointer:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  demo(FD_FormulaName), or
-  demo(FD_PlotFormulaName).
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
+  A <- OUP$get_Analytical()
+  FD <- OUP$get_FiniteDifference()
+  ML <- OUP$get_MaximumLikelihood()
+  MC <- OUP$get_MonteCarlo()
 }\if{html}{\out{</div>}}
+
+The FiniteDifference object will coordinate arguments to functions with the
+Analytial, MaximumLikelihood and MonteCarlo objects.  The second
+way instantiates the FiniteDifference object by itself with no coordination:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  FD <- FiniteDifference$new()
+}\if{html}{\out{</div>}}
+
+Once the object is instantiated, its methods can be called, to calculate and
+plot a Decision Threshold, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  FD$DecisionThreshold()
+}\if{html}{\out{</div>}}
+
+The plot methods can be used to customize the plots, with a title, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  FD$PlotDecisionThreshold(title="My Decision")
+}\if{html}{\out{</div>}}
+
+Other functions and methods are called in the same way.  To see all the
+possibilities, check out the demos below.
+}
+
+\section{Demos:}{
+Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDemoList()
+  OUPDemoRun(<number of demo in list>)
+}\if{html}{\out{</div>}}
+
+Entering the demos by number in the list saves typing.
 }
 
 \section{Discussion:}{
 The Finite Difference Method can solve problems with no analytical solutions.
-As a numerical procedure, it will have errors. Large dif fusions will cause
-larger errors. To manage the errors, the domain for x should be as large as
-practical. The increment between times is ds and skip subdivides time into
-small intervals. Only calculations for ds are reported.  The increment
-between states is dx and ds/skip should be at most dx/100. Increasing skip
-or dx may reduce errors up to a point. If possible, the Finite Difference
-Method should be calibrated against an analytical solution for a simple
-problem before solving more complicated problems.
+As a numerical procedure, it will have errors. The larger the scale parameter,
+the larger the errors.  To manage the errors, the domain for x should be as
+large as practical. The increment between times is ds.  Parameter skip
+subdivides ds into smaller intervals. Only calculations for ds are reported.
+The increment between states is dx and ds/skip should be about dx/100.
+Increasing skip or dx may reduce errors up to a point. If possible, the
+Finite Difference Method should be calibrated against an analytical solution
+for a simpler problem before solving more complicated problems.
 
 The functions include many different types of terminal values, but suppose
 the bottom line is a simple exit option:
@@ -107,8 +142,8 @@ to exit, calculating the exit decision first:
 }\if{html}{\out{</div>}}
 
 The functions all return named lists. Before being used in calculations, a
-list must be stripped of its names, the names Ohat for the option envelope
-and V for the terminal value, in the above example. The functions try to
+list must be stripped of its names.  In the above example, the names are Ohat
+for the option envelope and V for the terminal value. The functions try to
 help by accepting named lists as arguments.  For example:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  V <- FD$TerminalValue_Kinked(xo=5,vs=1)
@@ -121,7 +156,7 @@ object, so entering V as as argument does nothing useful in this case.
 You may wish to calculate your own terminal value in the console. You must
 first get rid of the names. The names to get rid of are listed under
 'Returns' in the help for each function. You can also use double brackets
-to eliminate names if you know the position in the list. Both 'Ohat' and 'V'
+to eliminate names if you know the position in the list. Both 'OOhat' and 'V'
 are first in their lists:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  FD$TerminalValue_Kinked(xo=0,vs=-1)
@@ -130,162 +165,142 @@ are first in their lists:
   FD$DecisionThreshold(V=V,phi=1)
 }\if{html}{\out{</div>}}
 
+Or you can unlist everything:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  V <- unlist(FD$OptionEnvelope())+unlist(FD$TerminalValue_Kinked(xo=5,vs=1))
+}\if{html}{\out{</div>}}
+
 Sorry.
-
-Examples in R6 don't work the same way as other R modules.  There is only
-one example for an R6 object, not one for each function in the object.
-To run examples, the devtools::run_examples() works, but the R command
-example("FiniteDifference") doesn't.  You can copy commands to the clipboard,
-paste into the console and press Enter. Examples in this help and a simple
-example at the bottom can be run in this way.
-
-A better alternative is demo(), but this works sometimes, sometimes not.
-If you don't see the demos for this package, go to Files and demo.  You will
-see the demo names and then type something like demo(FD_DecisionThreshold).
 }
 
-\examples{
-
-## ------------------------------------------------
-## Method `FiniteDifference$new`
-## ------------------------------------------------
-
-  FD <- FiniteDifference$new()
-  FD$TerminalValue_Mitscherlich(plotit=FALSE)
-  FD$DecisionThreshold()
-}
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-FiniteDifference-new}{\code{FiniteDifference$new()}}
-\item \href{#method-FiniteDifference-set_oup_params}{\code{FiniteDifference$set_oup_params()}}
-\item \href{#method-FiniteDifference-set_x_stoch_args}{\code{FiniteDifference$set_x_stoch_args()}}
-\item \href{#method-FiniteDifference-set_V_linear_args}{\code{FiniteDifference$set_V_linear_args()}}
-\item \href{#method-FiniteDifference-set_V_degenerate_args}{\code{FiniteDifference$set_V_degenerate_args()}}
-\item \href{#method-FiniteDifference-set_V_stepped_args}{\code{FiniteDifference$set_V_stepped_args()}}
-\item \href{#method-FiniteDifference-set_V_kinked_args}{\code{FiniteDifference$set_V_kinked_args()}}
-\item \href{#method-FiniteDifference-set_V_butterfly_args}{\code{FiniteDifference$set_V_butterfly_args()}}
-\item \href{#method-FiniteDifference-set_V_mitscherlich_args}{\code{FiniteDifference$set_V_mitscherlich_args()}}
-\item \href{#method-FiniteDifference-set_V_gompertz_args}{\code{FiniteDifference$set_V_gompertz_args()}}
-\item \href{#method-FiniteDifference-set_V_logistic_args}{\code{FiniteDifference$set_V_logistic_args()}}
-\item \href{#method-FiniteDifference-set_V_transcendental_args}{\code{FiniteDifference$set_V_transcendental_args()}}
-\item \href{#method-FiniteDifference-set_V_yieldindex_args}{\code{FiniteDifference$set_V_yieldindex_args()}}
-\item \href{#method-FiniteDifference-set_V_args}{\code{FiniteDifference$set_V_args()}}
-\item \href{#method-FiniteDifference-set_V_info}{\code{FiniteDifference$set_V_info()}}
-\item \href{#method-FiniteDifference-set_plot_info}{\code{FiniteDifference$set_plot_info()}}
-\item \href{#method-FiniteDifference-get_all}{\code{FiniteDifference$get_all()}}
-\item \href{#method-FiniteDifference-get_oup_params}{\code{FiniteDifference$get_oup_params()}}
-\item \href{#method-FiniteDifference-get_x_stoch_args}{\code{FiniteDifference$get_x_stoch_args()}}
-\item \href{#method-FiniteDifference-get_V_linear_args}{\code{FiniteDifference$get_V_linear_args()}}
-\item \href{#method-FiniteDifference-get_V_degenerate_args}{\code{FiniteDifference$get_V_degenerate_args()}}
-\item \href{#method-FiniteDifference-get_V_stepped_args}{\code{FiniteDifference$get_V_stepped_args()}}
-\item \href{#method-FiniteDifference-get_V_kinked_args}{\code{FiniteDifference$get_V_kinked_args()}}
-\item \href{#method-FiniteDifference-get_V_butterfly_args}{\code{FiniteDifference$get_V_butterfly_args()}}
-\item \href{#method-FiniteDifference-get_V_mitscherlich_args}{\code{FiniteDifference$get_V_mitscherlich_args()}}
-\item \href{#method-FiniteDifference-get_V_gompertz_args}{\code{FiniteDifference$get_V_gompertz_args()}}
-\item \href{#method-FiniteDifference-get_V_logistic_args}{\code{FiniteDifference$get_V_logistic_args()}}
-\item \href{#method-FiniteDifference-get_V_transcendental_args}{\code{FiniteDifference$get_V_transcendental_args()}}
-\item \href{#method-FiniteDifference-get_V_yieldindex_args}{\code{FiniteDifference$get_V_yieldindex_args()}}
-\item \href{#method-FiniteDifference-get_V_args}{\code{FiniteDifference$get_V_args()}}
-\item \href{#method-FiniteDifference-get_V_info}{\code{FiniteDifference$get_V_info()}}
-\item \href{#method-FiniteDifference-get_plot_info}{\code{FiniteDifference$get_plot_info()}}
-\item \href{#method-FiniteDifference-get_plot_colors}{\code{FiniteDifference$get_plot_colors()}}
-\item \href{#method-FiniteDifference-axes_x_stoch}{\code{FiniteDifference$axes_x_stoch()}}
-\item \href{#method-FiniteDifference-undo_clear}{\code{FiniteDifference$undo_clear()}}
-\item \href{#method-FiniteDifference-undo_save}{\code{FiniteDifference$undo_save()}}
-\item \href{#method-FiniteDifference-undo_undo}{\code{FiniteDifference$undo_undo()}}
-\item \href{#method-FiniteDifference-Drift}{\code{FiniteDifference$Drift()}}
-\item \href{#method-FiniteDifference-Diffusion}{\code{FiniteDifference$Diffusion()}}
-\item \href{#method-FiniteDifference-TerminalValue_Linear}{\code{FiniteDifference$TerminalValue_Linear()}}
-\item \href{#method-FiniteDifference-TerminalValue_Degenerate}{\code{FiniteDifference$TerminalValue_Degenerate()}}
-\item \href{#method-FiniteDifference-TerminalValue_Stepped}{\code{FiniteDifference$TerminalValue_Stepped()}}
-\item \href{#method-FiniteDifference-TerminalValue_Kinked}{\code{FiniteDifference$TerminalValue_Kinked()}}
-\item \href{#method-FiniteDifference-TerminalValue_Butterfly}{\code{FiniteDifference$TerminalValue_Butterfly()}}
-\item \href{#method-FiniteDifference-TerminalValue_Mitscherlich}{\code{FiniteDifference$TerminalValue_Mitscherlich()}}
-\item \href{#method-FiniteDifference-TerminalValue_Gompertz}{\code{FiniteDifference$TerminalValue_Gompertz()}}
-\item \href{#method-FiniteDifference-TerminalValue_Logistic}{\code{FiniteDifference$TerminalValue_Logistic()}}
-\item \href{#method-FiniteDifference-TerminalValue_Transcendental}{\code{FiniteDifference$TerminalValue_Transcendental()}}
-\item \href{#method-FiniteDifference-TerminalValue_YieldIndex}{\code{FiniteDifference$TerminalValue_YieldIndex()}}
-\item \href{#method-FiniteDifference-TerminalValue}{\code{FiniteDifference$TerminalValue()}}
-\item \href{#method-FiniteDifference-Option}{\code{FiniteDifference$Option()}}
-\item \href{#method-FiniteDifference-OptionEnvelope}{\code{FiniteDifference$OptionEnvelope()}}
-\item \href{#method-FiniteDifference-DecisionThreshold}{\code{FiniteDifference$DecisionThreshold()}}
-\item \href{#method-FiniteDifference-PlotDrift}{\code{FiniteDifference$PlotDrift()}}
-\item \href{#method-FiniteDifference-PlotDiffusion}{\code{FiniteDifference$PlotDiffusion()}}
-\item \href{#method-FiniteDifference-PlotTerminalValue}{\code{FiniteDifference$PlotTerminalValue()}}
-\item \href{#method-FiniteDifference-PlotOption}{\code{FiniteDifference$PlotOption()}}
-\item \href{#method-FiniteDifference-PlotOptionEnvelope}{\code{FiniteDifference$PlotOptionEnvelope()}}
-\item \href{#method-FiniteDifference-PlotDecisionThreshold}{\code{FiniteDifference$PlotDecisionThreshold()}}
-}
+  \itemize{
+    \item \href{#method-FiniteDifference-initialize}{\code{FiniteDifference$new()}}
+    \item \href{#method-FiniteDifference-set_oup_params}{\code{FiniteDifference$set_oup_params()}}
+    \item \href{#method-FiniteDifference-set_x_stoch_args}{\code{FiniteDifference$set_x_stoch_args()}}
+    \item \href{#method-FiniteDifference-set_V_linear_args}{\code{FiniteDifference$set_V_linear_args()}}
+    \item \href{#method-FiniteDifference-set_V_degenerate_args}{\code{FiniteDifference$set_V_degenerate_args()}}
+    \item \href{#method-FiniteDifference-set_V_stepped_args}{\code{FiniteDifference$set_V_stepped_args()}}
+    \item \href{#method-FiniteDifference-set_V_kinked_args}{\code{FiniteDifference$set_V_kinked_args()}}
+    \item \href{#method-FiniteDifference-set_V_butterfly_args}{\code{FiniteDifference$set_V_butterfly_args()}}
+    \item \href{#method-FiniteDifference-set_V_mitscherlich_args}{\code{FiniteDifference$set_V_mitscherlich_args()}}
+    \item \href{#method-FiniteDifference-set_V_gompertz_args}{\code{FiniteDifference$set_V_gompertz_args()}}
+    \item \href{#method-FiniteDifference-set_V_logistic_args}{\code{FiniteDifference$set_V_logistic_args()}}
+    \item \href{#method-FiniteDifference-set_V_transcendental_args}{\code{FiniteDifference$set_V_transcendental_args()}}
+    \item \href{#method-FiniteDifference-set_V_yieldindex_args}{\code{FiniteDifference$set_V_yieldindex_args()}}
+    \item \href{#method-FiniteDifference-set_V_args}{\code{FiniteDifference$set_V_args()}}
+    \item \href{#method-FiniteDifference-set_V_info}{\code{FiniteDifference$set_V_info()}}
+    \item \href{#method-FiniteDifference-set_plot_info}{\code{FiniteDifference$set_plot_info()}}
+    \item \href{#method-FiniteDifference-set_plot_type}{\code{FiniteDifference$set_plot_type()}}
+    \item \href{#method-FiniteDifference-set_flags}{\code{FiniteDifference$set_flags()}}
+    \item \href{#method-FiniteDifference-get_all}{\code{FiniteDifference$get_all()}}
+    \item \href{#method-FiniteDifference-get_oup_params}{\code{FiniteDifference$get_oup_params()}}
+    \item \href{#method-FiniteDifference-get_x_stoch_args}{\code{FiniteDifference$get_x_stoch_args()}}
+    \item \href{#method-FiniteDifference-get_V_linear_args}{\code{FiniteDifference$get_V_linear_args()}}
+    \item \href{#method-FiniteDifference-get_V_degenerate_args}{\code{FiniteDifference$get_V_degenerate_args()}}
+    \item \href{#method-FiniteDifference-get_V_stepped_args}{\code{FiniteDifference$get_V_stepped_args()}}
+    \item \href{#method-FiniteDifference-get_V_kinked_args}{\code{FiniteDifference$get_V_kinked_args()}}
+    \item \href{#method-FiniteDifference-get_V_butterfly_args}{\code{FiniteDifference$get_V_butterfly_args()}}
+    \item \href{#method-FiniteDifference-get_V_mitscherlich_args}{\code{FiniteDifference$get_V_mitscherlich_args()}}
+    \item \href{#method-FiniteDifference-get_V_gompertz_args}{\code{FiniteDifference$get_V_gompertz_args()}}
+    \item \href{#method-FiniteDifference-get_V_logistic_args}{\code{FiniteDifference$get_V_logistic_args()}}
+    \item \href{#method-FiniteDifference-get_V_transcendental_args}{\code{FiniteDifference$get_V_transcendental_args()}}
+    \item \href{#method-FiniteDifference-get_V_yieldindex_args}{\code{FiniteDifference$get_V_yieldindex_args()}}
+    \item \href{#method-FiniteDifference-get_V_args}{\code{FiniteDifference$get_V_args()}}
+    \item \href{#method-FiniteDifference-get_V_info}{\code{FiniteDifference$get_V_info()}}
+    \item \href{#method-FiniteDifference-get_plot_info}{\code{FiniteDifference$get_plot_info()}}
+    \item \href{#method-FiniteDifference-get_plot_colors}{\code{FiniteDifference$get_plot_colors()}}
+    \item \href{#method-FiniteDifference-get_plot_types}{\code{FiniteDifference$get_plot_types()}}
+    \item \href{#method-FiniteDifference-get_flags}{\code{FiniteDifference$get_flags()}}
+    \item \href{#method-FiniteDifference-axes_x_stoch}{\code{FiniteDifference$axes_x_stoch()}}
+    \item \href{#method-FiniteDifference-undo_clear}{\code{FiniteDifference$undo_clear()}}
+    \item \href{#method-FiniteDifference-undo_save}{\code{FiniteDifference$undo_save()}}
+    \item \href{#method-FiniteDifference-undo_undo}{\code{FiniteDifference$undo_undo()}}
+    \item \href{#method-FiniteDifference-Drift}{\code{FiniteDifference$Drift()}}
+    \item \href{#method-FiniteDifference-Diffusion}{\code{FiniteDifference$Diffusion()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Linear}{\code{FiniteDifference$TerminalValue_Linear()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Degenerate}{\code{FiniteDifference$TerminalValue_Degenerate()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Stepped}{\code{FiniteDifference$TerminalValue_Stepped()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Kinked}{\code{FiniteDifference$TerminalValue_Kinked()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Butterfly}{\code{FiniteDifference$TerminalValue_Butterfly()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Mitscherlich}{\code{FiniteDifference$TerminalValue_Mitscherlich()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Gompertz}{\code{FiniteDifference$TerminalValue_Gompertz()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Logistic}{\code{FiniteDifference$TerminalValue_Logistic()}}
+    \item \href{#method-FiniteDifference-TerminalValue_Transcendental}{\code{FiniteDifference$TerminalValue_Transcendental()}}
+    \item \href{#method-FiniteDifference-TerminalValue_YieldIndex}{\code{FiniteDifference$TerminalValue_YieldIndex()}}
+    \item \href{#method-FiniteDifference-TerminalValue}{\code{FiniteDifference$TerminalValue()}}
+    \item \href{#method-FiniteDifference-Option}{\code{FiniteDifference$Option()}}
+    \item \href{#method-FiniteDifference-OptionEnvelope}{\code{FiniteDifference$OptionEnvelope()}}
+    \item \href{#method-FiniteDifference-DecisionThreshold}{\code{FiniteDifference$DecisionThreshold()}}
+    \item \href{#method-FiniteDifference-PlotDrift}{\code{FiniteDifference$PlotDrift()}}
+    \item \href{#method-FiniteDifference-PlotDiffusion}{\code{FiniteDifference$PlotDiffusion()}}
+    \item \href{#method-FiniteDifference-PlotTerminalValue}{\code{FiniteDifference$PlotTerminalValue()}}
+    \item \href{#method-FiniteDifference-PlotOption}{\code{FiniteDifference$PlotOption()}}
+    \item \href{#method-FiniteDifference-PlotOptionEnvelope}{\code{FiniteDifference$PlotOptionEnvelope()}}
+    \item \href{#method-FiniteDifference-PlotDecisionThreshold}{\code{FiniteDifference$PlotDecisionThreshold()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FiniteDifference-new"></a>}}
-\if{latex}{\out{\hypertarget{method-FiniteDifference-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new FiniteDifference object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$new(OUP = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-FiniteDifference-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-initialize}{}}}
+\subsection{\code{FiniteDifference$new()}}{
+  Create a new FiniteDifference object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$new(OUP = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{OUP}}{pointer set by the OUProcess object}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new FiniteDifference object
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{OUP}}{pointer set by the OUProcess object}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new FiniteDifference object
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{  FD <- FiniteDifference$new()
-  FD$TerminalValue_Mitscherlich(plotit=FALSE)
-  FD$DecisionThreshold()
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_oup_params}{}}}
-\subsection{Method \code{set_oup_params()}}{
-Set OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_oup_params(
+\subsection{\code{FiniteDifference$set_oup_params()}}{
+  Set OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_oup_params(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{who}}{identifier for object sending the parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(rho,mu,sigma)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_x_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_x_stoch_args}{}}}
-\subsection{Method \code{set_x_stoch_args()}}{
-Set x as a stochastic state and its arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_x_stoch_args(
+\subsection{\code{FiniteDifference$set_x_stoch_args()}}{
+  Set x as a stochastic state and its arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_x_stoch_args(
   s = NULL,
   x = NULL,
   V = NULL,
@@ -294,344 +309,329 @@ Set x as a stochastic state and its arguments
   theta = NULL,
   skip = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of times}
+      \item{\code{x}}{vector of states}
+      \item{\code{V}}{vector of terminal values}
+      \item{\code{r}}{discount rate 0<=r<inf, scalar}
+      \item{\code{phi}}{search direction for exit or entry options}
+      \item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
+      \item{\code{skip}}{subdivide time intervals but report at times s 1<=skip<=1000}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(s,x,V,r,phi,theta,skip,ds,dx)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{vector of times}
-
-\item{\code{x}}{vector of states}
-
-\item{\code{V}}{vector of terminal values}
-
-\item{\code{r}}{discount rate 0<=r<inf, scalar}
-
-\item{\code{phi}}{search direction for exit or entry options}
-
-\item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
-
-\item{\code{skip}}{divide the time interval and report every skip result}
-
-\item{\code{who}}{identifier for object sending the parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(s,x,V,r,phi,theta,skip,ds,dx)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_linear_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_linear_args}{}}}
-\subsection{Method \code{set_V_linear_args()}}{
-Set V linear arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_linear_args(xo = NULL, vs = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$set_V_linear_args()}}{
+  Set V linear arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_linear_args(xo = NULL, vs = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{vs}}{slope}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vs)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{vs}}{slope}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,vs)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_degenerate_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_degenerate_args}{}}}
-\subsection{Method \code{set_V_degenerate_args()}}{
-Set V degenerate arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_degenerate_args(xo = NULL, Vmax = NULL, Vmin = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$set_V_degenerate_args()}}{
+  Set V degenerate arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_degenerate_args(xo = NULL, Vmax = NULL, Vmin = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the step}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vs,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the step}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,vs,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_stepped_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_stepped_args}{}}}
-\subsection{Method \code{set_V_stepped_args()}}{
-Set V stepped arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_stepped_args(
+\subsection{\code{FiniteDifference$set_V_stepped_args()}}{
+  Set V stepped arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_stepped_args(
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the step}
+      \item{\code{vs}}{direction of the step}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vs,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the step}
-
-\item{\code{vs}}{direction of the step}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,vs,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_kinked_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_kinked_args}{}}}
-\subsection{Method \code{set_V_kinked_args()}}{
-Set V kinked arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_kinked_args(
+\subsection{\code{FiniteDifference$set_V_kinked_args()}}{
+  Set V kinked arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_kinked_args(
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the kink}
+      \item{\code{vs}}{slope}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vs,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the kink}
-
-\item{\code{vs}}{slope}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,vs,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_butterfly_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_butterfly_args}{}}}
-\subsection{Method \code{set_V_butterfly_args()}}{
-Set V butterfly arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_butterfly_args(
+\subsection{\code{FiniteDifference$set_V_butterfly_args()}}{
+  Set V butterfly arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_butterfly_args(
   xo = NULL,
   xm = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the left wing}
+      \item{\code{xm}}{state at the right wing}
+      \item{\code{vs}}{slope}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,xm,vs,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the left wing}
-
-\item{\code{xm}}{state at the right wing}
-
-\item{\code{vs}}{slope}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,xm,vs,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_mitscherlich_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_mitscherlich_args}{}}}
-\subsection{Method \code{set_V_mitscherlich_args()}}{
-Set V mitscherlich arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_mitscherlich_args(
+\subsection{\code{FiniteDifference$set_V_mitscherlich_args()}}{
+  Set V mitscherlich arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_mitscherlich_args(
   xo = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{vr}}{rate of change}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vr,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{vr}}{rate of change}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,vr,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_gompertz_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_gompertz_args}{}}}
-\subsection{Method \code{set_V_gompertz_args()}}{
-Set V gompertz arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_gompertz_args(
+\subsection{\code{FiniteDifference$set_V_gompertz_args()}}{
+  Set V gompertz arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_gompertz_args(
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{vr}}{rate of change}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xi,vr,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{vr}}{rate of change}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xi,vr,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_logistic_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_logistic_args}{}}}
-\subsection{Method \code{set_V_logistic_args()}}{
-Set V logistic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_logistic_args(
+\subsection{\code{FiniteDifference$set_V_logistic_args()}}{
+  Set V logistic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_logistic_args(
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{vr}}{rate of change}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xi,vr,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{vr}}{rate of change}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xi,vr,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_transcendental_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_transcendental_args}{}}}
-\subsection{Method \code{set_V_transcendental_args()}}{
-Set V transcendental arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_transcendental_args(
+\subsection{\code{FiniteDifference$set_V_transcendental_args()}}{
+  Set V transcendental arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_transcendental_args(
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{xm}}{state at the maximum}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,xi,xm,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{xm}}{state at the maximum}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,xi,xm,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_yieldindex_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_yieldindex_args}{}}}
-\subsection{Method \code{set_V_yieldindex_args()}}{
-Set V yield index arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_yieldindex_args(
+\subsection{\code{FiniteDifference$set_V_yieldindex_args()}}{
+  Set V yield index arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_yieldindex_args(
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{xm}}{state at the maximum}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,xi,xm,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{xm}}{state at the maximum}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,xi,xm,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_args}{}}}
-\subsection{Method \code{set_V_args()}}{
-Set V arguments by position in list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_args(
+\subsection{\code{FiniteDifference$set_V_args()}}{
+  Set V arguments by position in list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_args(
   Ix = NULL,
   name = NULL,
   v1 = NULL,
@@ -639,62 +639,58 @@ Set V arguments by position in list
   v3 = NULL,
   v4 = NULL,
   v5 = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{Ix}}{index of terminal value}
+      \item{\code{name}}{name of terminal value}
+      \item{\code{v1}}{first parameter}
+      \item{\code{v2}}{second parameter}
+      \item{\code{v3}}{third parameter}
+      \item{\code{v4}}{fourth parameter}
+      \item{\code{v5}}{fifth parameter}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(Ix,name,v1,v2,v3,v4,v5)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{Ix}}{index of terminal value}
-
-\item{\code{name}}{name of terminal value}
-
-\item{\code{v1}}{first parameter}
-
-\item{\code{v2}}{second parameter}
-
-\item{\code{v3}}{third parameter}
-
-\item{\code{v4}}{fourth parameter}
-
-\item{\code{v5}}{fifth parameter}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(Ix,name,v1,v2,v3,v4,v5)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_V_info"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_V_info}{}}}
-\subsection{Method \code{set_V_info()}}{
-Set information for terminal value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_V_info(Ix = NULL, name = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$set_V_info()}}{
+  Set information for terminal value
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_V_info(Ix = NULL, name = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{Ix}}{index of terminal value}
+      \item{\code{name}}{name of terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(Ix,name,names,text)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{Ix}}{index of terminal value}
-
-\item{\code{name}}{name of terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(Ix,name,names,text)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-set_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-set_plot_info}{}}}
-\subsection{Method \code{set_plot_info()}}{
-Set information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$set_plot_info(
-  type = NULL,
+\subsection{\code{FiniteDifference$set_plot_info()}}{
+  Set information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -706,1031 +702,1089 @@ Set information for plotting
   floor = NULL,
   labels = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{fontfamily}}{font family for plot labels}
+      \item{\code{fontsize}}{font size for plot labels}
+      \item{\code{fileformat}}{'png' or 'svg'}
+      \item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
+      \item{\code{fileheight}}{pixel height of 2D plot}
+      \item{\code{theme}}{'light' or 'dark'}
+      \item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
+      \item{\code{walls}}{3D walls TRUE or FALSE}
+      \item{\code{floor}}{3D floor TRUE or FALSE}
+      \item{\code{labels}}{title and parameters TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(font,file,theme,3D,labels)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1 and 2 for 2D, 3 and 4 for 3D}
-
-\item{\code{fontfamily}}{font family for plot labels}
-
-\item{\code{fontsize}}{font size for plot labels}
-
-\item{\code{fileformat}}{'png' or 'svg'}
-
-\item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
-
-\item{\code{fileheight}}{pixel height of 2D plot}
-
-\item{\code{theme}}{'light' or 'dark'}
-
-\item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
-
-\item{\code{walls}}{3D walls TRUE or FALSE}
-
-\item{\code{floor}}{3D floor TRUE or FALSE}
-
-\item{\code{labels}}{title and parameters TRUE or FALSE}
-
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-set_plot_type"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-set_plot_type}{}}}
+\subsection{\code{FiniteDifference$set_plot_type()}}{
+  Set plot types by group
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_plot_type(type = NULL, group = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{a number identifying the type for a group}
+      \item{\code{group}}{identifier for groups of similar plots}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(types,group)
+  }
 }
-\if{html}{\out{</div>}}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-set_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-set_flags}{}}}
+\subsection{\code{FiniteDifference$set_flags()}}{
+  Set flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$set_flags(plotit = NULL, copyit = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{plotit}}{automatic plot after calculation TRUE or FALSE}
+      \item{\code{copyit}}{copy to clipboard TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
-\subsection{Returns}{
-list(type,font,file,theme,3D)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_all"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_all}{}}}
-\subsection{Method \code{get_all()}}{
-Get all arguments and parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_all()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_all()}}{
+  Get all arguments and information
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_all()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(oup_params,x_stoch_args,V_linear_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,plot_info)
+  }
 }
 
-\subsection{Returns}{
-list(oup_params,x_stoch_args,V_linear_args,V_stepped_args,V_kinked_args,V_butterfly_args,V_mitscherlich_args,V_gompertz_args,V_logistic_args,V_transcendental_args,V_yieldindex_args,plot_info)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_oup_params}{}}}
-\subsection{Method \code{get_oup_params()}}{
-Get OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_oup_params()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_oup_params()}}{
+  Get OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_oup_params()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
+  }
 }
 
-\subsection{Returns}{
-list(rho,mu,sigma)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_x_stoch_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_x_stoch_args}{}}}
-\subsection{Method \code{get_x_stoch_args()}}{
-Get x as a stochastic state and its arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_x_stoch_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_x_stoch_args()}}{
+  Get x as a stochastic state and its arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_x_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(s,x,V,r,phi,theta,skip,ds,dx)
+  }
 }
 
-\subsection{Returns}{
-list(s,x,V,r,phi,theta,skip,ds,dx)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_linear_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_linear_args}{}}}
-\subsection{Method \code{get_V_linear_args()}}{
-Get V linear arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_linear_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_linear_args()}}{
+  Get V linear arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_linear_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vs)
+  }
 }
 
-\subsection{Returns}{
-list(xo,vs)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_degenerate_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_degenerate_args}{}}}
-\subsection{Method \code{get_V_degenerate_args()}}{
-Get V degenerate arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_degenerate_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_degenerate_args()}}{
+  Get V degenerate arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_degenerate_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xo,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_stepped_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_stepped_args}{}}}
-\subsection{Method \code{get_V_stepped_args()}}{
-Get V stepped arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_stepped_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_stepped_args()}}{
+  Get V stepped arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_stepped_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vs,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xo,vs,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_kinked_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_kinked_args}{}}}
-\subsection{Method \code{get_V_kinked_args()}}{
-Get V kinked arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_kinked_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_kinked_args()}}{
+  Get V kinked arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_kinked_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vs,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xo,vs,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_butterfly_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_butterfly_args}{}}}
-\subsection{Method \code{get_V_butterfly_args()}}{
-Get V butterfly arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_butterfly_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_butterfly_args()}}{
+  Get V butterfly arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_butterfly_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,xm,vs,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xo,xm,vs,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_mitscherlich_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_mitscherlich_args}{}}}
-\subsection{Method \code{get_V_mitscherlich_args()}}{
-Get V mitscherlich arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_mitscherlich_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_mitscherlich_args()}}{
+  Get V mitscherlich arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_mitscherlich_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,vr,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xo,vr,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_gompertz_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_gompertz_args}{}}}
-\subsection{Method \code{get_V_gompertz_args()}}{
-Get V gompertz arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_gompertz_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_gompertz_args()}}{
+  Get V gompertz arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_gompertz_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xi,vr,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xi,vr,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_logistic_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_logistic_args}{}}}
-\subsection{Method \code{get_V_logistic_args()}}{
-Get V logistic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_logistic_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_logistic_args()}}{
+  Get V logistic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_logistic_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xi,vr,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xi,vr,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_transcendental_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_transcendental_args}{}}}
-\subsection{Method \code{get_V_transcendental_args()}}{
-Get V transcendental arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_transcendental_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_transcendental_args()}}{
+  Get V transcendental arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_transcendental_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,xi,xm,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xo,xi,xm,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_yieldindex_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_yieldindex_args}{}}}
-\subsection{Method \code{get_V_yieldindex_args()}}{
-Get V yield index arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_yieldindex_args()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_yieldindex_args()}}{
+  Get V yield index arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_yieldindex_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,xi,xm,Vmax,Vmin)
+  }
 }
 
-\subsection{Returns}{
-list(xo,xi,xm,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_args"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_args}{}}}
-\subsection{Method \code{get_V_args()}}{
-Get V arguments by index or name
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_args(Ix = NULL, name = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_args()}}{
+  Get V arguments by index or name
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_args(Ix = NULL, name = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{Ix}}{index of terminal value}
+      \item{\code{name}}{name of terminal value}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(xo,xi,xm,vs,vr,Vmax,Vmin)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{Ix}}{index of terminal value}
-
-\item{\code{name}}{name of terminal value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(xo,xi,xm,vs,vr,Vmax,Vmin)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_V_info"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_V_info}{}}}
-\subsection{Method \code{get_V_info()}}{
-Get information for terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_V_info()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_V_info()}}{
+  Get information for terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_V_info()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(Ix,name,names,text)
+  }
 }
 
-\subsection{Returns}{
-list(Ix,names)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_plot_info}{}}}
-\subsection{Method \code{get_plot_info()}}{
-Get information for plotting options
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_plot_info()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_plot_info()}}{
+  Get information for plotting options
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_plot_info()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(font,file,theme,3D,labels)
+  }
 }
 
-\subsection{Returns}{
-list(type,font,file,theme,3D,labels)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-get_plot_colors"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-get_plot_colors}{}}}
-\subsection{Method \code{get_plot_colors()}}{
-Get colors for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$get_plot_colors()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$get_plot_colors()}}{
+  Get colors for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_plot_colors()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+  }
 }
 
-\subsection{Returns}{
-list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-get_plot_types"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-get_plot_types}{}}}
+\subsection{\code{FiniteDifference$get_plot_types()}}{
+  Get current types for plot routines
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_plot_types()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(types,description)
+  }
 }
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-get_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-get_flags}{}}}
+\subsection{\code{FiniteDifference$get_flags()}}{
+  Get flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$get_flags()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-axes_x_stoch"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-axes_x_stoch}{}}}
-\subsection{Method \code{axes_x_stoch()}}{
-Scale axes for x stochastic arguments
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$axes_x_stoch()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$axes_x_stoch()}}{
+  Scale axes for x stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$axes_x_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
 }
 
-\subsection{Returns}{
-NULL
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-undo_clear"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-undo_clear}{}}}
-\subsection{Method \code{undo_clear()}}{
-Clear undo list and save current arguments to list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$undo_clear()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$undo_clear()}}{
+  Clear undo list and save current arguments to list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$undo_clear()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    1
+  }
 }
 
-\subsection{Returns}{
-1
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-undo_save"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-undo_save}{}}}
-\subsection{Method \code{undo_save()}}{
-Save current arguments to undo list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$undo_save()}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$undo_save()}}{
+  Save current arguments to undo list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$undo_save()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    number of argument sets
+  }
 }
 
-\subsection{Returns}{
-number of argument sets
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-undo_undo"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-undo_undo}{}}}
-\subsection{Method \code{undo_undo()}}{
-Replace current arguments from undo list
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$undo_undo(updn = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$undo_undo()}}{
+  Replace current arguments from undo list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$undo_undo(updn = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{updn}}{positive to move up, negative to move down}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    c(index of this argument set, number of argument sets)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{updn}}{positive to move up, negative to move down}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-c(index of this argument set, number of argument sets)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-Drift"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-Drift}{}}}
-\subsection{Method \code{Drift()}}{
-Calculate, plot and return drifts
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$Drift(x = NULL, rho = NULL, mu = NULL, plotit = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$Drift()}}{
+  Calculate, plot and return drifts
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$Drift(x = NULL, rho = NULL, mu = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{rho}}{rate parameter 0<=<rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(g(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{rho}}{rate parameter 0<=<rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(g(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-Diffusion"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-Diffusion}{}}}
-\subsection{Method \code{Diffusion()}}{
-Calculate, plot and return diffusions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$Diffusion(x = NULL, sigma = NULL, plotit = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$Diffusion()}}{
+  Calculate, plot and return diffusions
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$Diffusion(x = NULL, sigma = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(h2(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(h2(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Linear"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Linear}{}}}
-\subsection{Method \code{TerminalValue_Linear()}}{
-Create and plot linear terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Linear(
+\subsection{\code{FiniteDifference$TerminalValue_Linear()}}{
+  Create and plot linear terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Linear(
   x = NULL,
   xo = NULL,
   vs = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{vs}}{slope}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{vs}}{slope}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Degenerate"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Degenerate}{}}}
-\subsection{Method \code{TerminalValue_Degenerate()}}{
-Create and plot degenerate terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Degenerate(
+\subsection{\code{FiniteDifference$TerminalValue_Degenerate()}}{
+  Create and plot degenerate terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Degenerate(
   x = NULL,
   xo = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the spike}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the spike}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Stepped"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Stepped}{}}}
-\subsection{Method \code{TerminalValue_Stepped()}}{
-Create and plot stepped terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Stepped(
+\subsection{\code{FiniteDifference$TerminalValue_Stepped()}}{
+  Create and plot stepped terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Stepped(
   x = NULL,
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the step}
+      \item{\code{vs}}{direction of the step}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the step}
-
-\item{\code{vs}}{direction of the step}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Kinked"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Kinked}{}}}
-\subsection{Method \code{TerminalValue_Kinked()}}{
-Create and plot kinked terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Kinked(
+\subsection{\code{FiniteDifference$TerminalValue_Kinked()}}{
+  Create and plot kinked terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Kinked(
   x = NULL,
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the kink}
+      \item{\code{vs}}{slope}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the kink}
-
-\item{\code{vs}}{slope}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Butterfly"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Butterfly}{}}}
-\subsection{Method \code{TerminalValue_Butterfly()}}{
-Create and plot butterfly terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Butterfly(
+\subsection{\code{FiniteDifference$TerminalValue_Butterfly()}}{
+  Create and plot butterfly terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Butterfly(
   x = NULL,
   xo = NULL,
   xm = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the left wing}
+      \item{\code{xm}}{state at the right wing}
+      \item{\code{vs}}{slope}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the left wing}
-
-\item{\code{xm}}{state at the right wing}
-
-\item{\code{vs}}{slope}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Mitscherlich"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Mitscherlich}{}}}
-\subsection{Method \code{TerminalValue_Mitscherlich()}}{
-Create and plot Mitscherlich terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Mitscherlich(
+\subsection{\code{FiniteDifference$TerminalValue_Mitscherlich()}}{
+  Create and plot Mitscherlich terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Mitscherlich(
   x = NULL,
   xo = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{vr}}{rate of change}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{vr}}{rate of change}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Gompertz"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Gompertz}{}}}
-\subsection{Method \code{TerminalValue_Gompertz()}}{
-Create and plot Gompertz terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Gompertz(
+\subsection{\code{FiniteDifference$TerminalValue_Gompertz()}}{
+  Create and plot Gompertz terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Gompertz(
   x = NULL,
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{vr}}{rate of change}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{vr}}{rate of change}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Logistic"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Logistic}{}}}
-\subsection{Method \code{TerminalValue_Logistic()}}{
-Create and plot Logistic terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Logistic(
+\subsection{\code{FiniteDifference$TerminalValue_Logistic()}}{
+  Create and plot Logistic terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Logistic(
   x = NULL,
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{vr}}{rate of change}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{vr}}{rate of change}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_Transcendental"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_Transcendental}{}}}
-\subsection{Method \code{TerminalValue_Transcendental()}}{
-Create and plot Transcendental terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_Transcendental(
+\subsection{\code{FiniteDifference$TerminalValue_Transcendental()}}{
+  Create and plot Transcendental terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_Transcendental(
   x = NULL,
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{xm}}{state at the maximum}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{xm}}{state at the maximum}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue_YieldIndex"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue_YieldIndex}{}}}
-\subsection{Method \code{TerminalValue_YieldIndex()}}{
-Create and plot Yield Index terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue_YieldIndex(
+\subsection{\code{FiniteDifference$TerminalValue_YieldIndex()}}{
+  Create and plot Yield Index terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue_YieldIndex(
   x = NULL,
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{x}}{vector of n states}
+      \item{\code{xo}}{state at the intercept}
+      \item{\code{xi}}{state at the inflection point}
+      \item{\code{xm}}{state at the maximum}
+      \item{\code{Vmax}}{maximum terminal value}
+      \item{\code{Vmin}}{minimum terminal value}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{xo}}{state at the intercept}
-
-\item{\code{xi}}{state at the inflection point}
-
-\item{\code{xm}}{state at the maximum}
-
-\item{\code{Vmax}}{maximum terminal value}
-
-\item{\code{Vmin}}{minimum terminal value}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-TerminalValue"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-TerminalValue}{}}}
-\subsection{Method \code{TerminalValue()}}{
-Retrieves and plots terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$TerminalValue(Ix = NULL, name = NULL, plotit = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{FiniteDifference$TerminalValue()}}{
+  Retrieves and plots terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$TerminalValue(Ix = NULL, name = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{Ix}}{index number or name of terminal values}
+      \item{\code{name}}{name of terminal values}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(V(1xn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{Ix}}{index number or name of terminal values}
-
-\item{\code{name}}{name of terminal values}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(V(1xn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-Option"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-Option}{}}}
-\subsection{Method \code{Option()}}{
-Calculate and plot option prices
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$Option(
+\subsection{\code{FiniteDifference$Option()}}{
+  Calculate and plot option prices
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$Option(
   s = NULL,
   x = NULL,
   V = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   theta = NULL,
   skip = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times}
+      \item{\code{x}}{vector of n states}
+      \item{\code{V}}{vector of n terminal values}
+      \item{\code{r}}{discount rate 0<=r<inf}
+      \item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
+      \item{\code{skip}}{subdivide time intervals but report at times s 1<=skip<=1000}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(OO(mxn))
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{s}}{vector of m times}
-
-\item{\code{x}}{vector of n states}
-
-\item{\code{V}}{vector of n terminal values}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{r}}{discount rate 0<=r<inf}
-
-\item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
-
-\item{\code{skip}}{divide the time interval and report every skip result}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(O(mxn))
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-OptionEnvelope"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-OptionEnvelope}{}}}
-\subsection{Method \code{OptionEnvelope()}}{
-Calculate and plot the envelope of option prices
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$OptionEnvelope(
+\subsection{\code{FiniteDifference$OptionEnvelope()}}{
+  Calculate and plot the envelope of option prices
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$OptionEnvelope(
+  s = NULL,
   x = NULL,
   V = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   theta = NULL,
   skip = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{V}}{vector of n terminal values}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{r}}{discount rate 0<=r<inf}
-
-\item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
-
-\item{\code{skip}}{divide the time interval and report every skip result}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(Ohat(1xn))
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FiniteDifference-DecisionThreshold"></a>}}
-\if{latex}{\out{\hypertarget{method-FiniteDifference-DecisionThreshold}{}}}
-\subsection{Method \code{DecisionThreshold()}}{
-Calculate and plot the decision threshold
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$DecisionThreshold(
-  x = NULL,
-  V = NULL,
   rho = NULL,
   mu = NULL,
   sigma = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times}
+      \item{\code{x}}{vector of n states}
+      \item{\code{V}}{vector of n terminal values}
+      \item{\code{r}}{discount rate 0<=r<inf}
+      \item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
+      \item{\code{skip}}{subdivide time intervals but report at times s 1<=skip<=1000}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(OOhat(1xn))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FiniteDifference-DecisionThreshold"></a>}}
+\if{latex}{\out{\hypertarget{method-FiniteDifference-DecisionThreshold}{}}}
+\subsection{\code{FiniteDifference$DecisionThreshold()}}{
+  Calculate and plot the decision threshold
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$DecisionThreshold(
+  s = NULL,
+  x = NULL,
+  V = NULL,
   r = NULL,
   phi = NULL,
   theta = NULL,
   skip = NULL,
-  plotit = TRUE
-)}\if{html}{\out{</div>}}
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times}
+      \item{\code{x}}{vector of n states}
+      \item{\code{V}}{vector of n terminal values}
+      \item{\code{r}}{discount rate 0<=r<inf}
+      \item{\code{phi}}{search direction for exit or entry options}
+      \item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
+      \item{\code{skip}}{subdivide time intervals but report at times s 1<=skip<=1000}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(k,OOhat)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{x}}{vector of n states}
-
-\item{\code{V}}{vector of n terminal values}
-
-\item{\code{rho}}{rate parameter 0<=rho<inf}
-
-\item{\code{mu}}{location parameter -inf<mu<inf}
-
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
-
-\item{\code{r}}{discount rate 0<=r<inf}
-
-\item{\code{phi}}{search direction for exit or entry options}
-
-\item{\code{theta}}{weight of current time in time stepping 0.5<=theta<=1}
-
-\item{\code{skip}}{divide the time interval and report every skip result}
-
-\item{\code{plotit}}{TRUE or FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-list(k,Ohat)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-PlotDrift"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-PlotDrift}{}}}
-\subsection{Method \code{PlotDrift()}}{
-Plot drifts
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$PlotDrift(
+\subsection{\code{FiniteDifference$PlotDrift()}}{
+  Plot drifts
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$PlotDrift(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-PlotDiffusion"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-PlotDiffusion}{}}}
-\subsection{Method \code{PlotDiffusion()}}{
-Plot diffusions
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$PlotDiffusion(
+\subsection{\code{FiniteDifference$PlotDiffusion()}}{
+  Plot diffusions
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$PlotDiffusion(
   type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 and 3 for 2D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-PlotTerminalValue"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-PlotTerminalValue}{}}}
-\subsection{Method \code{PlotTerminalValue()}}{
-Plot terminal values
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$PlotTerminalValue(
+\subsection{\code{FiniteDifference$PlotTerminalValue()}}{
+  Plot terminal values
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$PlotTerminalValue(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-PlotOption"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-PlotOption}{}}}
-\subsection{Method \code{PlotOption()}}{
-Plot options
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$PlotOption(
+\subsection{\code{FiniteDifference$PlotOption()}}{
+  Plot options
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$PlotOption(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -1740,43 +1794,37 @@ Plot options
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{sbeg}}{begin value for time axis}
+      \item{\code{send}}{end value for time axis}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 2 for 2D, 3, 4 and 5 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{sbeg}}{begin value for time axis}
-
-\item{\code{send}}{end value for time axis}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-PlotOptionEnvelope"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-PlotOptionEnvelope}{}}}
-\subsection{Method \code{PlotOptionEnvelope()}}{
-Plot the option envelope
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$PlotOptionEnvelope(
+\subsection{\code{FiniteDifference$PlotOptionEnvelope()}}{
+  Plot the option envelope
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$PlotOptionEnvelope(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -1786,68 +1834,61 @@ Plot the option envelope
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{sbeg}}{begin value for time axis}
+      \item{\code{send}}{end value for time axis}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 3 for 2D, 4 for 3D}
-
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{zaxis}}{text for z-axis label}
-
-\item{\code{sbeg}}{begin value for time axis}
-
-\item{\code{send}}{end value for time axis}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FiniteDifference-PlotDecisionThreshold"></a>}}
 \if{latex}{\out{\hypertarget{method-FiniteDifference-PlotDecisionThreshold}{}}}
-\subsection{Method \code{PlotDecisionThreshold()}}{
-Plot the decision threshold
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FiniteDifference$PlotDecisionThreshold(
+\subsection{\code{FiniteDifference$PlotDecisionThreshold()}}{
+  Plot the decision threshold
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FiniteDifference$PlotDecisionThreshold(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{title}}{text for plot title}
-
-\item{\code{xaxis}}{text for x-axis label}
-
-\item{\code{yaxis}}{text for y-axis label}
-
-\item{\code{xbeg}}{begin value for state axis}
-
-\item{\code{xend}}{end value for state axis}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-plot
-}
-}
 }

@@ -3,9 +3,10 @@
 # Type 'demo(FD_Drift)'
 # R6 object
 FD <- FiniteDifference$new()
-# type 'g' to print numbers
-g <- FD$Drift(plotit=FALSE)
-# print and plot
+# calculate no plot
+g <- FD$Drift()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 g <- FD$Drift()
 # new drift
 g <- FD$Drift(rho=1.0,mu=15)

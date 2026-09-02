@@ -12,7 +12,8 @@ V <- FD$TerminalValue("Gompertz")
 V <- FD$TerminalValue("Logistic")
 V <- FD$TerminalValue("Transcendental")
 V <- FD$TerminalValue("Yield Index")
-# by number
+# by number with plots
+FD$set_flags(plotit=TRUE)
 V <- FD$TerminalValue(1)
 V <- FD$TerminalValue(2)
 V <- FD$TerminalValue(3)
@@ -28,5 +29,3 @@ V <- (x-mu)^2
 FD$set_x_stoch_args(V=V)
 FD$set_V_info(name="Quadratic")
 FD$TerminalValue()
-
-

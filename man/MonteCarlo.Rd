@@ -2,123 +2,518 @@
 % Please edit documentation in R/MonteCarloHertz.R
 \name{MonteCarlo}
 \alias{MonteCarlo}
-\title{R6 Class implementing Monte Carlo simulation}
+\title{R6 class implementing Monte Carlo simulation of the Ornstein-Uhlenbeck Process}
 \description{
-This object is a placeholder to be completed in a future version.
+Monte Carlo simulations of Forward Paths, Bounded Paths, Backward Paths,
+Probabilities, Options and Passage Times.  Forward, Backward and Bounded Paths
+are simulated by a 4th order Runge-Kutta method and by using the stochastic
+integral equation.  Probabilities, Options and Passage Times are various ways
+of binning and counting the Paths.
 }
 \section{Methods:}{
-To be completed.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{y stochastic
+  ForwardPaths
+  Mean
+  Variance
+  Density
+  Probability
+  DoubleIntegral
+x stochastic
+  BackwardPaths
+  Option
+t stochastic
+  ForwardPaths
+  BoundedPaths
+  VisitingTimeModeMedianMean
+  VisitingTimePercentiles
+  VisitingTimeDensity
+  VisitingTimeProbability
+  FirstPassageTimeModeMedianMean
+  FirstPassageTimePercentiles
+  FirstPassageTimeDensity
+  FirstPassageTimeProbability
+}\if{html}{\out{</div>}}
 }
 
 \section{Plots:}{
-To be completed,
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  PlotForwardPaths
+  PlotBackwardPaths
+  PlotBoundedPaths
+  PlotMean
+  PlotVariance
+  PlotDensity
+  PlotProbability
+  PlotDoubleIntegral
+  PlotOption
+  PlotVisitingTimeModeMedianMean
+  PlotVisitingTimePercentiles
+  PlotVisitingTimeDensity
+  PlotVisitingTimeProbability
+  PlotFirstPassageTimeModeMedianMean
+  PlotFirstPassageTimePercentiles
+  PlotFirstPassageTimeDensity
+  PlotFirstPassageTimeProbability
+}\if{html}{\out{</div>}}
 }
 
 \section{Arguments of functions:}{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  All arguments are optional in all functions.
+OUP parameters
+  rho:    rate parameter 0<=rho<inf
+  mu:     location parameter -inf<mu<inf
+  sigma:  scale parameter -inf<sigma<inf
+y stochastic
+  t:      vector of times s<=t<inf
+  x:      initial state -inf<x<inf
+  psi:    <=0 for integral -inf to y,
+           >0 for integral y to inf
+x stochastic
+  s:      vector of times -inf<s<t
+  y:      terminal state -inf<y<inf
+  r:      discount rate -inf<r<inf
+  phi:    <=0 for exit option,
+           >0 for entry option
+t stochastic
+  t:      vector of times s<=t<inf
+  k:      decision threshold -inf<k<int
+  x:      initial state -inf<x<inf
+  Ppct:   probability for a percentile 0.01<=Ppct<=0.99
+path
+  paths:  number of paths 1<paths<1,000,000
+  skip:   subdivide time interval but report at times t 1<=skip<=50
+  seed:   seed for random number generators -inf<seed<inf
+  method: 4 for 4th order Runge-Kutta, otherwise integral equation
 }\if{html}{\out{</div>}}
-
-To be completed.
 }
 
-\section{Using the methods:}{
-Demonstration scripts are in files in the 'demo' directory. Identify a
-formula and in the console type:
+\section{Usage:}{
+The MonteCarlo object must first be instantiated before its methods are called.
+There are two ways.  The first way instantiates the OUProcess object and
+calls a function to get a pointer:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{  demo(MC_FormulaName), or
-  demo(MC_PlotFormulaName).
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
+  A <- OUP$get_Analytical()
+  FD <- OUP$get_FiniteDifference()
+  ML <- OUP$get_MaximumLikelihood()
+  MC <- OUP$get_MonteCarlo()
 }\if{html}{\out{</div>}}
+
+The MonteCarlo object will coordinate arguments to functions with the
+Analytial, FiniteDifference and MaximumLikelihood objects.  The second
+way instantiates the MonteCarlo object by itself with no coordination:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  MC <- MonteCarlol$new()
+}\if{html}{\out{</div>}}
+
+Once the object is instantiated, its methods can be called, to simulate
+100,000 Forward Paths, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  MC$ForwardPaths(paths=100000)
+}\if{html}{\out{</div>}}
+
+The plot methods can be used to customize the plots, with a title, for example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  A$PlotForwardPaths(title="My Paths Forward")
+}\if{html}{\out{</div>}}
+
+An attempt to plot 100,000 paths would choke the computer, so there are tricks.
+One is to select a hundred or so paths for the plot.  Another is to plot heat
+maps, just like in a weather report.
+
+Other functions and methods are called in the same way.  To see all the
+possibilities, check out the demos below.
+}
+
+\section{Demos:}{
+Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUPDemoList()
+  OUPDemoRun(<number of demo in list>)
+}\if{html}{\out{</div>}}
+
+Entering the demos by number in the list saves typing.
 }
 
 \section{Discussion:}{
-To be completed.
+Monte Carlo simulation of the Ornstein-Uhlenbeck Process can be done with
+either of two methods:  numerically integrating the stochastic differential
+equation, or calculating the stochastic integral equation.  The stochastic
+differential equation is shocked by a Wiener Process, simulated as
+sigma * dt^0.5 * epsilon, where sigma * dt^0.5 is the square root of the
+instantaneous variance and epsilon are draws from a standard normal
+density. The stochastic integral equation is shocked by the integral of
+the Wiener Process, or H * epsilon, where H is the square-root of the
+variance over a longer time interval.
+
+Numerically integrating the stochastic differential equation uses the Euler,
+Marayuma or Runge-Kutta schemes. The Euler and Marayuma schemes are first
+and third-order schemes and less accurate than the fourth-order Runge-Kutta
+scheme.
+
+The fourth-order Runge-Kutta scheme is standard practice.  In tests, shocked
+by the same draws from a standard normal density, the paths from the stochastic
+integral equation and the fourth-order Runge-Kutta scheme were the same to
+within five or six significant digits. To compare the fourth-order Runge-
+Kutta scheme with the integral equation:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  MC <- MonteCarlo$new()
+  rk <- MC$ForwardPaths(paths=100000,skip=10,method=4)[[1]]
+  ie <- MC$ForwardPaths(method=1)[[1]]
+  dif <- rk-ie
+  max(dif)
+  min(dif)
+  sum(dif)
+}\if{html}{\out{</div>}}
+
+A Forward Path starts from the backward state at the backward time and goes
+forward. A single path, sampled from all possible paths, is a Sample Path.
+Just like the flea trying to understand the elephant, a sample Path is enough
+for Maximum Likelihood Estimation of the Ornstein-Uhlenbeck Process. An
+ensemble of paths can be counted to approximate Transition Densities and
+Probabilities and Visiting Time Densities and Probabilities. The larger the
+ensemble, the better the approximations.
+
+Forward Paths are continuous in the state and time which makes them very hard
+to count. Instead, Forward Paths are treated as discrete and put into bins.
+Counting the number of Forward Paths in each bin and dividing by the total
+number of paths approximates Transition Densities. Summing the Transition
+Densities approximates Transition Probabilities. Summing again approximates
+Double Integrals.  Double Integrals are a curiosity. If time runs backwards,
+they become Options.
+
+A Forward Path begins from a known state and travels forward into an uncertain
+future.  A Backward Path ends with a known state and trudges backward into an
+uncertain past. Turning around and travelling back to the future resolves the
+uncertainty over time. An example is a Bayesian analysis which begins with a
+Diffuse Prior and ends with certainty. Another example is an Option. Simulating
+and counting Backward Paths approximates Prior Densities, Prior Probabilities
+and Options.  To compare Monte Carlo and Analytical Options:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
+  A <- OUP$get_Analytical()
+  ML <- OUP$get_MaximumLikelihood()
+  MC <- OUP$get_MonteCarlo()
+  ML$Estimates()
+  ao <- A$Option()[[1]]
+  mco <- MC$Option(paths=1000000)[[1]]
+  dif <- ao-mco
+  max(dif)
+  min(dif)
+  sum(dif)
+}\if{html}{\out{</div>}}
+
+If we count at right angles--in the time direction instead of the state
+direction--Forward Paths become Visiting Time Densities and Probabilities.
+Bounded Paths become First Passage Time Densities and Probabilities.
+Monte Carlo and Analytical Visiting and First Passage Times can also be
+compared:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
+  A <- OUP$get_Analytical()
+  MC <- OUP$get_MonteCarlo()
+  ad <- A$PassageTimeDensity(omega=0)[[1]]
+  mcd <- MC$VisitingTimeDensity(paths=1000000)[[1]]
+  dif <- ad-mcd
+  max(dif)
+  min(dif)
+  sum(dif)
+}\if{html}{\out{</div>}}
+
+Of course, the question is, 'Why bother?' We have Analytical formulas to do
+the counting.  One reason is to explain the formulas.  First Passage Times
+make more sense if you plot Bounded Paths and count the number of paths that
+have crossed the threshold.  Even in prestigious journal articles, the first
+and, possibly, only plot will be a Monte Carlo simulation.
+
+Another reason is to validate the formulas.  Although an Analytical formula
+may calculate a thousand times faster than a Monte Carlo simulation, arriving
+at approximately the same answer both ways is reassuring.
 }
 
-\examples{
-
-## ------------------------------------------------
-## Method `MonteCarlo$new`
-## ------------------------------------------------
-
-  MC <- MonteCarlo$new()
-  MC$get_oup_params()
-}
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-MonteCarlo-new}{\code{MonteCarlo$new()}}
-\item \href{#method-MonteCarlo-set_oup_params}{\code{MonteCarlo$set_oup_params()}}
-\item \href{#method-MonteCarlo-set_plot_info}{\code{MonteCarlo$set_plot_info()}}
-\item \href{#method-MonteCarlo-get_oup_params}{\code{MonteCarlo$get_oup_params()}}
-\item \href{#method-MonteCarlo-get_plot_info}{\code{MonteCarlo$get_plot_info()}}
-\item \href{#method-MonteCarlo-get_plot_colors}{\code{MonteCarlo$get_plot_colors()}}
-}
+  \itemize{
+    \item \href{#method-MonteCarlo-initialize}{\code{MonteCarlo$new()}}
+    \item \href{#method-MonteCarlo-set_oup_params}{\code{MonteCarlo$set_oup_params()}}
+    \item \href{#method-MonteCarlo-set_y_stoch_args}{\code{MonteCarlo$set_y_stoch_args()}}
+    \item \href{#method-MonteCarlo-set_x_stoch_args}{\code{MonteCarlo$set_x_stoch_args()}}
+    \item \href{#method-MonteCarlo-set_t_stoch_args}{\code{MonteCarlo$set_t_stoch_args()}}
+    \item \href{#method-MonteCarlo-set_path_args}{\code{MonteCarlo$set_path_args()}}
+    \item \href{#method-MonteCarlo-set_plot_args}{\code{MonteCarlo$set_plot_args()}}
+    \item \href{#method-MonteCarlo-set_plot_info}{\code{MonteCarlo$set_plot_info()}}
+    \item \href{#method-MonteCarlo-set_plot_type}{\code{MonteCarlo$set_plot_type()}}
+    \item \href{#method-MonteCarlo-set_flags}{\code{MonteCarlo$set_flags()}}
+    \item \href{#method-MonteCarlo-get_all}{\code{MonteCarlo$get_all()}}
+    \item \href{#method-MonteCarlo-get_oup_params}{\code{MonteCarlo$get_oup_params()}}
+    \item \href{#method-MonteCarlo-get_y_stoch_args}{\code{MonteCarlo$get_y_stoch_args()}}
+    \item \href{#method-MonteCarlo-get_x_stoch_args}{\code{MonteCarlo$get_x_stoch_args()}}
+    \item \href{#method-MonteCarlo-get_t_stoch_args}{\code{MonteCarlo$get_t_stoch_args()}}
+    \item \href{#method-MonteCarlo-get_path_args}{\code{MonteCarlo$get_path_args()}}
+    \item \href{#method-MonteCarlo-get_plot_args}{\code{MonteCarlo$get_plot_args()}}
+    \item \href{#method-MonteCarlo-get_plot_info}{\code{MonteCarlo$get_plot_info()}}
+    \item \href{#method-MonteCarlo-get_plot_colors}{\code{MonteCarlo$get_plot_colors()}}
+    \item \href{#method-MonteCarlo-get_plot_types}{\code{MonteCarlo$get_plot_types()}}
+    \item \href{#method-MonteCarlo-get_flags}{\code{MonteCarlo$get_flags()}}
+    \item \href{#method-MonteCarlo-axes_y_stoch}{\code{MonteCarlo$axes_y_stoch()}}
+    \item \href{#method-MonteCarlo-axes_x_stoch}{\code{MonteCarlo$axes_x_stoch()}}
+    \item \href{#method-MonteCarlo-axes_t_stoch}{\code{MonteCarlo$axes_t_stoch()}}
+    \item \href{#method-MonteCarlo-sync_yxt_stoch}{\code{MonteCarlo$sync_yxt_stoch()}}
+    \item \href{#method-MonteCarlo-undo_clear}{\code{MonteCarlo$undo_clear()}}
+    \item \href{#method-MonteCarlo-undo_save}{\code{MonteCarlo$undo_save()}}
+    \item \href{#method-MonteCarlo-undo_undo}{\code{MonteCarlo$undo_undo()}}
+    \item \href{#method-MonteCarlo-ForwardPaths}{\code{MonteCarlo$ForwardPaths()}}
+    \item \href{#method-MonteCarlo-BackwardPaths}{\code{MonteCarlo$BackwardPaths()}}
+    \item \href{#method-MonteCarlo-BoundedPaths}{\code{MonteCarlo$BoundedPaths()}}
+    \item \href{#method-MonteCarlo-Mean}{\code{MonteCarlo$Mean()}}
+    \item \href{#method-MonteCarlo-Variance}{\code{MonteCarlo$Variance()}}
+    \item \href{#method-MonteCarlo-Density}{\code{MonteCarlo$Density()}}
+    \item \href{#method-MonteCarlo-Probability}{\code{MonteCarlo$Probability()}}
+    \item \href{#method-MonteCarlo-DoubleIntegral}{\code{MonteCarlo$DoubleIntegral()}}
+    \item \href{#method-MonteCarlo-Option}{\code{MonteCarlo$Option()}}
+    \item \href{#method-MonteCarlo-VisitingTimeModeMedianMean}{\code{MonteCarlo$VisitingTimeModeMedianMean()}}
+    \item \href{#method-MonteCarlo-VisitingTimePercentiles}{\code{MonteCarlo$VisitingTimePercentiles()}}
+    \item \href{#method-MonteCarlo-VisitingTimeDensity}{\code{MonteCarlo$VisitingTimeDensity()}}
+    \item \href{#method-MonteCarlo-VisitingTimeProbability}{\code{MonteCarlo$VisitingTimeProbability()}}
+    \item \href{#method-MonteCarlo-FirstPassageTimeModeMedianMean}{\code{MonteCarlo$FirstPassageTimeModeMedianMean()}}
+    \item \href{#method-MonteCarlo-FirstPassageTimePercentiles}{\code{MonteCarlo$FirstPassageTimePercentiles()}}
+    \item \href{#method-MonteCarlo-FirstPassageTimeDensity}{\code{MonteCarlo$FirstPassageTimeDensity()}}
+    \item \href{#method-MonteCarlo-FirstPassageTimeProbability}{\code{MonteCarlo$FirstPassageTimeProbability()}}
+    \item \href{#method-MonteCarlo-PlotForwardPaths}{\code{MonteCarlo$PlotForwardPaths()}}
+    \item \href{#method-MonteCarlo-PlotBackwardPaths}{\code{MonteCarlo$PlotBackwardPaths()}}
+    \item \href{#method-MonteCarlo-PlotBoundedPaths}{\code{MonteCarlo$PlotBoundedPaths()}}
+    \item \href{#method-MonteCarlo-PlotMean}{\code{MonteCarlo$PlotMean()}}
+    \item \href{#method-MonteCarlo-PlotVariance}{\code{MonteCarlo$PlotVariance()}}
+    \item \href{#method-MonteCarlo-PlotDensity}{\code{MonteCarlo$PlotDensity()}}
+    \item \href{#method-MonteCarlo-PlotProbability}{\code{MonteCarlo$PlotProbability()}}
+    \item \href{#method-MonteCarlo-PlotDoubleIntegral}{\code{MonteCarlo$PlotDoubleIntegral()}}
+    \item \href{#method-MonteCarlo-PlotOption}{\code{MonteCarlo$PlotOption()}}
+    \item \href{#method-MonteCarlo-PlotVisitingTimeModeMedianMean}{\code{MonteCarlo$PlotVisitingTimeModeMedianMean()}}
+    \item \href{#method-MonteCarlo-PlotVisitingTimePercentiles}{\code{MonteCarlo$PlotVisitingTimePercentiles()}}
+    \item \href{#method-MonteCarlo-PlotVisitingTimeDensity}{\code{MonteCarlo$PlotVisitingTimeDensity()}}
+    \item \href{#method-MonteCarlo-PlotVisitingTimeProbability}{\code{MonteCarlo$PlotVisitingTimeProbability()}}
+    \item \href{#method-MonteCarlo-PlotFirstPassageTimeModeMedianMean}{\code{MonteCarlo$PlotFirstPassageTimeModeMedianMean()}}
+    \item \href{#method-MonteCarlo-PlotFirstPassageTimePercentiles}{\code{MonteCarlo$PlotFirstPassageTimePercentiles()}}
+    \item \href{#method-MonteCarlo-PlotFirstPassageTimeDensity}{\code{MonteCarlo$PlotFirstPassageTimeDensity()}}
+    \item \href{#method-MonteCarlo-PlotFirstPassageTimeProbability}{\code{MonteCarlo$PlotFirstPassageTimeProbability()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MonteCarlo-new"></a>}}
-\if{latex}{\out{\hypertarget{method-MonteCarlo-new}{}}}
-\subsection{Method \code{new()}}{
-Create a MonteCarlo object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MonteCarlo$new(OUP = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-MonteCarlo-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-initialize}{}}}
+\subsection{\code{MonteCarlo$new()}}{
+  Create a MonteCarlo object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$new(OUP = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{OUP}}{pointer set by the OUProcess object}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new MonteCarlo object
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{OUP}}{pointer set by the OUProcess object}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new MonteCarlo object
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{  MC <- MonteCarlo$new()
-  MC$get_oup_params()
-}
-\if{html}{\out{</div>}}
-
-}
-
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MonteCarlo-set_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-MonteCarlo-set_oup_params}{}}}
-\subsection{Method \code{set_oup_params()}}{
-Set OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MonteCarlo$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)}\if{html}{\out{</div>}}
+\subsection{\code{MonteCarlo$set_oup_params()}}{
+  Set OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{rho}}{rate parameter 0<=rho<inf}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-set_y_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-set_y_stoch_args}{}}}
+\subsection{\code{MonteCarlo$set_y_stoch_args()}}{
+  Set arguments for y as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_y_stoch_args(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  psi = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,y,x,psi)
+  }
+}
 
-\item{\code{mu}}{location parameter -inf<mu<inf}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-set_x_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-set_x_stoch_args}{}}}
+\subsection{\code{MonteCarlo$set_x_stoch_args()}}{
+  Set arguments for x as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_x_stoch_args(
+  s = NULL,
+  x = NULL,
+  y = NULL,
+  r = NULL,
+  phi = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times -inf<s<t}
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for exit option, >0 for entry option}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(s,x,y,r,phi)
+  }
+}
 
-\item{\code{sigma}}{scale parameter -inf<sigma<inf}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-set_t_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-set_t_stoch_args}{}}}
+\subsection{\code{MonteCarlo$set_t_stoch_args()}}{
+  Set t stochastic arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_t_stoch_args(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  omega = NULL,
+  Ppct = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{k}}{threshold -inf<k<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{omega}}{degree of irreversibility 0<=omega<=1}
+      \item{\code{Ppct}}{passage time probability for a percentile  0.01<=Ppct<=0.99}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,k,x)
+  }
+}
 
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-set_path_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-set_path_args}{}}}
+\subsection{\code{MonteCarlo$set_path_args()}}{
+  Set path arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_path_args(paths = NULL, skip = NULL, seed = NULL, method = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time intervals but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(paths,skip,seed,method)
+  }
 }
-\if{html}{\out{</div>}}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-set_plot_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-set_plot_args}{}}}
+\subsection{\code{MonteCarlo$set_plot_args()}}{
+  Set plot arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_plot_args(
+  pmax = NULL,
+  ptmax = NULL,
+  first = NULL,
+  last = NULL,
+  zbeg = NULL,
+  zend = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{first}}{first path to plot}
+      \item{\code{last}}{last path to plot}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(pmax,ptmax,first,last,zbeg,zend)
+  }
 }
-\subsection{Returns}{
-list(rho,mu,sigma)
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MonteCarlo-set_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-MonteCarlo-set_plot_info}{}}}
-\subsection{Method \code{set_plot_info()}}{
-Set information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MonteCarlo$set_plot_info(
-  type = NULL,
-  pmax = NULL,
-  ptmax = NULL,
+\subsection{\code{MonteCarlo$set_plot_info()}}{
+  Set information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -130,83 +525,1772 @@ Set information for plotting
   floor = NULL,
   labels = NULL,
   who = NULL
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{fontfamily}}{font family for plot labels}
+      \item{\code{fontsize}}{font size for plot labels}
+      \item{\code{fileformat}}{'png' or 'svg'}
+      \item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
+      \item{\code{fileheight}}{pixel height of 2D plot}
+      \item{\code{theme}}{'light' or 'dark'}
+      \item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
+      \item{\code{walls}}{3D walls TRUE or FALSE}
+      \item{\code{floor}}{3D floor TRUE or FALSE}
+      \item{\code{labels}}{title and parameters TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(font,file,theme,3D,labels)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{= 1 and 2 for 2D, 3 and 4 for 3D}
-
-\item{\code{pmax}}{maximum vertical axis for transition density plot}
-
-\item{\code{ptmax}}{maximum vertical axis for passage time density plot}
-
-\item{\code{fontfamily}}{font family for plot labels}
-
-\item{\code{fontsize}}{font size for plot labels}
-
-\item{\code{fileformat}}{'png' or 'svg'}
-
-\item{\code{filewidth}}{pixel width of 2D plot, pixel width and height of 3D plot}
-
-\item{\code{fileheight}}{pixel height of 2D plot}
-
-\item{\code{theme}}{'light' or 'dark'}
-
-\item{\code{opaque}}{transparent to opaque background 0.0<=opaque<=1.0}
-
-\item{\code{walls}}{3D walls TRUE or FALSE}
-
-\item{\code{floor}}{3D floor TRUE or FALSE}
-
-\item{\code{labels}}{title and parameters TRUE or FALSE}
-
-\item{\code{who}}{identifier for object sending the parameters}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-set_plot_type"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-set_plot_type}{}}}
+\subsection{\code{MonteCarlo$set_plot_type()}}{
+  Set plot types by group
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_plot_type(type = NULL, group = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{a number identifying the type for a group}
+      \item{\code{group}}{identifier for groups of similar plots}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(type,group)
+  }
 }
-\if{html}{\out{</div>}}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-set_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-set_flags}{}}}
+\subsection{\code{MonteCarlo$set_flags()}}{
+  Set flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$set_flags(plotit = NULL, copyit = NULL, who = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{plotit}}{automatic plot after calculation TRUE or FALSE}
+      \item{\code{copyit}}{copy to clipboard TRUE or FALSE}
+      \item{\code{who}}{object id of sender}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
-\subsection{Returns}{
-list(type,font,file,theme,3D,labels)
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_all"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_all}{}}}
+\subsection{\code{MonteCarlo$get_all()}}{
+  Get all arguments and information
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_all()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(oup_params,y_stoch_args,x_stoch_args,t_stoch_args,path_args,plot_info)
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MonteCarlo-get_oup_params"></a>}}
 \if{latex}{\out{\hypertarget{method-MonteCarlo-get_oup_params}{}}}
-\subsection{Method \code{get_oup_params()}}{
-Get OUP parameters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MonteCarlo$get_oup_params()}\if{html}{\out{</div>}}
+\subsection{\code{MonteCarlo$get_oup_params()}}{
+  Get OUP parameters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_oup_params()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(rho,mu,sigma)
+  }
 }
 
-\subsection{Returns}{
-list(rho,mu,sigma)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_y_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_y_stoch_args}{}}}
+\subsection{\code{MonteCarlo$get_y_stoch_args()}}{
+  Get arguments for y as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_y_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,y,x,psi)
+  }
 }
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_x_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_x_stoch_args}{}}}
+\subsection{\code{MonteCarlo$get_x_stoch_args()}}{
+  Get arguments for x as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_x_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(s,y,r,phi)
+  }
 }
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_t_stoch_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_t_stoch_args}{}}}
+\subsection{\code{MonteCarlo$get_t_stoch_args()}}{
+  Get arguments for t as a stochastic state
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_t_stoch_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(t,k,x,z,omega,Ppct)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_path_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_path_args}{}}}
+\subsection{\code{MonteCarlo$get_path_args()}}{
+  get path arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_path_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(paths,skip,seed,method)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_plot_args"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_plot_args}{}}}
+\subsection{\code{MonteCarlo$get_plot_args()}}{
+  get plot arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_plot_args()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(pmax,ptmax,first,last,zbeg,zend)
+  }
+}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MonteCarlo-get_plot_info"></a>}}
 \if{latex}{\out{\hypertarget{method-MonteCarlo-get_plot_info}{}}}
-\subsection{Method \code{get_plot_info()}}{
-Get information for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MonteCarlo$get_plot_info()}\if{html}{\out{</div>}}
+\subsection{\code{MonteCarlo$get_plot_info()}}{
+  Get information for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_plot_info()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(font,file,theme,3D,labels)
+  }
 }
 
-\subsection{Returns}{
-list(type,font,file,theme,3D,labels)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MonteCarlo-get_plot_colors"></a>}}
 \if{latex}{\out{\hypertarget{method-MonteCarlo-get_plot_colors}{}}}
-\subsection{Method \code{get_plot_colors()}}{
-Get colors for plotting
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MonteCarlo$get_plot_colors()}\if{html}{\out{</div>}}
+\subsection{\code{MonteCarlo$get_plot_colors()}}{
+  Get colors for plotting
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_plot_colors()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+  }
 }
 
-\subsection{Returns}{
-list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_plot_types"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_plot_types}{}}}
+\subsection{\code{MonteCarlo$get_plot_types()}}{
+  Get current types for plot routines
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_plot_types()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    (list(types,description))
+  }
 }
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-get_flags"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-get_flags}{}}}
+\subsection{\code{MonteCarlo$get_flags()}}{
+  Get flags for plotting and copying
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$get_flags()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(plotit,copyit)
+  }
 }
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-axes_y_stoch"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-axes_y_stoch}{}}}
+\subsection{\code{MonteCarlo$axes_y_stoch()}}{
+  Scale axes for y stochastic paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$axes_y_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-axes_x_stoch"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-axes_x_stoch}{}}}
+\subsection{\code{MonteCarlo$axes_x_stoch()}}{
+  Scale axes for x stochastic paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$axes_x_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-axes_t_stoch"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-axes_t_stoch}{}}}
+\subsection{\code{MonteCarlo$axes_t_stoch()}}{
+  Scale axes for t stochastic paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$axes_t_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-sync_yxt_stoch"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-sync_yxt_stoch}{}}}
+\subsection{\code{MonteCarlo$sync_yxt_stoch()}}{
+  Synchronize arguments
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$sync_yxt_stoch()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    NULL
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-undo_clear"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-undo_clear}{}}}
+\subsection{\code{MonteCarlo$undo_clear()}}{
+  Clear undo list and save current arguments to list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$undo_clear()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    1
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-undo_save"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-undo_save}{}}}
+\subsection{\code{MonteCarlo$undo_save()}}{
+  Save current arguments to undo list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$undo_save()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    number of argument sets
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-undo_undo"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-undo_undo}{}}}
+\subsection{\code{MonteCarlo$undo_undo()}}{
+  Replace current arguments from undo list
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$undo_undo(updn = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{updn}}{positive to move up, negative to move down}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    c(index of this argument set, number of argument sets)
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-ForwardPaths"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-ForwardPaths}{}}}
+\subsection{\code{MonteCarlo$ForwardPaths()}}{
+  Calculate and plot forward paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$ForwardPaths(
+  t = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(forward(m,paths))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-BackwardPaths"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-BackwardPaths}{}}}
+\subsection{\code{MonteCarlo$BackwardPaths()}}{
+  Calculate and plot backward paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$BackwardPaths(
+  s = NULL,
+  y = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times -inf<s<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(backward(m,paths))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-BoundedPaths"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-BoundedPaths}{}}}
+\subsection{\code{MonteCarlo$BoundedPaths()}}{
+  Calculate and plot bounded paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$BoundedPaths(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{k}}{threshold or bound -inf<k<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(bounded(m,paths))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-Mean"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-Mean}{}}}
+\subsection{\code{MonteCarlo$Mean()}}{
+  Calculate and plot means
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$Mean(
+  t = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(G(m))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-Variance"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-Variance}{}}}
+\subsection{\code{MonteCarlo$Variance()}}{
+  Calculate and plot variances
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$Variance(
+  t = NULL,
+  x = NULL,
+  rho = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(H2(m))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-Density"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-Density}{}}}
+\subsection{\code{MonteCarlo$Density()}}{
+  Calculate and plot densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$Density(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(p(m,n))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-Probability"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-Probability}{}}}
+\subsection{\code{MonteCarlo$Probability()}}{
+  Calculate and plot probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$Probability(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  psi = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(P(m,n))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-DoubleIntegral"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-DoubleIntegral}{}}}
+\subsection{\code{MonteCarlo$DoubleIntegral()}}{
+  Calculate and plot double integrals
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$DoubleIntegral(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  psi = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times -inf<t<inf}
+      \item{\code{y}}{vector of n states -inf<y<inf}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{psi}}{<=0 for integral -inf to y, >0 for integral y to inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(PP(m,n))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-Option"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-Option}{}}}
+\subsection{\code{MonteCarlo$Option()}}{
+  Calculate and plot option prices
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$Option(
+  s = NULL,
+  x = NULL,
+  y = NULL,
+  r = NULL,
+  phi = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{s}}{vector of m times -inf<s<t}
+      \item{\code{x}}{vector of n states -inf<x<inf}
+      \item{\code{y}}{terminal state -inf<y<inf}
+      \item{\code{r}}{discount rate -inf<r<inf}
+      \item{\code{phi}}{<=0 for exit option, >0 for entry option}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(OO(mxn))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-VisitingTimeModeMedianMean"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-VisitingTimeModeMedianMean}{}}}
+\subsection{\code{MonteCarlo$VisitingTimeModeMedianMean()}}{
+  Calculate and plot visiting time mode, median and mean
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$VisitingTimeModeMedianMean(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(vtmmm(3x3))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-VisitingTimePercentiles"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-VisitingTimePercentiles}{}}}
+\subsection{\code{MonteCarlo$VisitingTimePercentiles()}}{
+  Calculate and plot visiting time percentiles
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$VisitingTimePercentiles(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  Ppct = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{Ppct}}{probability for a percentile 0.01<=Ppct<=0.99}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(vtpct(3x3))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-VisitingTimeDensity"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-VisitingTimeDensity}{}}}
+\subsection{\code{MonteCarlo$VisitingTimeDensity()}}{
+  Calculate and plot visiting time densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$VisitingTimeDensity(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(pv(m))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-VisitingTimeProbability"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-VisitingTimeProbability}{}}}
+\subsection{\code{MonteCarlo$VisitingTimeProbability()}}{
+  Calculate and plot visiting time probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$VisitingTimeProbability(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(Pv(m))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-FirstPassageTimeModeMedianMean"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-FirstPassageTimeModeMedianMean}{}}}
+\subsection{\code{MonteCarlo$FirstPassageTimeModeMedianMean()}}{
+  Calculate and plot first passage time mode, median and mean
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$FirstPassageTimeModeMedianMean(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(fptmmm(3x3))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-FirstPassageTimePercentiles"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-FirstPassageTimePercentiles}{}}}
+\subsection{\code{MonteCarlo$FirstPassageTimePercentiles()}}{
+  Calculate and plot first passage time percentiles
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$FirstPassageTimePercentiles(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  Ppct = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{Ppct}}{probability for a percentile 0.01<=Ppct<=0.99}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(fptpct(3x3))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-FirstPassageTimeDensity"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-FirstPassageTimeDensity}{}}}
+\subsection{\code{MonteCarlo$FirstPassageTimeDensity()}}{
+  Calculate and plot first passage time densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$FirstPassageTimeDensity(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(pf(m))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-FirstPassageTimeProbability"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-FirstPassageTimeProbability}{}}}
+\subsection{\code{MonteCarlo$FirstPassageTimeProbability()}}{
+  Calculate and plot first passage time probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$FirstPassageTimeProbability(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  method = NULL,
+  who = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{t}}{vector of m times s<=t<inf}
+      \item{\code{k}}{decision threshold -inf<k<int}
+      \item{\code{x}}{initial state -inf<x<inf}
+      \item{\code{rho}}{rate parameter 0<=rho<inf}
+      \item{\code{mu}}{location parameter -inf<mu<inf}
+      \item{\code{sigma}}{scale parameter -inf<sigma<inf}
+      \item{\code{paths}}{number of paths 1<paths<1,000,000}
+      \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
+      \item{\code{seed}}{seed for random number generators -inf<seed<inf}
+      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
+      \item{\code{who}}{object id of caller}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list(Pf(m))
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotForwardPaths"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotForwardPaths}{}}}
+\subsection{\code{MonteCarlo$PlotForwardPaths()}}{
+  Plot forward paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotForwardPaths(
+  type = NULL,
+  first = NULL,
+  last = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -3,...,0, or 'n','p','d' for next, previous, default}
+      \item{\code{first}}{first path to plot}
+      \item{\code{last}}{last path to plot}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotBackwardPaths"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotBackwardPaths}{}}}
+\subsection{\code{MonteCarlo$PlotBackwardPaths()}}{
+  Plot backward paths
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotBackwardPaths(
+  type = NULL,
+  first = NULL,
+  last = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  sbeg = NULL,
+  send = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -3,...,0, or 'n','p','d' for next, previous, default}
+      \item{\code{first}}{first path to plot}
+      \item{\code{last}}{last path to plot}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{sbeg}}{begin value for time axis}
+      \item{\code{send}}{end value for time axis}
+      \item{\code{copyit}}{TRUE or FALSE}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+Plot bounded paths
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotBoundedPaths"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotBoundedPaths}{}}}
+\subsection{\code{MonteCarlo$PlotBoundedPaths()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotBoundedPaths(
+  type = NULL,
+  first = NULL,
+  last = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -3,...,0, or 'n','p','d' for next, previous, default}
+      \item{\code{first}}{first path to plot}
+      \item{\code{last}}{last path to plot}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotMean"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotMean}{}}}
+\subsection{\code{MonteCarlo$PlotMean()}}{
+  Plot means
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotMean(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotVariance"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotVariance}{}}}
+\subsection{\code{MonteCarlo$PlotVariance()}}{
+  Plot variances
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotVariance(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotDensity"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotDensity}{}}}
+\subsection{\code{MonteCarlo$PlotDensity()}}{
+  Plot transition densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotDensity(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotProbability"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotProbability}{}}}
+\subsection{\code{MonteCarlo$PlotProbability()}}{
+  Plot transition probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotProbability(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotDoubleIntegral"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotDoubleIntegral}{}}}
+\subsection{\code{MonteCarlo$PlotDoubleIntegral()}}{
+  Plot double integrals of transition densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotDoubleIntegral(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{ybeg}}{begin value for state axis}
+      \item{\code{yend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotOption"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotOption}{}}}
+\subsection{\code{MonteCarlo$PlotOption()}}{
+  Plot options
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotOption(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  sbeg = NULL,
+  send = NULL,
+  xbeg = NULL,
+  xend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{sbeg}}{begin value for time axis}
+      \item{\code{send}}{end value for time axis}
+      \item{\code{xbeg}}{begin value for state axis}
+      \item{\code{xend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotVisitingTimeModeMedianMean"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotVisitingTimeModeMedianMean}{}}}
+\subsection{\code{MonteCarlo$PlotVisitingTimeModeMedianMean()}}{
+  Plot visiting time mode, median and mean
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotVisitingTimeModeMedianMean(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotVisitingTimePercentiles"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotVisitingTimePercentiles}{}}}
+\subsection{\code{MonteCarlo$PlotVisitingTimePercentiles()}}{
+  Plot visiting time lower, median and upper percentiles
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotVisitingTimePercentiles(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotVisitingTimeDensity"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotVisitingTimeDensity}{}}}
+\subsection{\code{MonteCarlo$PlotVisitingTimeDensity()}}{
+  Plot visiting time densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotVisitingTimeDensity(
+  type = NULL,
+  pmax = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotVisitingTimeProbability"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotVisitingTimeProbability}{}}}
+\subsection{\code{MonteCarlo$PlotVisitingTimeProbability()}}{
+  Plot visiting time probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotVisitingTimeProbability(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotFirstPassageTimeModeMedianMean"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotFirstPassageTimeModeMedianMean}{}}}
+\subsection{\code{MonteCarlo$PlotFirstPassageTimeModeMedianMean()}}{
+  Plot first passage time mode, median and mean
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotFirstPassageTimeModeMedianMean(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotFirstPassageTimePercentiles"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotFirstPassageTimePercentiles}{}}}
+\subsection{\code{MonteCarlo$PlotFirstPassageTimePercentiles()}}{
+  Plot first passage time lower, median and upper percentiles
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotFirstPassageTimePercentiles(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= -1, 0, or 'n','p','d' for next, previous, default}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotFirstPassageTimeDensity"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotFirstPassageTimeDensity}{}}}
+\subsection{\code{MonteCarlo$PlotFirstPassageTimeDensity()}}{
+  Plot first passage time densities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotFirstPassageTimeDensity(
+  type = NULL,
+  pmax = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{ptmax}}{maximum visiting time and first passage time densities}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MonteCarlo-PlotFirstPassageTimeProbability"></a>}}
+\if{latex}{\out{\hypertarget{method-MonteCarlo-PlotFirstPassageTimeProbability}{}}}
+\subsection{\code{MonteCarlo$PlotFirstPassageTimeProbability()}}{
+  Plot first passage time probabilities
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{MonteCarlo$PlotFirstPassageTimeProbability(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{= 0, 1, or 'n','p','d' for next, previous, default}
+      \item{\code{pmax}}{maximum transition density}
+      \item{\code{title}}{text for plot title}
+      \item{\code{xaxis}}{text for x-axis label}
+      \item{\code{yaxis}}{text for y-axis label}
+      \item{\code{zaxis}}{text for z-axis label}
+      \item{\code{tbeg}}{begin value for time axis}
+      \item{\code{tend}}{end value for time axis}
+      \item{\code{zbeg}}{begin value for state axis}
+      \item{\code{zend}}{end value for state axis}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    plot
+  }
+}
+
 }

@@ -3,6 +3,8 @@
 # Type 'demo(FD_TerminalValue_Transcendental)'
 # R6 object
 FD <- FiniteDifference$new()
+# automatic plot with calculation
+FD$set_flags(plotit=TRUE)
 V <- FD$TerminalValue_Transcendental()
 V <- FD$TerminalValue_Transcendental(xo=-25,xi=-10,xm=5)
 V <- FD$TerminalValue_Transcendental(xo=-25,xi=-25,xm=5)

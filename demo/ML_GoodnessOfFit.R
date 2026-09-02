@@ -8,23 +8,24 @@ ML$GoodnessOfFit()
 # bad parameters
 ML$GoodnessOfFit(rho=0.4,mu=-10,sigma=25)
 # unrestricted estimates
-ML$Estimates(plotit=FALSE)
+ML$Estimates()
 ML$GoodnessOfFit()
 # invariant stochastic process
-ML$Estimates(rhor=10000,plotit=FALSE)
+ML$Estimates(rhor=10000)
 ML$GoodnessOfFit()
 # scaled brownian motion
-ML$Estimates(rhor=0,plotit=FALSE)
+ML$Estimates(rhor=0)
 ML$GoodnessOfFit()
 # other data
 df<-OUPDataRead("OUP_NotMissing")
-ML$Estimates(df=df,plotit=FALSE)
+ML$Estimates(df=df)
 ML$GoodnessOfFit()
 # other columns in data
-ML$Estimates(df=df,taucol=1,zcol=3,plotit=FALSE)
+ML$Estimates(df=df,taucol=1,zcol=3)
 ML$GoodnessOfFit()
-# with plots this time
+# with automatic plots this time
 ML$PlotTimeSeries(df=df)
+ML$set_flags(plotit=TRUE)
 ML$Estimates()
 ML$GoodnessOfFit()
 # customize plot

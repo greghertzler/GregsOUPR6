@@ -3,7 +3,8 @@
 # Type 'demo(Adoption_Obligation)'
 # R6 object
 A <- Analytical$new()
-A$set_plot_info(type=2)
+# automatic plots with calculations
+A$set_flags(plotit=TRUE)
 # entry option
 A$Option(phi=1)
 # exit option
