@@ -7,7 +7,7 @@ License: GPL (>=3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 URL: https://greghertzler.github.io/GregsOUPR6/, https://greghertzler.github.io/GregsOUPR6/OUP_Help.html, https://greghertzler.github.io/GregsOUPShiny/OUP_Shiny.html, https://real-options-adoption-resilience.shinyapps.io/GregsOUPShiny/
-Imports: plotly, stringr, clipr, Rcpp
+Imports: plotly, stringr, shiny, clipr, Rcpp
 Suggests: RcppParallel, sitmo, testthat (>= 3.0.0)
 LinkingTo: Rcpp
 SystemRequirements: GNU make
