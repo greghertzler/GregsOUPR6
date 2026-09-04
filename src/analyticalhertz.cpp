@@ -1479,7 +1479,7 @@ struct ROAOOs : public Worker
   double tsmin;
   double maxmin;
 
-  ROAOOs(NumericMatrix& OOs, const NumericVector& x,double t, double y, double rho, double mu, double sigma, double dy, double r, double phi, double b, double c, double tsguess, double tsmax, double tsmin, double maxmin)
+  ROAOOs(NumericMatrix& OOs, const NumericVector& x, double t, double y, double rho, double mu, double sigma, double dy, double r, double phi, double b, double c, double tsguess, double tsmax, double tsmin, double maxmin)
     : OOs(OOs), x(x), t(t), y(y), rho(rho), mu(mu), sigma(sigma), dy(dy), r(r), phi(phi), b(b), c(c), tsguess(tsguess), tsmax(tsmax), tsmin(tsmin), maxmin(maxmin) {}
 
   void operator()(std::size_t begin, std::size_t end) {
@@ -1521,7 +1521,7 @@ NumericMatrix RcppOUPAOptionEnvelope(NumericVector s, NumericVector x, double t,
   double tsguess = tsmin;
   tsguess = OUPOptionMaxMin(y,y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1)[1];
 #ifdef USE_PARALLEL
-  ROAOOs worker(OOs,x,y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1);
+  ROAOOs worker(OOs,x,t,y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1);
   parallelFor(0,n,worker);
 #else
   if(phi > 0)

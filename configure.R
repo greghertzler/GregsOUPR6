@@ -1,9 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env Rscript
 # configure — CRAN-safe conditional compilation for optional RcppParallel + sitmo
-# Works on Linux, macOS, and Windows (Rtools/MSYS2)
+# Works with rsconnect for shinyapps to publish on Linux, macOS, and Windows (Rtools/MSYS2)
 
 echo "Configuring conditional compilation..."
 
+# Detect shinyapps.io environment
+if(Sys.getenv("R_CONFIG_ACTIVE") != "shinyapps" && Sys.getenv("SHINY_PORT") == "")
+{
 # --- Detect RcppParallel ---
 RCPP_PARALLEL_HOME=$(Rscript -e "cat(system.file(package='RcppParallel'))" 2>/dev/null)
 if [ -n "$RCPP_PARALLEL_HOME" ]; then
@@ -25,6 +28,7 @@ else
     echo "  sitmo not found — building with standard RNG only."
     PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_SITMO"
 fi
+}
 
 # Ensure src directory exists
 mkdir -p src
