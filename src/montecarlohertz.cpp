@@ -244,8 +244,39 @@ using namespace RcppParallel;
 //'  it takes over twice as long.  Most simulations will have more than 1,000 paths.
 //'  So users get no choice.  By default, RcppParallel functions are compiled if
 //'  RcppParallel is installed. Otherwise compilation falls back to Rcpp.
+//'  
+//' Monte Carlo simulations are memory and CPU intensive.  Here are microbenchmark
+//'  median times by number of threads for generating standard normal variables
+//'  and simulating 1,000,000 Forward Paths over 100 time intervals using the
+//'  stochastic integral equation with parameter skip=1:
 //'
-//' Potentially, the functions could be imported into other packages.
+//'     Unit: milliseconds
+//'                threads    stdnorm  ForwardPath      total
+//'     -----------------------------------------------------
+//'                      1  5461.3963     667.0016  6129.3979
+//'                      2  2843.4390     438.4120  3281.8510
+//'                      3  2877.2132     437.0354  3314.2486
+//'                      4  1525.4355     326.4385  1851.8740
+//'                      5  1281.7121     301.5675  1583.2796
+//'                      6  1280.7483     301.8346  1582.5829
+//'                      7  1121.1044     293.7598  1414.8642
+//'                      8  1038.6441     306.8126  1345.4567
+//'                      9  1070.7125     259.2108  1329.9233 
+//'                     10   847.3448     283.3598  1130.7046
+//'                     11   850.3528     282.3086  1132.6614
+//'                     12   805.8151     284.3971  1090.2122
+//'                      
+//' These times are longer than previous times.  My computer seems tired today.
+//'  But the changes in times by thread number are instructive.  Generating the
+//'  standard normal variables would benefit from more threads.  Simulating the
+//'  Forward Paths only needs six or eight threads.  Once you have generated the
+//'  random variables, you could get by with fewer threads using the RcppParallel
+//'  commands:
+//'  
+//'      defaultNumThreads()
+//'      setThreadOptions(numThreads=8)
+//'
+//' Potentially, the Rcpp functions could be imported into other packages.
 //'
 //' @name MonteCarlo_Rcpp
 

@@ -260,16 +260,16 @@ library(utils)
 #'
 #' Finally, calculation functions print to the console, which is usually truncated.
 #'  Plotting doesn't give the numbers behind the plots. As a convenience, every
-#'  calculation and plot function copies tab-delimited text to the clipboard.
+#'  calculation and plot function can copy tab-delimited text to the clipboard.
 #'  The text can be pasted as a table in most other applications.  Copying is
-#'  painless, but you can turn it off from any module, for example, from the
+#'  off by default but you turn it on from any module, for example, from the
 #'  Analytical module:
 #'
 #'       A <- Analytical$new()
-#'       A$set_flags(plotit=FALSE,copyit=FALSE)
+#'       A$set_flags(plotit=TRUE,copyit=TRUE)
 #'
 #' For good measure, the flag which allows calculation routines to automatically
-#'  call plot routines is also set to FALSE.
+#'  call plot routines is also set to TRUE.
 #'
 #' Plotting is by Plotly.  Every plot can be downloaded as an SVG or PNG file.
 #'  Optionally, the file format and dimensions can be set.

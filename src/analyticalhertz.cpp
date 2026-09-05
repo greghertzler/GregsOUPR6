@@ -283,6 +283,28 @@ using namespace RcppParallel;
 //'  the global environment, but there is no map of inputs to outputs.  Outputs
 //'  can be stale.  Another advantage of the R6 object is predefined plots with
 //'  Plotly. The same simulation can plotted different ways without recalculation.
+//'  
+//' More threads are faster, but 12 seem to be enough.  Here are microbenchmark
+//'  median times for calculating 40,000 Transition Probabilities, by the number
+//'  of threads:
+//'
+//'     Unit: milliseconds
+//'                threads  Probability    threads  Probability
+//'     -------------------------------------------------------
+//'                      1      11.6022          7       2.5224
+//'                      2      11.6015          8       2.7832
+//'                      3       4.2567          9       2.4505
+//'                      4       4.2533         10       2.4361
+//'                      5       3.3214         11       2.3523
+//'                      6       2.8246         12       2.2651
+//'                      
+//' These times do not match up with previous times.  Those were done yesterday.
+//'  Come back tomorrow and the times will be different again.  But the changes
+//'  in times by thread number should be similar. If you need four threads for
+//'  something else, you can use the RcppParallel commands:
+//'  
+//'      defaultNumThreads()
+//'      setThreadOptions(numThreads=8)
 //'
 //' Potentially, the Rcpp functions could be imported into other packages.
 //'

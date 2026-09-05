@@ -108,7 +108,7 @@ using namespace Rcpp;
 //'  Outputs are calculated only as needed and only once. Then they are reused.
 //'  In plots using Plotly, for example.
 //'
-//' Potentially, the functions could be imported into other packages.
+//' Potentially, the Rcpp functions could be imported into other packages.
 //'
 //' @name FiniteDifference_Rcpp
 
@@ -537,16 +537,32 @@ NumericVector RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V,
   double dsskip = ds/skip;
   double dx = abs(x[n-1]-x[0])/(n-1);
   OptionA(n,A,g,h2,r,theta,dsskip,dx);
+  for(int i = 0; i < n; i++) {
+    for(int j = 0; j < n; j++) {
+      if(std::isnan(A(i,j)) || std::isinf(A(i,j))) { Rcpp::stop("A(%d,%d): NaN/Inf detected",i,j); }
+    }
+  }
   OptionLU(n,A);
+  for(int i = 0; i < n; i++) {
+    for(int j = 0; j < n; j++) {
+      if(std::isnan(A(i,j)) || std::isinf(A(i,j))) { Rcpp::stop("LU(%d,%d): NaN/Inf detected",i,j); }
+    }
+  }
   for(int i = 1; i < m; i++)
   {
     Optionb(i,n,b,c,g,h2,r,theta,dsskip,dx);
+    for(int j = 0; j < n; j++) {
+      if(std::isnan(b(j)) || std::isinf(b(j))) { Rcpp::stop("b(%d): NaN/Inf detected",j); }
+    }
     for(int iskip = 1; iskip < skip; iskip++)
     {
       OptionSolve(iskip,n,A,b,cskip);
       Optionb(iskip+1,n,b,cskip,g,h2,r,theta,dsskip,dx);
     }
     OptionSolve(i,n,A,b,c);
+    for(int j = 0; j < n; j++) {
+      if(std::isnan(c(i,j)) || std::isinf(c(i,j))) { Rcpp::stop("c(%d,%d): NaN/Inf detected",i,j); }
+    }
   }
   Rcout << "Option " << (m-1)*skip+1 << ":" << n << std::endl;
 

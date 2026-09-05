@@ -143,7 +143,7 @@ using namespace RcppParallel;
 //'
 //'     Unit: milliseconds       R6+Rcpp+  Console Rcpp+
 //'                function  RcppParallel   RcppParallel
-//'     -----------------------------------------
+//'     ------------------------------------------------
 //'           LogLikelihood       0.56320        0.48475
 //'                 NMStart       0.40560        0.11865
 //'              NelderMead     144.35000      143.42000
@@ -171,8 +171,44 @@ using namespace RcppParallel;
 //'  to 15 digits as Log Likelihoods for each observation are added.  Changing the
 //'  order changes the rounding and may give slightly different answers.  The TBB
 //'  scheduler determines the order.
+//'  
+//' Estimation uses a Nelder-Mead algorithm which calls a log likelihood function.
+//'  The Nelder-Mead algorithm is hopelessly sequential.  The log likelihood is
+//'  is embarrassingly parallel.  Here are microbenchmark median times for the
+//'  data set with 19,312 observations:
 //'
-//' Potentially, the functions could be imported into other packages.
+//'     Unit: milliseconds           Nelder-Mead
+//'                threads  nmstart   log likely      total
+//'     ---------------------------------------------------
+//'                      1   0.4203    1588.5964  1589.0617
+//'                      2   0.4744     851.8501   852.3245 
+//'                      3   0.4626     856.4483   856.9109
+//'                      4   0.6665     590.3574   591.0239
+//'                      5   0.6576     603.7107   604.3683
+//'                      6   0.9718     586.3567   587.3285
+//'                      7   1.0130     548.3021   549.3151
+//'                      8   1.2138     611.0684   612.2822
+//'                      9   1.1134     612.3945   613.5079
+//'                     10   1.3902     625.8831   627.2733
+//'                     11   1.7917     717.5494   719.3411
+//'                     12   1.5899     756.6424   758.2323
+//'                      
+//' These times are longer than previous measurements.  Maybe next time they will be
+//'  shorter.  But a curious thing happens.  More threads can be slower than fewer
+//'  threads.  Monitoring the CPU reveals that all 12 threads are used in all
+//'  estimations. It appears that 'threads' actually means 'working groups' which
+//'  Intel's Threading Building Blocks (TBB) uses to organize the calculations.
+//'  nmstart is a sequential algorithm which takes more time with more threads.
+//'  The Nelder-Mead algorithm takes more time with more threads but the log
+//'  likelihood function takes less time with more threads.  The sweet spot is
+//'  somewhere in the middle.
+//'  
+//' Estimation could be tweaked by using the RcppParallel commands:
+//'  
+//'      defaultNumThreads()
+//'      setThreadOptions(numThreads=6)
+//'
+//' Potentially, the Rcpp functions could be imported into other packages.
 //'
 //' @name MaximumLikelihood_Rcpp
 
