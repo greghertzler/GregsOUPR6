@@ -471,7 +471,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // RcppOUPFDOption
-NumericVector RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V, double r, double theta, int skip, double rho, double mu, double sigma);
+NumericMatrix RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V, double r, double theta, int skip, double rho, double mu, double sigma);
 RcppExport SEXP _GregsOUPR6_RcppOUPFDOption(SEXP sSEXP, SEXP xSEXP, SEXP VSEXP, SEXP rSEXP, SEXP thetaSEXP, SEXP skipSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

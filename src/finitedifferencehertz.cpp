@@ -116,27 +116,27 @@ using namespace Rcpp;
 
 void OptionA(int n, NumericMatrix& A, NumericVector g, NumericVector h2, double r, double theta, double ds, double dx)
 {
-  Rcout << "OptionA" << std::endl;
-  Rcout << n << ", " << r << ", " << theta << ", " << ds << ", " << dx << std::endl;
+  // Rcout << "OptionA" << std::endl;
+  // Rcout << n << ", " << r << ", " << theta << ", " << ds << ", " << dx << std::endl;
   double dx2 = dx*dx;
   // first row has 3 entries
   A(0,0) = 1/ds+theta*r+0.5*theta*(3*g[0]/dx-h2[0]/dx2);
   A(0,1) = -theta*(2*g[0]/dx-h2[0]/dx2);
   A(0,2) = 0.5*theta*(g[0]/dx-h2[0]/dx2);
-  Rcout << 0 << ": " << A(0,0) << ", " << A(0,1) << ", " << A(0,2) << std::endl;
+  // Rcout << 0 << ": " << A(0,0) << ", " << A(0,1) << ", " << A(0,2) << std::endl;
   // middle rows are tridiagonal
   for(int j = 1; j < n-1; j++)
   {
     A(j,j-1) = 0.5*theta*(g[j]/dx-h2[j]/dx2);
     A(j,j) = 1/ds+theta*r+theta*h2[j]/dx2;
     A(j,j+1) = -0.5*theta*(g[j]/dx+h2[j]/dx2);
-    Rcout << j << ": " << A(j,j-1) << ", " << A(j,j) << ", " << A(j,j+1) << std::endl;
+    // Rcout << j << ": " << A(j,j-1) << ", " << A(j,j) << ", " << A(j,j+1) << std::endl;
   }
   // last row has 3 entries
   A(n-1,n-3) = -0.5*theta*(g[n-1]/dx+h2[n-1]/dx2);
   A(n-1,n-2) = theta*(2*g[n-1]/dx+h2[n-1]/dx2);
   A(n-1,n-1) = 1/ds+theta*r-0.5*theta*(3*g[n-1]/dx+h2[n-1]/dx2);
-  Rcout << n-1 << ": " << A(n-1,n-3) << ", " << A(n-1,n-2) << ", " << A(n-1,n-1) << std::endl;
+  // Rcout << n-1 << ": " << A(n-1,n-3) << ", " << A(n-1,n-2) << ", " << A(n-1,n-1) << std::endl;
 }
 
 void OptionLU(int n, NumericMatrix& A)
@@ -527,7 +527,7 @@ NumericMatrix RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V,
   Rcout << "Option" << std::endl;
   int m = s.size();
   int n = x.size();
-  Rcout << m << ", " << n << std::endl;
+  Rcout << m << ":" << n << ", " << s[0] << ", " << s[m-1] << ", " << x[0] << ", " << x[n-1] << std::endl;
   NumericMatrix A(n,n);
   NumericMatrix c(m,n);
   NumericMatrix cskip(skip,n);
@@ -539,7 +539,6 @@ NumericMatrix RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V,
     c(0,j) = V[j];
     g[j] = -rho*(x[j]-mu);
     h2[j] = sigma*sigma;
-    Rcout << c(0,j) << ", " << g[j] << ", " << h2[j] << std::endl;
   }
   double ds = abs(s[0]-s[m-1])/(m-1);
   double dsskip = ds/skip;
