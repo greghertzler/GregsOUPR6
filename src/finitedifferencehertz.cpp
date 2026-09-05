@@ -517,7 +517,7 @@ NumericVector RcppOUPFDTerminalValue_YieldIndex(NumericVector x, double xo, doub
 //' @return c(m,n) <- RcppOUPFDOption()
 //' @export
 // [[Rcpp::export]]
-NumericVector RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V, double r, double theta, int skip, double rho, double mu, double sigma)
+NumericMatrix RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V, double r, double theta, int skip, double rho, double mu, double sigma)
 {
   int m = s.size();
   int n = x.size();
