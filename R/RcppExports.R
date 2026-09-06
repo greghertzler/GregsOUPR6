@@ -1276,7 +1276,7 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'
 #'     Unit: milliseconds              paths                paths
 #'                        function   100,000            1,000,000
-#'     ----------------------------------------------------------
+#'     ---------------------------------------------------------------------
 #'                  StandardNormal   57.2060             588.7932
 #'     ForwardPathIntegralEquation   18.9317  ________   187.9792  _________
 #'                        subtotal             76.1377              776.7524
@@ -1325,7 +1325,7 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'
 #'     Unit: milliseconds                     R6+        Console
 #'                         function   RcppParallel  RcppParallel
-#'     -------------------------------------------------------------------
+#'     ---------------------------------------------------------
 #'      ForwardPathIntegralEquation       807.2069      837.4392
 #'     BackwardPathIntegralEquation       807.4201      837.8897
 #'      BoundedPathIntegralEquation      1200.3780      834.9122

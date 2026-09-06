@@ -18,7 +18,8 @@ bool <- RcppsitmoInstalled()
 \description{
 Queries whether functions are compiled with RcppParallel or fall back
 to Rcpp only.  Also queries whether random numbers are generated
-by RcppParallel using sitmo() or fall back to Rcpp using rnorm().
+by RcppParallel using sitmo() or fall back to Rcpp using rnorm().  And
+there are functions for setting and getting the number of threads.
 }
 \section{Discussion}{
 Rcpp calculates hundreds of times faster than R6 objects.  RcppParallel

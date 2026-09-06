@@ -413,8 +413,8 @@ double OUPDensity(double t, double y, double s, double x, double rho, double mu,
   double pij;
   double variance;
   if(rho < 0.0000000001) { variance = sigma*sigma*(t-s); }
-  else { variance = sigma*sigma/(2*rho)*(1.0-exp(-2.0*rho*(t-s))); }
-  double mean = mu+(x-mu)*exp(-rho*(t-s));
+  else { variance = sigma*sigma/(2*rho)*(1.0-std::exp(-2.0*rho*(t-s))); }
+  double mean = mu+(x-mu)*std::exp(-rho*(t-s));
   double ymean = y-mean;
   if(variance < dy*dy)
   {
@@ -427,9 +427,9 @@ double OUPDensity(double t, double y, double s, double x, double rho, double mu,
   }
   else
   {
-    double u = pow(6.28318530717958*variance,-0.5);
+    double u = std::pow(6.28318530717958*variance,-0.5);
     double v2 = 0.5*ymean*ymean/variance;
-    pij = u*exp(-v2);
+    pij = u*std::exp(-v2);
   }
   return pij;
 }
@@ -439,8 +439,8 @@ double OUPProbability(double t, double y, double s, double x, double rho, double
   double Pij;
   double variance;
   if(rho < 0.0000000001) { variance = sigma*sigma*(t-s); }
-  else { variance = sigma*sigma/(2*rho)*(1.0-exp(-2.0*rho*(t-s))); }
-  double mean = mu+(x-mu)*exp(-rho*(t-s));
+  else { variance = sigma*sigma/(2*rho)*(1.0-std::exp(-2.0*rho*(t-s))); }
+  double mean = mu+(x-mu)*std::exp(-rho*(t-s));
   double ymean = y-mean;
   if(variance < 0.0000000001)
   {
@@ -473,9 +473,9 @@ double OUPDoubleIntegral(double t, double y, double s, double x, double rho, dou
   int ltgt = 1;
   if(psi > 0) { ltgt = -1; }
   if(t <= s) { PPij = ltgt*(y-x)*OUPProbability(t,y,s,x,rho,mu,sigma,psi); }
-  else if(sigma == 0) { PPij = ltgt*(y-mu-(x-mu)*exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,psi); }
+  else if(sigma == 0) { PPij = ltgt*(y-mu-(x-mu)*std::exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,psi); }
   else if(rho < 0.0000000001) { PPij = ltgt*(y-x)*OUPProbability(t,y,s,x,rho,mu,sigma,psi)+sigma*sigma*(t-s)*OUPDensity(t,y,s,x,rho,mu,sigma,dy); }
-  else { PPij = ltgt*(y-mu-(x-mu)*exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,psi)+sigma*sigma/(2*rho)*(1-exp(-2*rho*(t-s)))*OUPDensity(t,y,s,x,rho,mu,sigma,dy); }
+  else { PPij = ltgt*(y-mu-(x-mu)*std::exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,psi)+sigma*sigma/(2*rho)*(1-std::exp(-2*rho*(t-s)))*OUPDensity(t,y,s,x,rho,mu,sigma,dy); }
 
   return PPij;
 }
@@ -491,20 +491,20 @@ double OUPOption(double s, double x, double t, double y, double rho, double mu, 
     bc = b;
   }
   if(t <= s) { OOij = ltgt*(y-x)*OUPProbability(t,y,s,x,rho,mu,sigma,phi);  }
-  else if(sigma == 0) { OOij = ltgt*(y-mu-(x-mu)*exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,phi); }
+  else if(sigma == 0) { OOij = ltgt*(y-mu-(x-mu)*std::exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,phi); }
   else if(rho < 0.0000000001) { OOij = ltgt*(y-x)*OUPProbability(t,y,s,x,rho,mu,sigma,phi)+sigma*sigma*(t-s)*OUPDensity(t,y,s,x,rho,mu,sigma,dy); }
-  else { OOij = ltgt*(y-mu-(x-mu)*exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,phi)+sigma*sigma/(2*rho)*(1-exp(-2*rho*(t-s)))*OUPDensity(t,y,s,x,rho,mu,sigma,dy); }
+  else { OOij = ltgt*(y-mu-(x-mu)*std::exp(-rho*(t-s)))*OUPProbability(t,y,s,x,rho,mu,sigma,phi)+sigma*sigma/(2*rho)*(1-std::exp(-2*rho*(t-s)))*OUPDensity(t,y,s,x,rho,mu,sigma,dy); }
 
-  return exp(-r*(t-s))*(OOij+bc);
+  return std::exp(-r*(t-s))*(OOij+bc);
 }
 
 double OUPObligation(double s, double x, double t, double y, double rho, double mu, double r, double phi, double b, double c)
 {
   double BCij;
-  if(phi <= 0) { BCij = (mu+(x-mu)*exp(-rho*(t-s))-y+b+c); }
-  else { BCij = -(mu+(x-mu)*exp(-rho*(t-s))-y+b+c); }
+  if(phi <= 0) { BCij = (mu+(x-mu)*std::exp(-rho*(t-s))-y+b+c); }
+  else { BCij = -(mu+(x-mu)*std::exp(-rho*(t-s))-y+b+c); }
 
-  return exp(-r*(t-s))*BCij;
+  return std::exp(-r*(t-s))*BCij;
 }
 
 double OUPPassageTimeDensity(double s, double x, double t, double k, double omega, double rho, double mu, double sigma, double dt)
@@ -514,61 +514,61 @@ double OUPPassageTimeDensity(double s, double x, double t, double k, double omeg
   {
     double varx;
     if(rho < 0.0000000001) { varx = sigma*sigma*(t-s); }
-    else { varx = sigma*sigma*(1-exp(-2*rho*(t-s)))/(2*rho); }
+    else { varx = sigma*sigma*(1-std::exp(-2*rho*(t-s)))/(2*rho); }
     if(varx < 0.0000000001)
     {
       density = 0.0;
       if(x < mu)
       {
-        if(k > mu+(x-mu)*exp(-rho*(t-0.5*dt-s)) && k <= mu+(x-mu)*exp(-rho*(t+0.5*dt-s))) { density = 10.0; }
+        if(k > mu+(x-mu)*std::exp(-rho*(t-0.5*dt-s)) && k <= mu+(x-mu)*std::exp(-rho*(t+0.5*dt-s))) { density = 10.0; }
       }
       else
       {
-        if(k > mu+(x-mu)*exp(-rho*(t+0.5*dt-s)) && k <= mu+(x-mu)*exp(-rho*(t-0.5*dt-s))) { density = 10.0; }
+        if(k > mu+(x-mu)*std::exp(-rho*(t+0.5*dt-s)) && k <= mu+(x-mu)*std::exp(-rho*(t-0.5*dt-s))) { density = 10.0; }
       }
     }
     else if(x == k)
     {
-      double u = abs(k-mu)*(exp(-rho*(t-s))-exp(-2*rho*(t-s)))*sigma*sigma/pow(varx,1.5);
-      double v2 = (k-mu)*(1-exp(-rho*(t-s)));
+      double u = std::abs(k-mu)*(std::exp(-rho*(t-s))-std::exp(-2*rho*(t-s)))*sigma*sigma/std::pow(varx,1.5);
+      double v2 = (k-mu)*(1-std::exp(-rho*(t-s)));
       v2 = 0.5*v2*v2/varx;
-      density = (1-omega)*u*exp(-v2)/(2*2.50662827431001);
+      density = (1-omega)*u*std::exp(-v2)/(2*2.50662827431001);
     }
     else if(k == mu)
     {
-      double u = abs(x-k)*exp(-rho*(t-s))*sigma*sigma/pow(varx,1.5);
-      double v2 = (k-x)*exp(-rho*(t-s));
+      double u = std::abs(x-k)*std::exp(-rho*(t-s))*sigma*sigma/std::pow(varx,1.5);
+      double v2 = (k-x)*std::exp(-rho*(t-s));
       v2 = 0.5*v2*v2/varx;
-      density = (1+omega)*u*exp(-v2)/(2*2.50662827431001);
+      density = (1+omega)*u*std::exp(-v2)/(2*2.50662827431001);
     }
     else
     {
-      double meanx = mu+(x-mu)*exp(-rho*(t-s));
-      double boundx = mu+(k-mu)*exp(-rho*(t-s))-(x-k)*exp(-rho*(t-s));
+      double meanx = mu+(x-mu)*std::exp(-rho*(t-s));
+      double boundx = mu+(k-mu)*std::exp(-rho*(t-s))-(x-k)*std::exp(-rho*(t-s));
       double vm2 = 0.5*(k-meanx)*(k-meanx)/varx;
       double vb2 = 0.5*(k-boundx)*(k-boundx)/varx;
       double smallgammab = GammaSmallOneHalf(vb2);
       double biggammab = GammaBigOneHalf(vb2);
-      double lnlambda = 2*(k-mu)*(1-exp(-rho*(t-s)))*(x-k)*exp(-rho*(t-s))/varx;
-      double dlnlambda = -(k-mu)*(x-k)*sigma*sigma*(exp(-rho*(t-s))-2*exp(-2*rho*(t-s))+exp(-3*rho*(t-s)))/(varx*varx);
+      double lnlambda = 2*(k-mu)*(1-std::exp(-rho*(t-s)))*(x-k)*std::exp(-rho*(t-s))/varx;
+      double dlnlambda = -(k-mu)*(x-k)*sigma*sigma*(std::exp(-rho*(t-s))-2*std::exp(-2*rho*(t-s))+std::exp(-3*rho*(t-s)))/(varx*varx);
       if(x > k)
       {
-        double u = ((x-mu)*exp(-rho*(t-s))-(k-mu)*exp(-2*rho*(t-s))+omega*((x-k)*exp(-rho*(t-s))-(k-mu)*(exp(-rho*(t-s))-exp(-2*rho*(t-s)))))*sigma*sigma/pow(varx,1.5);
-        if(k < mu && k < boundx) { density = u*exp(-vm2)/(2*2.50662827431001)+omega*dlnlambda*exp(lnlambda)*(1.77245385090552+smallgammab)/(2*1.77245385090552); }
+        double u = ((x-mu)*std::exp(-rho*(t-s))-(k-mu)*std::exp(-2*rho*(t-s))+omega*((x-k)*std::exp(-rho*(t-s))-(k-mu)*(std::exp(-rho*(t-s))-std::exp(-2*rho*(t-s)))))*sigma*sigma/std::pow(varx,1.5);
+        if(k < mu && k < boundx) { density = u*std::exp(-vm2)/(2*2.50662827431001)+omega*dlnlambda*std::exp(lnlambda)*(1.77245385090552+smallgammab)/(2*1.77245385090552); }
         else
         {
-          if(lnlambda > 709.782712893384) { density = u*exp(-vm2)/(2*2.50662827431001); }
-          else { density = u*exp(-vm2)/(2*2.50662827431001)+omega*biggammab*dlnlambda*exp(lnlambda)/(2*1.77245385090552); }
+          if(lnlambda > 709.782712893384) { density = u*std::exp(-vm2)/(2*2.50662827431001); }
+          else { density = u*std::exp(-vm2)/(2*2.50662827431001)+omega*biggammab*dlnlambda*std::exp(lnlambda)/(2*1.77245385090552); }
         }
       }
       else
       {
-        double u = ((k-mu)*exp(-2*rho*(t-s))-(x-mu)*exp(-rho*(t-s))+omega*((k-mu)*(exp(-rho*(t-s))-exp(-2*rho*(t-s)))-(x-k)*exp(-rho*(t-s))))*sigma*sigma/pow(varx,1.5);
-        if(k > mu && k > boundx) { density = u*exp(-vm2)/(2*2.50662827431001)+omega*dlnlambda*exp(lnlambda)*(1.77245385090552+smallgammab)/(2*1.77245385090552); }
+        double u = ((k-mu)*std::exp(-2*rho*(t-s))-(x-mu)*std::exp(-rho*(t-s))+omega*((k-mu)*(std::exp(-rho*(t-s))-std::exp(-2*rho*(t-s)))-(x-k)*std::exp(-rho*(t-s))))*sigma*sigma/std::pow(varx,1.5);
+        if(k > mu && k > boundx) { density = u*std::exp(-vm2)/(2*2.50662827431001)+omega*dlnlambda*std::exp(lnlambda)*(1.77245385090552+smallgammab)/(2*1.77245385090552); }
         else
         {
-          if(lnlambda > 709.782712893384) { density = u*exp(-vm2)/(2*2.50662827431001); }
-          else { density = u*exp(-vm2)/(2*2.50662827431001)+omega*biggammab*dlnlambda*exp(lnlambda)/(2*1.77245385090552); }
+          if(lnlambda > 709.782712893384) { density = u*std::exp(-vm2)/(2*2.50662827431001); }
+          else { density = u*std::exp(-vm2)/(2*2.50662827431001)+omega*biggammab*dlnlambda*std::exp(lnlambda)/(2*1.77245385090552); }
         }
       }
     }
@@ -588,11 +588,11 @@ double OUPPassageTimeProbability(double s, double x, double t, double k, double 
       else
       {
         if(rho < 0.0000000001) { varx = sigma*sigma*(t-s); }
-        else { varx = sigma*sigma*(1-exp(-2*rho*(t-s)))/(2*rho); }
+        else { varx = sigma*sigma*(1-std::exp(-2*rho*(t-s)))/(2*rho); }
         if(varx < 0.0000000001) { probability = 0.5*(1+omega); }
         else
         {
-          double v2 = (k-mu)*(1-exp(-rho*(t-s)));
+          double v2 = (k-mu)*(1-std::exp(-rho*(t-s)));
           v2 = 0.5*v2*v2/varx;
           double smallgamma = GammaSmallOneHalf(v2);
           double biggamma = GammaBigOneHalf(v2);
@@ -603,11 +603,11 @@ double OUPPassageTimeProbability(double s, double x, double t, double k, double 
     else if(k == mu)
     {
       if(rho < 0.0000000001) { varx = sigma*sigma*(t-s); }
-      else { varx = sigma*sigma*(1-exp(-2*rho*(t-s)))/(2*rho); }
+      else { varx = sigma*sigma*(1-std::exp(-2*rho*(t-s)))/(2*rho); }
       if(varx < 0.0000000001) { probability = 0.0; }
       else
       {
-        double v2 = (k-x)*exp(-rho*(t-s));
+        double v2 = (k-x)*std::exp(-rho*(t-s));
         v2 = 0.5*v2*v2/varx;
         double biggamma = GammaBigOneHalf(v2);
         probability = (1+omega)*biggamma/(2*1.77245385090552);
@@ -615,10 +615,10 @@ double OUPPassageTimeProbability(double s, double x, double t, double k, double 
     }
     else
     {
-      double meanx = mu+(x-mu)*exp(-rho*(t-s));
-      double boundx = mu+(k-mu)*exp(-rho*(t-s))-(x-k)*exp(-rho*(t-s));
+      double meanx = mu+(x-mu)*std::exp(-rho*(t-s));
+      double boundx = mu+(k-mu)*std::exp(-rho*(t-s))-(x-k)*std::exp(-rho*(t-s));
       if(rho < 0.0000000001) { varx = sigma*sigma*(t-s); }
-      else { varx = sigma*sigma*(1-exp(-2*rho*(t-s)))/(2*rho); }
+      else { varx = sigma*sigma*(1-std::exp(-2*rho*(t-s)))/(2*rho); }
       if(varx < 0.0000000001)
       {
         if(x > k && k > mu)
@@ -642,7 +642,7 @@ double OUPPassageTimeProbability(double s, double x, double t, double k, double 
         vm2 = 0.5*vm2*vm2/varx;
         double vb2 = k-boundx;
         vb2 = 0.5*vb2*vb2/varx;
-        double lnlambda = 2*(k-mu)*(1-exp(-rho*(t-s)))*(x-k)*exp(-rho*(t-s))/varx;
+        double lnlambda = 2*(k-mu)*(1-std::exp(-rho*(t-s)))*(x-k)*std::exp(-rho*(t-s))/varx;
         double smallgammam = GammaSmallOneHalf(vm2);
         double biggammam = GammaBigOneHalf(vm2);
         double smallgammab = GammaSmallOneHalf(vb2);
@@ -652,36 +652,36 @@ double OUPPassageTimeProbability(double s, double x, double t, double k, double 
           if(k < meanx)
           {
             if(lnlambda > 709.782712893384) { probability = biggammam/(2*1.77245385090552); }
-            else { probability = (biggammam+omega*biggammab*exp(lnlambda))/(2*1.77245385090552); }
+            else { probability = (biggammam+omega*biggammab*std::exp(lnlambda))/(2*1.77245385090552); }
           }
           else
           {
             if(lnlambda > 709.782712893384) { probability = (1.77245385090552+smallgammam)/(2*1.77245385090552); }
-            else { probability = (1.77245385090552+smallgammam+omega*biggammab*exp(lnlambda))/(2*1.77245385090552); }
+            else { probability = (1.77245385090552+smallgammam+omega*biggammab*std::exp(lnlambda))/(2*1.77245385090552); }
           }
         }
         else if(x > k && mu > k)
         {
-          if(k > boundx) { probability = (biggammam+omega*exp(lnlambda)*biggammab)/(2*1.77245385090552); }
-          else { probability = (biggammam+omega*exp(lnlambda)*(1.77245385090552+smallgammab))/(2*1.77245385090552); }
+          if(k > boundx) { probability = (biggammam+omega*std::exp(lnlambda)*biggammab)/(2*1.77245385090552); }
+          else { probability = (biggammam+omega*std::exp(lnlambda)*(1.77245385090552+smallgammab))/(2*1.77245385090552); }
         }
         else if(x < k && k < mu)
         {
           if(k > meanx)
           {
             if(lnlambda > 709.782712893384) { probability = biggammam/(2*1.77245385090552); }
-            else { probability = (biggammam+omega*biggammab*exp(lnlambda))/(2*1.77245385090552); }
+            else { probability = (biggammam+omega*biggammab*std::exp(lnlambda))/(2*1.77245385090552); }
           }
           else
           {
             if(lnlambda > 709.782712893384) { probability = (1.77245385090552+smallgammam)/(2*1.77245385090552); }
-            else { probability = (1.77245385090552+smallgammam+omega*biggammab*exp(lnlambda))/(2*1.77245385090552); }
+            else { probability = (1.77245385090552+smallgammam+omega*biggammab*std::exp(lnlambda))/(2*1.77245385090552); }
           }
         }
         else
         {
-          if(k < boundx) { probability = (biggammam+omega*exp(lnlambda)*biggammab)/(2*1.77245385090552); }
-          else { probability = (biggammam+omega*exp(lnlambda)*(1.77245385090552+smallgammab))/(2*1.77245385090552); }
+          if(k < boundx) { probability = (biggammam+omega*std::exp(lnlambda)*biggammab)/(2*1.77245385090552); }
+          else { probability = (biggammam+omega*std::exp(lnlambda)*(1.77245385090552+smallgammab))/(2*1.77245385090552); }
         }
       }
     }
@@ -781,7 +781,7 @@ std::vector<double> OUPOptionMaxMin(double x, double y, double rho, double mu, d
       if(maxmin*(Optn[i]-Optn[m]) > 0) { m = i; }
     }
     std::size_t j = 0;
-    while(tensigdig*abs(Optn[3]-Optn[1]) >= abs(Optn[2]) && ts[2] < 10.0*tsmax && ts[2] > tsmin && j < n)
+    while(tensigdig*std::abs(Optn[3]-Optn[1]) >= std::abs(Optn[2]) && ts[2] < 10.0*tsmax && ts[2] > tsmin && j < n)
     {
       j += 1;
       if(m == 1 || m == 2 || m == 3)
@@ -878,13 +878,13 @@ std::vector<double> OUPOptionMaxMin(double x, double y, double rho, double mu, d
 double OUPPassageTimeModeSearch(double s, double x, double k, double omega, double rho, double mu, double sigma, double median)
 {
   double mode = median;
-  if(median < std::numeric_limits<double>::infinity() && abs(x - k) >= 0.0000000001 && sigma*sigma >= 0.0000000001)
+  if(median < std::numeric_limits<double>::infinity() && std::abs(x - k) >= 0.0000000001 && sigma*sigma >= 0.0000000001)
   {
     std::vector<int> m(2);
     std::vector<double> dt(2);
     std::vector<double> Dens(10);
     std::vector<double> t(10);
-    double fivesigdig = 1000000;
+    double tensigdig = 1000000;
     std::size_t n = 1000;
     dt[0] = 0.01*(median-s);
     dt[1] = 0.5*(median-s);
@@ -910,7 +910,7 @@ double OUPPassageTimeModeSearch(double s, double x, double k, double omega, doub
     {
       std::size_t co = 5*c;
       std::size_t j = 0;
-      while(fivesigdig*(t[3+co]-t[1+co]) >= t[2+co] && j < n)
+      while(tensigdig*(t[3+co]-t[1+co]) >= t[2+co] && j < n)
       {
         j = j+1;
         if(m[c] == 1 || m[c] == 2 || m[c] == 3)
@@ -990,15 +990,15 @@ double OUPPassageTimePctSearch(double s, double x, double k, double omega, doubl
   double tpct = std::numeric_limits<double>::infinity();
   if(k < std::numeric_limits<double>::infinity() && k > -std::numeric_limits<double>::infinity())
   {
-    if(abs(x - k) < 0.0000000001) { tpct = s; }
+    if(std::abs(x - k) < 0.0000000001) { tpct = s; }
     else if(sigma*sigma < 0.0000000001)
     {
-      if(((x < k && k < mu) || (x > k && k > mu)) && rho > 0) { tpct = s + log((x-mu)/(k-mu))/rho; }
+      if(((x < k && k < mu) || (x > k && k > mu)) && rho > 0) { tpct = s + std::log((x-mu)/(k-mu))/rho; }
       else if(omega == 0) { tpct = s; }
     }
     else
     {
-      double fivesigdig = 1000000;
+      double tensigdig = 1000000;
       std::size_t n = 1000;
       double PInf = OUPPassageTimeProbabilityInf(x,k,omega,rho,mu,sigma);
       std::vector<double> Prob(5);
@@ -1017,7 +1017,7 @@ double OUPPassageTimePctSearch(double s, double x, double k, double omega, doubl
       if(m > 0)
       {
         std::size_t j = 0;
-        while(fivesigdig*(t[3]-t[1]) >= t[2] && j < n)
+        while(tensigdig*(t[3]-t[1]) >= t[2] && j < n)
         {
           j = j+1;
           if(m == 1 || m == 2 || m == 3)
@@ -1104,7 +1104,7 @@ double OUPPassageTimeMeanIntegrate(double s, double x, double k, double omega, d
 {
   double mean = median;
   if(rho < 0.0000000001) { mean = std::numeric_limits<double>::infinity(); }
-  else if(median < std::numeric_limits<double>::infinity() && abs(x - k) >= 0.0000000001 && sigma*sigma >= 0.0000000001)
+  else if(median < std::numeric_limits<double>::infinity() && std::abs(x - k) >= 0.0000000001 && sigma*sigma >= 0.0000000001)
   {
     double PInf = OUPPassageTimeProbabilityInf(x,k,omega,rho,mu,sigma);
     double dss = (median-s)/100.0;
@@ -1125,7 +1125,7 @@ double OUPPassageTimeMeanIntegrate(double s, double x, double k, double omega, d
     mean = 0;
     for(std::size_t i = 0; i < 41; i++)
     {
-      wghtfnct[i] = exp(-t[i]);
+      wghtfnct[i] = std::exp(-t[i]);
       t[i] = t[i]*(median-s-ss)/tscale+ss;
       w[i] = w[i]*(median-s-ss)/tscale;
       density[i] = OUPPassageTimeDensity(0,x,t[i],k,omega,rho,mu,sigma,0.05);
@@ -1187,10 +1187,10 @@ NumericVector RcppOUPAMean(NumericVector t, double s, double x, double rho, doub
 {
   int m = t.size();
   NumericVector Gt(m+1);
-  for(int i = 0; i < m; i++) { Gt[i] = mu+(x-mu)*exp(-rho*(t[i]-s)); }
+  for(int i = 0; i < m; i++) { Gt[i] = mu+(x-mu)*std::exp(-rho*(t[i]-s)); }
   Gt[m] = s;
   if(eps <= 0 || rho < 0.0000000001) { Gt[m] = std::numeric_limits<double>::infinity(); }
-  else { Gt[m] = s-log(eps)/rho; }
+  else { Gt[m] = s-std::log(eps)/rho; }
 
   return Gt;
 }
@@ -1215,11 +1215,11 @@ NumericVector RcppOUPAVariance(NumericVector t, double s, double rho, double sig
   }
   else
   {
-    for(int i = 0; i < m; i++) { H2t[i] = sigma*sigma/(2*rho)*(1-exp(-2*rho*(t[i]-s))); }
+    for(int i = 0; i < m; i++) { H2t[i] = sigma*sigma/(2*rho)*(1-std::exp(-2*rho*(t[i]-s))); }
   }
   H2t[m] = s;
   if(eps <= 0 || rho < 0.0000000001) { H2t[m] = std::numeric_limits<double>::infinity(); }
-  else { H2t[m] = s-log(eps)/(2*rho); }
+  else { H2t[m] = s-std::log(eps)/(2*rho); }
 
   return H2t;
 }
@@ -1595,7 +1595,7 @@ NumericMatrix RcppOUPAdOOdsZero(NumericVector s, NumericVector x, double t, doub
   int m = s.size();
   int n = x.size();
   double dy = 0.1;
-  if(n > 1) { dy = (x[n-1]-x[0])/(n-1); }
+  if(n > 1) { dy = std::abs(x[n-1]-x[0])/(n-1); }
   NumericMatrix dOOdszero(4,n+3);
   if(phi > 0 )
   {
@@ -1790,7 +1790,7 @@ NumericVector RcppOUPADecisionThreshold(double y, double rho, double mu, double 
       }
     }
     int j = 0;
-    while(tensigdig*(x[3]-x[1]) >= abs(x[2]) && j < n)
+    while(tensigdig*(x[3]-x[1]) >= std::abs(x[2]) && j < n)
     {
       j += 1;
       if(m == 1 || m == 2 || m == 3)
@@ -2188,7 +2188,7 @@ NumericMatrix RcppOUPAPassageTimeDensity(NumericVector t, double k, double s, do
 {
   std::size_t m = t.size();
   double dt = 0.5;
-  if(m > 1) { dt = (t[m-1]-t[0])/(m-1); }
+  if(m > 1) { dt = std::abs(t[m-1]-t[0])/(m-1); }
   if(z.isNull())
   {
     NumericMatrix ptptx(m,1);

@@ -237,7 +237,7 @@ them indirectly through R6 objects.  Here are microbenchmark median times for
 the data set with 19,312 observations:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>Unit<span class="sc">:</span> milliseconds       R6<span class="sc">+</span>Rcpp<span class="sc">+</span>  Console Rcpp<span class="sc">+</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>           <span class="cf">function</span>  RcppParallel   RcppParallel</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="sc">-----------------------------------------</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="sc">------------------------------------------------</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>      LogLikelihood       <span class="fl">0.56320</span>        <span class="fl">0.48475</span></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>            NMStart       <span class="fl">0.40560</span>        <span class="fl">0.11865</span></span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>         NelderMead     <span class="fl">144.35000</span>      <span class="fl">143.42000</span></span>
@@ -262,7 +262,38 @@ floating-point arithmetic, it does.  For example, a Log Likelihood is rounded
 to 15 digits as Log Likelihoods for each observation are added.  Changing the
 order changes the rounding and may give slightly different answers.  The TBB
 scheduler determines the order.</p>
-<p>Potentially, the functions could be imported into other packages.</p>
+<p>Estimation uses a Nelder-Mead algorithm which calls a log likelihood function.
+The Nelder-Mead algorithm is hopelessly sequential.  The log likelihood is
+is embarrassingly parallel.  Here are microbenchmark median times for the
+data set with 19,312 observations:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>Unit<span class="sc">:</span> milliseconds           Nelder<span class="sc">-</span>Mead</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>           threads  nmstart   log likely      total</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="sc">---------------------------------------------------</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>                 <span class="dv">1</span>   <span class="fl">0.4203</span>    <span class="fl">1588.5964</span>  <span class="fl">1589.0617</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>                 <span class="dv">2</span>   <span class="fl">0.4744</span>     <span class="fl">851.8501</span>   <span class="fl">852.3245</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>                 <span class="dv">3</span>   <span class="fl">0.4626</span>     <span class="fl">856.4483</span>   <span class="fl">856.9109</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>                 <span class="dv">4</span>   <span class="fl">0.6665</span>     <span class="fl">590.3574</span>   <span class="fl">591.0239</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>                 <span class="dv">5</span>   <span class="fl">0.6576</span>     <span class="fl">603.7107</span>   <span class="fl">604.3683</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>                 <span class="dv">6</span>   <span class="fl">0.9718</span>     <span class="fl">586.3567</span>   <span class="fl">587.3285</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>                 <span class="dv">7</span>   <span class="fl">1.0130</span>     <span class="fl">548.3021</span>   <span class="fl">549.3151</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>                 <span class="dv">8</span>   <span class="fl">1.2138</span>     <span class="fl">611.0684</span>   <span class="fl">612.2822</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>                 <span class="dv">9</span>   <span class="fl">1.1134</span>     <span class="fl">612.3945</span>   <span class="fl">613.5079</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>                <span class="dv">10</span>   <span class="fl">1.3902</span>     <span class="fl">625.8831</span>   <span class="fl">627.2733</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>                <span class="dv">11</span>   <span class="fl">1.7917</span>     <span class="fl">717.5494</span>   <span class="fl">719.3411</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>                <span class="dv">12</span>   <span class="fl">1.5899</span>     <span class="fl">756.6424</span>   <span class="fl">758.2323</span></span></code></pre><p></p></div>
+<p>These times are longer than previous measurements.  Maybe next time they will be
+shorter.  But a curious thing happens.  More threads can be slower than fewer
+threads.  Monitoring the CPU reveals that all 12 threads are used in all
+estimations. It appears that 'threads' actually means 'working groups' which
+Intel's Threading Building Blocks (TBB) uses to organize the calculations.
+nmstart is a sequential algorithm which takes more time with more threads.
+The Nelder-Mead algorithm takes more time with more threads but the log
+likelihood function takes less time with more threads.  The sweet spot is
+somewhere in the middle.</p>
+<p>Estimation could be tweaked by using the RcppParallel commands:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a> <span class="fu">defaultNumThreads</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a> <span class="fu">setThreadOptions</span>(<span class="at">numThreads=</span><span class="dv">6</span>)</span></code></pre><p></p></div>
+<p>Potentially, the Rcpp functions could be imported into other packages.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

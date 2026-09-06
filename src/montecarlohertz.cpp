@@ -162,7 +162,7 @@ using namespace RcppParallel;
 //'
 //'     Unit: milliseconds              paths                paths
 //'                        function   100,000            1,000,000
-//'     ----------------------------------------------------------
+//'     ---------------------------------------------------------------------
 //'                  StandardNormal   57.2060             588.7932
 //'     ForwardPathIntegralEquation   18.9317  ________   187.9792  _________
 //'                        subtotal             76.1377              776.7524
@@ -211,7 +211,7 @@ using namespace RcppParallel;
 //'
 //'     Unit: milliseconds                     R6+        Console
 //'                         function   RcppParallel  RcppParallel
-//'     -------------------------------------------------------------------
+//'     ---------------------------------------------------------
 //'      ForwardPathIntegralEquation       807.2069      837.4392
 //'     BackwardPathIntegralEquation       807.4201      837.8897
 //'      BoundedPathIntegralEquation      1200.3780      834.9122
@@ -289,7 +289,7 @@ double OUPVisitingTimeProbabilityInf(double x, double k, double rho, double mu, 
   else
   {
     if(k == mu) { pinf = 0.5; }
-    else if(pow(sigma,2) < 0.0000000001)
+    else if(sigma*sigma < 0.0000000001)
     {
       if(x == k) { pinf = 1.0; }
       else if(x > k)
@@ -305,7 +305,7 @@ double OUPVisitingTimeProbabilityInf(double x, double k, double rho, double mu, 
     }
     else
     {
-      double v2 = rho*pow(((k-mu)/sigma),2);
+      double v2 = rho*((k-mu)/sigma)*((k-mu)/sigma);
       if(x == k) { pinf = (1.77245385090552+GammaSmallOneHalf(v2))/(2*1.77245385090552); }
       else if(x > k)
       {
@@ -516,7 +516,7 @@ NumericMatrix RcppOUPMCForwardPathRungeKutta(NumericMatrix stdnorm, double x, st
   std::size_t paths = stdnorm.ncol();
   NumericMatrix forward(m,paths);
   double dtau = dt/skip;
-  double H = sigma*sqrt(dtau);
+  double H = sigma*std::sqrt(dtau);
 #ifdef USE_PARALLEL
   ROMCPFwRK worker(stdnorm, forward, x, m, skip, dtau, rho, mu, H);
   parallelFor(0, paths, worker);
@@ -609,7 +609,7 @@ NumericMatrix RcppOUPMCBackwardPathRungeKutta(NumericMatrix stdnorm, double y, s
   std::size_t paths = stdnorm.ncol();
   NumericMatrix backward(m,paths);
   double dtau = ds/skip;
-  double H = sigma*sqrt(dtau);
+  double H = sigma*std::sqrt(dtau);
 #ifdef USE_PARALLEL
   ROMCPBkRK worker(stdnorm, backward, y, m, skip, dtau, rho, mu, H);
   parallelFor(0, paths, worker);
@@ -719,7 +719,7 @@ NumericMatrix RcppOUPMCBoundedPathRungeKutta(NumericMatrix stdnorm, double k, do
   std::size_t paths = stdnorm.ncol();
   NumericMatrix bndfpt(m+1,paths);
   double dtau = dt/skip;
-  double H = sigma*sqrt(dtau);
+  double H = sigma*std::sqrt(dtau);
 #ifdef USE_PARALLEL
   ROMCPBdRK worker(stdnorm, bndfpt, k, x, m, skip, dtau, rho, mu, H);
   parallelFor(0, paths, worker);
@@ -819,9 +819,9 @@ NumericMatrix RcppOUPMCForwardPathIntegralEquation(NumericMatrix stdnorm, double
   std::size_t paths = stdnorm.ncol();
   NumericMatrix forward(m,paths);
   double dtau = dt/skip;
-  double H = sigma*sqrt(dtau);
-  if(rho > 0) { H = sqrt(sigma*sigma/(2*rho)*(1-exp(-2*rho*dtau))); }
-  double exprhodt = exp(-rho*dtau);
+  double H = sigma*std::sqrt(dtau);
+  if(rho > 0) { H = std::sqrt(sigma*sigma/(2*rho)*(1-std::exp(-2*rho*dtau))); }
+  double exprhodt = std::exp(-rho*dtau);
 #ifdef USE_PARALLEL
   ROMCPFwIE worker(stdnorm, forward, x, m, skip, rho, mu, H, exprhodt);
   parallelFor(0, paths, worker);
@@ -897,9 +897,9 @@ NumericMatrix RcppOUPMCBackwardPathIntegralEquation(NumericMatrix stdnorm, doubl
   std::size_t paths = stdnorm.ncol();
   NumericMatrix backward(m,paths);
   double dtau = ds/skip;
-  double H = sigma*sqrt(dtau);
-  if(rho > 0) { H = sqrt(sigma*sigma/(2*rho)*(exp(2*rho*dtau)-1)); }
-  double exprhods = exp(rho*dtau);
+  double H = sigma*std::sqrt(dtau);
+  if(rho > 0) { H = std::sqrt(sigma*sigma/(2*rho)*(std::exp(2*rho*dtau)-1)); }
+  double exprhods = std::exp(rho*dtau);
 #ifdef USE_PARALLEL
   ROMCPBkIE worker(stdnorm, backward, y, m, skip, rho, mu, H, exprhods);
   parallelFor(0, paths, worker);
@@ -995,9 +995,9 @@ NumericMatrix RcppOUPMCBoundedPathIntegralEquation(NumericMatrix stdnorm, double
   std::size_t paths = stdnorm.ncol();
   NumericMatrix bndfpt(m+1,paths);
   double dtau = dt/skip;
-  double H = sigma*sqrt(dtau);
-  if(rho > 0) { H = sqrt(sigma*sigma/(2*rho)*(1-exp(-2*rho*dtau))); }
-  double exprhodt = exp(-rho*dtau);
+  double H = sigma*std::sqrt(dtau);
+  if(rho > 0) { H = std::sqrt(sigma*sigma/(2*rho)*(1-std::exp(-2*rho*dtau))); }
+  double exprhodt = std::exp(-rho*dtau);
 #ifdef USE_PARALLEL
   ROMCPBdIE worker(stdnorm, bndfpt, k, x, m, skip, dtau, rho, mu, H, exprhodt);
   parallelFor(0, paths, worker);
@@ -1065,12 +1065,12 @@ struct ROMCPmvpPPP : public Worker
       for(std::size_t j = 0; j < paths; j++)
       {
         mvdpd(i,0) += forward(i,j);
-        mvdpd(i,1) += pow(forward(i,j),2);
+        mvdpd(i,1) += forward(i,j)*forward(i,j);
         std::size_t bin = static_cast<std::size_t>((forward(i,j)-ymin)/width);
         dens(i,bin) += 1;
       }
       mvdpd(i,0) /= paths;
-      mvdpd(i,1) = mvdpd(i,1)/paths-pow(mvdpd(i,0),2);
+      mvdpd(i,1) = mvdpd(i,1)/paths-mvdpd(i,0)*mvdpd(i,0);
       if(psi > 0)
       {
         dens(i,nn-1) = dens(i,nn-1)/paths;
@@ -1203,12 +1203,12 @@ NumericMatrix RcppOUPMCForwardCountY(NumericMatrix forward, NumericVector y, dou
     for(std::size_t j = 0; j < paths; j++)
     {
       mvdpd(i,0) += forward(i,j);
-      mvdpd(i,1) += pow(forward(i,j),2);
+      mvdpd(i,1) += forward(i,j)*forward(i,j);
       std::size_t bin = static_cast<int>((forward(i,j)-ymin)/width);
       dens(i,bin) += 1;
     }
     mvdpd(i,0) /= paths;
-    mvdpd(i,1) = mvdpd(i,1)/paths-pow(mvdpd(i,0),2);
+    mvdpd(i,1) = mvdpd(i,1)/paths-mvdpd(i,0)*mvdpd(i,0);
     if(psi > 0)
     {
       dens(i,nn-1) = dens(i,nn-1)/paths;
@@ -1309,8 +1309,8 @@ struct ROMCPoOOO : public Worker
           dens(i,j-1) = dens(i,j-1)/width;
         }
       }
-      double exprhods = exp(rho*i*ds);
-      double exprhords= exp(-(rho+r)*i*ds);
+      double exprhods = std::exp(rho*i*ds);
+      double exprhords= std::exp(-(rho+r)*i*ds);
       for(std::size_t j = 0; j < n; j++)
       {
         dpo(i,j+n0) = exprhods*dens(i,j+offset);
@@ -1446,8 +1446,8 @@ NumericMatrix RcppOUPMCBackwardCountX(NumericMatrix backward, NumericVector x, d
         dens(i,j-1) = dens(i,j-1)/width;
       }
     }
-    double exprhods = exp(rho*i*ds);
-    double exprhords= exp(-(rho+r)*i*ds);
+    double exprhods = std::exp(rho*i*ds);
+    double exprhords= std::exp(-(rho+r)*i*ds);
     for(std::size_t j = 0; j < n; j++)
     {
       dpo(i,j+n0) = exprhods*dens(i,j+offset);

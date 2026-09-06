@@ -349,7 +349,7 @@ NumericVector RcppOUPFDTerminalValue_Kinked(NumericVector x, double xo, double v
 NumericVector RcppOUPFDTerminalValue_Butterfly(NumericVector x, double xo, double xm, double vs, double Vmax, double Vmin)
 {
   int n = x.size();
-  double slope = abs(vs);
+  double slope = std::abs(vs);
   NumericVector V(n);
   for(int j = 0; j < n; j++)
   {
@@ -379,7 +379,7 @@ NumericVector RcppOUPFDTerminalValue_Mitscherlich(NumericVector x, double xo, do
   NumericVector V(n);
   for(int j = 0; j < n; j++)
   {
-    if(vr*(x[j]-xo) > 0) { V[j] = Vmin+(Vmax-Vmin)*(1-exp(-vr*(x[j]-xo))); }
+    if(vr*(x[j]-xo) > 0) { V[j] = Vmin+(Vmax-Vmin)*(1-std::exp(-vr*(x[j]-xo))); }
     else { V[j] = Vmin; }
   }
   return V;
@@ -401,11 +401,11 @@ NumericVector RcppOUPFDTerminalValue_Gompertz(NumericVector x, double xi, double
   NumericVector V(n);
   if(vr > 0)
   {
-    for(int j = 0; j < n; j++) { V[j] = Vmin+(Vmax-Vmin)*exp(-exp(-vr*(x[j]-xi))); }
+    for(int j = 0; j < n; j++) { V[j] = Vmin+(Vmax-Vmin)*std::exp(-std::exp(-vr*(x[j]-xi))); }
   }
   else
   {
-    for(int j = 0; j < n; j++) { V[j] = Vmax-(Vmax-Vmin)*exp(-exp(vr*(x[j]-xi))); }
+    for(int j = 0; j < n; j++) { V[j] = Vmax-(Vmax-Vmin)*std::exp(-std::exp(vr*(x[j]-xi))); }
   }
   return V;
 }
@@ -426,11 +426,11 @@ NumericVector RcppOUPFDTerminalValue_Logistic(NumericVector x, double xi, double
   NumericVector V(n);
   if(vr > 0)
   {
-    for(int j = 0; j < n; j++) { V[j] = Vmin+(Vmax-Vmin)/(1+exp(-vr*(x[j]-xi))); }
+    for(int j = 0; j < n; j++) { V[j] = Vmin+(Vmax-Vmin)/(1+std::exp(-vr*(x[j]-xi))); }
   }
   else
   {
-    for(int j = 0; j < n; j++) { V[j] = Vmax-(Vmax-Vmin)/(1+exp(vr*(x[j]-xi))); }
+    for(int j = 0; j < n; j++) { V[j] = Vmax-(Vmax-Vmin)/(1+std::exp(vr*(x[j]-xi))); }
   }
   return V;
 }
@@ -450,20 +450,20 @@ NumericVector RcppOUPFDTerminalValue_Transcendental(NumericVector x, double xo, 
 {
   int n = x.size();
   NumericVector V(n);
-  if(abs(xm-xi) < 0.0000000001 || Vmax-Vmin < 0.0000000001 || (xm-xi)*(xi-xo) < 0)
+  if(std::abs(xm-xi) < 0.0000000001 || Vmax-Vmin < 0.0000000001 || (xm-xi)*(xi-xo) < 0)
   {
     for(int j = 0; j < n; j++) { V[j] = Vmin; }
   }
   else
   {
-    double b = pow(((xm-xo)/(xm-xi)),2);
-    double c = (xm-xo)/pow((xm-xi),2);
+    double b = ((xm-xo)/(xm-xi))*((xm-xo)/(xm-xi));
+    double c = (xm-xo)/((xm-xi)*(xm-xi));
     for(int j = 0; j < n; j++)
     {
       if((x[j]-xo)*(xm-xo) > 0)
       {
-        double lnv = log(Vmax-Vmin)+b*log((x[j]-xo)/(xm-xo))-c*(x[j]-xm);
-        V[j] = Vmin+exp(lnv);
+        double lnv = std::log(Vmax-Vmin)+b*std::log((x[j]-xo)/(xm-xo))-c*(x[j]-xm);
+        V[j] = Vmin+std::exp(lnv);
       }
       else { V[j] = Vmin; }
     }
@@ -486,20 +486,20 @@ NumericVector RcppOUPFDTerminalValue_YieldIndex(NumericVector x, double xo, doub
 {
   int n = x.size();
   NumericVector V(n);
-  if(abs(xm-xi) < 0.0000000001 || Vmax-Vmin < 0.0000000001 || (xm-xi)*(xi-xo) < 0)
+  if(std::abs(xm-xi) < 0.0000000001 || Vmax-Vmin < 0.0000000001 || (xm-xi)*(xi-xo) < 0)
   {
     for(int j = 0; j < n; j++) { V[j] = Vmax; }
   }
   else
   {
-    double b = pow(((xm-xo)/(xm-xi)),2);
-    double c = (xm-xo)/pow((xm-xi),2);
+    double b = ((xm-xo)/(xm-xi))*((xm-xo)/(xm-xi));
+    double c = (xm-xo)/((xm-xi)*(xm-xi));
     for(int j = 0; j < n; j++)
     {
       if((x[j]-xo)*(xm-xo) > 0)
       {
-        double lnv = log(Vmax-Vmin)+b*log((x[j]-xo)/(xm-xo))-c*(x[j]-xm);
-        V[j] = Vmax-exp(lnv);
+        double lnv = std::log(Vmax-Vmin)+b*std::log((x[j]-xo)/(xm-xo))-c*(x[j]-xm);
+        V[j] = Vmax-std::exp(lnv);
         if(V[j] < 0) { V[j] = 0; }
       }
       else { V[j] = Vmax; }
@@ -540,9 +540,9 @@ NumericMatrix RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V,
     g[j] = -rho*(x[j]-mu);
     h2[j] = sigma*sigma;
   }
-  double ds = abs(s[0]-s[m-1])/(m-1);
+  double ds = std::abs(s[0]-s[m-1])/(m-1);
   double dsskip = ds/skip;
-  double dx = abs(x[n-1]-x[0])/(n-1);
+  double dx = std::abs(x[n-1]-x[0])/(n-1);
   Rcout << ds << ", " << dsskip << ", " << dx << std::endl;
   OptionA(n,A,g,h2,r,theta,dsskip,dx);
   OptionLU(n,A);
@@ -597,9 +597,9 @@ NumericVector RcppOUPFDOptionEnvelope(NumericVector s, NumericVector x, NumericV
     h2[j] = sigma*sigma;
     up[j] = false;
   }
-  double ds = abs(s[0]-s[m-1])/(m-1);
+  double ds = std::abs(s[0]-s[m-1])/(m-1);
   double dsskip = ds/skip;
-  double dx = abs(x[n-1]-x[0])/(n-1);
+  double dx = std::abs(x[n-1]-x[0])/(n-1);
   OptionA(n,A,g,h2,r,theta,dsskip,dx);
   OptionLU(n,A);
   int i;
@@ -652,7 +652,7 @@ NumericVector RcppOUPFDDecisionThreshold(NumericVector x, NumericVector V, Numer
   int n = x.size();
   NumericVector OO(7);
   NumericVector dec(2);
-  double dx = (x[n-1]-x[0])/(n-1);
+  double dx = std::abs(x[n-1]-x[0])/(n-1);
   double dxx = dx/100;
   // search for enter to right
   if(phi > 0 || (phi == 0 && V[n-1] > V[0]))

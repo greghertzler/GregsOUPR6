@@ -19,7 +19,7 @@ double GammaSmallOneHalf(double x)
     dgm = 1;
     gm = dgm;
     int cnt = 0;
-    while(pow(10,sigdig)*dgm >= gm && cnt < cmax)
+    while(std::pow(10,sigdig)*dgm >= gm && cnt < cmax)
     {
       cnt += 1;
       dgm *= x/(1.5+cnt);
@@ -27,8 +27,8 @@ double GammaSmallOneHalf(double x)
     }
     if(cnt < cmax)
     {
-      gm *= pow(x,1.5)/(1.5)*exp(-x);
-      gm = (pow(x,0.5)*exp(-x)+gm)/0.5;
+      gm *= std::pow(x,1.5)/(1.5)*std::exp(-x);
+      gm = (std::pow(x,0.5)*std::exp(-x)+gm)/0.5;
       gamma = gm;
     }
     else { gamma = NA_REAL; }
@@ -50,7 +50,7 @@ double GammaBigOneHalf(double x)
     dgm = 1;
     gm = dgm;
     int cnt = 0;
-    while(pow(10,sigdig)*dgm >= gm && cnt < cmax)
+    while(std::pow(10,sigdig)*dgm >= gm && cnt < cmax)
     {
       cnt += 1;
       dgm *= x/(1.5+cnt);
@@ -58,8 +58,8 @@ double GammaBigOneHalf(double x)
     }
     if(cnt < cmax)
     {
-      gm *= pow(x,1.5)/(1.5)*exp(-x);
-      gm = (pow(x,0.5)*exp(-x)+gm)/0.5;
+      gm *= std::pow(x,1.5)/(1.5)*std::exp(-x);
+      gm = (std::pow(x,0.5)*std::exp(-x)+gm)/0.5;
       gamma = 1.77245385090552-gm;
     }
     else { gamma = NA_REAL; }
@@ -76,7 +76,7 @@ double GammaBigOneHalf(double x)
       dgm *= (0.5-cnt)/x;
       gm += dgm;
     }
-    gamma = gm*pow(x,-0.5)*exp(-x);
+    gamma = gm*std::pow(x,-0.5)*std::exp(-x);
   }
   return gamma;
 }
@@ -101,16 +101,16 @@ double PoincaireExpansion(double a)
   B2k[13] = 27298231.0678161;
   B2k[14] = 601580873.900642;
   B2k[15] = 15116315767.0922;
-  double gammaln = (a-0.5)*log(a)-a+0.918938533204673;
+  double gammaln = (a-0.5)*std::log(a)-a+0.918938533204673;
   int k = 0;
   while(k < 15)
   {
     k += 1;
-    double dgm = log(B2k[k-1])-log(2*k*(2*k-1))-(2*k-1)*log(a);
-    gammaln += exp(dgm);
+    double dgm = std::log(B2k[k-1])-std::log(2*k*(2*k-1))-(2*k-1)*std::log(a);
+    gammaln += std::exp(dgm);
     k += 1;
-    dgm = log(B2k[k-1])-log(2*k*(2*k-1))-(2*k-1)*log(a);
-    gammaln -= exp(dgm);
+    dgm = std::log(B2k[k-1])-std::log(2*k*(2*k-1))-(2*k-1)*std::log(a);
+    gammaln -= std::exp(dgm);
   }
   return(gammaln);
 }
@@ -122,14 +122,14 @@ double GammaComplete(double a)
   if(a < 50)
   {
     // split a into integer portion, p, and remainder, r
-    double p = floor(a);
+    double p = std::floor(a);
     double r = a-p;
     // check for a equal to zero or negative integer
     if(r == 0 && p < 1) { gamma = NA_REAL; }
     else
     {
       // special cases
-      if(2*a-floor(2*a) == 0)
+      if(2*a-std::floor(2*a) == 0)
       {
         if(r == 0)
         {
@@ -173,13 +173,13 @@ double GammaComplete(double a)
         double dgm = 1.0;
         double gm = dgm;
         int cnt = 0;
-        while(cnt < cmax && pow(10,sigdig)*dgm >= gm)
+        while(cnt < cmax && std::pow(10,sigdig)*dgm >= gm)
         {
           cnt += 1;
           dgm *= 199/(r+1+cnt);
           gm += dgm;
         }
-        gm *= pow(199,r+1)/(r+1)*exp(-199);
+        gm *= std::pow(199,r+1)/(r+1)*std::exp(-199);
         // factorial calculations (gm is gamma of r+1)
         double j = r;
         while(p-1+r-j > 1e-15)
@@ -198,7 +198,7 @@ double GammaComplete(double a)
     }
   }
   // large a
-  else { gamma = exp(PoincaireExpansion(a)); }
+  else { gamma = std::exp(PoincaireExpansion(a)); }
 
   return(gamma);
 }
@@ -209,7 +209,7 @@ double GammaLn(double a)
   // positive a
   if(a <= 0) { gammaln = NA_REAL; }
   // ln of GammaComplete for small to medium a
-  else if(a < 50) { gammaln = log(GammaComplete(a)); }
+  else if(a < 50) { gammaln = std::log(GammaComplete(a)); }
   // large a
   else { gammaln = PoincaireExpansion(a); }
 
@@ -228,22 +228,22 @@ double GammaSmallRatio(double a, double x)
   {
     int sigdig = 15;
     int cmax = 30000;
-    double lnx = log(x);
+    double lnx = std::log(x);
     double sumlnxlna = 0.0;
     double dgm = 1.0;
     double gm = dgm;
     int cnt = 1;
-    while(pow(10,sigdig)*dgm >= gm && cnt <= cmax)
+    while(std::pow(10,sigdig)*dgm >= gm && cnt <= cmax)
     {
-      sumlnxlna += lnx-log(cnt+a);
-      dgm = exp(sumlnxlna);
+      sumlnxlna += lnx-std::log(cnt+a);
+      dgm = std::exp(sumlnxlna);
       gm += dgm;
       cnt += 1;
     }
-    double lngm = -log(a)+a*lnx-x+log(gm)-GammaLn(a);
+    double lngm = -std::log(a)+a*lnx-x+std::log(gm)-GammaLn(a);
     if(lngm <= -27.6310211159285) { gammaratio = 0.0; }
     else if(lngm >= -1e-12) { gammaratio = 1.0; }
-    else { gammaratio = exp(lngm); }
+    else { gammaratio = std::exp(lngm); }
   }
   return(gammaratio);
 }

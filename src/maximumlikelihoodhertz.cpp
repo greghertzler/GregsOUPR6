@@ -232,9 +232,9 @@ struct NMlnLrhozero : public Worker
     for(std::size_t i = begin; i < end; i++)
     {
       double mean = z[i];
-      double variance = pow(sgma,2)*(tau[i+1]-tau[i]);
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double variance = sgma*sgma*(tau[i+1]-tau[i]);
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       local_logL += lnu-v;
     }
     logL = local_logL;
@@ -262,10 +262,10 @@ struct NMlnL : public Worker
     double local_logL = logL;
     for(std::size_t i = begin; i < end; i++)
     {
-      double mean = mu+(z[i]-mu)*exp(-rho*(tau[i+1]-tau[i]));
-      double variance = pow(sgma,2)/(2*rho)*(1-exp(-2*rho*(tau[i+1]-tau[i])));
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double mean = mu+(z[i]-mu)*std::exp(-rho*(tau[i+1]-tau[i]));
+      double variance = sgma*sgma/(2*rho)*(1-std::exp(-2*rho*(tau[i+1]-tau[i])));
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       local_logL += lnu-v;
     }
     logL = local_logL;
@@ -282,7 +282,7 @@ double NMLogLikelihood(NumericVector tau, NumericVector z, double rho, double mu
   double sgma = sigma;
   if(sgma < 0.000001) { sgma = 0.000001; }
   double logL = 0.0;
-  if(abs(rho) < 0.0000000001)
+  if(std::abs(rho) < 0.0000000001)
   {
 #ifdef USE_PARALLEL
     NMlnLrhozero worker(tau,z,sgma);
@@ -292,9 +292,9 @@ double NMLogLikelihood(NumericVector tau, NumericVector z, double rho, double mu
     for(std::size_t i = 0; i < m-1; i++)
     {
       double mean = z[i];
-      double variance = pow(sgma,2)*(tau[i+1]-tau[i]);
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double variance = sgma*sgma*(tau[i+1]-tau[i]);
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       logL += lnu-v;
     }
 #endif
@@ -308,10 +308,10 @@ double NMLogLikelihood(NumericVector tau, NumericVector z, double rho, double mu
 #else
     for(std::size_t i = 0; i < m-1; i++)
     {
-      double mean = mu+(z[i]-mu)*exp(-rho*(tau[i+1]-tau[i]));
-      double variance = pow(sgma,2)/(2*rho)*(1-exp(-2*rho*(tau[i+1]-tau[i])));
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double mean = mu+(z[i]-mu)*std::exp(-rho*(tau[i+1]-tau[i]));
+      double variance = sgma*sgma/(2*rho)*(1-std::exp(-2*rho*(tau[i+1]-tau[i])));
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       logL += lnu-v;
     }
 #endif
@@ -339,9 +339,9 @@ struct ROMLPlnLrhozero : public Worker
     for(std::size_t i = begin; i < end; i++)
     {
       double mean = z[i];
-      double variance = pow(sgma,2)*(tau[i+1]-tau[i]);
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double variance = sgma*sgma*(tau[i+1]-tau[i]);
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       local_logL += lnu-v;
     }
     logL = local_logL;
@@ -371,12 +371,12 @@ struct ROMLPlnL : public Worker
     double local_alpha = alpha;
     for(std::size_t i = begin; i < end; i++)
     {
-      double mean = mu+(z[i]-mu)*exp(-rho*(tau[i+1]-tau[i]));
-      double variance = pow(sgma,2)/(2*rho)*(1-exp(-2*rho*(tau[i+1]-tau[i])));
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double mean = mu+(z[i]-mu)*std::exp(-rho*(tau[i+1]-tau[i]));
+      double variance = sgma*sgma/(2*rho)*(1-std::exp(-2*rho*(tau[i+1]-tau[i])));
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       local_logL += lnu-v;
-      local_alpha += 1+exp(-2*rho*(tau[i+1]-tau[i]));
+      local_alpha += 1+std::exp(-2*rho*(tau[i+1]-tau[i]));
     }
     logL = local_logL;
     alpha = local_alpha;
@@ -406,7 +406,7 @@ NumericVector RcppOUPMLLogLikelihood(NumericVector tau, NumericVector z, double 
   NumericVector logL(4);
   logL[1] = NA_REAL;
   logL[3] = m-1;
-  if(abs(rho) < 0.0000000001)
+  if(std::abs(rho) < 0.0000000001)
   {
 #ifdef USE_PARALLEL
     ROMLPlnLrhozero worker(tau,z,sgma);
@@ -417,9 +417,9 @@ NumericVector RcppOUPMLLogLikelihood(NumericVector tau, NumericVector z, double 
     for(std::size_t i = 0; i < m-1; i++)
     {
       double mean = z[i];
-      double variance = pow(sgma,2)*(tau[i+1]-tau[i]);
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double variance = sgma*sgma*(tau[i+1]-tau[i]);
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       logL[0] += lnu-v;
     }
     logL[2] = 0.5;
@@ -435,12 +435,12 @@ NumericVector RcppOUPMLLogLikelihood(NumericVector tau, NumericVector z, double 
 #else
     for(std::size_t i = 0; i < m-1; i++)
     {
-      double mean = mu+(z[i]-mu)*exp(-rho*(tau[i+1]-tau[i]));
-      double variance = pow(sgma,2)/(2*rho)*(1-exp(-2*rho*(tau[i+1]-tau[i])));
-      double lnu = -0.5*log(2*3.14159265358979*variance);
-      double v = 0.5*pow(z[i+1]-mean,2)/variance;
+      double mean = mu+(z[i]-mu)*std::exp(-rho*(tau[i+1]-tau[i]));
+      double variance = sgma*sgma/(2*rho)*(1-std::exp(-2*rho*(tau[i+1]-tau[i])));
+      double lnu = -0.5*std::log(2*3.14159265358979*variance);
+      double v = 0.5*(z[i+1]-mean)*(z[i+1]-mean)/variance;
       logL[0] += lnu-v;
-      logL[2] += 1+exp(-2*rho*(tau[i+1]-tau[i]));
+      logL[2] += 1+std::exp(-2*rho*(tau[i+1]-tau[i]));
     }
     logL[2] *= 0.5/(m-1);
 #endif
@@ -529,7 +529,7 @@ NumericMatrix RcppOUPMLNMStart(NumericVector tau, NumericVector z, Nullable<doub
   else
   {
     if(sigmas.isNotNull()) { thetasteps(0,2) = as<double>(sigmas); }
-    else { thetasteps(0,2) = pow(sbmsq,0.5); }
+    else { thetasteps(0,2) = std::sqrt(sbmsq); }
     thetasteps(1,2) = 1;
   }
   if(mur.isNotNull())
@@ -589,9 +589,8 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
   double kappa = 0.1;     // minimum step size (not in the usual Nelder-Mead algorithm)
   double iota = 0.3;      // steps increment (not in the usual Nelder-Mead algorithm)
   // iteration parameters
-  int sigdig = 12;
   int cmax = 9999;
-  double tensig = pow(0.1,sigdig);
+  double tensigdig = 100000000000;
   // cement constant thetas and create index of thetas in the simplex
   int k = theta.size();
   IntegerVector Ix(k);
@@ -637,7 +636,7 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
     int sign = -1;
     int cnt = 0;
     int starts = 0;
-    while(abs(Lprev-LnL) > abs(LnL*tensig) && cnt < cmax)
+    while(std::abs(Lprev-LnL) > std::abs(LnL*tensigdig) && cnt < cmax)
     {
       starts += 1;
       sign *= -1;
@@ -668,7 +667,7 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
       int jmax;
       double tdev = std::numeric_limits<double>::max();
       double Ldev = std::numeric_limits<double>::max();
-      while(tdev > tensig && Ldev > tensig && cnt < cmax)
+      while(tdev > tensigdig && Ldev > tensigdig && cnt < cmax)
       {
 // Rcout << "\n" << "tplex" << "\n" << tplex << "Lplex" << "\n" << Lplex << std::endl;
         //   minimum and maximum function values
@@ -860,14 +859,14 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
         {
           for(int i = 0; i < nk; i++)
           {
-            if(abs((tplex(i,j)-tbar[Ix[i]])/steps[Ix[i]]) > tdev)
+            if(std::abs((tplex(i,j)-tbar[Ix[i]])/steps[Ix[i]]) > tdev)
             {
-              tdev = abs((tplex(i,j)-tbar[Ix[i]])/steps[Ix[i]]);
+              tdev = std::abs((tplex(i,j)-tbar[Ix[i]])/steps[Ix[i]]);
             }
           }
-          if(abs(Lplex[j]/Lbar-1) > Ldev)
+          if(std::abs(Lplex[j]/Lbar-1) > Ldev)
           {
-            Ldev = abs(Lplex[j]/Lbar-1);
+            Ldev = std::abs(Lplex[j]/Lbar-1);
           }
         }
         cnt += +1;
@@ -878,7 +877,7 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
       for(int i = 0; i < nk; i++)
       {
         theta[Ix[i]] = tplex(i,jmin);
-        steps[Ix[i]] = abs(theta[Ix[i]])*iota;
+        steps[Ix[i]] = std::abs(theta[Ix[i]])*iota;
         if(steps[i] < kappa) { steps[i] = kappa; }
       }
       LnL = Lplex[jmin];
@@ -913,7 +912,7 @@ struct ROMLPGoF : public Worker
       local_sum += z[i+1];
       local_invsq += z[i+1]*z[i+1];
       local_sbmsq += (z[i+1]-z[i])*(z[i+1]-z[i])/(tau[i+1]-tau[i]);
-      local_sumlntau += log(tau[i+1]-tau[i]);
+      local_sumlntau += std::log(tau[i+1]-tau[i]);
     }
     sum = local_sum;
     invsq = local_invsq;
@@ -959,19 +958,19 @@ NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, double 
     sum += z[i+1];
     invsq += z[i+1]*z[i+1];
     sbmsq += (z[i+1]-z[i])*(z[i+1]-z[i])/(tau[i+1]-tau[i]);
-    sumlntau += log(tau[i+1]-tau[i]);
+    sumlntau += std::log(tau[i+1]-tau[i]);
   }
   sum /= (m-1);
   invsq = invsq/(m-1)-sum*sum;
   sbmsq /= (m-1);
 #endif
-  double lnLinv = -0.5*(m-1)*(log(2*3.14159265358979*invsq)+1);
+  double lnLinv = -0.5*(m-1)*(std::log(2*3.14159265358979*invsq)+1);
   double upsinv = 2*(lnL-lnLinv);
-  double lnLsbm = -0.5*(m-1)*(log(2*3.14159265358979*sbmsq)+1)-0.5*sumlntau;
+  double lnLsbm = -0.5*(m-1)*(std::log(2*3.14159265358979*sbmsq)+1)-0.5*sumlntau;
   double upssbm = 2*(lnL-lnLsbm);
   gof(0,0) = NA_REAL;
   gof(0,1) = sum;
-  gof(0,2) = pow(invsq,0.5);
+  gof(0,2) = std::sqrt(invsq);
   gof(0,3) = lnLinv;
   gof(0,4) = 2;
   gof(0,5) = 0.5;
@@ -983,12 +982,12 @@ NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, double 
   }
   else
   {
-    gof(0,7) = 1-exp(-log(2)*0.5*upsinv/(alpha*(m-1)));
+    gof(0,7) = 1-std::exp(-std::log(2)*0.5*upsinv/(alpha*(m-1)));
     gof(0,8) = GammaBigRatio(alpha*(m-1),0.5*upsinv);
   }
   gof(1,0) = 0.0;
   gof(1,1) = NA_REAL;
-  gof(1,2) = pow(sbmsq,0.5);
+  gof(1,2) = std::sqrt(sbmsq);
   gof(1,3) = lnLsbm;
   gof(1,4) = 1;
   gof(1,5) = 1.0;
@@ -1000,7 +999,7 @@ NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, double 
   }
   else
   {
-    gof(1,7) = 1-exp(-log(2)*0.5*upssbm/(alpha*(m-1)));
+    gof(1,7) = 1-std::exp(-std::log(2)*0.5*upssbm/(alpha*(m-1)));
     gof(1,8) = GammaBigRatio(alpha*(m-1),0.5*upssbm);
   }
   return gof;
@@ -1026,7 +1025,7 @@ NumericVector RcppOUPMLLikelihoodRatioTest(double lnL, double alpha, double m, d
   }
   else
   {
-    lrt[0] = 1-exp(-log(2)*0.5*upsilon/(alpha*(m-1)));
+    lrt[0] = 1-std::exp(-std::log(2)*0.5*upsilon/(alpha*(m-1)));
     lrt[1] = GammaBigRatio(alpha*(m-1),0.5*upsilon);
   }
   return lrt;

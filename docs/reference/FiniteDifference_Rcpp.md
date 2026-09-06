@@ -247,4 +247,4 @@ input will nullify dependent outputs, eliminating any danger of
 reporting a stale output. Outputs are calculated only as needed and only
 once. Then they are reused. In plots using Plotly, for example.
 
-Potentially, the functions could be imported into other packages.
+Potentially, the Rcpp functions could be imported into other packages.
