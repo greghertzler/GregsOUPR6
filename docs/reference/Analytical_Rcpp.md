@@ -126,7 +126,7 @@ PP(m,n) \<- RcppOUPADoubleIntegral()
 
 OO(m,n) \<- RcppOUPAOption()
 
-OOs(2,n) \<- RcppOUPAOptionEnvelope()
+env(2,n) \<- RcppOUPAOptionEnvelope()
 
 dOOdszero(4,n+3) \<- RcppOUPAdOOdsZero()
 
@@ -221,13 +221,13 @@ is a matrix of Options with rows for s and columns for x.
 
 The return value:
 
-    OOs(2,n)
+    env(2,n)
 
 is a matrix with two row vectors for option prices and corresponding
 times along the option envelope. It is subset in R as:
 
-    OOhat <- OOs[1,,drop=FALSE]
-    shat <- OOs[2,,drop=FALSE]
+    OOhat <- env[1,,drop=FALSE]
+    shat <- env[2,,drop=FALSE]
 
 where t is the terminal time.
 

@@ -38,8 +38,8 @@ using namespace Rcpp;
 //'  is a matrix with two row vectors for the option prices along the envelope
 //'  and the corresponding times.  It is subset in R as:
 //'
-//'     OOenv <- env[1,]
-//'     tsenv <- env[2,]
+//'     OOhat <- env[1,]
+//'     tshat <- env[2,]
 //'
 //' The return value:
 //'
@@ -116,27 +116,22 @@ using namespace Rcpp;
 
 void OptionA(int n, NumericMatrix& A, NumericVector g, NumericVector h2, double r, double theta, double ds, double dx)
 {
-  // Rcout << "OptionA" << std::endl;
-  // Rcout << n << ", " << r << ", " << theta << ", " << ds << ", " << dx << std::endl;
   double dx2 = dx*dx;
   // first row has 3 entries
   A(0,0) = 1/ds+theta*r+0.5*theta*(3*g[0]/dx-h2[0]/dx2);
   A(0,1) = -theta*(2*g[0]/dx-h2[0]/dx2);
   A(0,2) = 0.5*theta*(g[0]/dx-h2[0]/dx2);
-  // Rcout << 0 << ": " << A(0,0) << ", " << A(0,1) << ", " << A(0,2) << std::endl;
   // middle rows are tridiagonal
   for(int j = 1; j < n-1; j++)
   {
     A(j,j-1) = 0.5*theta*(g[j]/dx-h2[j]/dx2);
     A(j,j) = 1/ds+theta*r+theta*h2[j]/dx2;
     A(j,j+1) = -0.5*theta*(g[j]/dx+h2[j]/dx2);
-    // Rcout << j << ": " << A(j,j-1) << ", " << A(j,j) << ", " << A(j,j+1) << std::endl;
   }
   // last row has 3 entries
   A(n-1,n-3) = -0.5*theta*(g[n-1]/dx+h2[n-1]/dx2);
   A(n-1,n-2) = theta*(2*g[n-1]/dx+h2[n-1]/dx2);
   A(n-1,n-1) = 1/ds+theta*r-0.5*theta*(3*g[n-1]/dx+h2[n-1]/dx2);
-  // Rcout << n-1 << ": " << A(n-1,n-3) << ", " << A(n-1,n-2) << ", " << A(n-1,n-1) << std::endl;
 }
 
 void OptionLU(int n, NumericMatrix& A)
@@ -524,10 +519,8 @@ NumericVector RcppOUPFDTerminalValue_YieldIndex(NumericVector x, double xo, doub
 // [[Rcpp::export]]
 NumericMatrix RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V, double r, double theta, int skip, double rho, double mu, double sigma)
 {
-  Rcout << "Option" << std::endl;
   int m = s.size();
   int n = x.size();
-  Rcout << m << ":" << n << ", " << s[0] << ", " << s[m-1] << ", " << x[0] << ", " << x[n-1] << std::endl;
   NumericMatrix A(n,n);
   NumericMatrix c(m,n);
   NumericMatrix cskip(skip,n);
@@ -543,7 +536,6 @@ NumericMatrix RcppOUPFDOption(NumericVector s, NumericVector x, NumericVector V,
   double ds = std::abs(s[0]-s[m-1])/(m-1);
   double dsskip = ds/skip;
   double dx = std::abs(x[n-1]-x[0])/(n-1);
-  Rcout << ds << ", " << dsskip << ", " << dx << std::endl;
   OptionA(n,A,g,h2,r,theta,dsskip,dx);
   OptionLU(n,A);
   for(int i = 1; i < m; i++)
@@ -592,7 +584,7 @@ NumericVector RcppOUPFDOptionEnvelope(NumericVector s, NumericVector x, NumericV
   {
     cskip(0,j) = V[j];
     env(0,j) = V[j];
-    env(1,j) = 0;
+    env(1,j) = s[0];
     g[j] = -rho*(x[j]-mu);
     h2[j] = sigma*sigma;
     up[j] = false;
@@ -617,7 +609,7 @@ NumericVector RcppOUPFDOptionEnvelope(NumericVector s, NumericVector x, NumericV
         if(cskip(i,j) > env(0,j))
         {
           env(0,j) = cskip(i,j);
-          env(1,j) = i*dsskip;
+          env(1,j) = s[0]-i*dsskip;
         }
       }
       else if(cskip(i,j) <= cskip(i-1,j) && up[j] && i > 1)
@@ -625,10 +617,11 @@ NumericVector RcppOUPFDOptionEnvelope(NumericVector s, NumericVector x, NumericV
         up[j] = false;
         env(1,j) = (i-1+0.5*(cskip(i,j)-cskip(i-2,j))/(2*cskip(i-1,j)-cskip(i-2,j)-cskip(i,j)))*dsskip;
         env(0,j) = Lagrange3Point(cskip(i-2,j),cskip(i-1,j),cskip(i,j),(i-2)*dsskip,(i-1)*dsskip,i*dsskip,env(1,j));
+        env(1,j) = s[0]-env(1,j);
         if(env(0,j) < V[j])
         {
           env(0,j) = V[j];
-          env(1,j) = 0;
+          env(1,j) = s[0];
         }
       }
     }

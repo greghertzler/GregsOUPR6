@@ -1671,7 +1671,7 @@ Sorry.
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    list(k,OOhat)
+    list(k,OO)
   }
 }
 

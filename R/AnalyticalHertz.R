@@ -226,7 +226,7 @@ Analytical <- R6::R6Class("Analytical",
           if(sca < 0)
           {
             sca <- 0.0
-            message("negative rho set to zero.")
+            message("A:  negative rho set to zero.")
           }
           if(sca != private$oup_params$rho)
           {
@@ -253,8 +253,8 @@ Analytical <- R6::R6Class("Analytical",
             private$dOOdsconcavepos <- NULL
             private$dOOdspatchneg <- NULL
             private$dOOdspatchpos <- NULL
-            private$KOOneg <- NULL
-            private$KOOpos <- NULL
+            private$kOOneg <- NULL
+            private$kOOpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             private$tmodemedianmean <- NULL
@@ -267,7 +267,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("rho not set.")}
+        else { message("A:  rho not set.") }
       }
       if(!is.null(mu))
       {
@@ -296,8 +296,8 @@ Analytical <- R6::R6Class("Analytical",
             private$dOOdsconcavepos <- NULL
             private$dOOdspatchneg <- NULL
             private$dOOdspatchpos <- NULL
-            private$KOOneg <- NULL
-            private$KOOpos <- NULL
+            private$kOOneg <- NULL
+            private$kOOpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             private$tmodemedianmean <- NULL
@@ -310,7 +310,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("mu not set.")}
+        else { message("A:  mu not set.") }
       }
       if(!is.null(sigma))
       {
@@ -339,8 +339,8 @@ Analytical <- R6::R6Class("Analytical",
             private$dOOdsconcavepos <- NULL
             private$dOOdspatchneg <- NULL
             private$dOOdspatchpos <- NULL
-            private$KOOneg <- NULL
-            private$KOOpos <- NULL
+            private$kOOneg <- NULL
+            private$kOOpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             private$tmodemedianmean <- NULL
@@ -353,7 +353,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("sigma not set.")}
+        else { message("A:  sigma not set.") }
       }
       return(private$oup_params)
     },
@@ -375,7 +375,7 @@ Analytical <- R6::R6Class("Analytical",
             private$h2 <- NULL
           }
         }
-        else { message("z not set.") }
+        else { message("A:  z not set.") }
       }
       return(private$z_stoch_args)
     },
@@ -411,7 +411,7 @@ Analytical <- R6::R6Class("Analytical",
             hit <- TRUE
           }
         }
-        else { message("t not set.") }
+        else { message("A:  t not set.") }
       }
       if(!is.null(y))
       {
@@ -428,7 +428,7 @@ Analytical <- R6::R6Class("Analytical",
             hit <- TRUE
           }
         }
-        else { message("y not set.") }
+        else { message("A:  y not set.") }
       }
       if(!is.null(s))
       {
@@ -450,7 +450,7 @@ Analytical <- R6::R6Class("Analytical",
             hit <- TRUE
           }
         }
-        else { message("s not set.") }
+        else { message("A:  s not set.") }
       }
       if(!is.null(x))
       {
@@ -469,7 +469,7 @@ Analytical <- R6::R6Class("Analytical",
             hit <- TRUE
           }
         }
-        else { message("x not set.") }
+        else { message("A:  x not set.") }
       }
       if(!is.null(psi))
       {
@@ -481,7 +481,7 @@ Analytical <- R6::R6Class("Analytical",
             if(sca != -1)
             {
               sca <- -1
-              message("psi set to -1.")
+              message("A:  psi set to -1.")
             }
           }
           else
@@ -489,7 +489,7 @@ Analytical <- R6::R6Class("Analytical",
             if(sca != 1)
             {
               sca <- 1
-              message("psi set to 1.")
+              message("A:  psi set to 1.")
             }
           }
           if(sca != private$y_stoch_args$psi)
@@ -498,7 +498,7 @@ Analytical <- R6::R6Class("Analytical",
             hit <- TRUE
           }
         }
-        else { message("psi not set.") }
+        else { message("A:  psi not set.") }
       }
       if(!is.null(eps))
       {
@@ -508,12 +508,12 @@ Analytical <- R6::R6Class("Analytical",
           if(sca < 0)
           {
             sca <- 0
-            message("eps has been set to 0.")
+            message("A:  eps has been set to 0.")
           }
           else if(sca > 1)
           {
             sca <- 1
-            message("eps has been set to 1.")
+            message("A:  eps has been set to 1.")
           }
           if(sca != private$y_stoch_args$eps)
           {
@@ -523,13 +523,13 @@ Analytical <- R6::R6Class("Analytical",
             hit <- TRUE
           }
         }
-        else { message("eps not set.") }
+        else { message("A:  eps not set.") }
       }
       t1 <- private$y_stoch_args$t[1]
       if(private$y_stoch_args$s > t1)
       {
         private$y_stoch_args$s <- t1
-        message(paste(sep="","s has been set to ",t1,"."))
+        message(paste(sep="","A:  s has been set to ",t1,"."))
         private$G <- NULL
         private$H2 <- NULL
         private$p <- NULL
@@ -567,48 +567,47 @@ Analytical <- R6::R6Class("Analytical",
             private$x_stoch_args$s <- vec
             private$OOneg <- NULL
             private$OOpos <- NULL
+            private$shatneg <- NULL
+            private$shatpos <- NULL
+            private$dOOdsconvexneg <- NULL
+            private$dOOdsconvexpos <- NULL
+            private$dOOdsconcaveneg <- NULL
+            private$dOOdsconcavepos <- NULL
+            private$dOOdspatchneg <- NULL
+            private$dOOdspatchpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             hit <- TRUE
           }
         }
-        else { message("s not set.") }
+        else { message("A:  s not set.") }
       }
       if(!is.null(x))
       {
         vec <- private$extract_vector(x,1)
         if(!is.null(vec))
         {
-          n <- length(vec)
-          if(n > 100 || is.null(private$OUP))
+          if(!private$vecs_equal(vec,private$x_stoch_args$x))
           {
-            if(!private$vecs_equal(vec,private$x_stoch_args$x))
-            {
-              private$x_stoch_args$x <- vec
-              private$OOneg <- NULL
-              private$OOpos <- NULL
-              private$OOhatneg <- NULL
-              private$OOhatpos <- NULL
-              private$shatneg <- NULL
-              private$shatpos <- NULL
-              private$dOOdsconvexneg <- NULL
-              private$dOOdsconvexpos <- NULL
-              private$dOOdsconcaveneg <- NULL
-              private$dOOdsconcavepos <- NULL
-              private$dOOdspatchneg <- NULL
-              private$dOOdspatchpos <- NULL
-              private$BCneg <- NULL
-              private$BCpos <- NULL
-              hit <- TRUE
-            }
-          }
-          else
-          {
-            message("x vector must have at least 101 elements")
-            message("x not set.")
+            private$x_stoch_args$x <- vec
+            private$OOneg <- NULL
+            private$OOpos <- NULL
+            private$OOhatneg <- NULL
+            private$OOhatpos <- NULL
+            private$shatneg <- NULL
+            private$shatpos <- NULL
+            private$dOOdsconvexneg <- NULL
+            private$dOOdsconvexpos <- NULL
+            private$dOOdsconcaveneg <- NULL
+            private$dOOdsconcavepos <- NULL
+            private$dOOdspatchneg <- NULL
+            private$dOOdspatchpos <- NULL
+            private$BCneg <- NULL
+            private$BCpos <- NULL
+            hit <- TRUE
           }
         }
-        else { message("x not set.") }
+        else { message("A:  x not set.") }
       }
       if(!is.null(t))
       {
@@ -620,12 +619,20 @@ Analytical <- R6::R6Class("Analytical",
             private$x_stoch_args$t <- sca
             private$OOneg <- NULL
             private$OOpos <- NULL
+            private$shatneg <- NULL
+            private$shatpos <- NULL
+            private$dOOdsconvexneg <- NULL
+            private$dOOdsconvexpos <- NULL
+            private$dOOdsconcaveneg <- NULL
+            private$dOOdsconcavepos <- NULL
+            private$dOOdspatchneg <- NULL
+            private$dOOdspatchpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             hit <- TRUE
           }
         }
-        else { message("t not set.") }
+        else { message("A:  t not set.") }
       }
       if(!is.null(y))
       {
@@ -647,14 +654,14 @@ Analytical <- R6::R6Class("Analytical",
             private$dOOdsconcavepos <- NULL
             private$dOOdspatchneg <- NULL
             private$dOOdspatchpos <- NULL
-            private$KOOneg <- NULL
-            private$KOOpos <- NULL
+            private$kOOneg <- NULL
+            private$kOOpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             hit <- TRUE
           }
         }
-        else { message("y not set.") }
+        else { message("A:  y not set.") }
       }
       if(!is.null(r))
       {
@@ -663,7 +670,7 @@ Analytical <- R6::R6Class("Analytical",
         {
           if(sca < 0)
           {
-            message("negative r set to zero.")
+            message("A:  negative r set to zero.")
             sca <- 0.0
           }
           if(sca != private$x_stoch_args$r)
@@ -681,14 +688,14 @@ Analytical <- R6::R6Class("Analytical",
             private$dOOdsconcavepos <- NULL
             private$dOOdspatchneg <- NULL
             private$dOOdspatchpos <- NULL
-            private$KOOneg <- NULL
-            private$KOOpos <- NULL
+            private$kOOneg <- NULL
+            private$kOOpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             hit <- TRUE
           }
         }
-        else { message("r not set.") }
+        else { message("A:  r not set.") }
       }
       if(!is.null(phi))
       {
@@ -700,7 +707,7 @@ Analytical <- R6::R6Class("Analytical",
             if(sca != -1)
             {
               sca <- -1
-              message("phi set to -1.")
+              message("A:  phi set to -1.")
             }
           }
           else if(sca > 0)
@@ -708,7 +715,7 @@ Analytical <- R6::R6Class("Analytical",
             if(sca != 1)
             {
               sca <- 1
-              message("phi set to 1.")
+              message("A:  phi set to 1.")
             }
           }
           if(sca != private$x_stoch_args$phi)
@@ -717,7 +724,7 @@ Analytical <- R6::R6Class("Analytical",
             hit <- TRUE
           }
         }
-        else { message("phi not set.") }
+        else { message("A:  phi not set.") }
       }
       if(!is.null(b))
       {
@@ -739,14 +746,14 @@ Analytical <- R6::R6Class("Analytical",
             private$dOOdsconcavepos <- NULL
             private$dOOdspatchneg <- NULL
             private$dOOdspatchpos <- NULL
-            private$KOOneg <- NULL
-            private$KOOpos <- NULL
+            private$kOOneg <- NULL
+            private$kOOpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             hit <- TRUE
           }
         }
-        else { message("b not set.") }
+        else { message("A:  b not set.") }
       }
       if(!is.null(c))
       {
@@ -768,22 +775,30 @@ Analytical <- R6::R6Class("Analytical",
             private$dOOdsconcavepos <- NULL
             private$dOOdspatchneg <- NULL
             private$dOOdspatchpos <- NULL
-            private$KOOneg <- NULL
-            private$KOOpos <- NULL
+            private$kOOneg <- NULL
+            private$kOOpos <- NULL
             private$BCneg <- NULL
             private$BCpos <- NULL
             hit <- TRUE
           }
         }
-        else { message("c not set.") }
+        else { message("A:  c not set.") }
       }
       sm <- private$x_stoch_args$s[1]
       if(private$x_stoch_args$t < sm)
       {
         private$x_stoch_args$t <- sm
-        message(paste(sep="","t has been set to ",sm,"."))
+        message(paste(sep="","A:  t has been set to ",sm,"."))
         private$OOneg <- NULL
         private$OOpos <- NULL
+        private$shatneg <- NULL
+        private$shatpos <- NULL
+        private$dOOdsconvexneg <- NULL
+        private$dOOdsconvexpos <- NULL
+        private$dOOdsconcaveneg <- NULL
+        private$dOOdsconcavepos <- NULL
+        private$dOOdspatchneg <- NULL
+        private$dOOdspatchpos <- NULL
         private$BCneg <- NULL
         private$BCpos <- NULL
       }
@@ -818,7 +833,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("t not set.") }
+        else { message("A:  t not set.") }
       }
       if(!is.null(k))
       {
@@ -856,7 +871,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("k not set.") }
+        else { message("A:  k not set.") }
       }
       if(!is.null(s))
       {
@@ -876,7 +891,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("s not set.") }
+        else { message("A:  s not set.") }
       }
       if(!is.null(x))
       {
@@ -892,7 +907,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Ptx <- NULL
           }
         }
-        else { message("x not set.") }
+        else { message("A:  x not set.") }
       }
       if(!is.null(z))
       {
@@ -925,7 +940,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("z not set.") }
+        else { message("A:  z not set.") }
       }
       if(!is.null(omega))
       {
@@ -935,12 +950,12 @@ Analytical <- R6::R6Class("Analytical",
           if(sca < 0)
           {
             sca <- 0
-            message("omega has been set to 0.")
+            message("A:  omega has been set to 0.")
           }
           else if(sca > 1)
           {
             sca <- 1
-            message("omega has been set to 1.")
+            message("A:  omega has been set to 1.")
           }
           if(sca != private$t_stoch_args$omega)
           {
@@ -955,7 +970,7 @@ Analytical <- R6::R6Class("Analytical",
             private$Pt <- NULL
           }
         }
-        else { message("omega not set.") }
+        else { message("A:  omega not set.") }
       }
       if(!is.null(Ppct))
       {
@@ -965,12 +980,12 @@ Analytical <- R6::R6Class("Analytical",
           if(sca < 0.01)
           {
             sca <- 0.01
-            message("Ppct has been set to 0.01.")
+            message("A:  Ppct has been set to 0.01.")
           }
           else if(sca > 0.99)
           {
             sca <- 0.99
-            message("Ppct has been set to 0.99.")
+            message("A:  Ppct has been set to 0.99.")
           }
           if(sca != private$t_stoch_args$Ppct)
           {
@@ -979,13 +994,13 @@ Analytical <- R6::R6Class("Analytical",
             private$tpercentiles <- NULL
           }
         }
-        else { message("Ppct not set.") }
+        else { message("A:  Ppct not set.") }
       }
       t1 <- private$t_stoch_args$t[1]
       if(private$t_stoch_args$s > t1)
       {
         private$t_stoch_args$s <- t1
-        message(paste(sep="","s has been set to ",t1,"."))
+        message(paste(sep="","A:  s has been set to ",t1,"."))
         private$tmodemedianmean <- NULL
         private$tmodesmediansmeans <- NULL
         private$tpercentile <- NULL
@@ -1018,7 +1033,7 @@ Analytical <- R6::R6Class("Analytical",
             private$plot_args$pmax <- sca
           }
         }
-        else { message("pmax not set.") }
+        else { message("A:  pmax not set.") }
       }
       if(!is.null(ptmax))
       {
@@ -1032,7 +1047,7 @@ Analytical <- R6::R6Class("Analytical",
             private$plot_args$ptmax <- sca
           }
         }
-        else { message("ptmax not set.") }
+        else { message("A:  ptmax not set.") }
       }
       return(private$plot_args)
     },
@@ -1057,13 +1072,13 @@ Analytical <- R6::R6Class("Analytical",
       {
         chr <- private$extract_character(fontfamily)
         if(!is.null(chr)) { private$plot_info$plotfont$family <- chr }
-        else { message("fontfamily not set.") }
+        else { message("A:  fontfamily not set.") }
       }
       if(!is.null(fontsize))
       {
         sca <- private$extract_scalar(fontsize)
         if(!is.null(sca)) { private$plot_info$plotfont$size <- sca }
-        else { message("fontsize not set.") }
+        else { message("A:  fontsize not set.") }
       }
       if(!is.null(fileformat))
       {
@@ -1071,25 +1086,21 @@ Analytical <- R6::R6Class("Analytical",
         if(!is.null(chr))
         {
           if(chr == "png" || chr == "svg") { private$plot_info$plotfile$format <- chr }
-          else
-          {
-            message("fileformat must be 'png' or 'svg'.")
-            message("fileformat not set.")
-          }
+          else { message("A:  fileformat must be 'png' or 'svg'.  fileformat not set.") }
         }
-        else { message("fileformat not set.") }
+        else { message("A:  fileformat not set.") }
       }
       if(!is.null(filewidth))
       {
         sca <- private$extract_scalar(filewidth)
         if(!is.null(sca)) { private$plot_info$plotfile$width <- sca }
-        else { message("filewidth not set.") }
+        else { message("A:  filewidth not set.") }
       }
       if(!is.null(fileheight))
       {
         sca <- private$extract_scalar(fileheight)
         if(!is.null(sca)) { private$plot_info$plotfile$height <- sca }
-        else { message("fileheight not set.") }
+        else { message("A:  fileheight not set.") }
       }
       if(!is.null(theme) || !is.null(opaque))
       {
@@ -1101,11 +1112,10 @@ Analytical <- R6::R6Class("Analytical",
             if(chr == "light" || chr == "dark") { private$plot_info$plottheme$name <- chr }
             else
             {
-              message("theme not set.")
-              message("available themes are: 'light' and 'dark'.")
+              message("A:  theme not set.  Available themes are: 'light' and 'dark'.")
             }
           }
-          else { message("theme not set.") }
+          else { message("A:  theme not set.") }
         }
         if(!is.null(opaque))
         {
@@ -1115,16 +1125,16 @@ Analytical <- R6::R6Class("Analytical",
             if(sca < 0.0)
             {
               sca = 0.0
-              message("opaque set to 0.0.")
+              message("A:  opaque set to 0.0.")
             }
             else if(sca > 1.0)
             {
               sca = 1.0
-              message("opaque set to 1.0.")
+              message("A:  opaque set to 1.0.")
             }
             private$plot_info$plottheme$opaque <- sca
           }
-          else { message("opaque not set.") }
+          else { message("A:  opaque not set.") }
         }
         private$plot_colors <- private$rainbow(private$plot_info$plottheme$name,private$plot_info$plottheme$opaque)
       }
@@ -1132,19 +1142,19 @@ Analytical <- R6::R6Class("Analytical",
       {
         bool <- private$extract_boolean(walls)
         if(!is.null(bool)) { private$plot_info$plot3D$walls <- bool  }
-        else { message("walls not set.") }
+        else { message("A:  walls not set.") }
       }
       if(!is.null(floor))
       {
         bool <- private$extract_boolean(floor)
         if(!is.null(bool)) { private$plot_info$plot3D$floor <- bool  }
-        else { message("floor not set.") }
+        else { message("A:  floor not set.") }
       }
       if(!is.null(labels))
       {
         bool <- private$extract_boolean(labels)
         if(!is.null(bool)) { private$plot_info$plotlabels <- bool  }
-        else { message("labels not set.") }
+        else { message("A:  labels not set.") }
       }
       return(private$plot_info)
     },
@@ -1216,13 +1226,13 @@ Analytical <- R6::R6Class("Analytical",
       {
         bool <- private$extract_boolean(plotit)
         if(!is.null(bool)) { private$flags$plotit <- bool  }
-        else { message("plotit not set.") }
+        else { message("A:  plotit not set.") }
       }
       if(!is.null(copyit))
       {
         bool <- private$extract_boolean(copyit)
         if(!is.null(bool)) { private$flags$copyit <- bool  }
-        else { message("copyit not set.") }
+        else { message("A:  copyit not set.") }
       }
       return(private$flags)
     },
@@ -1514,7 +1524,7 @@ Analytical <- R6::R6Class("Analytical",
       phi <- private$x_stoch_args[[6]]
       if(phi <= 0)
       {
-        decision <- private$KOOneg
+        decision <- private$kOOneg
         if(is.null(decision))
         {
           k <- mu
@@ -1529,7 +1539,7 @@ Analytical <- R6::R6Class("Analytical",
       }
       else
       {
-        decision <- private$KOOpos
+        decision <- private$kOOpos
         if(is.null(decision))
         {
           k <- mu
@@ -2111,9 +2121,9 @@ Analytical <- R6::R6Class("Analytical",
         shat <- private$shatneg
         if(is.null(OOhat) || is.null(shat))
         {
-          OOs <- RcppOUPAOptionEnvelope(s,x,t,y,rho,mu,sigma,r,phi,b,c)
-          OOhat <- OOs[1,]
-          shat <- OOs[2,]
+          env <- RcppOUPAOptionEnvelope(s,x,t,y,rho,mu,sigma,r,phi,b,c)
+          OOhat <- env[1,]
+          shat <- env[2,]
           private$OOhatneg <- OOhat
           private$shatneg <- shat
         }
@@ -2124,9 +2134,9 @@ Analytical <- R6::R6Class("Analytical",
         shat <- private$shatpos
         if(is.null(OOhat)|| is.null(shat))
         {
-          OOs <- RcppOUPAOptionEnvelope(s,x,t,y,rho,mu,sigma,r,phi,b,c)
-          OOhat <- OOs[1,]
-          shat <- OOs[2,]
+          env <- RcppOUPAOptionEnvelope(s,x,t,y,rho,mu,sigma,r,phi,b,c)
+          OOhat <- env[1,]
+          shat <- env[2,]
           private$OOhatpos <- OOhat
           private$shatpos <- shat
         }
@@ -2177,20 +2187,20 @@ Analytical <- R6::R6Class("Analytical",
       # calculate ----
       if(phi <= 0)
       {
-        decision <- private$KOOneg
+        decision <- private$kOOneg
         if(is.null(decision))
         {
           decision <- RcppOUPADecisionThreshold(y,rho,mu,sigma,r,phi,b,c)
-          private$KOOneg <- decision
+          private$kOOneg <- decision
         }
       }
       else
       {
-        decision <- private$KOOpos
+        decision <- private$kOOpos
         if(is.null(decision))
         {
           decision <- RcppOUPADecisionThreshold(y,rho,mu,sigma,r,phi,b,c)
-          private$KOOpos <- decision
+          private$kOOpos <- decision
         }
       }
       # plot or copy ----
@@ -3903,8 +3913,13 @@ Analytical <- R6::R6Class("Analytical",
       if(phi <= 0)
       {
         OOhat <- private$OOhatneg #protect against recursive call
-        if(is.null(OOhat)) { OOhat <- self$OptionEnvelope(who="A")[[1]] }
         shat <- private$shatneg
+        if(is.null(OOhat) || is.null(shat))
+        {
+          env <- self$OptionEnvelope(who="A")
+          OOhat <- env[[1]]
+          shat <- env[[2]]
+        }
         options <- private$OOneg #no plot or copy
         if(is.null(options)) { options <- self$Option(who="A")[[1]] }
         dOOdsconvex <- private$dOOdsconvexneg
@@ -3915,8 +3930,13 @@ Analytical <- R6::R6Class("Analytical",
       else
       {
         OOhat <- private$OOhatpos
-        if(is.null(OOhat)) { OOhat <- self$OptionEnvelope(who="A")[[1]] }
         shat <- private$shatpos
+        if(is.null(OOhat) || is.null(shat))
+        {
+          env <- self$OptionEnvelope(who="A")
+          OOhat <- env[[1]]
+          shat <- env[[2]]
+        }
         options <- private$OOpos
         if(is.null(options)) { options <- self$Option(who="A")[[1]] }
         dOOdsconvex <- private$dOOdsconvexpos
@@ -4116,8 +4136,8 @@ Analytical <- R6::R6Class("Analytical",
       gry <- private$plot_colors$gry
       background <- private$plot_colors$background
       copyit <- private$flags[[2]]
-      if(phi <= 0) { decision <- private$KOOneg } #protect against recursive call
-      else { decision <- private$KOOpos }
+      if(phi <= 0) { decision <- private$kOOneg } #protect against recursive call
+      else { decision <- private$kOOpos }
       if(is.null(decision))
       {
         decision <- self$DecisionThreshold(who="A")
@@ -4201,15 +4221,15 @@ Analytical <- R6::R6Class("Analytical",
       if(phi > 0)
       {
         fig <- add_trace(fig,type="scatter",x=c(x[n],k),y=c(OO,OO),mode="lines",line=OOline,hoverinfo="x+y")
-        KOO <- list(x=k,y=OO,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OO,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",align="right",showarrow=FALSE)
+        kOOsyms <- list(x=k,y=OO,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OO,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",align="right",showarrow=FALSE)
       }
       else
       {
         fig <- add_trace(fig,type="scatter",x=c(x[1],k),y=c(OO,OO),mode="lines",line=OOline,hoverinfo="x+y")
-        KOO <- list(x=k,y=OO,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OO,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",align="left",showarrow=FALSE)
+        kOOsyms <- list(x=k,y=OO,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OO,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",align="left",showarrow=FALSE)
       }
       fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-        layout(.,title=lookup,annotations=KOO,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        layout(.,title=lookup,annotations=kOOsyms,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
       return(fig)
     },
@@ -6028,8 +6048,8 @@ Analytical <- R6::R6Class("Analytical",
     OOhatpos = NULL,
     shatneg = NULL,
     shatpos = NULL,
-    KOOneg = NULL,
-    KOOpos = NULL,
+    kOOneg = NULL,
+    kOOpos = NULL,
     BCneg = NULL,
     BCpos = NULL,
     tmodemedianmean = NULL,
@@ -6131,7 +6151,7 @@ Analytical <- R6::R6Class("Analytical",
       {
         if(is.list(input)) { input <- input[[1]] }
         if(!is.numeric(input[1])) { chr <- as.character(input[1]) }
-        else { message(paste(sep="",input[1]," is a number.")) }
+        else { message(paste(sep="", input[1]," is a number.")) }
       }
       return(chr)
     },

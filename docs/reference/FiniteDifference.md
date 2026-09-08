@@ -2067,7 +2067,7 @@ Calculate and plot the decision threshold
 
 #### Returns
 
-list(k,OOhat)
+list(k,OO)
 
 ------------------------------------------------------------------------
 

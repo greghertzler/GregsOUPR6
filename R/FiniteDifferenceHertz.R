@@ -233,7 +233,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         {
           if(sca < 0)
           {
-            message("negative rho set to zero.")
+            message("FD:  negative rho set to zero.")
             sca <- 0.0
           }
           if(sca != private$oup_params$rho)
@@ -242,10 +242,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$g <- NULL
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("rho not set.")}
+        else { message("FD:  rho not set.") }
       }
       if(!is.null(mu))
       {
@@ -258,10 +259,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$g <- NULL
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("mu not set.")}
+        else { message("FD:  mu not set.") }
       }
       if(!is.null(sigma))
       {
@@ -274,10 +276,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$h2 <- NULL
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("sigma not set.")}
+        else { message("FD:  sigma not set.") }
       }
       return(private$oup_params)
     },
@@ -313,8 +316,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
                 i <- i+1
                 if(abs(vec[i-1]-vec[i]-ds) > 0.00001)
                 {
-                  message("time increments are not equal.")
-                  message("s not set.")
+                  message("FD:  time increments are not equal.  s not set.")
                   ok <- FALSE
                 }
               }
@@ -325,22 +327,15 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
                   private$x_stoch_args$s <- vec
                   private$x_stoch_args$ds <- ds
                   private$OO <- NULL
+                  private$shat <- NULL
                 }
               }
             }
-            else
-            {
-              message("time increment is zero.")
-              message("s not set.")
-            }
+            else { message("FD:  time increment is zero.  s not set.") }
           }
-          else
-          {
-            message("must have at least two times.")
-            message("s not set.")
-          }
+          else { message("FD:  must have at least two times.  s not set.") }
         }
-        else { message("s not set.")}
+        else { message("FD:  s not set.") }
       }
       if(!is.null(x))
       {
@@ -362,7 +357,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
                 i <- i+1
                 if(abs(xx[i]-xx[i-1]-dx) > 0.00001)
                 {
-                  message("x increments are not equal.")
+                  message("FD:  x increments are not equal.")
                   cancel <- TRUE
                   xx <- NULL
                 }
@@ -370,13 +365,13 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             }
             else
             {
-              message("x increment is zero.")
+              message("FD:  x increment is zero.")
               xx <- NULL
             }
           }
           else
           {
-            message("x vector must have at least 101 elements")
+            message("FD:  x vector must have at least 101 elements")
             xx <- NULL
           }
         }
@@ -401,7 +396,8 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$V_yieldindex <- NULL
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
           if(!is.null(V))
           {
@@ -411,12 +407,12 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               nV <- length(VV)
               if(nV < nx)
               {
-                message("vector V is shorter than vector x.")
+                message("FD:  vector V is shorter than vector x.")
                 VV <- NULL
               }
               else if(nV > nx)
               {
-                message("vector V is longer than vector x.")
+                message("FD:  vector V is longer than vector x.")
                 VV <- NULL
               }
             }
@@ -429,10 +425,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
                 private$V_info$name <- "Terminal Value"
               }
             }
-            else { message("V not set.")}
+            else { message("FD:  V not set.") }
           }
         }
-        else { message("x not set.") }
+        else { message("FD:  x not set.") }
       }
       else if(!is.null(V))
       {
@@ -444,12 +440,12 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           nV <- length(VV)
           if(nV < nx)
           {
-            message("vector V is shorter than vector x.")
+            message("FD:  vector V is shorter than vector x.")
             VV <- NULL
           }
           else if(nV > nx)
           {
-            message("vector V is longer than vector x.")
+            message("FD:  vector V is longer than vector x.")
             VV <- NULL
           }
         }
@@ -461,10 +457,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$V_info$name <- "Terminal Value"
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("V not set.")}
+        else { message("FD:  V not set.") }
       }
       if(!is.null(r))
       {
@@ -473,7 +470,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         {
           if(sca < 0)
           {
-            message("negative r set to zero.")
+            message("FD:  negative r set to zero.")
             sca <- 0.0
           }
           if(sca != private$x_stoch_args$r)
@@ -481,10 +478,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$x_stoch_args$r <- sca
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("r not set.")}
+        else { message("FD:  r not set.") }
       }
       if(!is.null(phi))
       {
@@ -494,10 +492,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           if(sca != private$x_stoch_args$phi)
           {
             private$x_stoch_args$phi <- sca
-            private$kOOhat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("phi not set.")}
+        else { message("FD:  phi not set.") }
       }
       if(!is.null(theta))
       {
@@ -506,12 +504,12 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         {
           if(sca < 0.5)
           {
-            message("theta has been set to 0.5.")
+            message("FD:  theta has been set to 0.5.")
             sca <- 0.5
           }
           else if(sca > 1)
           {
-            message("theta has been set to 1.")
+            message("FD:  theta has been set to 1.")
             sca <- 1
           }
           if(sca != private$x_stoch_args$theta)
@@ -519,10 +517,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$x_stoch_args$theta <- sca
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("theta not set.")}
+        else { message("FD:  theta not set.") }
       }
       if(!is.null(skip))
       {
@@ -532,12 +531,12 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           sca <- as.integer(sca)
           if(sca < 1)
           {
-            message("skip has been set to 1.")
+            message("FD:  skip has been set to 1.")
             sca <- 1
           }
           else if(sca > 1000)
           {
-            message("skip has been set to 1000.")
+            message("FD:  skip has been set to 1000.")
             sca <- 1000
           }
           if(sca != private$x_stoch_args$skip)
@@ -545,10 +544,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             private$x_stoch_args$skip <- sca
             private$OO <- NULL
             private$OOhat <- NULL
-            private$kOOhat <- NULL
+            private$shat <- NULL
+            private$kOO <- NULL
           }
         }
-        else { message("skip not set.")}
+        else { message("FD:  skip not set.") }
       }
       return(private$x_stoch_args)
     },
@@ -571,7 +571,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 1) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       if(!is.null(vs))
       {
@@ -585,7 +585,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 1) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("vs not set.")}
+        else { message("FD:  vs not set.") }
       }
       return(private$V_linear_args)
     },
@@ -609,7 +609,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 2) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -627,13 +627,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 2) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -650,13 +646,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 2) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -673,13 +665,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 2) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
-          }
+          else { message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set.")) }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_degenerate_args)
     },
@@ -704,7 +692,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 3) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       if(!is.null(vs))
       {
@@ -718,7 +706,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 3) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("vs not set.")}
+        else { message("FD:  vs not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -736,13 +724,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 3) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -761,11 +745,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           }
           else
           {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
+            message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set."))
           }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -784,11 +767,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           }
           else
           {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
+            message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set."))
           }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_stepped_args)
     },
@@ -813,7 +795,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 4) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       if(!is.null(vs))
       {
@@ -827,7 +809,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 4) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("vs not set.")}
+        else { message("FD:  vs not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -845,13 +827,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 4) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -868,13 +846,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 4) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -891,13 +865,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 4) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
-          }
+          else { message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set.")) }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_kinked_args)
     },
@@ -927,13 +897,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("xo > xm.")
-            message("x0 and xm not set.")
-          }
+          else { message("FD:  xo > xm.  x0 and xm not set.") }
         }
-        else { message("xo and xm not set.")}
+        else { message("FD:  xo and xm not set.") }
       }
       else if(!is.null(xo))
       {
@@ -950,13 +916,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("xo > mx=",scam))
-            message("xo not set.")
-          }
+          else { message(paste("FD:  xo > mx=",scam,".  xo not set.")) }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       else if(!is.null(xm))
       {
@@ -973,13 +935,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("xm < existing xo=",scao))
-            message("xm not set.")
-          }
+          else { message(paste("FD:  xm < existing xo=",scam,".  xm not set.")) }
         }
-        else { message("xm not set.")}
+        else { message("FD:  xm not set.") }
       }
       if(!is.null(vs))
       {
@@ -993,7 +951,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("vs not set.")}
+        else { message("FD:  vs not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -1011,13 +969,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -1034,13 +988,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -1057,13 +1007,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 5) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
-          }
+          else { message(paste("FD:  Vmin >= existing Vmax=",mx,", Vmin not set.")) }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_butterfly_args)
     },
@@ -1088,7 +1034,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       if(!is.null(vr))
       {
@@ -1102,7 +1048,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("vr not set.")}
+        else { message("FD:  vr not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -1120,13 +1066,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -1143,13 +1085,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -1166,13 +1104,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 6) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
-          }
+          else { message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set.")) }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_mitscherlich_args)
     },
@@ -1197,7 +1131,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xi not set.")}
+        else { message("FD:  xi not set.") }
       }
       if(!is.null(vr))
       {
@@ -1211,7 +1145,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("vr not set.")}
+        else { message("FD:  vr not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -1229,13 +1163,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -1252,13 +1182,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -1275,13 +1201,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 7) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
-          }
+          else { message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set.")) }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_gompertz_args)
     },
@@ -1306,7 +1228,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xi not set.")}
+        else { message("FD:  xi not set.") }
       }
       if(!is.null(vr))
       {
@@ -1320,7 +1242,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("vr not set.")}
+        else { message("FD:  vr not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -1338,13 +1260,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -1361,13 +1279,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,". Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -1384,13 +1298,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 8) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
-          }
+          else { message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set.")) }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_logistic_args)
     },
@@ -1416,7 +1326,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       if(!is.null(xi))
       {
@@ -1430,7 +1340,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xi not set.")}
+        else { message("FD:  xi not set.") }
       }
       if(!is.null(xm))
       {
@@ -1444,7 +1354,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xm not set.")}
+        else { message("FD:  xm not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -1462,13 +1372,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -1485,13 +1391,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -1508,13 +1410,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 9) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
-          }
+          else { message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set.")) }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_transcendental_args)
     },
@@ -1540,7 +1438,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xo not set.")}
+        else { message("FD:  xo not set.") }
       }
       if(!is.null(xi))
       {
@@ -1554,7 +1452,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xi not set.")}
+        else { message("FD:  xi not set.") }
       }
       if(!is.null(xm))
       {
@@ -1568,7 +1466,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
           }
         }
-        else { message("xm not set.")}
+        else { message("FD:  xm not set.") }
       }
       if(!is.null(Vmax) && !is.null(Vmin))
       {
@@ -1586,13 +1484,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message("Vmax <= Vmin.")
-            message("Vmax and Vmin not set.")
-          }
+          else { message("FD:  Vmax <= Vmin.  Vmax and Vmin not set.") }
         }
-        else { message("Vmax and Vmin not set.")}
+        else { message("FD:  Vmax and Vmin not set.") }
       }
       else if(!is.null(Vmax))
       {
@@ -1609,13 +1503,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               if(private$V_info[[1]] == 10) { private$x_stoch_args[3] <- list(V=NULL) }
             }
           }
-          else
-          {
-            message(paste("Vmax <= existing Vmin=",mn))
-            message("Vmax not set.")
-          }
+          else { message(paste("FD:  Vmax <= existing Vmin=",mn,".  Vmax not set.")) }
         }
-        else { message("Vmax not set.")}
+        else { message("FD:  Vmax not set.") }
       }
       else if(!is.null(Vmin))
       {
@@ -1634,11 +1524,10 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           }
           else
           {
-            message(paste("Vmin >= existing Vmax=",mx))
-            message("Vmin not set.")
+            message(paste("FD:  Vmin >= existing Vmax=",mx,".  Vmin not set."))
           }
         }
-        else { message("Vmin not set.")}
+        else { message("FD:  Vmin not set.") }
       }
       return(private$V_yieldindex_args)
     },
@@ -1661,16 +1550,16 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         {
           Ix <- as.integer(private$extract_scalar(Ix))
           if(Ix > 0 && Ix < 11) { OK <- TRUE }
-          else { message("Ix must be from 1 to 10.") }
+          else { message("FD:  Ix must be from 1 to 10.") }
         }
         else if(is.character(Ix))
         {
           chr <- private$extract_character(Ix)
           Ix <- match(chr,private$V_info$names)
           if(!is.na(Ix)) { OK <- TRUE }
-          else { message(paste(sep="",chr," is not recognized. Recognized names are: ",private$V_info$text)) }
+          else { message(paste(sep="","FD:  ",chr," is not recognized. Recognized names are: ",private$V_info$text)) }
         }
-        else {  message(paste(sep="","name is not recognized. Recognized names are: ",private$V_info$text)) }
+        else {  message(paste(sep="","FD:  name is not recognized. Recognized names are: ",private$V_info$text)) }
       }
       else
       {
@@ -1681,9 +1570,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           {
             Ix <- match(chr,private$V_info$names)
             if(!is.na(Ix)) { OK <- TRUE }
-            else {  message(paste(sep="",chr," is not recognized. Recognized names are: ",private$V_info$text)) }
+            else {  message(paste(sep="","FD:  ",chr," is not recognized. Recognized names are: ",private$V_info$text)) }
           }
-          else {  message(paste(sep="","name is not recognized. Recognized names are: ",private$V_info$text)) }
+          else {  message(paste(sep="","FD:  name is not recognized. Recognized names are: ",private$V_info$text)) }
         }
       }
       if(OK == FALSE) { Ix <- private$V_info$Ix }
@@ -1725,12 +1614,13 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
                 private$x_stoch_args[3] <- list(V=NULL)
                 private$OO <- NULL
                 private$OOhat <- NULL
-                private$kOOhat <- NULL
+                private$shat <- NULL
+                private$kOO <- NULL
               }
             }
-            else { message("Ix must be from 1 to 10.") }
+            else { message("FD:  Ix must be from 1 to 10.") }
           }
-          else { message("Ix must be from 1 to 10.") }
+          else { message("FD:  Ix must be from 1 to 10.") }
         }
         else if(is.character(Ix))
         {
@@ -1745,10 +1635,11 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               private$x_stoch_args[3] <- list(V=NULL)
               private$OO <- NULL
               private$OOhat <- NULL
-              private$kOOhat <- NULL
+              private$shat <- NULL
+              private$kOO <- NULL
             }
           }
-          else { message(paste(sep="",chr," is not recognized. Recognized names are: ",private$V_info$text,". For a new name, use set_V_info(name='newname').")) }
+          else { message(paste(sep="","FD:  ",chr," is not recognized. Recognized names are: ",private$V_info$text,". For a new name, use set_V_info(name='newname').")) }
         }
       }
       else
@@ -1765,7 +1656,8 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
               private$x_stoch_args[3] <- list(V=NULL)
               private$OO <- NULL
               private$OOhat <- NULL
-              private$kOOhat <- NULL
+              private$shat <- NULL
+              private$kOO <- NULL
             }
           }
           private$V_info$name <- chr
@@ -1794,13 +1686,13 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       {
         chr <- private$extract_character(fontfamily)
         if(!is.null(chr)) { private$plot_info$plotfont$family <- chr }
-        else { message("fontfamily not set.") }
+        else { message("FD:  fontfamily not set.") }
       }
       if(!is.null(fontsize))
       {
         sca <- private$extract_scalar(fontsize)
         if(!is.null(sca)) { private$plot_info$plotfont$size <- sca }
-        else { message("fontsize not set.") }
+        else { message("FD:  fontsize not set.") }
       }
       if(!is.null(fileformat))
       {
@@ -1808,25 +1700,21 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(!is.null(chr))
         {
           if(chr == "png" || chr == "svg") { private$plot_info$plotfile$format <- chr }
-          else
-          {
-            message("fileformat must be 'png' or 'svg'.")
-            message("fileformat not set.")
-          }
+          else { message("FD:  fileformat must be 'png' or 'svg'.  fileformat not set.") }
         }
-        else { message("fileformat not set.") }
+        else { message("FD:  fileformat not set.") }
       }
       if(!is.null(filewidth))
       {
         sca <- private$extract_scalar(filewidth)
         if(!is.null(sca)) { private$plot_info$plotfile$width <- sca }
-        else { message("filewidth not set.") }
+        else { message("FD:  filewidth not set.") }
       }
       if(!is.null(fileheight))
       {
         sca <- private$extract_scalar(fileheight)
         if(!is.null(sca)) { private$plot_info$plotfile$height <- sca }
-        else { message("fileheight not set.") }
+        else { message("FD:  fileheight not set.") }
       }
       if(!is.null(theme) || !is.null(opaque))
       {
@@ -1836,13 +1724,9 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           if(!is.null(chr))
           {
             if(chr == "light" || chr == "dark") { private$plot_info$plottheme$name <- chr }
-            else
-            {
-              message("theme not set.")
-              message("available themes are: 'light' and 'dark'.")
-            }
+            else { message("FD:  theme not set.  Available themes are: 'light' and 'dark'.") }
           }
-          else { message("theme not set.") }
+          else { message("FD:  theme not set.") }
         }
         if(!is.null(opaque))
         {
@@ -1852,16 +1736,16 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             if(sca < 0.0)
             {
               sca = 0.0
-              message("opaque set to 0.0.")
+              message("FD:  opaque set to 0.0.")
             }
             else if(sca > 1.0)
             {
               sca = 1.0
-              message("opaque set to 1.0.")
+              message("FD:  opaque set to 1.0.")
             }
             private$plot_info$plottheme$opaque <- sca
           }
-          else { message("opaque not set.") }
+          else { message("FD:  opaque not set.") }
         }
         private$plot_colors <- private$rainbow(private$plot_info$plottheme$name,private$plot_info$plottheme$opaque)
       }
@@ -1869,19 +1753,19 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       {
         bool <- private$extract_boolean(walls)
         if(!is.null(bool)) { private$plot_info$plot3D$walls <- bool  }
-        else { message("walls not set.") }
+        else { message("FD:  walls not set.") }
       }
       if(!is.null(floor))
       {
         bool <- private$extract_boolean(floor)
         if(!is.null(bool)) { private$plot_info$plot3D$floor <- bool  }
-        else { message("floor not set.") }
+        else { message("FD:  floor not set.") }
       }
       if(!is.null(labels))
       {
         bool <- private$extract_boolean(labels)
         if(!is.null(bool)) { private$plot_info$plotlabels <- bool  }
-        else { message("labels not set.") }
+        else { message("FD:  labels not set.") }
       }
       return(private$plot_info)
     },
@@ -1938,13 +1822,13 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       {
         bool <- private$extract_boolean(plotit)
         if(!is.null(bool)) { private$flags$plotit <- bool  }
-        else { message("plotit not set.") }
+        else { message("FD:  plotit not set.") }
       }
       if(!is.null(copyit))
       {
         bool <- private$extract_boolean(copyit)
         if(!is.null(bool)) { private$flags$copyit <- bool  }
-        else { message("copyit not set.") }
+        else { message("FD:  copyit not set.") }
       }
       return(private$flags)
     },
@@ -2102,8 +1986,8 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       sigma <- private$oup_params[[3]]
       s <- private$x_stoch_args[[1]]
       x <- private$x_stoch_args[[2]]
-      kOOhat <- private$kOOhat
-      if(!is.null(kOOhat)) { k <- kOOhat[[1]] }
+      kOO <- private$kOO
+      if(!is.null(kOO)) { k <- kOO[[1]] }
       else { k <- mu }
       # time
       t <- 100
@@ -2383,7 +2267,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Linear"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2428,7 +2312,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Degenerate"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2475,7 +2359,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Stepped"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2522,7 +2406,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Kinked"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2571,7 +2455,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Butterfly"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2618,7 +2502,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Mitscherlich"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2665,7 +2549,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Gompertz"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2712,7 +2596,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Logistic"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2761,7 +2645,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Transcendental"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2810,7 +2694,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       private$V_info$name <- "Yield Index"
       private$OO <- NULL
       private$OOhat <- NULL
-      private$kOOhat <- NULL
+      private$kOO <- NULL
       # plot or copy ----
       if(is.null(who))
       {
@@ -2977,7 +2861,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(is.null(V)) { V <- self$TerminalValue(who="FD")[[1]] }
         env <- RcppOUPFDOptionEnvelope(s,x,V,r,theta,skip,rho,mu,sigma)
         OOhat <- env[1,]
-        shat <- s[1]-env[2,]
+        shat <- env[2,]
         private$OOhat <- OOhat
         private$shat <- shat
       }
@@ -3007,7 +2891,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     #' @param mu      location parameter -inf<mu<inf
     #' @param sigma   scale parameter -inf<sigma<inf
     #' @param who     object id of caller
-    #' @return list(k,OOhat)
+    #' @return list(k,OO)
     DecisionThreshold = function(s=NULL,x=NULL,V=NULL,r=NULL,phi=NULL,theta=NULL,skip=NULL,rho=NULL,mu=NULL,sigma=NULL,who=NULL)
     {
       # set / get ----
@@ -3028,14 +2912,14 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
-      decision <- private$kOOhat
+      decision <- private$kOO
       if(is.null(decision))
       {
         if(is.null(V)) { V <- self$TerminalValue(who="FD")[[1]] }
         OOhat <- private$OOhat #no plot or copy
         if(is.null(OOhat)) { OOhat <- self$OptionEnvelope(who="FD")[[1]] }
         decision <- RcppOUPFDDecisionThreshold(x,V,OOhat,phi)
-        private$kOOhat <- decision
+        private$kOO <- decision
       }
       # plot or copy ----
       if(is.null(who))
@@ -3047,7 +2931,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
           private$CopyToClipboard(clip)
         }
       }
-      return(list(k=decision[1],OOhat=decision[2]))
+      return(list(k=decision[1],OO=decision[2]))
     },
     # public plot methods ----
     #' @description
@@ -3526,8 +3410,13 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       m <- length(s)
       n <- length(x)
       OOhat <- private$OOhat #protect against recursive call
-      if(is.null(OOhat)) { OOhat <- self$OptionEnvelope(who="FD")[[1]] }
       shat <- private$shat
+      if(is.null(OOhat) || is.null(shat))
+      {
+        env <- self$OptionEnvelope(who="FD")
+        OOhat <- env[[1]]
+        shat <- env[[2]]
+      }
       options <- private$OO #no plot or copy
       if(is.null(options)) { options <- self$Option(who="FD")[[1]] }
       Inx <- index(x,xbeg,xend)
@@ -3679,17 +3568,17 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       n <- length(x)
       OOhat <- private$OOhat #no plot or copy
       if(is.null(OOhat)) { OOhat <- self$OptionEnvelope(who="FD")[[1]] }
-      decision <- private$kOOhat #protect against recursive call
+      decision <- private$kOO #protect against recursive call
       if(is.null(decision))
       {
         decision <- self$DecisionThreshold(who="FD")
         k <- decision[[1]]
-        OOhat <- decision[[2]]
+        OO <- decision[[2]]
       }
       else
       {
         k <- decision[1]
-        OOhat <- decision[2]
+        OO <- decision[2]
       }
       Inx <- index(x,xbeg,xend)
       Ixbeg <- Inx[[1]]
@@ -3704,7 +3593,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Finite Difference",""),c("Decision Threshold",""),c("rho",rho),c("mu",mu),c("sigma",sigma),c("r",r),c("phi",phi),c("theta",theta),c("ds",ds),c("skip",skip),c("dx",dx),c("k",k),c("\u00D4",OOhat))
+        clip <- rbind(c("Finite Difference",""),c("Decision Threshold",""),c("rho",rho),c("mu",mu),c("sigma",sigma),c("r",r),c("phi",phi),c("theta",theta),c("ds",ds),c("skip",skip),c("dx",dx),c("k",k),c("\u00D4",OO))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3740,19 +3629,19 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       fig <- plot_ly() %>%
         add_trace(.,type="scatter",x=x,y=V,name="<i>V</i>(<i>x</i>)",mode="lines",line=terminalline,hoverinfo="x+y") %>%
         add_trace(.,type="scatter",x=x,y=OOhat,name="\u00D4(<i>x</i>)",mode="lines",line=OOhatline,hoverinfo="x+y") %>%
-        add_trace(.,type="scatter",x=c(k,k),y=c(0,OOhat),name="<i>k</i>",mode="lines",line=kline,hoverinfo="x+y")
+        add_trace(.,type="scatter",x=c(k,k),y=c(0,OO),name="<i>k</i>",mode="lines",line=kline,hoverinfo="x+y")
       if(phi > 0 || (phi == 0 && V[n] > V[1]))
       {
-        fig <- add_trace(fig,type="scatter",x=c(x[n],k),y=c(OOhat,OOhat),mode="lines",line=OOline,hoverinfo="x+y")
-        kOOhat <- list(x=k,y=OOhat,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OOhat,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",showarrow=FALSE)
+        fig <- add_trace(fig,type="scatter",x=c(x[n],k),y=c(OO,OO),mode="lines",line=OOline,hoverinfo="x+y")
+        kOOsyms <- list(x=k,y=OO,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OO,digits=4)),xref="x",yref="y",xanchor="right",yanchor="bottom",showarrow=FALSE)
       }
       else
       {
-        fig <- add_trace(fig,type="scatter",x=c(x[1],k),y=c(OOhat,OOhat),mode="lines",line=OOline,hoverinfo="x+y")
-        kOOhat <- list(x=k,y=OOhat,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OOhat,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",showarrow=FALSE)
+        fig <- add_trace(fig,type="scatter",x=c(x[1],k),y=c(OO,OO),mode="lines",line=OOline,hoverinfo="x+y")
+        kOOsyms <- list(x=k,y=OO,text=paste(sep="","<i>k</i>",bsym,"=",esym,format(k,digits=4),"<br>\u00D4",bsym,"=",esym,format(OO,digits=4)),xref="x",yref="y",xanchor="left",yanchor="bottom",showarrow=FALSE)
       }
       fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-        layout(.,title=lookup,annotations=kOOhat,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        layout(.,title=lookup,annotations=kOOsyms,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
 
       return(fig)
     }
@@ -3795,7 +3684,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
     # private output fields ----
     OO = NULL,
     OOhat = NULL,
-    kOOhat = NULL,
+    kOO = NULL,
     # private globals ----
     undoIx = NULL,
     modebar_2D = NULL,

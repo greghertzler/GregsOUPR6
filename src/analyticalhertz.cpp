@@ -88,13 +88,13 @@ using namespace RcppParallel;
 //'
 //' The return value:
 //'
-//'     OOs(2,n)
+//'     env(2,n)
 //'
 //'  is a matrix with two row vectors for option prices and corresponding times
 //'  along the option envelope.  It is subset in R as:
 //'
-//'     OOhat <- OOs[1,,drop=FALSE]
-//'     shat <- OOs[2,,drop=FALSE]
+//'     OOhat <- env[1,,drop=FALSE]
+//'     shat <- env[2,,drop=FALSE]
 //'
 //'  where t is the terminal time.
 //'
@@ -283,7 +283,7 @@ using namespace RcppParallel;
 //'  the global environment, but there is no map of inputs to outputs.  Outputs
 //'  can be stale.  Another advantage of the R6 object is predefined plots with
 //'  Plotly. The same simulation can plotted different ways without recalculation.
-//'  
+//'
 //' More threads are faster, but 12 seem to be enough.  Here are microbenchmark
 //'  median times for calculating 40,000 Transition Probabilities, by the number
 //'  of threads:
@@ -297,12 +297,12 @@ using namespace RcppParallel;
 //'                      4       4.2533         10       2.4361
 //'                      5       3.3214         11       2.3523
 //'                      6       2.8246         12       2.2651
-//'                      
+//'
 //' These times do not match up with previous times.  Those were done yesterday.
 //'  Come back tomorrow and the times will be different again.  But the changes
 //'  in times by thread number should be similar. If you need four threads for
 //'  something else, you can use the RcppParallel commands:
-//'  
+//'
 //'      defaultNumThreads()
 //'      setThreadOptions(numThreads=8)
 //'
@@ -1484,7 +1484,7 @@ NumericMatrix RcppOUPAOption(NumericVector s, NumericVector x, double t, double 
 #ifdef USE_PARALLEL
 struct ROAOOs : public Worker
 {
-  RMatrix<double> OOs;
+  RMatrix<double> env;
   const RVector<double> x;
   double t;
   double y;
@@ -1501,15 +1501,15 @@ struct ROAOOs : public Worker
   double tsmin;
   double maxmin;
 
-  ROAOOs(NumericMatrix& OOs, const NumericVector& x, double t, double y, double rho, double mu, double sigma, double dy, double r, double phi, double b, double c, double tsguess, double tsmax, double tsmin, double maxmin)
-    : OOs(OOs), x(x), t(t), y(y), rho(rho), mu(mu), sigma(sigma), dy(dy), r(r), phi(phi), b(b), c(c), tsguess(tsguess), tsmax(tsmax), tsmin(tsmin), maxmin(maxmin) {}
+  ROAOOs(NumericMatrix& env, const NumericVector& x, double t, double y, double rho, double mu, double sigma, double dy, double r, double phi, double b, double c, double tsguess, double tsmax, double tsmin, double maxmin)
+    : env(env), x(x), t(t), y(y), rho(rho), mu(mu), sigma(sigma), dy(dy), r(r), phi(phi), b(b), c(c), tsguess(tsguess), tsmax(tsmax), tsmin(tsmin), maxmin(maxmin) {}
 
   void operator()(std::size_t begin, std::size_t end) {
     for(std::size_t j = begin; j < end; j++)
     {
       std::vector<double> OOshat = OUPOptionMaxMin(x[j],y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,maxmin);
-      OOs(0,j) = OOshat[0];
-      OOs(1,j) = t-OOshat[1];
+      env(0,j) = OOshat[0];
+      env(1,j) = t-OOshat[1];
     }
   }
 };
@@ -1528,7 +1528,7 @@ struct ROAOOs : public Worker
 //' @param  phi   <=0 for integral -inf to x, >0 for integral x to inf
 //' @param  b     lump-sum benefit for entry option
 //' @param  c     lump-sum cost for exit option
-//' @return OOs(2,n) <- RcppOUPAOptionEnvelope()
+//' @return env(2,n) <- RcppOUPAOptionEnvelope()
 //' @export
 // [[Rcpp::export]]
 NumericMatrix RcppOUPAOptionEnvelope(NumericVector s, NumericVector x, double t, double y, double rho, double mu, double sigma, double r, double phi, double b, double c)
@@ -1537,13 +1537,12 @@ NumericMatrix RcppOUPAOptionEnvelope(NumericVector s, NumericVector x, double t,
   std::size_t n = x.size();
   double dy = 0.1;
   if(n > 1) { dy = (x[n-1]-x[0])/(n-1); }
-  NumericMatrix OOs(2,n);
-  double tsmax = s[0];
-  double tsmin = s[m-1];
-  double tsguess = tsmin;
-  tsguess = OUPOptionMaxMin(y,y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1)[1];
+  NumericMatrix env(2,n);
+  double tsmax = t-s[m-1];
+  double tsmin = 0;
+  double tsguess = OUPOptionMaxMin(y,y,rho,mu,sigma,dy,r,phi,b,c,tsmin,tsmax,tsmin,1)[1];
 #ifdef USE_PARALLEL
-  ROAOOs worker(OOs,x,t,y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1);
+  ROAOOs worker(env,x,t,y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1);
   parallelFor(0,n,worker);
 #else
   if(phi > 0)
@@ -1552,8 +1551,8 @@ NumericMatrix RcppOUPAOptionEnvelope(NumericVector s, NumericVector x, double t,
     while(j < n)
     {
       std::vector<double> OOshat = OUPOptionMaxMin(x[j],y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1);
-      OOs(0,j) = OOshat[0];
-      OOs(1,j) = t-OOshat[1];
+      env(0,j) = OOshat[0];
+      env(1,j) = t-OOshat[1];
       tsguess = OOshat[1];
       j += 1;
     }
@@ -1565,13 +1564,13 @@ NumericMatrix RcppOUPAOptionEnvelope(NumericVector s, NumericVector x, double t,
     {
       j -= 1;
       std::vector<double> OOshat = OUPOptionMaxMin(x[j],y,rho,mu,sigma,dy,r,phi,b,c,tsguess,tsmax,tsmin,1);
-      OOs(0,j) = OOshat[0];
-      OOs(1,j) = t-OOshat[1];
+      env(0,j) = OOshat[0];
+      env(1,j) = t-OOshat[1];
       tsguess = OOshat[1];
     }
   }
 #endif
-  return OOs;
+  return env;
 }
 
 //' @rdname Analytical_Rcpp
@@ -1600,8 +1599,8 @@ NumericMatrix RcppOUPAdOOdsZero(NumericVector s, NumericVector x, double t, doub
   if(phi > 0 )
   {
     std::vector<double> env(2);
-    double tsmax = s[0];
-    double tsmin = s[m-1];
+    double tsmax = t-s[m-1];
+    double tsmin = 0;
     double tsguess = tsmax;
     int j = -1;
     while(tsguess > tsmin && j < n-1)
@@ -1618,9 +1617,9 @@ NumericMatrix RcppOUPAdOOdsZero(NumericVector s, NumericVector x, double t, doub
       while(j < n)
       {
         dOOdszero(0,j) = NA_REAL;
-        dOOdszero(1,j) = t-tsmax;
+        dOOdszero(1,j) = t-tsmin;
         dOOdszero(2,j) = NA_REAL;
-        dOOdszero(3,j) = t-tsmin;
+        dOOdszero(3,j) = t-tsmax;
         j += 1;
       }
     }
@@ -1657,8 +1656,8 @@ NumericMatrix RcppOUPAdOOdsZero(NumericVector s, NumericVector x, double t, doub
   else
   {
     std::vector<double> env(2);
-    double tsmax = s[0];
-    double tsmin = s[m-1];
+    double tsmax = t-s[m-1];
+    double tsmin = 0;
     double tsguess = tsmax;
     int j = n;
     while(tsguess > tsmin && j > 0)
@@ -1675,9 +1674,9 @@ NumericMatrix RcppOUPAdOOdsZero(NumericVector s, NumericVector x, double t, doub
       while(j > -1)
       {
         dOOdszero(0,j) = NA_REAL;
-        dOOdszero(1,j) = t-tsmax;
+        dOOdszero(1,j) = t-tsmin;
         dOOdszero(2,j) = NA_REAL;
-        dOOdszero(3,j) = t-tsmin;
+        dOOdszero(3,j) = t-tsmax;
         j -= 1;
       }
     }

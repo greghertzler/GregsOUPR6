@@ -291,7 +291,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(sca < 0)
           {
             sca <- 0.0
-            message("negative rho set to zero.")
+            message("MC:  negative rho set to zero.")
           }
           if(sca != private$oup_params$rho)
           {
@@ -327,7 +327,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("rho not set.")}
+        else { message("MC:  rho not set.") }
       }
       if(!is.null(mu))
       {
@@ -368,7 +368,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("mu not set.")}
+        else { message("MC:  mu not set.") }
       }
       if(!is.null(sigma))
       {
@@ -409,7 +409,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("sigma not set.")}
+        else { message("MC:  sigma not set.") }
       }
       return(private$oup_params)
     },
@@ -444,10 +444,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               private$PPneg <- NULL
               private$PPpos <- NULL
             }
-            else { message("101 times at most.  t not set.") }
+            else { message("MC:  101 times at most.  t not set.") }
           }
         }
-        else { message("t not set.") }
+        else { message("MC:  t not set.") }
       }
       if(!is.null(y))
       {
@@ -464,7 +464,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$PPpos <- NULL
           }
         }
-        else { message("y not set.") }
+        else { message("MC:  y not set.") }
       }
       if(!is.null(x))
       {
@@ -484,7 +484,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$PPpos <- NULL
           }
         }
-        else { message("x not set.") }
+        else { message("MC:  x not set.") }
       }
       if(!is.null(psi))
       {
@@ -496,7 +496,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             if(sca != -1)
             {
               sca <- -1
-              message("psi set to -1.")
+              message("MC:  psi set to -1.")
             }
           }
           else
@@ -504,7 +504,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             if(sca != 1)
             {
               sca <- 1
-              message("psi set to 1.")
+              message("MC:  psi set to 1.")
             }
           }
           if(sca != private$y_stoch_args$psi)
@@ -512,7 +512,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$y_stoch_args$psi <- sca
           }
         }
-        else { message("psi not set.") }
+        else { message("MC:  psi not set.") }
       }
       private$syncyxt <- 1
       private$forwardyt <- 1
@@ -548,10 +548,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               private$OOneg <- NULL
               private$OOpos <- NULL
             }
-            else { message("101 times at most.  s not set.") }
+            else { message("MC:  101 times at most.  s not set.") }
           }
         }
-        else { message("s not set.") }
+        else { message("MC:  s not set.") }
       }
       if(!is.null(x))
       {
@@ -573,13 +573,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               private$OOpos <- NULL
             }
           }
-          else
-          {
-            message("x vector must have at least 101 elements")
-            message("x not set.")
-          }
+          else { message("MC:  x vector must have at least 101 elements.  x not set.") }
         }
-        else { message("x not set.") }
+        else { message("MC:  x not set.") }
       }
       if(!is.null(y))
       {
@@ -597,7 +593,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$OOpos <- NULL
           }
         }
-        else { message("y not set.") }
+        else { message("MC:  y not set.") }
       }
       if(!is.null(r))
       {
@@ -606,7 +602,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(sca < 0)
           {
-            message("negative r set to zero.")
+            message("MC:  negative r set to zero.")
             sca <- 0.0
           }
           if(sca != private$x_stoch_args$r)
@@ -616,7 +612,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$OOpos <- NULL
           }
         }
-        else { message("r not set.") }
+        else { message("MC:  r not set.") }
       }
       if(!is.null(phi))
       {
@@ -628,7 +624,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             if(sca != -1)
             {
               sca <- -1
-              message("phi set to -1.")
+              message("MC:  phi set to -1.")
             }
           }
           else if(sca > 0)
@@ -636,7 +632,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             if(sca != 1)
             {
               sca <- 1
-              message("phi set to 1.")
+              message("MC:  phi set to 1.")
             }
           }
           if(sca != private$x_stoch_args$phi)
@@ -644,7 +640,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$x_stoch_args$phi <- sca
           }
         }
-        else { message("phi not set.") }
+        else { message("MC:  phi not set.") }
       }
       private$syncyxt <- 2
       return(private$x_stoch_args)
@@ -688,10 +684,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               private$bheat <- NULL
               private$bz <- NULL
             }
-            else { message("101 times at most.  t not set.") }
+            else { message("MC:  101 times at most.  t not set.") }
           }
         }
-        else { message("t not set.") }
+        else { message("MC:  t not set.") }
       }
       if(!is.null(k))
       {
@@ -717,7 +713,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("k not set.") }
+        else { message("MC:  k not set.") }
       }
       if(!is.null(x))
       {
@@ -744,7 +740,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("x not set.") }
+        else { message("MC:  x not set.") }
       }
       if(!is.null(Ppct))
       {
@@ -754,12 +750,12 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(sca < 0.01)
           {
             sca <- 0.01
-            message("Ppct has been set to 0.01.")
+            message("MC:  Ppct has been set to 0.01.")
           }
           else if(sca > 0.99)
           {
             sca <- 0.99
-            message("Ppct has been set to 0.99.")
+            message("MC:  Ppct has been set to 0.99.")
           }
           if(sca != private$t_stoch_args$Ppct)
           {
@@ -768,7 +764,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$fptpct <- NULL
           }
         }
-        else { message("Ppct not set.") }
+        else { message("MC:  Ppct not set.") }
       }
       private$syncyxt <- 3
       private$forwardyt <- 3
@@ -793,12 +789,12 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             if(sca < 1 )
             {
               sca <- 1
-              message("paths set to 1.")
+              message("MC:  paths set to 1.")
             }
             else if (sca > 1000000)
             {
               sca <- 1000000
-              message("paths set to 1,000,000.")
+              message("MC:  paths set to 1,000,000.")
             }
             private$path_args$paths <- sca
             private$ystdnorm <- NULL
@@ -835,7 +831,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("paths not set.") }
+        else { message("MC:  paths not set.") }
       }
       if(!is.null(skip))
       {
@@ -847,12 +843,12 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             if(sca < 1 )
             {
               sca <- 1
-              message("skip set to 1.")
+              message("MC:  skip set to 1.")
             }
             else if (sca > 50)
             {
               sca <- 50
-              message(paste(sep="","skip set to 50."))
+              message("MC:  skip set to 50.")
             }
             private$path_args$skip <- sca
             private$ystdnorm <- NULL
@@ -889,7 +885,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("skip not set.") }
+        else { message("MC:  skip not set.") }
       }
       if(!is.null(seed))
       {
@@ -933,7 +929,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("seed not set.") }
+        else { message("MC:  seed not set.") }
       }
       if(!is.null(method))
       {
@@ -974,7 +970,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$bz <- NULL
           }
         }
-        else { message("method not set.") }
+        else { message("MC:  method not set.") }
       }
       return(private$path_args)
     },
@@ -1003,7 +999,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$plot_args$pmax <- sca
           }
         }
-        else { message("pmax not set.") }
+        else { message("MC:  pmax not set.") }
       }
       if(!is.null(ptmax))
       {
@@ -1017,7 +1013,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$plot_args$ptmax <- sca
           }
         }
-        else { message("ptmax not set.") }
+        else { message("MC:  ptmax not set.") }
       }
       if(!is.null(first) && !is.null(last))
       {
@@ -1059,11 +1055,11 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             hit <- TRUE
             pn <- p1+99
           }
-          if(hit) { message(paste(sep="","first:last set to ",p1,":",pn,".")) }
+          if(hit) { message(paste(sep="","MC:  first:last set to ",p1,":",pn,".")) }
           private$plot_args$first <- p1
           private$plot_args$last <- pn
         }
-        else { message("first and last not set.") }
+        else { message("MC:  first and last not set.") }
       }
       else if(!is.null(first))
       {
@@ -1074,21 +1070,21 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(p1 > pn)
           {
             p1 <- pn
-            message(paste(sep="","first set to ",p1,"."))
+            message(paste(sep="","MC:  first set to ",p1,"."))
           }
           else if(p1 < pn-99 && pn-99 > 0)
           {
             p1 <- pn-99
-            message(paste(sep="","first set to ",p1,"."))
+            message(paste(sep="","MC:  first set to ",p1,"."))
           }
           if(p1 < 1)
           {
             p1 <- 1
-            message("first set to 1.")
+            message("MC:  first set to 1.")
           }
           private$plot_args$first <- p1
         }
-        else { message("first not set.") }
+        else { message("MC:  first not set.") }
       }
       else if(!is.null(last))
       {
@@ -1100,21 +1096,21 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(pn < p1)
           {
             pn <- p1
-            message(paste(sep="","last set to ",pn,"."))
+            message(paste(sep="","MC:  last set to ",pn,"."))
           }
           else if(pn > p1+99 && p1+99 < n+1)
           {
             pn <- p1+99
-            message(paste(sep="","last set to ",pn,"."))
+            message(paste(sep="","MC:  last set to ",pn,"."))
           }
           if(pn > n)
           {
             pn <- n
-            message(paste(sep="","last set to ",pn,"."))
+            message(paste(sep="","MC:  last set to ",pn,"."))
           }
           private$plot_args$last <- pn
         }
-        else { message("last not set.") }
+        else { message("MC:  last not set.") }
       }
       if(!is.null(zbeg) && !is.null(zend))
       {
@@ -1127,7 +1123,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             sca <- beg
             beg <- end
             end <- sca
-            message(paste(sep="","zbeg:zend set to ",beg,":",end,"."))
+            message(paste(sep="","MC:  zbeg:zend set to ",beg,":",end,"."))
           }
           private$plot_args$zbeg <- beg
           private$plot_args$zend <- end
@@ -1136,13 +1132,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         else
         {
           private$plot_args$zbeg <- -Inf
-          message(paste(sep="","zbeg set to -Inf."))
+          message("MC:  zbeg set to -Inf.")
         }
         if(!is.null(end)) { private$plot_args$zend <- end }
         else
         {
           private$plot_args$zend <- Inf
-          message(paste(sep="","zend set to Inf."))
+          message("MC:  zend set to Inf.")
         }
       }
       else if(!is.null(zbeg))
@@ -1154,14 +1150,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(zbeg > zend)
           {
             private$plot_args$zbeg <- zend
-            message(paste(sep="","zbeg set to ",zend,"."))
+            message(paste(sep="","MC:  zbeg set to ",zend,"."))
           }
           else{ private$plot_args$zbeg <- zbeg }
         }
         else
         {
           private$plot_args$zbeg <- -Inf
-          message(paste(sep="","zbeg set to -Inf."))
+          message("MC:  zbeg set to -Inf.")
         }
       }
       else if(!is.null(zend))
@@ -1173,14 +1169,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(zend < zbeg)
           {
             private$plot_args$zend <- zbeg
-            message(paste(sep="","zend set to ",zbeg,"."))
+            message(paste(sep="","MC:  zend set to ",zbeg,"."))
           }
           else{ private$plot_args$zend <- zend }
         }
         else
         {
           private$plot_args$zend <- Inf
-          message(paste(sep="","zend set to Inf."))
+          message("MC:  zend set to Inf.")
         }
       }
       return(private$plot_args)
@@ -1206,13 +1202,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       {
         chr <- private$extract_character(fontfamily)
         if(!is.null(chr)) { private$plot_info$plotfont$family <- chr }
-        else { message("fontfamily not set.") }
+        else { message("MC:  fontfamily not set.") }
       }
       if(!is.null(fontsize))
       {
         sca <- private$extract_scalar(fontsize)
         if(!is.null(sca)) { private$plot_info$plotfont$size <- sca }
-        else { message("fontsize not set.") }
+        else { message("MC:  fontsize not set.") }
       }
       if(!is.null(fileformat))
       {
@@ -1220,25 +1216,21 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(!is.null(chr))
         {
           if(chr == "png" || chr == "svg") { private$plot_info$plotfile$format <- chr }
-          else
-          {
-            message("fileformat must be 'png' or 'svg'.")
-            message("fileformat not set.")
-          }
+          else { message("MC:  fileformat must be 'png' or 'svg'.  fileformat not set.") }
         }
-        else { message("fileformat not set.") }
+        else { message("MC:  fileformat not set.") }
       }
       if(!is.null(filewidth))
       {
         sca <- private$extract_scalar(filewidth)
         if(!is.null(sca)) { private$plot_info$plotfile$width <- sca }
-        else { message("filewidth not set.") }
+        else { message("MC:  filewidth not set.") }
       }
       if(!is.null(fileheight))
       {
         sca <- private$extract_scalar(fileheight)
         if(!is.null(sca)) { private$plot_info$plotfile$height <- sca }
-        else { message("fileheight not set.") }
+        else { message("MC:  fileheight not set.") }
       }
       if(!is.null(theme) || !is.null(opaque))
       {
@@ -1248,13 +1240,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(!is.null(chr))
           {
             if(chr == "light" || chr == "dark") { private$plot_info$plottheme$name <- chr }
-            else
-            {
-              message("theme not set.")
-              message("available themes are: 'light' and 'dark'.")
-            }
+            else { message("MC:  theme not set.  Available themes are: 'light' and 'dark'.") }
           }
-          else { message("theme not set.") }
+          else { message("MC:  theme not set.") }
         }
         if(!is.null(opaque))
         {
@@ -1264,16 +1252,16 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             if(sca < 0.0)
             {
               sca = 0.0
-              message("opaque set to 0.0.")
+              message("MC:  opaque set to 0.0.")
             }
             else if(sca > 1.0)
             {
               sca = 1.0
-              message("opaque set to 1.0.")
+              message("MC:  opaque set to 1.0.")
             }
             private$plot_info$plottheme$opaque <- sca
           }
-          else { message("opaque not set.") }
+          else { message("MC:  opaque not set.") }
         }
         private$plot_colors <- private$rainbow(private$plot_info$plottheme$name,private$plot_info$plottheme$opaque)
       }
@@ -1281,19 +1269,19 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       {
         bool <- private$extract_boolean(walls)
         if(!is.null(bool)) { private$plot_info$plot3D$walls <- bool  }
-        else { message("walls not set.") }
+        else { message("MC:  walls not set.") }
       }
       if(!is.null(floor))
       {
         bool <- private$extract_boolean(floor)
         if(!is.null(bool)) { private$plot_info$plot3D$floor <- bool  }
-        else { message("floor not set.") }
+        else { message("MC:  floor not set.") }
       }
       if(!is.null(labels))
       {
         bool <- private$extract_boolean(labels)
         if(!is.null(bool)) { private$plot_info$plotlabels <- bool  }
-        else { message("labels not set.") }
+        else { message("MC:  labels not set.") }
       }
       return(private$plot_info)
     },
@@ -1360,13 +1348,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       {
         bool <- private$extract_boolean(plotit)
         if(!is.null(bool)) { private$flags$plotit <- bool  }
-        else { message("plotit not set.") }
+        else { message("MC:  plotit not set.") }
       }
       if(!is.null(copyit))
       {
         bool <- private$extract_boolean(copyit)
         if(!is.null(bool)) { private$flags$copyit <- bool  }
-        else { message("copyit not set.") }
+        else { message("MC:  copyit not set.") }
       }
       return(private$flags)
     },
@@ -4228,8 +4216,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         private$CopyToClipboard(clip)
       }
       # plot ----
-      if(type < -1) { message("Types available for Double Integral: -1,0,1,2.  Showing: type=-1") }
-      else if(type > 2) { message("Types available for Double Integral: -1,0,1,2.  Showing: type=2")}
       if(labels == TRUE)
       {
         bsml <- "<span style='font-size: 10pt;'>"

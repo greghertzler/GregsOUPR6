@@ -79,13 +79,13 @@
 #'
 #' The return value:
 #'
-#'     OOs(2,n)
+#'     env(2,n)
 #'
 #'  is a matrix with two row vectors for option prices and corresponding times
 #'  along the option envelope.  It is subset in R as:
 #'
-#'     OOhat <- OOs[1,,drop=FALSE]
-#'     shat <- OOs[2,,drop=FALSE]
+#'     OOhat <- env[1,,drop=FALSE]
+#'     shat <- env[2,,drop=FALSE]
 #'
 #'  where t is the terminal time.
 #'
@@ -274,7 +274,7 @@
 #'  the global environment, but there is no map of inputs to outputs.  Outputs
 #'  can be stale.  Another advantage of the R6 object is predefined plots with
 #'  Plotly. The same simulation can plotted different ways without recalculation.
-#'  
+#'
 #' More threads are faster, but 12 seem to be enough.  Here are microbenchmark
 #'  median times for calculating 40,000 Transition Probabilities, by the number
 #'  of threads:
@@ -288,12 +288,12 @@
 #'                      4       4.2533         10       2.4361
 #'                      5       3.3214         11       2.3523
 #'                      6       2.8246         12       2.2651
-#'                      
+#'
 #' These times do not match up with previous times.  Those were done yesterday.
 #'  Come back tomorrow and the times will be different again.  But the changes
 #'  in times by thread number should be similar. If you need four threads for
 #'  something else, you can use the RcppParallel commands:
-#'  
+#'
 #'      defaultNumThreads()
 #'      setThreadOptions(numThreads=8)
 #'
@@ -429,7 +429,7 @@ RcppOUPAOption <- function(s, x, t, y, rho, mu, sigma, r, phi, b, c) {
 #' @param  phi   <=0 for integral -inf to x, >0 for integral x to inf
 #' @param  b     lump-sum benefit for entry option
 #' @param  c     lump-sum cost for exit option
-#' @return OOs(2,n) <- RcppOUPAOptionEnvelope()
+#' @return env(2,n) <- RcppOUPAOptionEnvelope()
 #' @export
 RcppOUPAOptionEnvelope <- function(s, x, t, y, rho, mu, sigma, r, phi, b, c) {
     .Call(`_GregsOUPR6_RcppOUPAOptionEnvelope`, s, x, t, y, rho, mu, sigma, r, phi, b, c)
@@ -588,8 +588,8 @@ RcppOUPAPassageTimeProbability <- function(t, k, s, x, omega, rho, mu, sigma, z 
 #'  is a matrix with two row vectors for the option prices along the envelope
 #'  and the corresponding times.  It is subset in R as:
 #'
-#'     OOenv <- env[1,]
-#'     tsenv <- env[2,]
+#'     OOhat <- env[1,]
+#'     tshat <- env[2,]
 #'
 #' The return value:
 #'

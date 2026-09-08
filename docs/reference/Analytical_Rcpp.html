@@ -158,7 +158,7 @@
 <p>P(m,n) &lt;- RcppOUPAProbability()</p>
 <p>PP(m,n) &lt;- RcppOUPADoubleIntegral()</p>
 <p>OO(m,n) &lt;- RcppOUPAOption()</p>
-<p>OOs(2,n) &lt;- RcppOUPAOptionEnvelope()</p>
+<p>env(2,n) &lt;- RcppOUPAOptionEnvelope()</p>
 <p>dOOdszero(4,n+3) &lt;- RcppOUPAdOOdsZero()</p>
 <p>kOO(2) &lt;- RcppOUPADecisionThreshold()</p>
 <p>BC(m,n) &lt;- RcppOUPAObligation()</p>
@@ -223,11 +223,11 @@ Integrals  with rows for t and columns for y.</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">OO</span>(m,n)</span></code></pre><p></p></div>
 <p>is a matrix of Options with rows for s and columns for x.</p>
 <p>The return value:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">OOs</span>(<span class="dv">2</span>,n)</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">env</span>(<span class="dv">2</span>,n)</span></code></pre><p></p></div>
 <p>is a matrix with two row vectors for option prices and corresponding times
 along the option envelope.  It is subset in R as:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>OOhat <span class="ot">&lt;-</span> OOs[<span class="dv">1</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>shat <span class="ot">&lt;-</span> OOs[<span class="dv">2</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>OOhat <span class="ot">&lt;-</span> env[<span class="dv">1</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>shat <span class="ot">&lt;-</span> env[<span class="dv">2</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span></code></pre><p></p></div>
 <p>where t is the terminal time.</p>
 <p>The return value:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">dOOdszero</span>(<span class="dv">4</span>,n<span class="sc">+</span><span class="dv">3</span>)</span></code></pre><p></p></div>

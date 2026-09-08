@@ -210,7 +210,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           if(sca < 0)
           {
             sca <- 0.0
-            message("negative rho set to zero.")
+            message("ML:  negative rho set to zero.")
           }
           if(sca != private$oup_params$rho)
           {
@@ -221,7 +221,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
             private$likelyratio <- NULL
           }
         }
-        else { message("rho not set.")}
+        else { message("ML:  rho not set.") }
       }
       if(!is.null(mu))
       {
@@ -237,7 +237,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
             private$likelyratio <- NULL
          }
         }
-        else { message("mu not set.")}
+        else { message("ML:  mu not set.") }
       }
       if(!is.null(sigma))
       {
@@ -253,7 +253,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
             private$likelyratio <- NULL
         }
         }
-        else { message("sigma not set.")}
+        else { message("ML:  sigma not set.") }
       }
       return(private$oup_params)
     },
@@ -265,11 +265,11 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
     set_oup_params_restr = function(rhor=NULL,mur=NULL,sigmar=NULL)
     {
       rhosca <- private$extract_scalar(rhor)
-      if(!is.null(rhor) && is.null(rhosca)) { message("rhor not set.")}
+      if(!is.null(rhor) && is.null(rhosca)) { message("ML:  rhor not set.") }
       musca <- private$extract_scalar(mur)
-      if(!is.null(mur) && is.null(musca)) { message("mur not set.")}
+      if(!is.null(mur) && is.null(musca)) { message("ML:  mur not set.") }
       sigmasca <- private$extract_scalar(sigmar)
-      if(!is.null(sigmar) && is.null(sigmasca)) { message("sigmar not set.")}
+      if(!is.null(sigmar) && is.null(sigmasca)) { message("ML:  sigmar not set.") }
       rhoparam <- private$oup_params_restr[[1]]
       muparam <- private$oup_params_restr[[2]]
       sigmaparam <- private$oup_params_restr[[3]]
@@ -288,7 +288,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           if(rhosca < 0)
           {
             rhosca <- 0
-            message("negative rhor set to zero.")
+            message("ML:  negative rhor set to zero.")
           }
           private$oup_params_restr$rhor <- rhosca
         }
@@ -314,23 +314,23 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           if(sca < 0)
           {
             sca <- 0.0
-            message("negative rhos set to zero.")
+            message("ML:  negative rhos set to zero.")
           }
           private$oup_params_start$rhos <- sca
         }
-        else { message("rhos not set.")}
+        else { message("ML:  rhos not set.") }
       }
       if(!is.null(mus))
       {
         sca <- private$extract_scalar(mus)
         if(!is.null(sca)) { private$oup_params_start$mus <- sca }
-        else { message("mus not set.") }
+        else { message("ML:  mus not set.") }
       }
       if(!is.null(sigmas))
       {
         sca <- private$extract_scalar(sigmas)
         if(!is.null(sca)) { private$oup_params_start$sigmas <- sca }
-        else { message("sigmas not set.") }
+        else { message("ML:  sigmas not set.") }
       }
       return(private$oup_params_start)
     },
@@ -361,27 +361,27 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
                 zc <- as.integer(zc)
                 if(tc < 1)
                 {
-                  message("taucol too small,")
+                  message("ML:  taucol too small,")
                   OK <- FALSE
                 }
                 else if(tc > ncols)
                 {
-                  message("taucol too large,")
+                  message("ML:  taucol too large,")
                   OK <- FALSE
                 }
                 if(zc < 1)
                 {
-                  message("zcol too small,")
+                  message("ML:  zcol too small,")
                   OK <- FALSE
                 }
                 else if(zc > ncols)
                 {
-                  message("zcol too large,")
+                  message("ML:  zcol too large,")
                   OK <- FALSE
                 }
                 if(tc == zc)
                 {
-                  message("taucol equals zcol,")
+                  message("ML:  taucol equals zcol,")
                   OK <- FALSE
                 }
               }
@@ -389,26 +389,26 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
               {
                 tc <- 1
                 zc <- 2
-                message("tau from column 1, z from column 2.")
+                message("ML:  tau from column 1, z from column 2.")
               }
               else if(!is.null(tc))
               {
                 tc <- as.integer(tc)
                 if(tc < 1)
                 {
-                  message("taucol too small,")
+                  message("ML:  taucol too small,")
                   OK <- FALSE
                 }
                 else if(tc > ncols)
                 {
-                  message("taucol too big,")
+                  message("ML:  taucol too big,")
                   OK <- FALSE
                 }
                 else
                 {
                   zc <- tc+1
                   if(zc > ncols) { zc <- tc-1}
-                  message(paste(sep="","tau from column ",tc,", z from column ",zc,"."))
+                  message(paste(sep="","ML:  tau from column ",tc,", z from column ",zc,"."))
                 }
               }
               else
@@ -416,19 +416,19 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
                 zc <- as.integer(zc)
                 if(zc < 1)
                 {
-                  message("zcol too small,")
+                  message("ML:  zcol too small,")
                   OK <- FALSE
                 }
                 else if(zc > ncols)
                 {
-                  message("zcol too big,")
+                  message("ML:  zcol too big,")
                   OK <- FALSE
                 }
                 else
                 {
                   tc <- zc-1
                   if(tc < 1) { tc <- zc+1}
-                  message(paste(sep="","tau from column ",tc,", z from column ",zc,"."))
+                  message(paste(sep="","ML:  tau from column ",tc,", z from column ",zc,"."))
                 }
               }
               if(OK == TRUE)
@@ -444,7 +444,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
                   {
                     if(df[i+1,1] <= df[i,1])
                     {
-                      message(paste(sep="","tau[",i+1,"]<=tau[",i,"] : ",df[i+1,1],"<=",df[i,1]))
+                      message(paste(sep="","ML:  tau[",i+1,"]<=tau[",i,"] : ",df[i+1,1],"<=",df[i,1]))
                       OK <- FALSE
                     }
                     i <- i+1
@@ -464,41 +464,21 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
                     private$goodness <- NULL
                     private$likelyratio <- NULL
                   }
-                  else { message("tau and z were not set.") }
+                  else { message("ML:  tau and z were not set.") }
                 }
-                else
-                {
-                  message("fewer than 3 rows remain after cleaning data,")
-                  message("tau and z not set.")
-                }
+                else { message("ML:  fewer than 3 rows remain after cleaning data.  tau and z not set.") }
               }
-              else { message("tau and z were not set.") }
+              else { message("ML:  tau and z were not set.") }
             }
-            else
-            {
-              message("fewer than 3 rows in data frame,")
-              message("tau and z not set.")
-            }
+            else { message("ML:  fewer than 3 rows in data frame.  tau and z not set.") }
           }
-          else
-          {
-            message("fewer than 2 columns in data frame,")
-            message("tau and z not set.")
-          }
+          else { message("ML:  fewer than 2 columns in data frame.  tau and z not set.") }
         }
-        else
-        {
-          message("data must be in a data.frame,")
-          message("tau and z not set.")
-        }
+        else { message("ML:  data must be in a data.frame.  tau and z not set.") }
       }
       else
       {
-        if(!is.null(taucol) || !is.null(zcol))
-        {
-          message("no data frame,")
-          message("tau and z not set.")
-        }
+        if(!is.null(taucol) || !is.null(zcol)) { message("ML:  no data frame.  tau and z not set.") }
       }
       return(private$timeseries)
     },
@@ -528,7 +508,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
             else if(sca > tau[m]) { private$timeseries_info$tbeg <- tau[m] }
             else { private$timeseries_info$tbeg <- sca }
           }
-          else { message("beg not set.") }
+          else { message("ML:  beg not set.") }
         }
       }
       if(!is.null(tend))
@@ -544,32 +524,32 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
             else if(sca < private$timeseries_info$tbeg) {  private$timeseries_info$tend <- private$timeseries_info$tbeg }
             else { private$timeseries_info$tend <- sca }
           }
-          else { message("end not set.") }
+          else { message("ML:  end not set.") }
         }
       }
       if(!is.null(dataname))
       {
         chr <- private$extract_character(dataname)
         if(!is.null(chr)) { private$timeseries_info$dataname <- chr }
-        else { message("data name not set.") }
+        else { message("ML:  data name not set.") }
       }
       if(!is.null(timename))
       {
         chr <- private$extract_character(timename)
         if(!is.null(chr)) { private$timeseries_info$timename <- chr }
-        else { message("time name not set.") }
+        else { message("ML:  time name not set.") }
       }
       if(!is.null(statename))
       {
         chr <- private$extract_character(statename)
         if(!is.null(chr)) { private$timeseries_info$statename <- chr }
-        else { message("state name not set.") }
+        else { message("ML:  state name not set.") }
       }
       if(!is.null(estimation))
       {
         chr <- private$extract_character(estimation)
         if(!is.null(chr)) { private$timeseries_info$estimation <- chr }
-        else { message("estimation description not set.") }
+        else { message("ML:  estimation description not set.") }
       }
       return(private$timeseries_info)
     },
@@ -592,13 +572,13 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       {
         chr <- private$extract_character(fontfamily)
         if(!is.null(chr)) { private$plot_info$plotfont$family <- chr }
-        else { message("fontfamily not set.") }
+        else { message("ML:  fontfamily not set.") }
       }
       if(!is.null(fontsize))
       {
         sca <- private$extract_scalar(fontsize)
         if(!is.null(sca)) { private$plot_info$plotfont$size <- sca }
-        else { message("fontsize not set.") }
+        else { message("ML:  fontsize not set.") }
       }
       if(!is.null(fileformat))
       {
@@ -606,25 +586,21 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         if(!is.null(chr))
         {
           if(chr == "png" || chr == "svg") { private$plot_info$plotfile$format <- chr }
-          else
-          {
-            message("fileformat must be 'png' or 'svg'.")
-            message("fileformat not set.")
-          }
+          else { message("ML:  fileformat must be 'png' or 'svg'.  fileformat not set.") }
         }
-        else { message("fileformat not set.") }
+        else { message("ML:  fileformat not set.") }
       }
       if(!is.null(filewidth))
       {
         sca <- private$extract_scalar(filewidth)
         if(!is.null(sca)) { private$plot_info$plotfile$width <- sca }
-        else { message("filewidth not set.") }
+        else { message("ML:  filewidth not set.") }
       }
       if(!is.null(fileheight))
       {
         sca <- private$extract_scalar(fileheight)
         if(!is.null(sca)) { private$plot_info$plotfile$height <- sca }
-        else { message("fileheight not set.") }
+        else { message("ML:  fileheight not set.") }
       }
       if(!is.null(theme) || !is.null(opaque))
       {
@@ -634,13 +610,9 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           if(!is.null(chr))
           {
             if(chr == "light" || chr == "dark") { private$plot_info$plottheme$name <- chr }
-            else
-            {
-              message("theme not set.")
-              message("available themes are: 'light' and 'dark'.")
-            }
+            else { message("ML:  theme not set.  Available themes are: 'light' and 'dark'.") }
           }
-          else { message("theme not set.") }
+          else { message("ML:  theme not set.") }
         }
         if(!is.null(opaque))
         {
@@ -650,16 +622,16 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
             if(sca < 0.0)
             {
               sca = 0.0
-              message("opaque set to 0.0.")
+              message("ML:  opaque set to 0.0.")
             }
             else if(sca > 1.0)
             {
               sca = 1.0
-              message("opaque set to 1.0.")
+              message("ML:  opaque set to 1.0.")
             }
             private$plot_info$plottheme$opaque <- sca
           }
-          else { message("opaque not set.") }
+          else { message("ML:  opaque not set.") }
         }
         private$plot_colors <- private$rainbow(private$plot_info$plottheme$name,private$plot_info$plottheme$opaque)
       }
@@ -667,7 +639,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       {
         bool <- private$extract_boolean(labels)
         if(!is.null(bool)) { private$plot_info$plotlabels <- bool  }
-        else { message("labels not set.") }
+        else { message("ML:  labels not set.") }
       }
       return(private$plot_info)
     },
@@ -684,13 +656,13 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
       {
         bool <- private$extract_boolean(plotit)
         if(!is.null(bool)) { private$flags$plotit <- bool  }
-        else { message("plotit not set.") }
+        else { message("ML:  plotit not set.") }
       }
       if(!is.null(copyit))
       {
         bool <- private$extract_boolean(copyit)
         if(!is.null(bool)) { private$flags$copyit <- bool  }
-        else { message("copyit not set.") }
+        else { message("ML:  copyit not set.") }
       }
       return(private$flags)
     },

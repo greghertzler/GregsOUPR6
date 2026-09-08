@@ -138,9 +138,9 @@ console, the calculation functions may be in charge but in RShiny, the
 plot functions are in charge.
 
 In the diagrams below, P is a plot function and T is a flag set to true
-and F is the same flag set to false. By default, the flag is set to T. A
-set/get function manages the flag, as discussed below. There are two
-possibilities if the calculation functions are in charge.
+and F is the same flag set to false. By default, the flag is set to
+false. A set/get function manages the flag, as discussed below. There
+are two possibilities if the calculation functions are in charge.
 
      Calculations in mind:
 

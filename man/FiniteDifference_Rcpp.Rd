@@ -152,8 +152,8 @@ The return value:
 is a matrix with two row vectors for the option prices along the envelope
 and the corresponding times.  It is subset in R as:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{OOenv <- env[1,]
-tsenv <- env[2,]
+\if{html}{\out{<div class="sourceCode">}}\preformatted{OOhat <- env[1,]
+tshat <- env[2,]
 }\if{html}{\out{</div>}}
 
 The return value:
