@@ -25,7 +25,7 @@ if [ -n "$SITMO_HOME" ]; then
     echo "  sitmo found at: $SITMO_HOME"
     PKG_CPPFLAGS="$PKG_CPPFLAGS -DUSE_SITMO -I$SITMO_HOME/include"
 else
-    echo "  sitmo not found — building with standard RNG only."
+    echo "  sitmo not found — building without it."
     PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_SITMO"
 fi
 }
