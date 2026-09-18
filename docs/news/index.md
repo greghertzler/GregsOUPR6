@@ -1,6 +1,6 @@
 # Changelog
 
-## GregsOUPR6 1.4.5.0
+## Version 1.4.5.0
 
 ### Major changes
 
@@ -20,9 +20,9 @@
 - Add clipboard write to R6 objects.
 - Add functions to launch RShiny, tutorials and help and to read curated
   data from the console.
-- Conditionally compile optional packages RcppParallel and sitmo.
+- Conditionally compile optional packages.
 
-## GregsOUPR6 1.3.5.0
+## Version 1.3.5.0
 
 ### Public release
 

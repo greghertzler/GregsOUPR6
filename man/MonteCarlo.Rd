@@ -6,9 +6,8 @@
 \description{
 Monte Carlo simulations of Forward Paths, Bounded Paths, Backward Paths,
 Probabilities, Options and Passage Times.  Forward, Backward and Bounded Paths
-are simulated by a 4th order Runge-Kutta method and by using the stochastic
-integral equation.  Probabilities, Options and Passage Times are various ways
-of binning and counting the Paths.
+are simulated by the stochastic integral equation.  Probabilities, Options
+and Passage Times are various ways of binning and counting the Paths.
 }
 \section{Methods:}{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{y stochastic
@@ -82,7 +81,6 @@ path
   paths:  number of paths 1<paths<1,000,000
   skip:   subdivide time interval but report at times t 1<=skip<=50
   seed:   seed for random number generators -inf<seed<inf
-  method: 4 for 4th order Runge-Kutta, otherwise integral equation
 }\if{html}{\out{</div>}}
 }
 
@@ -117,8 +115,8 @@ The plot methods can be used to customize the plots, with a title, for example:
 }\if{html}{\out{</div>}}
 
 An attempt to plot 100,000 paths would choke the computer, so there are tricks.
-One is to select a hundred or so paths for the plot.  Another is to plot heat
-maps, just like in a weather report.
+One is to select a hundred or so paths for the plot.  Another is to summarise
+the paths as heat maps, just like in a weather report.
 
 Other functions and methods are called in the same way.  To see all the
 possibilities, check out the demos below.
@@ -139,12 +137,20 @@ Entering the demos by number in the list saves typing.
 Monte Carlo simulation of the Ornstein-Uhlenbeck Process can be done with
 either of two methods:  numerically integrating the stochastic differential
 equation, or calculating the stochastic integral equation.  The stochastic
-differential equation is shocked by a Wiener Process, simulated as
-sigma * dt^0.5 * epsilon, where sigma * dt^0.5 is the square root of the
-instantaneous variance and epsilon are draws from a standard normal
-density. The stochastic integral equation is shocked by the integral of
-the Wiener Process, or H * epsilon, where H is the square-root of the
-variance over a longer time interval.
+differential equation is shocked by Brownian Motion, also called a Wiener
+Process, simulated as sigma * dt^0.5 * epsilon, where sigma * dt^0.5 is
+the square root of the instantaneous variance and epsilon are draws from a
+standard normal density. The stochastic integral equation is shocked by the
+integral of the Wiener Process, or H * epsilon, where H is the square-root
+of the variance over a longer time interval.
+
+Drawing from a standard normal density is difficult and slow.  First uniform
+pseudo-random numbers are generated.  Then the uniform random numbers are
+transformed to normal.  If it is installed, the R6 object uses the dqrng
+package.  Otherwise it uses the c++ implementation std::mt19337.  The R
+function rnorm() is slow and not amenable to parallel processing.  It can
+be selected as an option in the Rcpp functions, along with the package sitmo,
+if it is installed.
 
 Numerically integrating the stochastic differential equation uses the Euler,
 Marayuma or Runge-Kutta schemes. The Euler and Marayuma schemes are first
@@ -154,23 +160,22 @@ scheme.
 The fourth-order Runge-Kutta scheme is standard practice.  In tests, shocked
 by the same draws from a standard normal density, the paths from the stochastic
 integral equation and the fourth-order Runge-Kutta scheme were the same to
-within five or six significant digits. To compare the fourth-order Runge-
-Kutta scheme with the integral equation:
+within four or five significant digits.  For the same level of accuracy, the
+stochastic integral equation calculates about 10 times faster.  For this reason,
+only the stochastic integral equation is available in the R6 object.  The
+fourth-order Runge-Kutta scheme is an option in the Rcpp functions.
+
+To simulate forward paths:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  MC <- MonteCarlo$new()
-  rk <- MC$ForwardPaths(paths=100000,skip=10,method=4)[[1]]
-  ie <- MC$ForwardPaths(method=1)[[1]]
-  dif <- rk-ie
-  max(dif)
-  min(dif)
-  sum(dif)
+  MC$ForwardPaths(paths=100000)
 }\if{html}{\out{</div>}}
 
 A Forward Path starts from the backward state at the backward time and goes
 forward. A single path, sampled from all possible paths, is a Sample Path.
 Just like the flea trying to understand the elephant, a sample Path is enough
-for Maximum Likelihood Estimation of the Ornstein-Uhlenbeck Process. An
-ensemble of paths can be counted to approximate Transition Densities and
+for Maximum Likelihood Estimation to reveal the Ornstein-Uhlenbeck Process.
+An ensemble of paths can be counted to approximate Transition Densities and
 Probabilities and Visiting Time Densities and Probabilities. The larger the
 ensemble, the better the approximations.
 
@@ -179,7 +184,7 @@ to count. Instead, Forward Paths are treated as discrete and put into bins.
 Counting the number of Forward Paths in each bin and dividing by the total
 number of paths approximates Transition Densities. Summing the Transition
 Densities approximates Transition Probabilities. Summing again approximates
-Double Integrals.  Double Integrals are a curiosity. If time runs backwards,
+Double Integrals.  Double Integrals are a curiosity, but if time runs backwards,
 they become Options.
 
 A Forward Path begins from a known state and travels forward into an uncertain
@@ -188,7 +193,9 @@ uncertain past. Turning around and travelling back to the future resolves the
 uncertainty over time. An example is a Bayesian analysis which begins with a
 Diffuse Prior and ends with certainty. Another example is an Option. Simulating
 and counting Backward Paths approximates Prior Densities, Prior Probabilities
-and Options.  To compare Monte Carlo and Analytical Options:
+and Options.
+
+To compare Monte Carlo and Analytical Options:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
   A <- OUP$get_Analytical()
@@ -203,11 +210,11 @@ and Options.  To compare Monte Carlo and Analytical Options:
   sum(dif)
 }\if{html}{\out{</div>}}
 
-If we count at right angles--in the time direction instead of the state
-direction--Forward Paths become Visiting Time Densities and Probabilities.
+If we count in the time direction instead of the state direction,
+Forward Paths become Visiting Time Densities and Probabilities.
 Bounded Paths become First Passage Time Densities and Probabilities.
-Monte Carlo and Analytical Visiting and First Passage Times can also be
-compared:
+
+To compare  Monte Carlo and Analytical Visiting Times:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  OUP <- OUProcess$new()
   A <- OUP$get_Analytical()
@@ -220,14 +227,14 @@ compared:
   sum(dif)
 }\if{html}{\out{</div>}}
 
-Of course, the question is, 'Why bother?' We have Analytical formulas to do
-the counting.  One reason is to explain the formulas.  First Passage Times
-make more sense if you plot Bounded Paths and count the number of paths that
-have crossed the threshold.  Even in prestigious journal articles, the first
-and, possibly, only plot will be a Monte Carlo simulation.
+Of course, the question is, 'Why bother?' Analytical formulas to do the
+counting much faster and more accurately.  One reason is to explain the
+formulas.  First Passage Times make start to make sense if you plot Bounded
+Paths and count the number of paths that have crossed the threshold.  Even
+in journal articles, the first  plot will be a Monte Carlo simulation.
 
-Another reason is to validate the formulas.  Although an Analytical formula
-may calculate a thousand times faster than a Monte Carlo simulation, arriving
+Another reason is to validate the formulas.  Although an Analytical formulay
+will calculate thousands of times faster than a Monte Carlo simulation, arriving
 at approximately the same answer both ways is reassuring.
 }
 
@@ -452,7 +459,7 @@ at approximately the same answer both ways is reassuring.
   Set path arguments
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{MonteCarlo$set_path_args(paths = NULL, skip = NULL, seed = NULL, method = NULL)}
+    \preformatted{MonteCarlo$set_path_args(paths = NULL, skip = NULL, seed = NULL)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -461,12 +468,11 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time intervals but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
     }
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    list(paths,skip,seed,method)
+    list(paths,skip,seed)
   }
 }
 
@@ -683,7 +689,7 @@ at approximately the same answer both ways is reassuring.
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    list(paths,skip,seed,method)
+    list(paths,skip,seed)
   }
 }
 
@@ -890,7 +896,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -906,7 +911,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -932,7 +936,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -948,7 +951,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -975,7 +977,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -992,7 +993,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1017,7 +1017,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1032,7 +1031,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1057,7 +1055,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1072,7 +1069,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1099,7 +1095,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1116,7 +1111,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1144,7 +1138,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1162,7 +1155,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1190,7 +1182,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1208,7 +1199,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1237,7 +1227,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1256,7 +1245,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1283,7 +1271,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1300,7 +1287,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1328,7 +1314,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1346,7 +1331,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1373,7 +1357,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1390,7 +1373,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1417,7 +1399,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1434,7 +1415,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1461,7 +1441,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1478,7 +1457,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1506,7 +1484,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1524,7 +1501,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1551,7 +1527,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1568,7 +1543,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}
@@ -1595,7 +1569,6 @@ at approximately the same answer both ways is reassuring.
   paths = NULL,
   skip = NULL,
   seed = NULL,
-  method = NULL,
   who = NULL
 )}
     \if{html}{\out{</div>}}
@@ -1612,7 +1585,6 @@ at approximately the same answer both ways is reassuring.
       \item{\code{paths}}{number of paths 1<paths<1,000,000}
       \item{\code{skip}}{subdivide time interval but report at times t 1<=skip<=50}
       \item{\code{seed}}{seed for random number generators -inf<seed<inf}
-      \item{\code{method}}{4 for 4th order Runge-Kutta, otherwise integral equation}
       \item{\code{who}}{object id of caller}
     }
     \if{html}{\out{</div>}}

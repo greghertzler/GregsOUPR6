@@ -250,10 +250,6 @@ and outputs can be stale. Another advantage of the R6 object is
 predefined plots with Plotly. The same simulation can plotted different
 ways without recalculation.
 
-The overhead of setting up RcppParallel means that small problems will
-calculate more slowly. But small problems calculate in microseconds,
-anyway.
-
 Sequential calculations are reproducible, but parallel calculations are
 not. Two runs of the same problem will agree to about 12 significant
 digits, but disagree thereafter. For exact arithmetic, order doesn't
@@ -286,15 +282,16 @@ times for the data set with 19,312 observations:
 These times are longer than previous measurements. Maybe next time they
 will be shorter. But a curious thing happens. More threads can be slower
 than fewer threads. Monitoring the CPU reveals that all 12 threads are
-used in all estimations. It appears that 'threads' actually means
-'working groups' which Intel's Threading Building Blocks (TBB) uses to
-organize the calculations. nmstart is a sequential algorithm which takes
-more time with more threads. The Nelder-Mead algorithm takes more time
-with more threads but the log likelihood function takes less time with
-more threads. The sweet spot is somewhere in the middle.
+used in all estimations. It appears that 'threads' means something else
+that Intel's Threading Building Blocks (TBB) uses to organize the
+calculations. The column for nmstart takes more time if it uses more
+threads. The Nelder-Mead algorithm also takes more time with more
+threads but the log likelihood function takes less time with more
+threads. The sweet spot is somewhere in the middle.
 
 Estimation could be tweaked by using the RcppParallel commands:
 
+     library(RcppParallel)
      defaultNumThreads()
      setThreadOptions(numThreads=6)
 

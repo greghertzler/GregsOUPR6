@@ -110,6 +110,12 @@
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_ObservationInterval.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_SampleSize.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_SmoothedData.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCBackwardPathIntegralEquation.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCBackwardPathRungeKutta.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCBoundedPathIntegralEquation.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCBoundedPathRungeKutta.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCForwardPathIntegralEquation.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCForwardPathRungeKutta.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/Resources/index.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/SP_ProcessesID.html</loc></url>
 </urlset>

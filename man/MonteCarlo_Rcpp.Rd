@@ -4,12 +4,9 @@
 \alias{MonteCarlo_Rcpp}
 \alias{RcppOUPMCMinMax}
 \alias{RcppOUPMCStandardNormal}
-\alias{RcppOUPMCForwardPathRungeKutta}
-\alias{RcppOUPMCBackwardPathRungeKutta}
-\alias{RcppOUPMCBoundedPathRungeKutta}
-\alias{RcppOUPMCForwardPathIntegralEquation}
-\alias{RcppOUPMCBackwardPathIntegralEquation}
-\alias{RcppOUPMCBoundedPathIntegralEquation}
+\alias{RcppOUPMCForwardPaths}
+\alias{RcppOUPMCBackwardPaths}
+\alias{RcppOUPMCBoundedPaths}
 \alias{RcppOUPMCForwardCountY}
 \alias{RcppOUPMCBackwardCountX}
 \alias{RcppOUPMCForwardCountT}
@@ -21,17 +18,11 @@ RcppOUPMCMinMax(matPaths)
 
 RcppOUPMCStandardNormal(m,skip,paths,seed)
 
-RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma)
+RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,method)
 
-RcppOUPMCBackwardPathRungeKutta(stdnorm,y,m,skip,ds,rho,mu,sigma)
+RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,method)
 
-RcppOUPMCBoundedPathRungeKutta(stdnorm,k,x,m,skip,dt,rho,mu,sigma)
-
-RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma)
-
-RcppOUPMCBackwardPathIntegralEquation(stdnorm,y,m,skip,ds,rho,mu,sigma)
-
-RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma)
+RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
 
 RcppOUPMCForwardCountY(forward,y,psi)
 
@@ -54,6 +45,8 @@ RcppOUPMCHeatCountZ(matPaths,z)
 
 \item{seed}{seed for reproducibility}
 
+\item{engine}{random number generator}
+
 \item{stdnorm}{matrix of standard normal shocks}
 
 \item{x}{initial state or vector of backward states}
@@ -65,6 +58,8 @@ RcppOUPMCHeatCountZ(matPaths,z)
 \item{mu}{location parameter -inf<mu<inf}
 
 \item{sigma}{scale parameter -inf<sigma<inf}
+
+\item{method}{4 for 4th order Runge-Kutta, 5 for integral equation}
 
 \item{y}{terminal state or vector of forward states}
 
@@ -93,17 +88,11 @@ minmax(2) <- RcppOUPMCMinMax()
 
 stdnorm((m-1)*skip,paths) <- RcppOUPMCStandardNormal()
 
-forward(m,paths) <- RcppOUPMCForwardPathRungeKutta()
+forward(m,paths) <- RcppOUPMCForwardPaths()
 
-backward(m,paths) <- RcppOUPMCBackwardPathRungeKutta()
+backward(m,paths) <- RcppOUPMCBackwardPaths()
 
-bndfpt(m+1,paths) <- RcppOUPMCBoundedPathRungeKutta()
-
-forward(m,paths) <- RcppOUPMCForwardPathIntegralEquation()
-
-backward(m,paths) <- RcppOUPMCBackwardPathIntegralEquation()
-
-bndfpt(m+1,paths) <- RcppOUPMCBoundedPathIntegralEquation()
+bndfpt(m+1,paths) <- RcppOUPMCBoundedPaths()
 
 mvdpd(m,3*n+2) <- RcppOUPMCForwardCountY()
 
@@ -221,121 +210,151 @@ probabilities <- pctdp[,5,drop=FALSE]
 A single-threaded R6 object is fast enough for many calculations, but not
 for Monte-Carlo simulations.  Attempts at parallel processing using parApply()
 and future_apply() failed.  The whole R6 object is copied to each thread,
-which locks up the computer.  Rccp is often hundreds of times faster and makes
+which locks up the computer.  Rccp can be hundreds of times faster and makes
 Monte-Carlo simulations practical for interactive applications such as RStudio
 and RShiny. RcppParallel speeds the calculations another five to eight times.
 
-For the simulations, both a 4th order Runge-Kutta method and the stochastic
-integral equation are implemented.  With argument skip set to 10, and the
-same seed in the random number generators, they give the same paths to about six
-significant digits, but the stochastic integral equation calculates faster.
+For Monte Carlo simulations, the stochastic integral equation is shocked by
+Brownian Motion.  Brownian Motion is a time transform of standard normal variables.
+The results are forward, backward and bounded paths.
 
-A typical simulation might require 100,000,000 standard normal variables.  On
-an i7 processor with 12 threads running at a maximum speed of 4.5 GHz,
-microbenchmark median times to generate the standard normal variables are:
+Forward, backward and bounded paths are binned and counted to approximate
+several solutions. The approximations converge to analytical solutions as the
+number of paths increases.  Binning and counting 1,000,000 paths will be
+accurate to 3 or 4 significant digits.  Here are microbenchmark median times
+for 100,000 and 1,000,000 paths over 100 time intervals, as calculated by
+R6+RccpParallel:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds             R6       R6+           R6+
-          function  single-thread      Rcpp  RcppParallel
----------------------------------------------------------
-    StandardNormal       5779.756  4002.566       660.010
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds     paths                paths
+          function   100,000            1,000,000
+------------------------------------------------------------
+    StandardNormal   21.6702             218.0919
+      ForwardPaths   19.6883  ________   189.7758  _________
+          Subtotal             41.4642              407.8677
+       Probability   54.8138  ________   965.1143  _________
+             Total             96.2780             1372.9820
 }\if{html}{\out{</div>}}
 
-R6 single-thread and R6+Rcpp use rnorm(), the standard random number
-generator in R.  The R6+RcppParallel uses sitmo::prng_engine with a Box-Muller
-transform for uniform to normal random variables.  R6+Rcpp is 1.4 times
-faster than R6 single-thread.  R6+RcppParallel is 6.1 times faster than
-R6+Rcpp and 8.8 times faster than R6 single-thread.
+The R6 object is reactive and will call the StandardNormal function only once.
+After that the standard normal variables will be passed to ForwardPaths and
+the forward paths will be passed to Probability.  To calculate a median time,
+the R6 object is tricked into recalculating by changing an input, calculating,
+changing the input back to the original, and calculating the original again.
+Do this 11 times and record the sixth fastest time as the median.  Times for
+ForwardPaths, the Subtotal and the Total are calculating by trickery. Times
+for StandardNormal and Probability are inferred by subtraction.
 
-Once the standard normal variables are calculated, microbenchmark median
-times to simulate the 4th order Runge-Kutta and stochastic integral
-equation for 100,000 paths over 100 time intervals with skip=10 are:
+Times for StandardNormal and ForwardPaths go up approximately ten-fold with
+a ten-fold increase in paths.  Times for Probability go up almost 18-fold
+with a ten-fold increase in paths.
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds                      R6       R6+           R6+
-                   function  single-thread      Rcpp  RcppParallel
-------------------------------------------------------------------
-      ForwardPathRungeKutta      207798.80  2688.932       242.135
-ForwardPathIntegralEquation       51298.03   416.793        47.316
-}\if{html}{\out{</div>}}
+The function Probability calls the Rcpp function ForwardCountY which bins and
+counts means, variances, transition densities, transition probabilities and
+double integrals.  So five sets of plots can be drawn from one simulation
+followed by a count. For comparison, a 3D plot by Plotly can take up to a
+second on an RTX 2070 GPU.  So calculations are only part of the job.
 
-The stochastic integral equation calculates from 4.1 to 6.5 times faster than
-the 4th order Runge-Kutta method.  R6+Rcpp calculates from 77.3 to 123.1 times
-faster than R6 single-thread.  R6+RcppParallel calculates from 8.8 to 11.1
-times faster than R6+Rcpp and from 858.2 to 1084.2 times faster than R6
-single-thread.
-
-The skip parameter can increase the accuracy of the Runge-Kutta method and
-enable a better count of First Passage Times.  The stochastic integral
-equation is not improved by skip=10 and is penalized in the timings above.
-
-Forward, backward and bounded paths can be binned and counted to approximate
-solutions. The approximations converge to analytical solutions as the number
-of paths increases.  Binning and counting 1,000,000 paths will be accurate to
-3 or 4 significant digits.  Here are microbenchmark median times for the
-stochastic integral equation over 100,000 and 1,000,000 paths for 100 time
-intervals with skip=1, as calculated by R6+RccpParallel:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds              paths                paths
-                   function   100,000            1,000,000
----------------------------------------------------------------------
-             StandardNormal   57.2060             588.7932
-ForwardPathIntegralEquation   18.9317  ________   187.9792  _________
-                   subtotal             76.1377              776.7524
-              ForwardCountY   70.0579  ________   906.2226  _________
-                      total            146.1956             1682.9750
-}\if{html}{\out{</div>}}
-
-Times go up approximately linearly with the number of paths.  Looking at the
-subtotals for simulating from a standing start, 100,000 paths will take
-0.076 seconds and 1,000,000 paths will take 0.777 seconds.  Looking at the
-totals for counting from a standing start, 100,000 paths will take 0.146
-seconds and 1,000,000 paths will take 1.683 seconds.  About a third of that
-time is spent generating the standard normal variables, which can be reused.
-Subsequent simulations will only take 0.019 and 0.188 seconds.  Forward Paths
-are not reused and subsequent simulations plus counting will take 0.089 and
-1.094 seconds.
-
-The function ForwardCountY bins and counts means, variances, transition densities,
-transition probabilities and double integrals.  So five sets of plots can be
-drawn from one set of calculations. For comparison, a 3D plot by Plotly will
-take up to a second on an RTX 2070 GPU.  So calculations are only a part of
-the job.
-
-Rcpp versions of the functions were coded first.  All but one function were
-translated into RcppParallel versions.  RccpParallel uses Intel's Threading
+The R6 object manages inputs and outputs and draws plots.  All calculations
+are in Rcpp and RcppParallel functions.  RccpParallel uses Intel's Threading
 Building Blocks (TBB) on the CPU.  Unlike parallel processing on a GPU or
 accelerator, memory isn't copied and there is less overhead.  On trivially
 small problems, sequential versions calculate faster.  On large problems,
 parallel versions calculate much faster.
 
-RcppParallel and sitmo are optional packages.  If installed, they will be
-used.  Function RcppParallelInstalled() will enquire whether calculations
-will use RcppParallel or fall back to Rcpp only.  Function RcppsitmoInstalled()
-will enquire whether random numbers will be generated by RcppPrallel with
-sitmo() or fall back to Rcpp with rnorm().
+RcppParallel is an optional package.  If it is installed, it will be used.
+Function RcppParallelInstalled() will enquire whether code is compiled with
+RcppParallel or has fallen back to Rcpp.  Optional packages for random number
+generation are dqrng and sitmo.  The functions RcppdqrngInstalled() and
+RcppsitmoInstalled() will enquire whether they are installed.
 }
 
 \section{From the Console}{
-These functions are available in R, the RStudio console and RShiny apps.
-For example, a simulation of 1,000,000 forward paths over 100 time intervals
-with skip=1 would be:
+Rcpp and RcppParallel functions are available in R, the RStudio console and
+RShiny apps.  From the console, a simulation of 1,000,000 forward paths
+over 100 time intervals would be:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ stdnorm <- RcppOUPMCStandardNormal(101,1,1000000,9999)
- fwd <- RcppOUPMCForwardPathIntegralEquation(stdnorm,15,100,1,0.1,0.5,-15,15)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ stdnorm <- RcppOUPMCStandardNormal(101,1,1000000,9999,1)
+ fwd <- RcppOUPMCForwardPaths(stdnorm,15,101,1,0.1,0.5,-15,15,5)
 }\if{html}{\out{</div>}}
 
-A microbenchmark comparison of indirectly calling the RcppParallel functions
+The R6 object doesn't give users a choice, but from the console there are four
+random number generators available: dqrng, std::mt19937, sitmo, and rnorm.
+In the last argument of the function, these are requested as engine
+1, 2, 3 or 4, respectively.  Microbenchmark median times for 100,000,000
+standard normal variables are:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds
+          language           rng    transform  StandardNormal
+-------------------------------------------------------------
+              Rcpp         rnorm    inversion       4145.0140
+              Rcpp   sitmo::prng   Box-Muller       3937.8950
+              Rcpp  std::mt19937   Box-Muller       3231.4860
+              Rcpp  dqrng::pcg64     Ziggurat        727.3865
+      RcppParallel   sitmo::prng   Box-Muller        585.1609
+      RcppParallel  std::mt19937   Box-Muller        547.9659
+      RcppParallel  dqrng::pcg64     Ziggurat        247.1802
+}\if{html}{\out{</div>}}
+
+The random number generators generate uniform random variables.  More time is
+spent transforming uniform to normal random variables.  The method of transform
+is also listed.  These include inverting the normal probability, the Polar
+Box-Muller transform and the Ziggurat transform.  The Ziggurat transform is
+a sophisticated lookup table and much faster.  Results on your computer may
+vary. On Unix-alike operating systems, the Polar Box-Muller transform has been
+replaced with the Ziggurat transform.
+
+Both dqrng and sitmo have other random number generators, but dqrng::pcg64 and
+sitmo::prng are the defaults.  Both packages are optional.  If dqrng is not
+installed, the fall back is std::mt19937, which is always available.  Therefore,
+sitmo::prng and rnorm will only used if requested as engines 3 and 4.  If
+sitmo::prng is requested but not installed the fallback is rnorm.
+
+Another choice available from the console is the method of simulation, either
+a 4th-order Runge-Kutta numerical integration or the stochastic integral
+equation, itself.  The last argument of the function is the method, with 4
+for 4th-order Runge-Kutta and 5 for stochastic integral equation.  Arguments
+1, 2 and 3 are reserved for possible future implementations of 1st-order
+Euler and 2nd and 3rd order Maryuma methods.  But this could be dangerous.
+Users might use them.  The purpose would be to demonstrate that low-order
+numerical methods only converge with short time intervals.
+
+In the function, the skip argument divides the time intervals.  For example,
+if the number of times is 101, there are 100 time intervals.  Argument
+skip=10 subdivides 100 into 1000 time intervals for the calculations and
+reports results at the 101 times.
+
+Here are microbenchmark times for 1,000,000 paths over 100 time intervals with
+increasing skips.  Also shown are the maximum and minimum differences.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds   Standard   Integral     Runge-
+              skip     Normal   Equation      Kutta  max dif  min dif
+---------------------------------------------------------------------
+                 1   208.6749   190.2418   360.3870  8.4e-03  -8.9e-03
+                 2   431.8739   214.1760   608.2229  2.1e-03  -2.1e-03
+                 4   978.7199   295.2814  1120.7290  5.3e-04  -5.3e-04
+                 8  2132.0220   424.4842  2086.3920  1.3e-04  -1.3e-04
+}\if{html}{\out{</div>}}
+
+Even larger skips will calculate, but microbenchmark becomes pac man and
+starts chomping memory.  For skip=8, the paths are the same to within four
+significant digits.  But the Runge-Kutta method is much slower.  The times
+for the standard normal variables and the Runge-Kutta simulation takes
+4.2 seconds.  The integral equation is not improved by larger skips.  For
+skip=1, the integral equation does the job in 0.4 seconds.
+
+A microbenchmark comparison of indirectly calling RcppParallel functions
 from R6 with directly calling them from the console is:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds                     R6+        Console
-                    function   RcppParallel  RcppParallel
----------------------------------------------------------
- ForwardPathIntegralEquation       807.2069      837.4392
-BackwardPathIntegralEquation       807.4201      837.8897
- BoundedPathIntegralEquation      1200.3780      834.9122
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds            R6+       Console
+          function   RcppParallel  RcppParallel
+-----------------------------------------------
+      ForwardPaths       540.7106      587.6297
+     BackwardPaths       543.9790      584.8225
+      BoundedPaths       845.6546      579.5391
 }\if{html}{\out{</div>}}
 
-These timings are from a standing start, generating the random variables before
-simulating the paths.  For Forward and Backward Paths, the R6 object is faster,
+These timings are from a standing start, generating the standard normal variables
+before simulating the paths.  For Forward and Backward Paths, the R6 object is faster,
 but for Bounded Paths, it is much slower.  Bounded Paths hit the boundary and have
 NA values thereafter.  We might speculate that R6 is slow with NA values.
 
@@ -344,11 +363,11 @@ coordinated across functions.  Enter an input once and calculate several outputs
 The R6 object is reactive.  In other words, it stores the inputs and outputs and
 maps inputs to outputs.  If an input changes, dependent outputs are nullified and
 will be recalculated, as requested, but nothing is calculated twice.  The console
-stores outputs in the global environment, but there is no map to inputs and they
-can be stale.  Another advantage of the  R6 object is predefined plots with Plotly.
-The same simulation can plotted different ways without recalculation.
+stores outputs in the global environment, but there is no map of inputs to outputs
+and outputs can be stale.  Another advantage of the R6 object are pre-programmed plots
+with Plotly.  The same simulation can be plotted different ways without recalculation.
 
-The parallel code has more overhead and is slower on small problems. Here
+Parallel processing has more overhead and is slower on small problems. Here
 are microbenchmark median times for simulating a small number of Forward Paths
 by calling the Rcpp and RcppParallel functions from the console:
 
@@ -361,39 +380,35 @@ by calling the Rcpp and RcppParallel functions from the console:
 
 For 100 paths, the Rcpp sequential function takes less time, but for 1,000 paths
 it takes over twice as long.  Most simulations will have more than 1,000 paths.
-So users get no choice.  By default, RcppParallel functions are compiled if
-RcppParallel is installed. Otherwise compilation falls back to Rcpp.
+So users get no choice.  RcppParallel functions are compiled if RcppParallel
+is installed. Otherwise compilation falls back to Rcpp.
 
-Monte Carlo simulations are memory and CPU intensive.  Here are microbenchmark
-median times by number of threads for generating standard normal variables
-and simulating 1,000,000 Forward Paths over 100 time intervals using the
-stochastic integral equation with parameter skip=1:
+More threads may be faster but also have more overhead.  Here are microbenchmark
+median times by number of threads for generating standard normal variables and
+simulating 1,000,000 Forward Paths over 100 time intervals:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds
-           threads    stdnorm  ForwardPath      total
+           threads   stdnorm  ForwardPaths      total
 -----------------------------------------------------
-                 1  5461.3963     667.0016  6129.3979
-                 2  2843.4390     438.4120  3281.8510
-                 3  2877.2132     437.0354  3314.2486
-                 4  1525.4355     326.4385  1851.8740
-                 5  1281.7121     301.5675  1583.2796
-                 6  1280.7483     301.8346  1582.5829
-                 7  1121.1044     293.7598  1414.8642
-                 8  1038.6441     306.8126  1345.4567
-                 9  1070.7125     259.2108  1329.9233 
-                10   847.3448     283.3598  1130.7046
-                11   850.3528     282.3086  1132.6614
-                12   805.8151     284.3971  1090.2122
+                 1	742.8735	    497.8163	1240.6898
+                 2	422.2265	    307.3954	 729.6219
+                 3	396.3184	    307.5473	 703.8657
+                 4	257.9281	    214.4442	 472.3723
+                 5	260.6473	    197.7865	 458.4338
+                 6	248.4076	    197.5342	 445.9418
+                 7	246.5812	    191.5214	 438.1026
+                 8	231.4124	    191.8745	 423.2869
+                 9	232.0408	    194.9968	 427.0376
+                10	235.8238	    191.1864	 427.0102
+                11	216.9428	    192.1811	 409.1239
+                12	211.6724	    191.6413	 403.3137
 }\if{html}{\out{</div>}}
 
-These times are longer than previous times.  My computer seems tired today.
-But the changes in times by thread number are instructive.  Generating the
-standard normal variables would benefit from more threads.  Simulating the
-Forward Paths only needs six or eight threads.  Once you have generated the
-random variables, you could get by with fewer threads using the RcppParallel
-commands:
+More is better, but a few is pretty good.  You could set fewer threads using
+the RcppParallel commands:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ defaultNumThreads()
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ library(RcppParallel)
+ defaultNumThreads()
  setThreadOptions(numThreads=8)
 }\if{html}{\out{</div>}}
 

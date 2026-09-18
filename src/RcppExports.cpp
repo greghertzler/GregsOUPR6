@@ -609,8 +609,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // RcppOUPMCStandardNormal
-NumericMatrix RcppOUPMCStandardNormal(int64_t m, int64_t skip, int64_t paths, uint64_t seed);
-RcppExport SEXP _GregsOUPR6_RcppOUPMCStandardNormal(SEXP mSEXP, SEXP skipSEXP, SEXP pathsSEXP, SEXP seedSEXP) {
+Rcpp::NumericMatrix RcppOUPMCStandardNormal(int64_t m, int64_t skip, int64_t paths, uint64_t seed, uint64_t engine);
+RcppExport SEXP _GregsOUPR6_RcppOUPMCStandardNormal(SEXP mSEXP, SEXP skipSEXP, SEXP pathsSEXP, SEXP seedSEXP, SEXP engineSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -618,13 +618,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int64_t >::type skip(skipSEXP);
     Rcpp::traits::input_parameter< int64_t >::type paths(pathsSEXP);
     Rcpp::traits::input_parameter< uint64_t >::type seed(seedSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMCStandardNormal(m, skip, paths, seed));
+    Rcpp::traits::input_parameter< uint64_t >::type engine(engineSEXP);
+    rcpp_result_gen = Rcpp::wrap(RcppOUPMCStandardNormal(m, skip, paths, seed, engine));
     return rcpp_result_gen;
 END_RCPP
 }
-// RcppOUPMCForwardPathRungeKutta
-NumericMatrix RcppOUPMCForwardPathRungeKutta(NumericMatrix stdnorm, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma);
-RcppExport SEXP _GregsOUPR6_RcppOUPMCForwardPathRungeKutta(SEXP stdnormSEXP, SEXP xSEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dtSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
+// RcppOUPMCForwardPaths
+NumericMatrix RcppOUPMCForwardPaths(NumericMatrix stdnorm, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma, std::size_t method);
+RcppExport SEXP _GregsOUPR6_RcppOUPMCForwardPaths(SEXP stdnormSEXP, SEXP xSEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dtSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -636,13 +637,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
     Rcpp::traits::input_parameter< double >::type mu(muSEXP);
     Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMCForwardPathRungeKutta(stdnorm, x, m, skip, dt, rho, mu, sigma));
+    Rcpp::traits::input_parameter< std::size_t >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(RcppOUPMCForwardPaths(stdnorm, x, m, skip, dt, rho, mu, sigma, method));
     return rcpp_result_gen;
 END_RCPP
 }
-// RcppOUPMCBackwardPathRungeKutta
-NumericMatrix RcppOUPMCBackwardPathRungeKutta(NumericMatrix stdnorm, double y, std::size_t m, std::size_t skip, double ds, double rho, double mu, double sigma);
-RcppExport SEXP _GregsOUPR6_RcppOUPMCBackwardPathRungeKutta(SEXP stdnormSEXP, SEXP ySEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dsSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
+// RcppOUPMCBackwardPaths
+NumericMatrix RcppOUPMCBackwardPaths(NumericMatrix stdnorm, double y, std::size_t m, std::size_t skip, double ds, double rho, double mu, double sigma, std::size_t method);
+RcppExport SEXP _GregsOUPR6_RcppOUPMCBackwardPaths(SEXP stdnormSEXP, SEXP ySEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dsSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -654,13 +656,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
     Rcpp::traits::input_parameter< double >::type mu(muSEXP);
     Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMCBackwardPathRungeKutta(stdnorm, y, m, skip, ds, rho, mu, sigma));
+    Rcpp::traits::input_parameter< std::size_t >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(RcppOUPMCBackwardPaths(stdnorm, y, m, skip, ds, rho, mu, sigma, method));
     return rcpp_result_gen;
 END_RCPP
 }
-// RcppOUPMCBoundedPathRungeKutta
-NumericMatrix RcppOUPMCBoundedPathRungeKutta(NumericMatrix stdnorm, double k, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma);
-RcppExport SEXP _GregsOUPR6_RcppOUPMCBoundedPathRungeKutta(SEXP stdnormSEXP, SEXP kSEXP, SEXP xSEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dtSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
+// RcppOUPMCBoundedPaths
+NumericMatrix RcppOUPMCBoundedPaths(NumericMatrix stdnorm, double k, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma, std::size_t method);
+RcppExport SEXP _GregsOUPR6_RcppOUPMCBoundedPaths(SEXP stdnormSEXP, SEXP kSEXP, SEXP xSEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dtSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -673,62 +676,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
     Rcpp::traits::input_parameter< double >::type mu(muSEXP);
     Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMCBoundedPathRungeKutta(stdnorm, k, x, m, skip, dt, rho, mu, sigma));
-    return rcpp_result_gen;
-END_RCPP
-}
-// RcppOUPMCForwardPathIntegralEquation
-NumericMatrix RcppOUPMCForwardPathIntegralEquation(NumericMatrix stdnorm, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma);
-RcppExport SEXP _GregsOUPR6_RcppOUPMCForwardPathIntegralEquation(SEXP stdnormSEXP, SEXP xSEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dtSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type stdnorm(stdnormSEXP);
-    Rcpp::traits::input_parameter< double >::type x(xSEXP);
-    Rcpp::traits::input_parameter< std::size_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< std::size_t >::type skip(skipSEXP);
-    Rcpp::traits::input_parameter< double >::type dt(dtSEXP);
-    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< double >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMCForwardPathIntegralEquation(stdnorm, x, m, skip, dt, rho, mu, sigma));
-    return rcpp_result_gen;
-END_RCPP
-}
-// RcppOUPMCBackwardPathIntegralEquation
-NumericMatrix RcppOUPMCBackwardPathIntegralEquation(NumericMatrix stdnorm, double y, std::size_t m, std::size_t skip, double ds, double rho, double mu, double sigma);
-RcppExport SEXP _GregsOUPR6_RcppOUPMCBackwardPathIntegralEquation(SEXP stdnormSEXP, SEXP ySEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dsSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type stdnorm(stdnormSEXP);
-    Rcpp::traits::input_parameter< double >::type y(ySEXP);
-    Rcpp::traits::input_parameter< std::size_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< std::size_t >::type skip(skipSEXP);
-    Rcpp::traits::input_parameter< double >::type ds(dsSEXP);
-    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< double >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMCBackwardPathIntegralEquation(stdnorm, y, m, skip, ds, rho, mu, sigma));
-    return rcpp_result_gen;
-END_RCPP
-}
-// RcppOUPMCBoundedPathIntegralEquation
-NumericMatrix RcppOUPMCBoundedPathIntegralEquation(NumericMatrix stdnorm, double k, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma);
-RcppExport SEXP _GregsOUPR6_RcppOUPMCBoundedPathIntegralEquation(SEXP stdnormSEXP, SEXP kSEXP, SEXP xSEXP, SEXP mSEXP, SEXP skipSEXP, SEXP dtSEXP, SEXP rhoSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type stdnorm(stdnormSEXP);
-    Rcpp::traits::input_parameter< double >::type k(kSEXP);
-    Rcpp::traits::input_parameter< double >::type x(xSEXP);
-    Rcpp::traits::input_parameter< std::size_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< std::size_t >::type skip(skipSEXP);
-    Rcpp::traits::input_parameter< double >::type dt(dtSEXP);
-    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
-    Rcpp::traits::input_parameter< double >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMCBoundedPathIntegralEquation(stdnorm, k, x, m, skip, dt, rho, mu, sigma));
+    Rcpp::traits::input_parameter< std::size_t >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(RcppOUPMCBoundedPaths(stdnorm, k, x, m, skip, dt, rho, mu, sigma, method));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -814,6 +763,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// RcppdqrngInstalled
+bool RcppdqrngInstalled();
+RcppExport SEXP _GregsOUPR6_RcppdqrngInstalled() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(RcppdqrngInstalled());
+    return rcpp_result_gen;
+END_RCPP
+}
 // RcppsitmoInstalled
 bool RcppsitmoInstalled();
 RcppExport SEXP _GregsOUPR6_RcppsitmoInstalled() {
@@ -863,19 +822,17 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GregsOUPR6_RcppOUPMLGoodnessOfFit", (DL_FUNC) &_GregsOUPR6_RcppOUPMLGoodnessOfFit, 4},
     {"_GregsOUPR6_RcppOUPMLLikelihoodRatioTest", (DL_FUNC) &_GregsOUPR6_RcppOUPMLLikelihoodRatioTest, 4},
     {"_GregsOUPR6_RcppOUPMCMinMax", (DL_FUNC) &_GregsOUPR6_RcppOUPMCMinMax, 1},
-    {"_GregsOUPR6_RcppOUPMCStandardNormal", (DL_FUNC) &_GregsOUPR6_RcppOUPMCStandardNormal, 4},
-    {"_GregsOUPR6_RcppOUPMCForwardPathRungeKutta", (DL_FUNC) &_GregsOUPR6_RcppOUPMCForwardPathRungeKutta, 8},
-    {"_GregsOUPR6_RcppOUPMCBackwardPathRungeKutta", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBackwardPathRungeKutta, 8},
-    {"_GregsOUPR6_RcppOUPMCBoundedPathRungeKutta", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBoundedPathRungeKutta, 9},
-    {"_GregsOUPR6_RcppOUPMCForwardPathIntegralEquation", (DL_FUNC) &_GregsOUPR6_RcppOUPMCForwardPathIntegralEquation, 8},
-    {"_GregsOUPR6_RcppOUPMCBackwardPathIntegralEquation", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBackwardPathIntegralEquation, 8},
-    {"_GregsOUPR6_RcppOUPMCBoundedPathIntegralEquation", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBoundedPathIntegralEquation, 9},
+    {"_GregsOUPR6_RcppOUPMCStandardNormal", (DL_FUNC) &_GregsOUPR6_RcppOUPMCStandardNormal, 5},
+    {"_GregsOUPR6_RcppOUPMCForwardPaths", (DL_FUNC) &_GregsOUPR6_RcppOUPMCForwardPaths, 9},
+    {"_GregsOUPR6_RcppOUPMCBackwardPaths", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBackwardPaths, 9},
+    {"_GregsOUPR6_RcppOUPMCBoundedPaths", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBoundedPaths, 10},
     {"_GregsOUPR6_RcppOUPMCForwardCountY", (DL_FUNC) &_GregsOUPR6_RcppOUPMCForwardCountY, 3},
     {"_GregsOUPR6_RcppOUPMCBackwardCountX", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBackwardCountX, 6},
     {"_GregsOUPR6_RcppOUPMCForwardCountT", (DL_FUNC) &_GregsOUPR6_RcppOUPMCForwardCountT, 7},
     {"_GregsOUPR6_RcppOUPMCBoundedCountT", (DL_FUNC) &_GregsOUPR6_RcppOUPMCBoundedCountT, 4},
     {"_GregsOUPR6_RcppOUPMCHeatCountZ", (DL_FUNC) &_GregsOUPR6_RcppOUPMCHeatCountZ, 2},
     {"_GregsOUPR6_RcppParallelInstalled", (DL_FUNC) &_GregsOUPR6_RcppParallelInstalled, 0},
+    {"_GregsOUPR6_RcppdqrngInstalled", (DL_FUNC) &_GregsOUPR6_RcppdqrngInstalled, 0},
     {"_GregsOUPR6_RcppsitmoInstalled", (DL_FUNC) &_GregsOUPR6_RcppsitmoInstalled, 0},
     {NULL, NULL, 0}
 };

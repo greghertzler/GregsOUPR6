@@ -87,12 +87,9 @@
 
 - [`RcppOUPMCMinMax()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
   [`RcppOUPMCStandardNormal()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
-  [`RcppOUPMCForwardPathRungeKutta()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
-  [`RcppOUPMCBackwardPathRungeKutta()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
-  [`RcppOUPMCBoundedPathRungeKutta()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
-  [`RcppOUPMCForwardPathIntegralEquation()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
-  [`RcppOUPMCBackwardPathIntegralEquation()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
-  [`RcppOUPMCBoundedPathIntegralEquation()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCForwardPaths()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBackwardPaths()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
+  [`RcppOUPMCBoundedPaths()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
   [`RcppOUPMCForwardCountY()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
   [`RcppOUPMCBackwardCountX()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
   [`RcppOUPMCForwardCountT()`](https://greghertzler.github.io/GregsOUPR6/reference/MonteCarlo_Rcpp.md)
@@ -104,8 +101,9 @@
 ### Optional Packages
 
 - [`RcppParallelInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
+  [`RcppdqrngInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
   [`RcppsitmoInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
-  : Optional packages for parallel processing
+  : Optional packages
 
 ## Data
 

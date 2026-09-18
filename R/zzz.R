@@ -2,7 +2,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @useDynLib GregsOUP, .registration = TRUE
+#' @useDynLib GregsOUPR6, .registration = TRUE
 #' @importFrom Rcpp  evalCpp
 ## usethis namespace: end
 NULL

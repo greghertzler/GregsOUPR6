@@ -230,9 +230,6 @@ inputs and outputs can be stale.  Another advantage of the R6 object is predefin
 plots with Plotly. The same simulation can plotted different ways without
 recalculation.
 
-The overhead of setting up RcppParallel means that small problems will
-calculate more slowly.  But small problems calculate in microseconds, anyway.
-
 Sequential calculations are reproducible, but parallel calculations are not.
 Two runs of the same problem will agree to about 12 significant digits, but
 disagree thereafter.  For exact arithmetic, order doesn't matter.  For
@@ -250,7 +247,7 @@ data set with 19,312 observations:
            threads  nmstart   log likely      total
 ---------------------------------------------------
                  1   0.4203    1588.5964  1589.0617
-                 2   0.4744     851.8501   852.3245 
+                 2   0.4744     851.8501   852.3245
                  3   0.4626     856.4483   856.9109
                  4   0.6665     590.3574   591.0239
                  5   0.6576     603.7107   604.3683
@@ -266,16 +263,16 @@ data set with 19,312 observations:
 These times are longer than previous measurements.  Maybe next time they will be
 shorter.  But a curious thing happens.  More threads can be slower than fewer
 threads.  Monitoring the CPU reveals that all 12 threads are used in all
-estimations. It appears that 'threads' actually means 'working groups' which
-Intel's Threading Building Blocks (TBB) uses to organize the calculations.
-nmstart is a sequential algorithm which takes more time with more threads.
-The Nelder-Mead algorithm takes more time with more threads but the log
-likelihood function takes less time with more threads.  The sweet spot is
-somewhere in the middle.
+estimations. It appears that 'threads' means something else that Intel's
+Threading Building Blocks (TBB) uses to organize the calculations. The column
+for nmstart takes more time if it uses more threads. The Nelder-Mead algorithm
+also takes more time with more threads but the log likelihood function takes
+less time with more threads.  The sweet spot is somewhere in the middle.
 
 Estimation could be tweaked by using the RcppParallel commands:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ defaultNumThreads()
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ library(RcppParallel)
+ defaultNumThreads()
  setThreadOptions(numThreads=6)
 }\if{html}{\out{</div>}}
 

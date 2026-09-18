@@ -3,33 +3,41 @@
 \name{OptionalPackages}
 \alias{OptionalPackages}
 \alias{RcppParallelInstalled}
+\alias{RcppdqrngInstalled}
 \alias{RcppsitmoInstalled}
-\title{Optional packages for parallel processing}
+\title{Optional packages}
 \usage{
 RcppParallelInstalled()
+
+RcppdqrngInstalled()
 
 RcppsitmoInstalled()
 }
 \value{
 bool <- RcppParallelInstalled()
 
+bool <- RcppdqrngInstalled()
+
 bool <- RcppsitmoInstalled()
 }
 \description{
 Queries whether functions are compiled with RcppParallel or fall back
-to Rcpp only.  Also queries whether random numbers are generated
-by RcppParallel using sitmo() or fall back to Rcpp using rnorm().  And
-there are functions for setting and getting the number of threads.
+to Rcpp only.  Also queries whether random number packages dqrng and sitmo
+are installed.
 }
 \section{Discussion}{
 Rcpp calculates hundreds of times faster than R6 objects.  RcppParallel
-calculates five to eight times faster than Rcpp on a typical laptop with
-12 threads, and thousands of times faster than R6 objects.  For Monte Carlo
-simulations, RcppParallel using sitmo() generates random numbers six times
-faster Rcpp using rnorm() and nine times faster R6 using rnorm().  Both
-RcppParallel and sitmo are optional but recommended:
+calculates five to eight times faster than Rcpp on a typical laptop and
+thousands of times faster than R6 objects.  Random number generation with
+the R function rnorm() is slow.  The packages dqrng and sitmo are
+alternatives:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{ install.packages("RcppParallel", "sitmo")
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ install.packages("RcppParallel", "dqrng", "sitmo")
 }\if{html}{\out{</div>}}
+
+If RcppParallel is installed it will be used for almost every calculation.
+If dqrng is installed, it will be the default for random number generation.
+Otherwise, the default is std::mt19937.  If sitmo is installed, it can be
+selected as an option in the function RcppOUPStandardNormal().
 }
 

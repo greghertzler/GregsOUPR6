@@ -253,8 +253,6 @@ The console stores outputs in the global environment, but there is no map to
 inputs and outputs can be stale.  Another advantage of the R6 object is predefined
 plots with Plotly. The same simulation can plotted different ways without
 recalculation.</p>
-<p>The overhead of setting up RcppParallel means that small problems will
-calculate more slowly.  But small problems calculate in microseconds, anyway.</p>
 <p>Sequential calculations are reproducible, but parallel calculations are not.
 Two runs of the same problem will agree to about 12 significant digits, but
 disagree thereafter.  For exact arithmetic, order doesn't matter.  For
@@ -284,15 +282,15 @@ data set with 19,312 observations:</p>
 <p>These times are longer than previous measurements.  Maybe next time they will be
 shorter.  But a curious thing happens.  More threads can be slower than fewer
 threads.  Monitoring the CPU reveals that all 12 threads are used in all
-estimations. It appears that 'threads' actually means 'working groups' which
-Intel's Threading Building Blocks (TBB) uses to organize the calculations.
-nmstart is a sequential algorithm which takes more time with more threads.
-The Nelder-Mead algorithm takes more time with more threads but the log
-likelihood function takes less time with more threads.  The sweet spot is
-somewhere in the middle.</p>
+estimations. It appears that 'threads' means something else that Intel's
+Threading Building Blocks (TBB) uses to organize the calculations. The column
+for nmstart takes more time if it uses more threads. The Nelder-Mead algorithm
+also takes more time with more threads but the log likelihood function takes
+less time with more threads.  The sweet spot is somewhere in the middle.</p>
 <p>Estimation could be tweaked by using the RcppParallel commands:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a> <span class="fu">defaultNumThreads</span>()</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a> <span class="fu">setThreadOptions</span>(<span class="at">numThreads=</span><span class="dv">6</span>)</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a> <span class="fu">library</span>(RcppParallel)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a> <span class="fu">defaultNumThreads</span>()</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a> <span class="fu">setThreadOptions</span>(<span class="at">numThreads=</span><span class="dv">6</span>)</span></code></pre><p></p></div>
 <p>Potentially, the Rcpp functions could be imported into other packages.</p>
     </div>
 
