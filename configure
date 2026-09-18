@@ -1,6 +1,5 @@
-```sh
 #!/bin/sh
-# configure — CRAN-safe conditional compilation for optional RcppParallel + sitmo
+# configure — CRAN-safe conditional compilation for optional RcppParallel, sitmo & dqrng
 # Works on Linux, macOS, and Windows (Rtools/MSYS2)
 
 echo "Configuring conditional compilation..."
@@ -49,4 +48,3 @@ mkdir -p src
 cp src/Makevars src/Makevars.win
 
 echo "Configuration complete."
-```
