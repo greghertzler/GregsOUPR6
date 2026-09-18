@@ -13,27 +13,11 @@ MC$BoundedPaths(paths=500)
 MC$BoundedPaths(seed=123)
 # no automatic plots
 MC$set_flags(plotit=FALSE)
-# Integral equation and 4th order Runge-Kutta convergence
-# skip is same in both to reuse pseudo-random numbers
-options(digits=10)
-fie <- MC$BoundedPaths(sigma=50)[[1]]
-frk <- MC$BoundedPaths(method=4)[[1]]
-difidx <- !is.na(fie) & !is.na(frk)
-dif <- fie[difidx]-frk[difidx]
-max(dif)
-min(dif)
-fie <- MC$BoundedPaths(skip=2)[[1]]
-frk <- MC$BoundedPaths()[[1]]
-difidx <- !is.na(fie) & !is.na(frk)
-dif <- fie[difidx]-frk[difidx]
-max(dif)
-min(dif)
 # Wiener Process as plot
 MC$set_oup_params(rho=0,sigma=1)
 MC$PlotBoundedPaths(last=100,title="Wiener Process")
 # Ornstein-Uhlenbeck Process as plot
 MC$set_oup_params(rho=0.5,sigma=15)
-MC$set_path_args(method=1,skip=1)
 MC$PlotBoundedPaths(title="Ornstein-Uhlenbeck Process")
 # custom labels
 MC$PlotBoundedPaths(title="MyTitle",xaxis="MyxAxis",yaxis="MyyAxis")

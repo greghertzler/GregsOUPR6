@@ -10,9 +10,8 @@ library(clipr)
 #' @description
 #' Monte Carlo simulations of Forward Paths, Bounded Paths, Backward Paths,
 #'  Probabilities, Options and Passage Times.  Forward, Backward and Bounded Paths
-#'  are simulated by a 4th order Runge-Kutta method and by using the stochastic
-#'  integral equation.  Probabilities, Options and Passage Times are various ways
-#'  of binning and counting the Paths.
+#'  are simulated by the stochastic integral equation.  Probabilities, Options
+#'  and Passage Times are various ways of binning and counting the Paths.
 #'
 #' @details # Methods:
 #'     y stochastic
@@ -82,7 +81,6 @@ library(clipr)
 #'       paths:  number of paths 1<paths<1,000,000
 #'       skip:   subdivide time interval but report at times t 1<=skip<=50
 #'       seed:   seed for random number generators -inf<seed<inf
-#'       method: 4 for 4th order Runge-Kutta, otherwise integral equation
 #'
 #' @details # Usage:
 #' The MonteCarlo object must first be instantiated before its methods are called.
@@ -111,8 +109,8 @@ library(clipr)
 #'       A$PlotForwardPaths(title="My Paths Forward")
 #'
 #' An attempt to plot 100,000 paths would choke the computer, so there are tricks.
-#'  One is to select a hundred or so paths for the plot.  Another is to plot heat
-#'   maps, just like in a weather report.
+#'  One is to select a hundred or so paths for the plot.  Another is to summarise
+#'  the paths as heat maps, just like in a weather report.
 #'
 #' Other functions and methods are called in the same way.  To see all the
 #'  possibilities, check out the demos below.
@@ -130,12 +128,20 @@ library(clipr)
 #' Monte Carlo simulation of the Ornstein-Uhlenbeck Process can be done with
 #'  either of two methods:  numerically integrating the stochastic differential
 #'  equation, or calculating the stochastic integral equation.  The stochastic
-#'  differential equation is shocked by a Wiener Process, simulated as
-#'  sigma * dt^0.5 * epsilon, where sigma * dt^0.5 is the square root of the
-#'  instantaneous variance and epsilon are draws from a standard normal
-#'  density. The stochastic integral equation is shocked by the integral of
-#'  the Wiener Process, or H * epsilon, where H is the square-root of the
-#'  variance over a longer time interval.
+#'  differential equation is shocked by Brownian Motion, also called a Wiener
+#'  Process, simulated as sigma * dt^0.5 * epsilon, where sigma * dt^0.5 is
+#'  the square root of the instantaneous variance and epsilon are draws from a
+#'  standard normal density. The stochastic integral equation is shocked by the
+#'  integral of the Wiener Process, or H * epsilon, where H is the square-root
+#'  of the variance over a longer time interval.
+#'
+#' Drawing from a standard normal density is difficult and slow.  First uniform
+#'  pseudo-random numbers are generated.  Then the uniform random numbers are
+#'  transformed to normal.  If it is installed, the R6 object uses the dqrng
+#'  package.  Otherwise it uses the c++ implementation std::mt19337.  The R
+#'  function rnorm() is slow and not amenable to parallel processing.  It can
+#'  be selected as an option in the Rcpp functions, along with the package sitmo,
+#'  if it is installed.
 #'
 #' Numerically integrating the stochastic differential equation uses the Euler,
 #'  Marayuma or Runge-Kutta schemes. The Euler and Marayuma schemes are first
@@ -145,22 +151,21 @@ library(clipr)
 #' The fourth-order Runge-Kutta scheme is standard practice.  In tests, shocked
 #'  by the same draws from a standard normal density, the paths from the stochastic
 #'  integral equation and the fourth-order Runge-Kutta scheme were the same to
-#'  within five or six significant digits. To compare the fourth-order Runge-
-#'  Kutta scheme with the integral equation:
+#'  within four or five significant digits.  For the same level of accuracy, the
+#'  stochastic integral equation calculates about 10 times faster.  For this reason,
+#'  only the stochastic integral equation is available in the R6 object.  The
+#'  fourth-order Runge-Kutta scheme is an option in the Rcpp functions.
+#'
+#' To simulate forward paths:
 #'
 #'       MC <- MonteCarlo$new()
-#'       rk <- MC$ForwardPaths(paths=100000,skip=10,method=4)[[1]]
-#'       ie <- MC$ForwardPaths(method=1)[[1]]
-#'       dif <- rk-ie
-#'       max(dif)
-#'       min(dif)
-#'       sum(dif)
+#'       MC$ForwardPaths(paths=100000)
 #'
 #' A Forward Path starts from the backward state at the backward time and goes
 #'  forward. A single path, sampled from all possible paths, is a Sample Path.
 #'  Just like the flea trying to understand the elephant, a sample Path is enough
-#'  for Maximum Likelihood Estimation of the Ornstein-Uhlenbeck Process. An
-#'  ensemble of paths can be counted to approximate Transition Densities and
+#'  for Maximum Likelihood Estimation to reveal the Ornstein-Uhlenbeck Process.
+#'  An ensemble of paths can be counted to approximate Transition Densities and
 #'  Probabilities and Visiting Time Densities and Probabilities. The larger the
 #'  ensemble, the better the approximations.
 #'
@@ -169,7 +174,7 @@ library(clipr)
 #'  Counting the number of Forward Paths in each bin and dividing by the total
 #'  number of paths approximates Transition Densities. Summing the Transition
 #'  Densities approximates Transition Probabilities. Summing again approximates
-#'  Double Integrals.  Double Integrals are a curiosity. If time runs backwards,
+#'  Double Integrals.  Double Integrals are a curiosity, but if time runs backwards,
 #'  they become Options.
 #'
 #' A Forward Path begins from a known state and travels forward into an uncertain
@@ -178,7 +183,9 @@ library(clipr)
 #'  uncertainty over time. An example is a Bayesian analysis which begins with a
 #'  Diffuse Prior and ends with certainty. Another example is an Option. Simulating
 #'  and counting Backward Paths approximates Prior Densities, Prior Probabilities
-#'  and Options.  To compare Monte Carlo and Analytical Options:
+#'  and Options.
+#'
+#' To compare Monte Carlo and Analytical Options:
 #'
 #'       OUP <- OUProcess$new()
 #'       A <- OUP$get_Analytical()
@@ -192,11 +199,11 @@ library(clipr)
 #'       min(dif)
 #'       sum(dif)
 #'
-#' If we count at right angles--in the time direction instead of the state
-#'  direction--Forward Paths become Visiting Time Densities and Probabilities.
+#' If we count in the time direction instead of the state direction,
+#'  Forward Paths become Visiting Time Densities and Probabilities.
 #'  Bounded Paths become First Passage Time Densities and Probabilities.
-#'  Monte Carlo and Analytical Visiting and First Passage Times can also be
-#'  compared:
+#'
+#' To compare  Monte Carlo and Analytical Visiting Times:
 #'
 #'       OUP <- OUProcess$new()
 #'       A <- OUP$get_Analytical()
@@ -208,14 +215,14 @@ library(clipr)
 #'       min(dif)
 #'       sum(dif)
 #'
-#' Of course, the question is, 'Why bother?' We have Analytical formulas to do
-#'  the counting.  One reason is to explain the formulas.  First Passage Times
-#'  make more sense if you plot Bounded Paths and count the number of paths that
-#'  have crossed the threshold.  Even in prestigious journal articles, the first
-#'  and, possibly, only plot will be a Monte Carlo simulation.
+#' Of course, the question is, 'Why bother?' Analytical formulas to do the
+#'  counting much faster and more accurately.  One reason is to explain the
+#'  formulas.  First Passage Times make start to make sense if you plot Bounded
+#'  Paths and count the number of paths that have crossed the threshold.  Even
+#'  in journal articles, the first  plot will be a Monte Carlo simulation.
 #'
-#' Another reason is to validate the formulas.  Although an Analytical formula
-#'  may calculate a thousand times faster than a Monte Carlo simulation, arriving
+#' Another reason is to validate the formulas.  Although an Analytical formulay
+#'  will calculate thousands of times faster than a Monte Carlo simulation, arriving
 #'  at approximately the same answer both ways is reassuring.
 
 # class ----
@@ -245,7 +252,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       private$y_stoch_args <- list(t=seq(from=0,to=10,by=0.1),y=xyseq,x=-15,psi=-1)
       private$x_stoch_args <- list(s=seq(from=10,to=0,by=-0.1),x=xyseq,y=0,r=0.05,phi=-1)
       private$t_stoch_args <- list(t=seq(from=0,to=10,by=0.1),k=20,x=-15,omega=1,Ppct=0.75)
-      private$path_args <- list(paths=100,skip=1,seed=99999,method=1)
+      private$path_args <- list(paths=100,skip=1,seed=99999)
       private$plot_args <- list(pmax=0.06,ptmax=0.6,first=1,last=10,zbeg=-30,zend=30)
       private$syncyxt <- 3
       private$forwardyt <- 3
@@ -775,9 +782,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths  number of paths 1<paths<1,000,000
     #' @param skip   subdivide time intervals but report at times t 1<=skip<=50
     #' @param seed   seed for random number generators -inf<seed<inf
-    #' @param method 4 for 4th order Runge-Kutta, otherwise integral equation
-    #' @return list(paths,skip,seed,method)
-    set_path_args = function(paths=NULL,skip=NULL,seed=NULL,method=NULL)
+    #' @return list(paths,skip,seed)
+    set_path_args = function(paths=NULL,skip=NULL,seed=NULL)
     {
       if(!is.null(paths))
       {
@@ -930,47 +936,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           }
         }
         else { message("MC:  seed not set.") }
-      }
-      if(!is.null(method))
-      {
-        sca <- private$extract_scalar(method)
-        if(!is.null(sca))
-        {
-          if(sca != private$path_args$method)
-          {
-            private$path_args$method <- sca
-            private$yforward <- NULL
-            private$xbackward <- NULL
-            private$tforward <- NULL
-            private$tbounded <- NULL
-            private$tfpt <- NULL
-            private$G <- NULL
-            private$H2 <- NULL
-            private$p <- NULL
-            private$Pneg <- NULL
-            private$Ppos <- NULL
-            private$PPneg <- NULL
-            private$PPpos <- NULL
-            private$o <- NULL
-            private$Oneg <- NULL
-            private$Opos <- NULL
-            private$OOneg <- NULL
-            private$OOpos <- NULL
-            private$vtmmm <- NULL
-            private$vtpct <- NULL
-            private$pv <- NULL
-            private$Pv <- NULL
-            private$fheat <- NULL
-            private$fz <- NULL
-            private$fptmmm <- NULL
-            private$fptpct <- NULL
-            private$pf <- NULL
-            private$Pf <- NULL
-            private$bheat <- NULL
-            private$bz <- NULL
-          }
-        }
-        else { message("MC:  method not set.") }
       }
       return(private$path_args)
     },
@@ -1391,7 +1356,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     get_t_stoch_args = function() { return(private$t_stoch_args) },
     #' @description
     #' get path arguments
-    #' @return list(paths,skip,seed,method)
+    #' @return list(paths,skip,seed)
     get_path_args = function() { return(private$path_args) },
     #' @description
     #' get plot arguments
@@ -1670,7 +1635,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       self$set_y_stoch_args(y_stoch[[1]],y_stoch[[2]],y_stoch[[3]],y_stoch[[4]])
       self$set_x_stoch_args(x_stoch[[1]],x_stoch[[2]],x_stoch[[3]],x_stoch[[4]],x_stoch[[5]])
       self$set_t_stoch_args(t_stoch[[1]],t_stoch[[2]],t_stoch[[3]],t_stoch[[4]],t_stoch[[5]])
-      self$set_path_args(path[[1]],path[[2]],path[[3]],path[[4]])
+      self$set_path_args(path[[1]],path[[2]],path[[3]])
       self$set_plot_args(plot[[1]],plot[[2]],plot[[3]],plot[[4]],plot[[5]],plot[[6]])
       private$undoIx <- undoIx
 
@@ -1687,17 +1652,16 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(forward(m,paths))
-    ForwardPaths = function(t=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    ForwardPaths = function(t=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       forwardyt <- private$forwardyt
       if(forwardyt == 1) { self$set_y_stoch_args(t,NULL,x,NULL) }
       else { self$set_t_stoch_args(t,NULL,x,NULL,NULL) }
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -1715,7 +1679,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       p1 <- private$plot_args[[3]]
       pn <- private$plot_args[[4]]
       plotit <- private$flags[[1]]
@@ -1732,12 +1695,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$ystdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$ystdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$yforward <- forward
         }
       }
@@ -1752,12 +1713,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$tforward <- forward
         }
       }
@@ -1767,8 +1726,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotForwardPaths()) }
         else if(copyit == TRUE)
         {
-          if(forwardyt == 1) { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("s",t[1],rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward[,p1:pn,drop=FALSE])) }
-          else { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",t[1],rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward[,p1:pn,drop=FALSE])) }
+          if(forwardyt == 1) { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("s",t[1],rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward[,p1:pn,drop=FALSE])) }
+          else { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",t[1],rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward[,p1:pn,drop=FALSE])) }
           private$CopyToClipboard(clip)
         }
       }
@@ -1784,15 +1743,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(backward(m,paths))
-    BackwardPaths = function(s=NULL,y=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    BackwardPaths = function(s=NULL,y=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_x_stoch_args(s,NULL,y,NULL,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -1801,7 +1759,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       p1 <- private$plot_args[[3]]
       pn <- private$plot_args[[4]]
       plotit <- private$flags[[1]]
@@ -1816,11 +1773,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         stdnorm <- private$xstdnorm
         if(is.null(stdnorm))
         {
-          stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+          stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
           private$xstdnorm <- stdnorm
         }
-        if(method == 4) { backward <- RcppOUPMCBackwardPathRungeKutta(stdnorm,y,m,skip,ds,rho,mu,sigma) }
-        else { backward <- RcppOUPMCBackwardPathIntegralEquation(stdnorm,y,m,skip,ds,rho,mu,sigma) }
+        backward <- RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,5)
         private$xbackward <- backward
       }
       # plot or copy ----
@@ -1829,7 +1785,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotBackwardPaths()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Backward Paths",rep("",pn-p1+1)),c("t",s[1],rep("",pn-p1)),c("y",y,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("s",paste0("path",p1:pn)),cbind(s,backward[,p1:pn,drop=FALSE]))
+          clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Backward Paths",rep("",pn-p1+1)),c("t",s[1],rep("",pn-p1)),c("y",y,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("s",paste0("path",p1:pn)),cbind(s,backward[,p1:pn,drop=FALSE]))
           private$CopyToClipboard(clip)
         }
       }
@@ -1846,15 +1802,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(bounded(m,paths))
-    BoundedPaths = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    BoundedPaths = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,NULL,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -1864,7 +1819,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       p1 <- private$plot_args[[3]]
       pn <- private$plot_args[[4]]
       plotit <- private$flags[[1]]
@@ -1879,11 +1833,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         stdnorm <- private$tstdnorm
         if(is.null(stdnorm))
         {
-          stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+          stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
           private$tstdnorm <- stdnorm
         }
-        if(method == 4) { bndfpt <- RcppOUPMCBoundedPathRungeKutta(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
-        else { bndfpt <- RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
+        bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
         bounded <- bndfpt[1:m,,drop=FALSE]
         fpt <- bndfpt[m+1,,drop=FALSE]
         private$tbounded <- bounded
@@ -1895,7 +1848,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotBoundedPaths()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Bounded Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",t[1],rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,bounded[,p1:pn,drop=FALSE]))
+          clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Bounded Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",t[1],rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,bounded[,p1:pn,drop=FALSE]))
           private$CopyToClipboard(clip)
         }
       }
@@ -1910,15 +1863,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(G(m))
-    Mean = function(t=NULL,x=NULL,rho=NULL,mu=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    Mean = function(t=NULL,x=NULL,rho=NULL,mu=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,NULL)
       self$set_y_stoch_args(t,NULL,x,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -1929,7 +1881,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -1945,11 +1896,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$ystdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$ystdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$yforward <- forward
         }
         n <- length(y)
@@ -1979,7 +1929,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotMean()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",""),c("Mean",""),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","G"),cbind(t,means))
+          clip <- rbind(c("Monte Carlo",""),c("Mean",""),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","G"),cbind(t,means))
           private$CopyToClipboard(clip)
         }
       }
@@ -1994,15 +1944,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(H2(m))
-    Variance = function(t=NULL,x=NULL,rho=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    Variance = function(t=NULL,x=NULL,rho=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,NULL,sigma)
       self$set_y_stoch_args(t,NULL,x,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2013,7 +1962,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2029,11 +1977,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$ystdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$ystdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$yforward <- forward
         }
         n <- length(y)
@@ -2063,7 +2010,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotVariance()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",""),c("Variance",""),c("s",t[1]),c("rho",rho),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","H\u00B2"),cbind(t,variances))
+          clip <- rbind(c("Monte Carlo",""),c("Variance",""),c("s",t[1]),c("rho",rho),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","H\u00B2"),cbind(t,variances))
           private$CopyToClipboard(clip)
         }
       }
@@ -2080,15 +2027,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(p(m,n))
-    Density = function(t=NULL,y=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    Density = function(t=NULL,y=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_y_stoch_args(t,y,x,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2099,7 +2045,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2116,11 +2061,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$ystdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$ystdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$yforward <- forward
         }
         mvdpd <- RcppOUPMCForwardCountY(forward,y,psi)
@@ -2149,7 +2093,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotDensity()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Densities",rep("",n)),c("s",t[1],rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("p(t,y)",y),cbind(t,densities))
+          clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Densities",rep("",n)),c("s",t[1],rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("p(t,y)",y),cbind(t,densities))
           private$CopyToClipboard(clip)
         }
       }
@@ -2167,15 +2111,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(P(m,n))
-    Probability = function(t=NULL,y=NULL,x=NULL,psi=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    Probability = function(t=NULL,y=NULL,x=NULL,psi=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_y_stoch_args(t,y,x,psi)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2186,7 +2129,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       m <- length(t)
@@ -2204,11 +2146,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$ystdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$ystdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$yforward <- forward
         }
         mvdpd <- RcppOUPMCForwardCountY(forward,y,psi)
@@ -2237,7 +2178,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotProbability()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Probabilities",rep("",n)),c("s",t[1],rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("P(t,y)",y),cbind(t,probabilities))
+          clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Probabilities",rep("",n)),c("s",t[1],rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("P(t,y)",y),cbind(t,probabilities))
           private$CopyToClipboard(clip)
         }
       }
@@ -2255,15 +2196,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(PP(m,n))
-    DoubleIntegral = function(t=NULL,y=NULL,x=NULL,psi=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    DoubleIntegral = function(t=NULL,y=NULL,x=NULL,psi=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_y_stoch_args(t,y,x,psi)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2274,7 +2214,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2292,11 +2231,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$ystdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$ystdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$yforward <- forward
         }
         mvdpd <- RcppOUPMCForwardCountY(forward,y,psi)
@@ -2325,7 +2263,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotDoubleIntegral()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",n)),c("Double Integrals",rep("",n)),c("s",t[1],rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("\u2119(t,y)",y),cbind(t,doubleintegrals))
+          clip <- rbind(c("Monte Carlo",rep("",n)),c("Double Integrals",rep("",n)),c("s",t[1],rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\u2119(t,y)",y),cbind(t,doubleintegrals))
           private$CopyToClipboard(clip)
         }
       }
@@ -2344,15 +2282,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(OO(mxn))
-    Option = function(s=NULL,x=NULL,y=NULL,r=NULL,phi=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    Option = function(s=NULL,x=NULL,y=NULL,r=NULL,phi=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_x_stoch_args(s,x,y,r,phi)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2364,7 +2301,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2382,11 +2318,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$xstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$xstdnorm <- stdnorm
           }
-          if(method == 4) { backward <- RcppOUPMCBackwardPathRungeKutta(stdnorm,y,m,skip,ds,rho,mu,sigma) }
-          else { backward <- RcppOUPMCBackwardPathIntegralEquation(stdnorm,y,m,skip,ds,rho,mu,sigma) }
+          backward <- RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,5)
           private$xbackward <- backward
         }
         dpo <- RcppOUPMCBackwardCountX(backward,x,phi,rho,r,ds)
@@ -2411,7 +2346,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotOption()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",s[1],rep("",n-1)),c("y",y,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
+          clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",s[1],rep("",n-1)),c("y",y,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
           private$CopyToClipboard(clip)
         }
       }
@@ -2428,15 +2363,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(vtmmm(3x3))
-    VisitingTimeModeMedianMean = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    VisitingTimeModeMedianMean = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,0,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2447,7 +2381,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2463,11 +2396,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2486,7 +2418,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotVisitingTimeModeMedianMean()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Mode, Median, Mean",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("tv","pv","Pv"),modemedianmean)
+          clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Mode, Median, Mean",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("tv","pv","Pv"),modemedianmean)
           private$CopyToClipboard(clip)
         }
       }
@@ -2504,15 +2436,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(vtpct(3x3))
-    VisitingTimePercentiles = function(t=NULL,k=NULL,x=NULL,Ppct=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    VisitingTimePercentiles = function(t=NULL,k=NULL,x=NULL,Ppct=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,0,Ppct)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2523,7 +2454,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2539,11 +2469,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2562,7 +2491,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotVisitingTimePercentiles()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Percentiles",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("t%","pv","Pv"),percentile)
+          clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Percentiles",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("t%","pv","Pv"),percentile)
           private$CopyToClipboard(clip)
         }
       }
@@ -2579,15 +2508,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(pv(m))
-    VisitingTimeDensity = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    VisitingTimeDensity = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,0,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2598,7 +2526,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2614,11 +2541,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2637,7 +2563,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotVisitingTimeDensity()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",""),c("Visiting Time Density",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","pv"),cbind(t,pv))
+          clip <- rbind(c("Monte Carlo",""),c("Visiting Time Density",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","pv"),cbind(t,pv))
           private$CopyToClipboard(clip)
         }
       }
@@ -2654,15 +2580,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(Pv(m))
-    VisitingTimeProbability = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    VisitingTimeProbability = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,0,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2673,7 +2598,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2689,11 +2613,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2712,7 +2635,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotVisitingTimeProbability()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",""),c("Visiting Time Probability",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","Pv"),cbind(t,Pv))
+          clip <- rbind(c("Monte Carlo",""),c("Visiting Time Probability",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","Pv"),cbind(t,Pv))
           private$CopyToClipboard(clip)
         }
       }
@@ -2729,15 +2652,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(fptmmm(3x3))
-    FirstPassageTimeModeMedianMean = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    FirstPassageTimeModeMedianMean = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,1,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2748,7 +2670,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2764,11 +2685,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { bndfpt <- RcppOUPMCBoundedPathRungeKutta(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
-          else { bndfpt <- RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -2790,7 +2710,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotFirstPassageTimeModeMedianMean()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Mode, Median and Mean",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("tf","pf","Pf"),modemedianmean)
+          clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Mode, Median and Mean",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("tf","pf","Pf"),modemedianmean)
           private$CopyToClipboard(clip)
         }
       }
@@ -2808,15 +2728,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(fptpct(3x3))
-    FirstPassageTimePercentiles = function(t=NULL,k=NULL,x=NULL,Ppct=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    FirstPassageTimePercentiles = function(t=NULL,k=NULL,x=NULL,Ppct=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,1,Ppct)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2827,7 +2746,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2843,11 +2761,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { bndfpt <- RcppOUPMCBoundedPathRungeKutta(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
-          else { bndfpt <- RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,1)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -2869,7 +2786,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotFirstPassageTimePercentiles()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Percentiles",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("t%","pf","Pf"),percentile)
+          clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Percentiles",rep("",2)),c("k",k,""),c("s",t[1],""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("t%","pf","Pf"),percentile)
           private$CopyToClipboard(clip)
         }
       }
@@ -2886,15 +2803,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(pf(m))
-    FirstPassageTimeDensity = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    FirstPassageTimeDensity = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,1,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2905,7 +2821,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2921,11 +2836,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { bndfpt <- RcppOUPMCBoundedPathRungeKutta(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
-          else { bndfpt <- RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -2947,7 +2861,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotFirstPassageTimeDensity()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",""),c("First Passage Time Density",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","pf"),cbind(t,pf))
+          clip <- rbind(c("Monte Carlo",""),c("First Passage Time Density",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","pf"),cbind(t,pf))
           private$CopyToClipboard(clip)
         }
       }
@@ -2964,15 +2878,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @param paths   number of paths 1<paths<1,000,000
     #' @param skip    subdivide time interval but report at times t 1<=skip<=50
     #' @param seed    seed for random number generators -inf<seed<inf
-    #' @param method  4 for 4th order Runge-Kutta, otherwise integral equation
     #' @param who     object id of caller
     #' @return list(Pf(m))
-    FirstPassageTimeProbability = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,method=NULL,who=NULL)
+    FirstPassageTimeProbability = function(t=NULL,k=NULL,x=NULL,rho=NULL,mu=NULL,sigma=NULL,paths=NULL,skip=NULL,seed=NULL,who=NULL)
     {
       # set / get ----
       self$set_oup_params(rho,mu,sigma)
       self$set_t_stoch_args(t,k,x,1,NULL)
-      self$set_path_args(paths,skip,seed,method)
+      self$set_path_args(paths,skip,seed)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
       sigma <- private$oup_params[[3]]
@@ -2983,7 +2896,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       plotit <- private$flags[[1]]
       copyit <- private$flags[[2]]
       # calculate ----
@@ -2999,11 +2911,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { bndfpt <- RcppOUPMCBoundedPathRungeKutta(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
-          else { bndfpt <- RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -3025,7 +2936,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotFirstPassageTimeProbability()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",""),c("First Passage Time Probability",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","Pf"),cbind(t,Pf))
+          clip <- rbind(c("Monte Carlo",""),c("First Passage Time Probability",""),c("k",k),c("s",t[1]),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","Pf"),cbind(t,Pf))
           private$CopyToClipboard(clip)
         }
       }
@@ -3054,7 +2965,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       if(type < -1.5)
       {
         private$forwardyt <- 1
@@ -3100,8 +3010,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        if(type < -1.5) { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
-        else { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
+        if(type < -1.5) { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
+        else { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3236,7 +3146,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       p1 <- private$plot_args$first
       pn <- private$plot_args$last
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
@@ -3267,7 +3176,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Backward Paths",rep("",pn-p1+1)),c("t",t,rep("",pn-p1)),c("y",y,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("s",paste0("path",p1:pn)),cbind(s,backward))
+        clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Backward Paths",rep("",pn-p1+1)),c("t",t,rep("",pn-p1)),c("y",y,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("s",paste0("path",p1:pn)),cbind(s,backward))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3396,7 +3305,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       p1 <- private$plot_args$first
       pn <- private$plot_args$last
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
@@ -3429,7 +3337,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Bounded Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("method",method,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,bounded))
+        clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Bounded Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,bounded))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3561,7 +3469,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -3591,7 +3498,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",""),c("Mean",""),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","G"),cbind(t,means))
+        clip <- rbind(c("Monte Carlo",""),c("Mean",""),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","G"),cbind(t,means))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3677,7 +3584,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -3717,7 +3623,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",""),c("Variance",""),c("s",s),c("rho",rho),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","H\u00B2"),cbind(t,variances))
+        clip <- rbind(c("Monte Carlo",""),c("Variance",""),c("s",s),c("rho",rho),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","H\u00B2"),cbind(t,variances))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3823,7 +3729,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -3862,7 +3767,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Densities",rep("",n)),c("s",s,rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("p(t,y)",y),cbind(t,densities))
+        clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Densities",rep("",n)),c("s",s,rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("p(t,y)",y),cbind(t,densities))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3995,7 +3900,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -4038,7 +3942,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Probabilities",rep("",n)),c("s",s,rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("P(t,y)",y),cbind(t,probabilities))
+        clip <- rbind(c("Monte Carlo",rep("",n)),c("Transition Probabilities",rep("",n)),c("s",s,rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("P(t,y)",y),cbind(t,probabilities))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -4170,7 +4074,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -4212,7 +4115,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",n)),c("Double Integrals",rep("",n)),c("s",s,rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("\u2119(t,y)",y),cbind(t,doubleintegrals))
+        clip <- rbind(c("Monte Carlo",rep("",n)),c("Double Integrals",rep("",n)),c("s",s,rep("",n-1)),c("x",x,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("psi",psi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\u2119(t,y)",y),cbind(t,doubleintegrals))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -4346,7 +4249,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -4388,7 +4290,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",t,rep("",n-1)),c("y",y,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("method",method,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
+        clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",t,rep("",n-1)),c("y",y,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -4521,7 +4423,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       ptmax <- private$plot_args[[2]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -4555,7 +4456,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Mode, Median and Mean",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("tv","pv","Pv"),vtmmm)
+        clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Mode, Median and Mean",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("tv","pv","Pv"),vtmmm)
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -4654,7 +4555,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       ptmax <- private$plot_args[[2]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -4699,7 +4599,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Percentiles",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("t%","pv","Pv"),vtpct)
+        clip <- rbind(c("Monte Carlo",rep("",2)),c("Visiting Time Percentiles",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("t%","pv","Pv"),vtpct)
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -4808,7 +4708,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       ptmax <- private$plot_args[[2]]
       zbeg <- private$plot_args[[5]]
@@ -4857,7 +4756,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",""),c("Visiting Time Density",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","pv"),cbind(t,pv))
+        clip <- rbind(c("Monte Carlo",""),c("Visiting Time Density",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","pv"),cbind(t,pv))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -4967,7 +4866,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       zbeg <- private$plot_args[[5]]
       zend <- private$plot_args[[6]]
@@ -5014,7 +4912,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",""),c("Visiting Time Probability",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","Pv"),cbind(t,Pv))
+        clip <- rbind(c("Monte Carlo",""),c("Visiting Time Probability",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","Pv"),cbind(t,Pv))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -5118,7 +5016,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       ptmax <- private$plot_args[[2]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -5151,7 +5048,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Mode, Median and Mean",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("tf","pf","Pf"),fptmmm)
+        clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Mode, Median and Mean",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("tf","pf","Pf"),fptmmm)
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -5249,7 +5146,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       ptmax <- private$plot_args[[2]]
       font <- list(family=private$plot_info$plotfont$family,size=private$plot_info$plotfont$size,color=private$plot_colors$font)
       file <- private$plot_info$plotfile
@@ -5293,7 +5189,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Percentiles",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("method",method,""),c("t%","pf","Pf"),fptpct)
+        clip <- rbind(c("Monte Carlo",rep("",2)),c("First Passage Time Percentiles",rep("",2)),c("k",k,""),c("s",s,""),c("x",x,""),c("P%",Ppct,""),c("rho",rho,""),c("mu",mu,""),c("sigma",sigma,""),c("paths",paths,""),c("skip",skip,""),c("seed",seed,""),c("t%","pf","Pf"),fptpct)
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -5401,7 +5297,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       ptmax <- private$plot_args[[2]]
       zbeg <- private$plot_args[[5]]
@@ -5449,7 +5344,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",""),c("First Passage Time Density",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","pf"),cbind(t,pf))
+        clip <- rbind(c("Monte Carlo",""),c("First Passage Time Density",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","pf"),cbind(t,pf))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -5558,7 +5453,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       paths <- private$path_args[[1]]
       skip <- private$path_args[[2]]
       seed <- private$path_args[[3]]
-      method <- private$path_args[[4]]
       pmax <- private$plot_args[[1]]
       zbeg <- private$plot_args[[5]]
       zend <- private$plot_args[[6]]
@@ -5605,7 +5499,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",""),c("First Passage Time Probability",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("method",method),c("t","Pf"),cbind(t,Pf))
+        clip <- rbind(c("Monte Carlo",""),c("First Passage Time Probability",""),c("k",k),c("s",s),c("x",x),c("rho",rho),c("mu",mu),c("sigma",sigma),c("paths",paths),c("skip",skip),c("seed",seed),c("t","Pf"),cbind(t,Pf))
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -6266,7 +6160,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         paths <- private$path_args[[1]]
         skip <- private$path_args[[2]]
         seed <- private$path_args[[3]]
-        method <- private$path_args[[4]]
         m <- length(t)
         if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
         else { dt <- 0.05 }
@@ -6276,11 +6169,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { forward <- RcppOUPMCForwardPathRungeKutta(stdnorm,x,m,skip,dt,rho,mu,sigma) }
-          else { forward <- RcppOUPMCForwardPathIntegralEquation(stdnorm,x,m,skip,dt,rho,mu,sigma) }
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$tforward <- forward
         }
         zdif <- 2*max(abs(x-mu),abs(x-k),abs(k-mu))
@@ -6314,7 +6206,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         paths <- private$path_args[[1]]
         skip <- private$path_args[[2]]
         seed <- private$path_args[[3]]
-        method <- private$path_args[[4]]
         m <- length(t)
         if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
         else { dt <- 0.05 }
@@ -6324,11 +6215,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           stdnorm <- private$tstdnorm
           if(is.null(stdnorm))
           {
-            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+            stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
             private$tstdnorm <- stdnorm
           }
-          if(method == 4) { bndfpt <- RcppOUPMCBoundedPathRungeKutta(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
-          else { bndfpt <- RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma) }
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded

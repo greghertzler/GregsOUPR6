@@ -21,16 +21,11 @@ double GammaSmallOneHalf(double x)
     int cnt = 0;
     while(std::pow(10,sigdig)*dgm >= gm && cnt < cmax)
     {
-      cnt += 1;
       dgm *= x/(1.5+cnt);
       gm += dgm;
+      cnt += 1;
     }
-    if(cnt < cmax)
-    {
-      gm *= std::pow(x,1.5)/(1.5)*std::exp(-x);
-      gm = (std::pow(x,0.5)*std::exp(-x)+gm)/0.5;
-      gamma = gm;
-    }
+    if(cnt < cmax) { gamma = 2*std::pow(x,0.5)*std::exp(-x)*gm; }
     else { gamma = NA_REAL; }
   }
   return gamma;
@@ -52,16 +47,11 @@ double GammaBigOneHalf(double x)
     int cnt = 0;
     while(std::pow(10,sigdig)*dgm >= gm && cnt < cmax)
     {
-      cnt += 1;
       dgm *= x/(1.5+cnt);
       gm += dgm;
+      cnt += 1;
     }
-    if(cnt < cmax)
-    {
-      gm *= std::pow(x,1.5)/(1.5)*std::exp(-x);
-      gm = (std::pow(x,0.5)*std::exp(-x)+gm)/0.5;
-      gamma = 1.77245385090552-gm;
-    }
+    if(cnt < cmax) { gamma = 1.77245385090552-2*std::pow(x,0.5)*std::exp(-x)*gm; }
     else { gamma = NA_REAL; }
   }
   else
@@ -76,7 +66,7 @@ double GammaBigOneHalf(double x)
       dgm *= (0.5-cnt)/x;
       gm += dgm;
     }
-    gamma = gm*std::pow(x,-0.5)*std::exp(-x);
+    gamma = std::pow(x,-0.5)*std::exp(-x)*gm;
   }
   return gamma;
 }

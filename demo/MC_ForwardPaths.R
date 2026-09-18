@@ -13,25 +13,11 @@ MC$ForwardPaths(paths=500)
 MC$ForwardPaths(seed=123)
 # not automatic plots
 MC$set_flags(plotit=FALSE)
-# Integral equation and 4th order Runge-Kutta convergence
-# skip is same in both to reuse pseudo-random numbers
-options(digits=10)
-fie <- MC$ForwardPaths(sigma=50)[[1]]
-frk <- MC$ForwardPaths(method=4)[[1]]
-dif <- fie-frk
-max(dif)
-min(dif)
-fie <- MC$ForwardPaths(skip=2)[[1]]
-frk <- MC$ForwardPaths()[[1]]
-dif <- fie-frk
-max(dif)
-min(dif)
 # Wiener Process as plot
 MC$set_oup_params(rho=0,sigma=1)
 MC$PlotForwardPaths(last=100,title="Wiener Process")
 # Ornstein-Uhlenbeck Process as plot
 MC$set_oup_params(rho=0.5,sigma=15)
-MC$set_path_args(method=1,skip=1)
 MC$PlotForwardPaths(title="Ornstein-Uhlenbeck Process")
 # custom labels
 MC$PlotForwardPaths(title="MyTitle",xaxis="MyxAxis",yaxis="MyyAxis")

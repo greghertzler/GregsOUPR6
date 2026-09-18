@@ -20,7 +20,7 @@ using namespace RcppParallel;
 //'  fixed or variable.  States can be either observed or stochastic.  As
 //'  arguments to the functions, they can be either scalars or vectors.
 //'  Functions in Rcpp have local scope and don't get confused.  But this
-//'  documentation is constructed in the R manner, assuming all arguments are
+//'  documentation is constructed in the R idiom, assuming all arguments are
 //'  globally defined.
 //'
 //' Simple arguments have globally unique names, but times and states have
@@ -45,7 +45,7 @@ using namespace RcppParallel;
 //'  RcppOUPAProbability(t,y,s,x,...), t and y are vectors and s and x are scalars.
 //'  In RcppOUPAOption(s,x,t,y,...), s and x are vectors and t and y are scalars.
 //'
-//' Finally, the state z is also schizophrenic.  In the stochastic differential
+//' Finally, the state z is schizophrenic.  In the stochastic differential
 //'  equation, it represents either state x or state y.  In passage times, it
 //'  is an optional argument for alternate initial states x.
 //'
@@ -303,6 +303,7 @@ using namespace RcppParallel;
 //'  in times by thread number should be similar. If you need four threads for
 //'  something else, you can use the RcppParallel commands:
 //'
+//'      library(RcppParallel)
 //'      defaultNumThreads()
 //'      setThreadOptions(numThreads=8)
 //'

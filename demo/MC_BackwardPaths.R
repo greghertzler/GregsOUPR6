@@ -13,25 +13,11 @@ MC$BackwardPaths(paths=500)
 MC$BackwardPaths(seed=123)
 # no automatic plots
 MC$set_flags(plotit=FALSE)
-# Integral equation and 4th order Runge-Kutta convergence
-# skip is same in both to reuse pseudo-random numbers
-options(digits=10)
-bie <- MC$BackwardPaths(sigma=50)[[1]]
-brk <- MC$BackwardPaths(method=4)[[1]]
-dif <- bie-brk
-max(dif)
-min(dif)
-bie <- MC$BackwardPaths(skip=2)[[1]]
-brk <- MC$BackwardPaths()[[1]]
-dif <- bie-brk
-max(dif)
-min(dif)
 # Wiener Process as plot
 MC$set_oup_params(rho=0,sigma=1)
 MC$PlotBackwardPaths(last=100,title="Wiener Process")
 # Ornstein-Uhlenbeck Process as plot
 MC$set_oup_params(rho=0.5,sigma=15)
-MC$set_path_args(method=1,skip=1)
 MC$PlotBackwardPaths(title="Ornstein-Uhlenbeck Process")
 # custom labels
 MC$PlotBackwardPaths(title="MyTitle",xaxis="MyxAxis",yaxis="MyyAxis")

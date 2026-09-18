@@ -30,6 +30,16 @@ else
 fi
 }
 
+# --- Detect dqrng ---
+DQRNG_HOME=$(Rscript -e "cat(system.file(package='dqrng'))" 2>/dev/null)
+if [ -n "$DQRNG_HOME" ]; then
+    echo "  dqrng found at: $DQRNG_HOME"
+    PKG_CPPFLAGS="$PKG_CPPFLAGS -DUSE_DQRNG -I$DQRNG_HOME/include"
+else
+    echo "  dqrng not found — building without it."
+    PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_DQRNG"
+fi
+
 # Ensure src directory exists
 mkdir -p src
 
