@@ -5,7 +5,7 @@
 echo "Configuring conditional compilation..."
 
 # --- Detect RcppParallel ---
-RCPP_PARALLEL_HOME=$(Rscript -e "cat(system.file(package='RcppParallel'))" 2>/dev/null)
+RCPP_PARALLEL_HOME=$(Rscript -e "cat(system.file(package='RcppParallel',lib.loc=.libPaths()))" 2>/dev/null)
 if [ -n "$RCPP_PARALLEL_HOME" ]; then
     echo "  RcppParallel found at: $RCPP_PARALLEL_HOME"
     PKG_CPPFLAGS="-DUSE_PARALLEL -I$RCPP_PARALLEL_HOME/include"
@@ -16,24 +16,24 @@ else
     PKG_LIBS=""
 fi
 
-# --- Detect sitmo ---
-SITMO_HOME=$(Rscript -e "cat(system.file(package='sitmo'))" 2>/dev/null)
-if [ -n "$SITMO_HOME" ]; then
-    echo "  sitmo found at: $SITMO_HOME"
-    PKG_CPPFLAGS="$PKG_CPPFLAGS -DUSE_SITMO -I$SITMO_HOME/include"
-else
-    echo "  sitmo not found — building without it."
-    PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_SITMO"
-fi
-
 # --- Detect dqrng ---
-DQRNG_HOME=$(Rscript -e "cat(system.file(package='dqrng'))" 2>/dev/null)
+DQRNG_HOME=$(Rscript -e "cat(system.file(package='dqrng',lib.loc=.libPaths()))" 2>/dev/null)
 if [ -n "$DQRNG_HOME" ]; then
     echo "  dqrng found at: $DQRNG_HOME"
     PKG_CPPFLAGS="$PKG_CPPFLAGS -DUSE_DQRNG -I$DQRNG_HOME/include"
 else
     echo "  dqrng not found — building without it."
     PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_DQRNG"
+fi
+
+# --- Detect sitmo ---
+SITMO_HOME=$(Rscript -e "cat(system.file(package='sitmo',lib.loc=.libPaths()))" 2>/dev/null)
+if [ -n "$SITMO_HOME" ]; then
+    echo "  sitmo found at: $SITMO_HOME"
+    PKG_CPPFLAGS="$PKG_CPPFLAGS -DUSE_SITMO -I$SITMO_HOME/include"
+else
+    echo "  sitmo not found — building without it."
+    PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_SITMO"
 fi
 
 # Ensure src directory exists
