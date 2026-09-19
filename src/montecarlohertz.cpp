@@ -506,8 +506,7 @@ Rcpp::NumericMatrix RcppOUPMCStandardNormal(int64_t m, int64_t skip, int64_t pat
     return as<NumericMatrix>(stdnorm);
   }
 #endif
-#endif
-#ifdef NO_PARALLEL
+#else
 #ifdef USE_DQRNG
   if(engine < 2)
   {
