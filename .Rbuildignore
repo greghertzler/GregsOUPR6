@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^GregsOUPR6\.Rproj$
 ^\.Rproj\.user$
 ^\.positai$
