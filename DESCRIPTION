@@ -8,8 +8,8 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 URL: https://greghertzler.github.io/GregsOUPR6/, https://greghertzler.github.io/GregsOUPR6/OUP_Help.html, https://greghertzler.github.io/GregsOUPShiny/OUP_Shiny.html, https://real-options-adoption-resilience.shinyapps.io/GregsOUPShiny/
 Imports: plotly, shiny, stringr, clipr, Rcpp
-Suggests: testthat (>= 3.0.0)
-LinkingTo: Rcpp, RcppParallel, dqrng, sitmo
+Suggests: RcppParallel, testthat (>= 3.0.0)
+LinkingTo: Rcpp, dqrng, sitmo
 SystemRequirements: GNU make
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0
