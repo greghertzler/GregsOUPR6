@@ -103,6 +103,7 @@
 - [`RcppParallelInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
   [`RcppdqrngInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
   [`RcppsitmoInstalled()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
+  [`RcppParallelThreads()`](https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.md)
   : Optional packages
 
 ## Data

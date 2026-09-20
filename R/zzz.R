@@ -7,13 +7,15 @@
 ## usethis namespace: end
 NULL
 
-library(RcppParallel)
-
 #' @rdname OptionalPackages
 #' @usage  RcppParallelThreads()
 #' @return int <- RcppParallelThreads()
 #' @export
-RcppParallelThreads = function() { return(RcppParallel::defaultNumThreads()) }
+RcppParallelThreads = function()
+{
+  if(RcppParallelInstalled()) { return(RcppParallel::defaultNumThreads()) }
+  else { return(1) }
+}
 
 .onAttach <- function(libname,pkgname) {
     msg <- paste0("\nGreetings!\n",

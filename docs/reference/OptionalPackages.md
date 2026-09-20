@@ -12,6 +12,8 @@ RcppParallelInstalled()
 RcppdqrngInstalled()
 
 RcppsitmoInstalled()
+
+RcppParallelThreads()
 ```
 
 ## Value
@@ -21,6 +23,8 @@ bool \<- RcppParallelInstalled()
 bool \<- RcppdqrngInstalled()
 
 bool \<- RcppsitmoInstalled()
+
+int \<- RcppParallelThreads()
 
 ## Discussion
 
