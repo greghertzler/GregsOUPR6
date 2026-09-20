@@ -4,7 +4,14 @@
 
 echo "Configuring conditional compilation..."
 
+# --- Detect shinyapps.io ---
+if [ -n "$SHINY_PORT" ] || [ "$R_CONFIG_ACTIVE" = "shinyapps" ]; then
+    echo "  RcppParallel not compiled — building with Rcpp only."
+    PKG_CPPFLAGS="-DNO_PARALLEL"
+    PKG_LIBS=""
+
 # --- Detect RcppParallel ---
+else
 RCPP_PARALLEL_HOME=$(Rscript -e "cat(system.file(package='RcppParallel',lib.loc=.libPaths()))" 2>/dev/null)
 if [ -n "$RCPP_PARALLEL_HOME" ]; then
     echo "  RcppParallel found at: $RCPP_PARALLEL_HOME"
@@ -14,6 +21,7 @@ else
     echo "  RcppParallel not found — building with Rcpp only."
     PKG_CPPFLAGS="-DNO_PARALLEL"
     PKG_LIBS=""
+fi
 fi
 
 # --- Detect dqrng ---
