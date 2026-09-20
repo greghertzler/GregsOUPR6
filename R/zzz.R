@@ -7,6 +7,8 @@
 ## usethis namespace: end
 NULL
 
+library(RcppParallel)
+
 .onAttach <- function(libname,pkgname) {
     msg <- paste0("\nGreetings!\n",
         "\u2139\ufe0f OUPShiny() to launch the RShiny app,\n",
@@ -14,7 +16,7 @@ NULL
         "\u2139\ufe0f OUPDataList() of data sets,\n",
         "\u2139\ufe0f OUPDemoList() of demos.\n\n",
         "\u2705 Compiled with Rcpp, ")
-    if (RcppParallelInstalled()) {  parallel <- "with RcppParallel, " }
+    if (RcppParallelInstalled()) {  parallel <- paste0("with RcppParallel (",RcppParallel::defaultNumThreads()," threads), ") }
     else { parallel <- "without RcppParallel, "}
     if (RcppdqrngInstalled()) { dqrng <- "with dqrng, " }
     else { dqrng <- "without dqrng, " }
