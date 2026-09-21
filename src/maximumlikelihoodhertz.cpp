@@ -586,8 +586,9 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
   double kappa = 0.1;     // minimum step size (not in the usual Nelder-Mead algorithm)
   double iota = 0.3;      // steps increment (not in the usual Nelder-Mead algorithm)
   // iteration parameters
+  int sigdig = 12;
   int cmax = 9999;
-  double tensigdig = 100000000000;
+  double tensig = 1/pow(10,sigdig);
   // cement constant thetas and create index of thetas in the simplex
   int k = theta.size();
   IntegerVector Ix(k);
@@ -633,7 +634,7 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
     int sign = -1;
     int cnt = 0;
     int starts = 0;
-    while(std::abs(Lprev-LnL) > std::abs(LnL*tensigdig) && cnt < cmax)
+    while(std::abs(Lprev-LnL) > std::abs(LnL*tensig) && cnt < cmax)
     {
       starts += 1;
       sign *= -1;
@@ -664,7 +665,7 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
       int jmax;
       double tdev = std::numeric_limits<double>::max();
       double Ldev = std::numeric_limits<double>::max();
-      while(tdev > tensigdig && Ldev > tensigdig && cnt < cmax)
+      while(tdev > tensig && Ldev > tensig && cnt < cmax)
       {
 // Rcout << "\n" << "tplex" << "\n" << tplex << "Lplex" << "\n" << Lplex << std::endl;
         //   minimum and maximum function values
@@ -867,7 +868,7 @@ NumericVector RcppOUPMLNelderMead(NumericVector tau, NumericVector z, NumericVec
           }
         }
         cnt += +1;
-// Rcout << "tdev, Ldev, starts, cnt " << tdev << "," << Ldev << "," << starts << "," << cnt << std::endl;
+ // Rcout << "tdev, Ldev, starts, cnt " << tdev << "," << Ldev << "," << starts << "," << cnt << std::endl;
       }
       // new minimum
       Lprev = LnL;
