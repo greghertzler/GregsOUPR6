@@ -171,9 +171,8 @@ of the variance over a longer time interval.</p>
 pseudo-random numbers are generated.  Then the uniform random numbers are
 transformed to normal.  If it is installed, the R6 object uses the dqrng
 package.  Otherwise it uses the c++ implementation std::mt19337.  The R
-function rnorm() is slow and not amenable to parallel processing.  It can
-be selected as an option in the Rcpp functions, along with the package sitmo,
-if it is installed.</p>
+function rnorm() is slow, not amenable to parallel processing and not
+available in the R6 object.  It is available in the Rcpp functions.</p>
 <p>Numerically integrating the stochastic differential equation uses the Euler,
 Marayuma or Runge-Kutta schemes. The Euler and Marayuma schemes are first
 and third-order schemes and less accurate than the fourth-order Runge-Kutta
@@ -234,12 +233,12 @@ Bounded Paths become First Passage Time Densities and Probabilities.</p>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="fu">max</span>(dif)</span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="fu">min</span>(dif)</span>
 <span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="fu">sum</span>(dif)</span></code></pre><p></p></div>
-<p>Of course, the question is, 'Why bother?' Analytical formulas to do the
-counting much faster and more accurately.  One reason is to explain the
-formulas.  First Passage Times make start to make sense if you plot Bounded
-Paths and count the number of paths that have crossed the threshold.  Even
-in journal articles, the first  plot will be a Monte Carlo simulation.</p>
-<p>Another reason is to validate the formulas.  Although an Analytical formulay
+<p>Of course, the question is, 'Why bother?' Analytical formulas count much
+faster and more accurately.  One reason is to explain the formulas.  First
+Passage Times make start to make sense if you plot Bounded Paths and count
+the number of paths that have crossed the threshold.  Even in journal
+articles, the method section begins with a Monte Carlo simulation.</p>
+<p>Another reason is to validate the formulas.  Although an Analytical formula
 will calculate thousands of times faster than a Monte Carlo simulation, arriving
 at approximately the same answer both ways is reassuring.</p>
     </div>

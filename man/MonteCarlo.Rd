@@ -148,9 +148,8 @@ Drawing from a standard normal density is difficult and slow.  First uniform
 pseudo-random numbers are generated.  Then the uniform random numbers are
 transformed to normal.  If it is installed, the R6 object uses the dqrng
 package.  Otherwise it uses the c++ implementation std::mt19337.  The R
-function rnorm() is slow and not amenable to parallel processing.  It can
-be selected as an option in the Rcpp functions, along with the package sitmo,
-if it is installed.
+function rnorm() is slow, not amenable to parallel processing and not
+available in the R6 object.  It is available in the Rcpp functions.
 
 Numerically integrating the stochastic differential equation uses the Euler,
 Marayuma or Runge-Kutta schemes. The Euler and Marayuma schemes are first
@@ -227,13 +226,13 @@ To compare  Monte Carlo and Analytical Visiting Times:
   sum(dif)
 }\if{html}{\out{</div>}}
 
-Of course, the question is, 'Why bother?' Analytical formulas to do the
-counting much faster and more accurately.  One reason is to explain the
-formulas.  First Passage Times make start to make sense if you plot Bounded
-Paths and count the number of paths that have crossed the threshold.  Even
-in journal articles, the first  plot will be a Monte Carlo simulation.
+Of course, the question is, 'Why bother?' Analytical formulas count much
+faster and more accurately.  One reason is to explain the formulas.  First
+Passage Times make start to make sense if you plot Bounded Paths and count
+the number of paths that have crossed the threshold.  Even in journal
+articles, the method section begins with a Monte Carlo simulation.
 
-Another reason is to validate the formulas.  Although an Analytical formulay
+Another reason is to validate the formulas.  Although an Analytical formula
 will calculate thousands of times faster than a Monte Carlo simulation, arriving
 at approximately the same answer both ways is reassuring.
 }

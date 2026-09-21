@@ -45,7 +45,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">RcppOUPMCMinMax</span><span class="op">(</span><span class="va">matPaths</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">RcppOUPMCStandardNormal</span><span class="op">(</span><span class="va">m</span>,<span class="va">skip</span>,<span class="va">paths</span>,<span class="va">seed</span><span class="op">)</span></span>
+<span><span class="fu">RcppOUPMCStandardNormal</span><span class="op">(</span><span class="va">m</span>,<span class="va">skip</span>,<span class="va">paths</span>,<span class="va">seed</span>,<span class="va">engine</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">RcppOUPMCForwardPaths</span><span class="op">(</span><span class="va">stdnorm</span>,<span class="va">x</span>,<span class="va">m</span>,<span class="va">skip</span>,<span class="va">dt</span>,<span class="va">rho</span>,<span class="va">mu</span>,<span class="va">sigma</span>,<span class="va">method</span><span class="op">)</span></span>
 <span></span>
@@ -89,7 +89,7 @@
 
 
 <dt id="arg-engine">engine<a class="anchor" aria-label="anchor" href="#arg-engine"></a></dt>
-<dd><p>random number generator</p></dd>
+<dd><p>random number generator, 1 dqrng, 2 mt19937, 3 sitmo, 4 rnorm</p></dd>
 
 
 <dt id="arg-stdnorm">stdnorm<a class="anchor" aria-label="anchor" href="#arg-stdnorm"></a></dt>
@@ -181,7 +181,7 @@
     <h2 id="notes-on-values">Notes on Values<a class="anchor" aria-label="anchor" href="#notes-on-values"></a></h2>
     <p>Return values are vectors and matrices allocated in Rcpp.  The dimensions are
 shown for information.  Of course, do not include them in R calls.  For example:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>stdnorm <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCStandardNormal</span>(m,skip,paths,seed)</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>stdnorm <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCStandardNormal</span>(m,skip,paths,seed,engine)</span></code></pre><p></p></div>
 <p>The return values:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">stdnorm</span>((m<span class="dv">-1</span>)<span class="sc">*</span>skip,paths)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">forward</span>(m,paths)</span>
@@ -201,7 +201,7 @@ backward paths and heat maps.</p>
 path in row m+1.  There are NA entries for paths which previously hit the
 threshold and NA entries in row m+1 for paths which have yet to hit the
 threshold.  Subset in R as:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>bndfpt <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCBoundedPathIntegralEquation</span>(stdnorm,k,x,m,skip,dt,rho,mu,sigma)</span>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>bndfpt <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCBoundedPaths</span>(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>bounded <span class="ot">&lt;-</span> bndfpt[<span class="dv">1</span><span class="sc">:</span>m,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>fpt <span class="ot">&lt;-</span> bndfpt[m<span class="sc">+</span><span class="dv">1</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span></code></pre><p></p></div>
 <p>The return value:</p>
@@ -249,14 +249,14 @@ which locks up the computer.  Rccp can be hundreds of times faster and makes
 Monte-Carlo simulations practical for interactive applications such as RStudio
 and RShiny. RcppParallel speeds the calculations another five to eight times.</p>
 <p>For Monte Carlo simulations, the stochastic integral equation is shocked by
-Brownian Motion.  Brownian Motion is a time transform of standard normal variables.
-The results are forward, backward and bounded paths.</p>
-<p>Forward, backward and bounded paths are binned and counted to approximate
-several solutions. The approximations converge to analytical solutions as the
-number of paths increases.  Binning and counting 1,000,000 paths will be
-accurate to 3 or 4 significant digits.  Here are microbenchmark median times
-for 100,000 and 1,000,000 paths over 100 time intervals, as calculated by
-R6+RccpParallel:</p>
+Brownian Motion, also called the Wiener Process.  This gives forward, backward
+and bounded paths.</p>
+<p>Paths are binned and counted to approximate several solutions. The approximations
+converge to analytical solutions as the number of paths increases.  Binning and
+counting 1,000,000 paths will be accurate to 3 or 4 significant digits.  Here
+are microbenchmark median times for 100,000 and 1,000,000 paths over 100 time
+intervals, as calculated by  R6+RccpParallel on an i7 CPU with 12 threads
+running at a maximum of 4.5 GHz:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>Unit<span class="sc">:</span> milliseconds     paths                paths</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>          <span class="cf">function</span>   <span class="dv">100</span>,<span class="dv">000</span>            <span class="dv">1</span>,<span class="dv">000</span>,<span class="dv">000</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="sc">------------------------------------------------------------</span></span>
@@ -289,8 +289,9 @@ small problems, sequential versions calculate faster.  On large problems,
 parallel versions calculate much faster.</p>
 <p>RcppParallel is an optional package.  If it is installed, it will be used.
 Function RcppParallelInstalled() will enquire whether code is compiled with
-RcppParallel or has fallen back to Rcpp.  Optional packages for random number
-generation are dqrng and sitmo.  The functions RcppdqrngInstalled() and
+RcppParallel or has fallen back to Rcpp.  Function RcppParallelThreads will
+return the number of threads. Optional packages for random number generation
+are dqrng and sitmo.  The functions RcppdqrngInstalled() and
 RcppsitmoInstalled() will enquire whether they are installed.</p>
     </div>
     <div class="section level2">
@@ -306,7 +307,7 @@ In the last argument of the function, these are requested as engine
 1, 2, 3 or 4, respectively.  Microbenchmark median times for 100,000,000
 standard normal variables are:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>Unit<span class="sc">:</span> milliseconds</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>          language           rng    transform  StandardNormal</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>          language        engine    transform  StandardNormal</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="sc">-------------------------------------------------------------</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>              Rcpp         rnorm    inversion       <span class="fl">4145.0140</span></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>              Rcpp   sitmo<span class="sc">::</span>prng   Box<span class="sc">-</span>Muller       <span class="fl">3937.8950</span></span>
@@ -351,7 +352,7 @@ increasing skips.  Also shown are the maximum and minimum differences.</p>
 <p>Even larger skips will calculate, but microbenchmark becomes pac man and
 starts chomping memory.  For skip=8, the paths are the same to within four
 significant digits.  But the Runge-Kutta method is much slower.  The times
-for the standard normal variables and the Runge-Kutta simulation takes
+for the standard normal variables and the Runge-Kutta simulation take
 4.2 seconds.  The integral equation is not improved by larger skips.  For
 skip=1, the integral equation does the job in 0.4 seconds.</p>
 <p>A microbenchmark comparison of indirectly calling RcppParallel functions

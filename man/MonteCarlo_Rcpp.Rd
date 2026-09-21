@@ -16,7 +16,7 @@
 \usage{
 RcppOUPMCMinMax(matPaths)
 
-RcppOUPMCStandardNormal(m,skip,paths,seed)
+RcppOUPMCStandardNormal(m,skip,paths,seed,engine)
 
 RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,method)
 
@@ -45,7 +45,7 @@ RcppOUPMCHeatCountZ(matPaths,z)
 
 \item{seed}{seed for reproducibility}
 
-\item{engine}{random number generator}
+\item{engine}{random number generator, 1 dqrng, 2 mt19937, 3 sitmo, 4 rnorm}
 
 \item{stdnorm}{matrix of standard normal shocks}
 
@@ -111,7 +111,7 @@ Calculations for the R6 class 'MonteCarlo', with parallel processing.
 Return values are vectors and matrices allocated in Rcpp.  The dimensions are
 shown for information.  Of course, do not include them in R calls.  For example:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,engine)
 }\if{html}{\out{</div>}}
 
 The return values:
@@ -147,7 +147,7 @@ path in row m+1.  There are NA entries for paths which previously hit the
 threshold and NA entries in row m+1 for paths which have yet to hit the
 threshold.  Subset in R as:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{bndfpt <- RcppOUPMCBoundedPathIntegralEquation(stdnorm,k,x,m,skip,dt,rho,mu,sigma)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
 bounded <- bndfpt[1:m,,drop=FALSE]
 fpt <- bndfpt[m+1,,drop=FALSE]
 }\if{html}{\out{</div>}}
@@ -215,15 +215,15 @@ Monte-Carlo simulations practical for interactive applications such as RStudio
 and RShiny. RcppParallel speeds the calculations another five to eight times.
 
 For Monte Carlo simulations, the stochastic integral equation is shocked by
-Brownian Motion.  Brownian Motion is a time transform of standard normal variables.
-The results are forward, backward and bounded paths.
+Brownian Motion, also called the Wiener Process.  This gives forward, backward
+and bounded paths.
 
-Forward, backward and bounded paths are binned and counted to approximate
-several solutions. The approximations converge to analytical solutions as the
-number of paths increases.  Binning and counting 1,000,000 paths will be
-accurate to 3 or 4 significant digits.  Here are microbenchmark median times
-for 100,000 and 1,000,000 paths over 100 time intervals, as calculated by
-R6+RccpParallel:
+Paths are binned and counted to approximate several solutions. The approximations
+converge to analytical solutions as the number of paths increases.  Binning and
+counting 1,000,000 paths will be accurate to 3 or 4 significant digits.  Here
+are microbenchmark median times for 100,000 and 1,000,000 paths over 100 time
+intervals, as calculated by  R6+RccpParallel on an i7 CPU with 12 threads
+running at a maximum of 4.5 GHz:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds     paths                paths
           function   100,000            1,000,000
@@ -263,8 +263,9 @@ parallel versions calculate much faster.
 
 RcppParallel is an optional package.  If it is installed, it will be used.
 Function RcppParallelInstalled() will enquire whether code is compiled with
-RcppParallel or has fallen back to Rcpp.  Optional packages for random number
-generation are dqrng and sitmo.  The functions RcppdqrngInstalled() and
+RcppParallel or has fallen back to Rcpp.  Function RcppParallelThreads will
+return the number of threads. Optional packages for random number generation
+are dqrng and sitmo.  The functions RcppdqrngInstalled() and
 RcppsitmoInstalled() will enquire whether they are installed.
 }
 
@@ -284,7 +285,7 @@ In the last argument of the function, these are requested as engine
 standard normal variables are:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Unit: milliseconds
-          language           rng    transform  StandardNormal
+          language        engine    transform  StandardNormal
 -------------------------------------------------------------
               Rcpp         rnorm    inversion       4145.0140
               Rcpp   sitmo::prng   Box-Muller       3937.8950
@@ -338,7 +339,7 @@ increasing skips.  Also shown are the maximum and minimum differences.
 Even larger skips will calculate, but microbenchmark becomes pac man and
 starts chomping memory.  For skip=8, the paths are the same to within four
 significant digits.  But the Runge-Kutta method is much slower.  The times
-for the standard normal variables and the Runge-Kutta simulation takes
+for the standard normal variables and the Runge-Kutta simulation take
 4.2 seconds.  The integral equation is not improved by larger skips.  For
 skip=1, the integral equation does the job in 0.4 seconds.
 

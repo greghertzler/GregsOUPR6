@@ -139,9 +139,8 @@ library(clipr)
 #'  pseudo-random numbers are generated.  Then the uniform random numbers are
 #'  transformed to normal.  If it is installed, the R6 object uses the dqrng
 #'  package.  Otherwise it uses the c++ implementation std::mt19337.  The R
-#'  function rnorm() is slow and not amenable to parallel processing.  It can
-#'  be selected as an option in the Rcpp functions, along with the package sitmo,
-#'  if it is installed.
+#'  function rnorm() is slow, not amenable to parallel processing and not
+#'  available in the R6 object.  It is available in the Rcpp functions.
 #'
 #' Numerically integrating the stochastic differential equation uses the Euler,
 #'  Marayuma or Runge-Kutta schemes. The Euler and Marayuma schemes are first
@@ -215,13 +214,13 @@ library(clipr)
 #'       min(dif)
 #'       sum(dif)
 #'
-#' Of course, the question is, 'Why bother?' Analytical formulas to do the
-#'  counting much faster and more accurately.  One reason is to explain the
-#'  formulas.  First Passage Times make start to make sense if you plot Bounded
-#'  Paths and count the number of paths that have crossed the threshold.  Even
-#'  in journal articles, the first  plot will be a Monte Carlo simulation.
+#' Of course, the question is, 'Why bother?' Analytical formulas count much
+#'  faster and more accurately.  One reason is to explain the formulas.  First
+#'  Passage Times make start to make sense if you plot Bounded Paths and count
+#'  the number of paths that have crossed the threshold.  Even in journal
+#'  articles, the method section begins with a Monte Carlo simulation.
 #'
-#' Another reason is to validate the formulas.  Although an Analytical formulay
+#' Another reason is to validate the formulas.  Although an Analytical formula
 #'  will calculate thousands of times faster than a Monte Carlo simulation, arriving
 #'  at approximately the same answer both ways is reassuring.
 
@@ -2346,7 +2345,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(plotit == TRUE) { print(self$PlotOption()) }
         else if(copyit == TRUE)
         {
-          clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",s[1],rep("",n-1)),c("y",y,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
+          clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",s[1],rep("",n-1)),c("y",y,rep("",n-1)),c("r",r,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
           private$CopyToClipboard(clip)
         }
       }
@@ -4290,7 +4289,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",t,rep("",n-1)),c("y",y,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
+        clip <- rbind(c("Monte Carlo",rep("",n)),c("Options",rep("",n)),c("t",t,rep("",n-1)),c("y",y,rep("",n-1)),c("r",r,rep("",n-1)),c("rho",rho,rep("",n-1)),c("mu",mu,rep("",n-1)),c("sigma",sigma,rep("",n-1)),c("phi",phi,rep("",n-1)),c("paths",paths,rep("",n-1)),c("skip",skip,rep("",n-1)),c("seed",seed,rep("",n-1)),c("\uD835\uDD46(s,x)",x),cbind(s,options))
         private$CopyToClipboard(clip)
       }
       # plot ----
