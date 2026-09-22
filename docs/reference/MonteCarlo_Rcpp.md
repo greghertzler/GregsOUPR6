@@ -244,17 +244,16 @@ faster and makes Monte-Carlo simulations practical for interactive
 applications such as RStudio and RShiny. RcppParallel speeds the
 calculations another five to eight times.
 
-For Monte Carlo simulations, the stochastic integral equation is shocked
-by Brownian Motion, also called the Wiener Process. This gives forward,
-backward and bounded paths.
-
+Monte Carlo simulations are possible paths taken by the stochastic
+integral equation. Paths can go forward or backward and may be bounded.
 Paths are binned and counted to approximate several solutions. The
 approximations converge to analytical solutions as the number of paths
 increases. Binning and counting 1,000,000 paths will be accurate to 3 or
-4 significant digits. Here are microbenchmark median times for 100,000
-and 1,000,000 paths over 100 time intervals, as calculated by
-R6+RccpParallel on an i7 CPU with 12 threads running at a maximum of 4.5
-GHz:
+4 significant digits.
+
+Here are microbenchmark median times for 100,000 and 1,000,000 paths
+over 100 time intervals, as calculated by R6+RccpParallel on an i7 CPU
+with 12 threads running at a maximum of 4.5 GHz:
 
     Unit: milliseconds     paths                paths
               function   100,000            1,000,000
@@ -279,12 +278,10 @@ Times for StandardNormal and ForwardPaths go up approximately ten-fold
 with a ten-fold increase in paths. Times for Probability go up almost
 18-fold with a ten-fold increase in paths.
 
-The function Probability calls the Rcpp function ForwardCountY which
+The R6 function Probability calls the Rcpp function ForwardCountY which
 bins and counts means, variances, transition densities, transition
 probabilities and double integrals. So five sets of plots can be drawn
-from one simulation followed by a count. For comparison, a 3D plot by
-Plotly can take up to a second on an RTX 2070 GPU. So calculations are
-only part of the job.
+from one simulation followed by a count.
 
 The R6 object manages inputs and outputs and draws plots. All
 calculations are in Rcpp and RcppParallel functions. RccpParallel uses
@@ -330,12 +327,12 @@ engine 1, 2, 3 or 4, respectively. Microbenchmark median times for
 
 The random number generators generate uniform random variables. More
 time is spent transforming uniform to normal random variables. The
-method of transform is also listed. These include inverting the normal
-probability, the Polar Box-Muller transform and the Ziggurat transform.
-The Ziggurat transform is a sophisticated lookup table and much faster.
-Results on your computer may vary. On Unix-alike operating systems, the
-Polar Box-Muller transform has been replaced with the Ziggurat
-transform.
+method of transform is also listed. These include inverting the
+cumulative normal, the Polar Box-Muller transform and the Ziggurat
+transform. The Ziggurat transform is a sophisticated lookup table and
+much faster. Results on your computer may vary. On Unix-alike operating
+systems, the Polar Box-Muller transform has been replaced with the
+Ziggurat transform.
 
 Both dqrng and sitmo have other random number generators, but
 dqrng::pcg64 and sitmo::prng are the defaults. Both packages are
@@ -349,12 +346,12 @@ either a 4th-order Runge-Kutta numerical integration or the stochastic
 integral equation, itself. The last argument of the function is the
 method, with 4 for 4th-order Runge-Kutta and 5 for stochastic integral
 equation. Arguments 1, 2 and 3 are reserved for possible future
-implementations of 1st-order Euler and 2nd and 3rd order Maryuma
-methods. But this could be dangerous. Users might use them. The purpose
-would be to demonstrate that low-order numerical methods only converge
-with short time intervals.
+implementations of 1st-order Euler and 2nd and 3rd order Maryuma or
+Runge-Kutta methods. But this could be dangerous. Users might use them.
+The purpose would be to demonstrate that low-order numerical methods
+only converge with short time intervals.
 
-In the function, the skip argument divides the time intervals. For
+In the function above, the skip argument divides the time intervals. For
 example, if the number of times is 101, there are 100 time intervals.
 Argument skip=10 subdivides 100 into 1000 time intervals for the
 calculations and reports results at the 101 times.
@@ -374,9 +371,10 @@ differences.
 Even larger skips will calculate, but microbenchmark becomes pac man and
 starts chomping memory. For skip=8, the paths are the same to within
 four significant digits. But the Runge-Kutta method is much slower. The
-times for the standard normal variables and the Runge-Kutta simulation
-take 4.2 seconds. The integral equation is not improved by larger skips.
-For skip=1, the integral equation does the job in 0.4 seconds.
+time for the standard normal variables plus the time fore the
+Runge-Kutta simulation is 4.2 seconds. The integral equation is not
+improved by larger skips. For skip=1, the integral equation does the job
+in 0.4 seconds.
 
 A microbenchmark comparison of indirectly calling RcppParallel functions
 from R6 with directly calling them from the console is:

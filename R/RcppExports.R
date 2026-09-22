@@ -87,15 +87,13 @@
 #'     OOhat <- env[1,,drop=FALSE]
 #'     shat <- env[2,,drop=FALSE]
 #'
-#'  where t is the terminal time.
-#'
 #' The return value:
 #'
 #'     dOOdszero(4,n+3)
 #'
 #'  is a matrix of four row vectors followed by three column vectors.  The row vectors
 #'  are for option prices and times where the derivatives of option prices with
-#'  respect to times equal zero.  The first and second rows are for option prices.
+#'  respect to times equal zero.  The first and second rows are for option prices
 #'  and times where option prices are convex in time. The third and fourth rows are
 #'  where option prices are concave in time.  The three column vectors are a patch to
 #'  connect the row vectors where the surface of the option prices transform from
@@ -217,7 +215,7 @@
 #'  faster than R6 single-thread.
 #'
 #' Passage Time calculations are expensive.  The mode, median and percentiles
-#'  are searches over densities and probabilities.  The mean is a Gaussian
+#'  require searches over densities and probabilities.  The mean is a Gaussian
 #'  quadrature.  Below are the median times for 10,000 Passage Times:
 #'
 #'     Unit: milliseconds                    R6      R6+           R6+
@@ -273,7 +271,7 @@
 #'  requested, but nothing is calculated twice.  The console stores outputs in
 #'  the global environment, but there is no map of inputs to outputs.  Outputs
 #'  can be stale.  Another advantage of the R6 object is predefined plots with
-#'  Plotly. The same simulation can plotted different ways without recalculation.
+#'  Plotly. The same result can plotted different ways without recalculation.
 #'
 #' More threads are faster, but 12 seem to be enough.  Here are microbenchmark
 #'  median times for calculating 40,000 Transition Probabilities, by the number
@@ -656,8 +654,8 @@ RcppOUPAPassageTimeProbability <- function(t, k, s, x, omega, rho, mu, sigma, z 
 #'  and it is much more convenient.  It is reactive.  In other words, it
 #'  stores inputs and outputs and maps inputs to outputs.  Changing an input will
 #'  nullify dependent outputs, eliminating any danger of reporting a stale output.
-#'  Outputs are calculated only as needed and only once. Then they are reused.
-#'  In plots using Plotly, for example.
+#'  Outputs are calculated only as needed and only once. Then they are reused,
+#'  in plots, for example.
 #'
 #' Potentially, the Rcpp functions could be imported into other packages.
 #'
@@ -957,8 +955,8 @@ RcppOUPFDDecisionThreshold <- function(x, V, OOenv, phi) {
 #'  1.6 times faster.  R6+Rcpp+RcppParallel, with parallel processing of the
 #'  Log Likelihood function, calculates calculates 16.5 times faster than R6+Rcpp
 #'  and 27.4 times faster than R6 single-thread.  Times increase linearly with
-#'  sample size.  The median time for estimating with 59,256 observations is
-#'  0.45198 seconds.
+#'  sample size.  In another estimation, the median time for estimating with
+#'  59,256 observations was 0.45198 seconds.
 #'
 #' RccpParallel uses Intel's Threading Building Blocks (TBB) on the CPU.  Unlike
 #'  parallel processing on a GPU or accelerator, memory isn't copied and there
@@ -1008,17 +1006,16 @@ RcppOUPFDDecisionThreshold <- function(x, V, OOenv, phi) {
 #'  outputs and maps inputs to outputs.  If an input changes, dependent outputs are
 #'  nullified and will be recalculated, as requested, but nothing is calculated twice.
 #'  The console stores outputs in the global environment, but there is no map to
-#'  inputs and outputs can be stale.  Another advantage of the R6 object is predefined
-#'  plots with Plotly. The same simulation can plotted different ways without
-#'  recalculation.
+#'  inputs and outputs can be stale.  Another advantage of the R6 object is
+#'  pre-programmed plots with Plotly.
 #'
 #' Sequential calculations are reproducible, but parallel calculations are not.
 #'  Two runs of the same problem will agree to about 12 significant digits, but
 #'  disagree thereafter.  For exact arithmetic, order doesn't matter.  For
 #'  floating-point arithmetic, it does.  For example, a Log Likelihood is rounded
 #'  to 15 digits as Log Likelihoods for each observation are added.  Changing the
-#'  order changes the rounding and may give slightly different answers.  The TBB
-#'  scheduler determines the order.
+#'  order changes the rounding and may give slightly different answers.  Intel's
+#'  Threading Building Blocks (TBB) determines the order.
 #'
 #' Estimation uses a Nelder-Mead algorithm which calls a log likelihood function.
 #'  The Nelder-Mead algorithm is hopelessly sequential.  The log likelihood is
@@ -1041,14 +1038,11 @@ RcppOUPFDDecisionThreshold <- function(x, V, OOenv, phi) {
 #'                     11   1.7917     717.5494   719.3411
 #'                     12   1.5899     756.6424   758.2323
 #'
-#' These times are longer than previous measurements.  Maybe next time they will be
-#'  shorter.  But a curious thing happens.  More threads can be slower than fewer
-#'  threads.  Monitoring the CPU reveals that all 12 threads are used in all
-#'  estimations. It appears that 'threads' means something else that Intel's
-#'  Threading Building Blocks (TBB) uses to organize the calculations. The column
-#'  for nmstart takes more time if it uses more threads. The Nelder-Mead algorithm
-#'  also takes more time with more threads but the log likelihood function takes
-#'  less time with more threads.  The sweet spot is somewhere in the middle.
+#' These times are longer than previous measurements.  Maybe next time they will
+#'  be shorter.  But curious things happen.  Parallel processing of nmstart should
+#'  probably be converted back to sequential processing.  The sequential Nelder-Mead
+#'  algorithm calling the parallel log likelihood function takes less time and then
+#'  more time as threads increase.  The sweet spot is somewhere in the middle.
 #'
 #' Estimation could be tweaked by using the RcppParallel commands:
 #'
@@ -1225,16 +1219,15 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'  Monte-Carlo simulations practical for interactive applications such as RStudio
 #'  and RShiny. RcppParallel speeds the calculations another five to eight times.
 #'
-#' For Monte Carlo simulations, the stochastic integral equation is shocked by
-#'  Brownian Motion, also called the Wiener Process.  This gives forward, backward
-#'  and bounded paths.
+#' Monte Carlo simulations are possible paths taken by the stochastic integral
+#'  equation.  Paths can go forward or backward and may be bounded.  Paths are
+#'  binned and counted to approximate several solutions. The approximations
+#'  converge to analytical solutions as the number of paths increases.  Binning
+#'  and counting 1,000,000 paths will be accurate to 3 or 4 significant digits.
 #'
-#' Paths are binned and counted to approximate several solutions. The approximations
-#'  converge to analytical solutions as the number of paths increases.  Binning and
-#'  counting 1,000,000 paths will be accurate to 3 or 4 significant digits.  Here
-#'  are microbenchmark median times for 100,000 and 1,000,000 paths over 100 time
-#'  intervals, as calculated by  R6+RccpParallel on an i7 CPU with 12 threads
-#'  running at a maximum of 4.5 GHz:
+#' Here are microbenchmark median times for 100,000 and 1,000,000 paths over
+#'  100 time intervals, as calculated by  R6+RccpParallel on an i7 CPU with
+#'  12 threads running at a maximum of 4.5 GHz:
 #'
 #'     Unit: milliseconds     paths                paths
 #'               function   100,000            1,000,000
@@ -1258,11 +1251,10 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'  a ten-fold increase in paths.  Times for Probability go up almost 18-fold
 #'  with a ten-fold increase in paths.
 #'
-#' The function Probability calls the Rcpp function ForwardCountY which bins and
-#'  counts means, variances, transition densities, transition probabilities and
-#'  double integrals.  So five sets of plots can be drawn from one simulation
-#'  followed by a count. For comparison, a 3D plot by Plotly can take up to a
-#'  second on an RTX 2070 GPU.  So calculations are only part of the job.
+#' The R6 function Probability calls the Rcpp function ForwardCountY which bins
+#'  and counts means, variances, transition densities, transition probabilities
+#'  and  double integrals.  So five sets of plots can be drawn from one simulation
+#'  followed by a count.
 #'
 #' The R6 object manages inputs and outputs and draws plots.  All calculations
 #'  are in Rcpp and RcppParallel functions.  RccpParallel uses Intel's Threading
@@ -1305,7 +1297,7 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'
 #' The random number generators generate uniform random variables.  More time is
 #'  spent transforming uniform to normal random variables.  The method of transform
-#'  is also listed.  These include inverting the normal probability, the Polar
+#'  is also listed.  These include inverting the cumulative normal, the Polar
 #'  Box-Muller transform and the Ziggurat transform.  The Ziggurat transform is
 #'  a sophisticated lookup table and much faster.  Results on your computer may
 #'  vary. On Unix-alike operating systems, the Polar Box-Muller transform has been
@@ -1322,11 +1314,11 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'  equation, itself.  The last argument of the function is the method, with 4
 #'  for 4th-order Runge-Kutta and 5 for stochastic integral equation.  Arguments
 #'  1, 2 and 3 are reserved for possible future implementations of 1st-order
-#'  Euler and 2nd and 3rd order Maryuma methods.  But this could be dangerous.
-#'  Users might use them.  The purpose would be to demonstrate that low-order
-#'  numerical methods only converge with short time intervals.
+#'  Euler and 2nd and 3rd order Maryuma or Runge-Kutta methods.  But this could
+#'  be dangerous. Users might use them.  The purpose would be to demonstrate that
+#'  low-order numerical methods only converge with short time intervals.
 #'
-#' In the function, the skip argument divides the time intervals.  For example,
+#' In the function above, the skip argument divides the time intervals.  For example,
 #'  if the number of times is 101, there are 100 time intervals.  Argument
 #'  skip=10 subdivides 100 into 1000 time intervals for the calculations and
 #'  reports results at the 101 times.
@@ -1344,10 +1336,10 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'
 #' Even larger skips will calculate, but microbenchmark becomes pac man and
 #'  starts chomping memory.  For skip=8, the paths are the same to within four
-#'  significant digits.  But the Runge-Kutta method is much slower.  The times
-#'  for the standard normal variables and the Runge-Kutta simulation take
-#'  4.2 seconds.  The integral equation is not improved by larger skips.  For
-#'  skip=1, the integral equation does the job in 0.4 seconds.
+#'  significant digits.  But the Runge-Kutta method is much slower.  The time
+#'  for the standard normal variables plus the time fore the Runge-Kutta
+#'  simulation is 4.2 seconds.  The integral equation is not improved by larger
+#'  skips.  For skip=1, the integral equation does the job in 0.4 seconds.
 #'
 #' A microbenchmark comparison of indirectly calling RcppParallel functions
 #'  from R6 with directly calling them from the console is:

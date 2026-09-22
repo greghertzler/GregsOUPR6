@@ -280,7 +280,7 @@ library(utils)
 #' Fonts and colors can also be set.  Then clicking a button on the plot downloads
 #'  it.  SVG files are editable for fonts and colors and are manageable for small
 #'  2D plots.  Large 2D and 3D plots are rendered with WebGL and downloaded by
-#'  a screen capture to become a PNG file.  The PNG file may we wrapped in an SVG
+#'  a screen capture to become a PNG file.  The PNG file may be wrapped in an SVG
 #'  file, but it is still just a PNG file.
 #'
 #' @name General
@@ -304,7 +304,7 @@ OUPShiny = function()
 OUPHelpList = function()
 {
   message("OUPHelpView('name') or OUPHelpView(number)")
-  c("General","OUProcess","Analytical","FiniteDifference","MaximumLikelihood","MonteCarlo","Analytical_Rcpp","FiniteDifference_Rcpp","MaximumLikelihood_Rcpp","MonteCarlo_Rcpp","GregsOUPR6","OUP_Shiny","OUP_Help")
+  c("General","OUProcess","Analytical","FiniteDifference","MaximumLikelihood","MonteCarlo","Analytical_Rcpp","FiniteDifference_Rcpp","MaximumLikelihood_Rcpp","MonteCarlo_Rcpp","OUP_Code","OUP_Shiny","OUP_Help")
 }
 #' Function to view help files
 #'
@@ -316,7 +316,7 @@ OUPHelpView = function(help="General")
 {
   if(is.character(help))
   {
-    if(help == "GregsOUPR6")
+    if(help == "OUP_Code")
     {
       utils::browseURL("https://greghertzler.github.io/GregsOUPR6/")
     }
@@ -332,7 +332,7 @@ OUPHelpView = function(help="General")
   }
   else if(is.numeric(help))
   {
-    filelist <-   c("General","OUProcess","Analytical","FiniteDifference","MaximumLikelihood","MonteCarlo","Analytical_Rcpp","FiniteDifference_Rcpp","MaximumLikelihood_Rcpp","MonteCarlo_Rcpp","GregsOUPR6","OUP_Shiny","OUP_Help")
+    filelist <-   c("General","OUProcess","Analytical","FiniteDifference","MaximumLikelihood","MonteCarlo","Analytical_Rcpp","FiniteDifference_Rcpp","MaximumLikelihood_Rcpp","MonteCarlo_Rcpp","OUP_Code","OUP_Shiny","OUP_Help")
     m <- length(filelist)
     i <- as.integer(help)
     if(i < 1) { i <- 1 }
@@ -360,7 +360,7 @@ OUPHelpView = function(help="General")
 #' @export
 OUPDataList = function()
 {
-  datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+  datapath <- paste0(system.file(package="GregsOUPR6"),"/data/")
   filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
   message("OUPDataHelp('name') or OUPDataHelp(number)")
   message("df <- OUPDataRead('name') or df <- OUPDataRead(number)")
@@ -376,7 +376,7 @@ OUPDataHelp = function(help="MyData")
   if(is.character(help)) { utils::help(help,package="GregsOUPR6") }
   else if(is.numeric(help))
   {
-    datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+    datapath <- paste0(system.file(package="GregsOUPR6"),"/data/")
     filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
     m <- length(filelist)
     if(m > 0)
@@ -400,7 +400,7 @@ OUPDataRead = function(file="MyData")
   df <- NULL
   if(is.character(file))
   {
-    datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+    datapath <- paste0(system.file(package="GregsOUPR6"),"/data/")
     filepath <- paste0(tools::file_path_sans_ext(paste0(datapath,file)),".csv")
     if(file.exists(filepath))
     {
@@ -411,7 +411,7 @@ OUPDataRead = function(file="MyData")
   }
   else if(is.numeric(file))
   {
-    datapath <- paste0(find.package("GregsOUPR6"),"/data/")
+    datapath <- paste0(system.file(package="GregsOUPR6"),"/data/")
     filelist <- tools::file_path_sans_ext(list.files(datapath,pattern=".csv"))
     m <- length(filelist)
     if(m > 0)
@@ -438,7 +438,7 @@ OUPDataRead = function(file="MyData")
 #' @export
 OUPDemoList = function()
 {
-  demopath <- paste0(find.package("GregsOUPR6"),"/demo/")
+  demopath <- paste0(system.file(package="GregsOUPR6"),"/demo/")
   filelist <- tools::file_path_sans_ext(list.files(demopath,pattern=".R"))
   message("OUPDemoRun('name') or OUPDemoRun(number)")
   return(filelist)
@@ -452,14 +452,14 @@ OUPDemoRun = function(demo="A_Drift")
 {
   if(is.character(demo))
   {
-    demopath <- paste0(find.package("GregsOUPR6"),"/demo/")
+    demopath <- paste0(system.file(package="GregsOUPR6"),"/demo/")
     filepath <- paste0(tools::file_path_sans_ext(paste0(demopath,demo)),".R")
     if(file.exists(filepath)) { source(filepath, echo = TRUE) }
     else { message(paste0(demo," not found.  Try entering by number in the list.")) }
   }
   else if(is.numeric(demo))
   {
-    demopath <- paste0(find.package("GregsOUPR6"),"/demo/")
+    demopath <- paste0(system.file(package="GregsOUPR6"),"/demo/")
     filelist <- tools::file_path_sans_ext(list.files(demopath,pattern=".R"))
     m <- length(filelist)
     if(m > 0)

@@ -193,8 +193,9 @@ processing for both the Nelder-Mead algorithm and the Log Likelihood
 function, calculates 1.6 times faster. R6+Rcpp+RcppParallel, with
 parallel processing of the Log Likelihood function, calculates
 calculates 16.5 times faster than R6+Rcpp and 27.4 times faster than R6
-single-thread. Times increase linearly with sample size. The median time
-for estimating with 59,256 observations is 0.45198 seconds.
+single-thread. Times increase linearly with sample size. In another
+estimation, the median time for estimating with 59,256 observations was
+0.45198 seconds.
 
 RccpParallel uses Intel's Threading Building Blocks (TBB) on the CPU.
 Unlike parallel processing on a GPU or accelerator, memory isn't copied
@@ -247,8 +248,7 @@ an input changes, dependent outputs are nullified and will be
 recalculated, as requested, but nothing is calculated twice. The console
 stores outputs in the global environment, but there is no map to inputs
 and outputs can be stale. Another advantage of the R6 object is
-predefined plots with Plotly. The same simulation can plotted different
-ways without recalculation.
+pre-programmed plots with Plotly.
 
 Sequential calculations are reproducible, but parallel calculations are
 not. Two runs of the same problem will agree to about 12 significant
@@ -256,7 +256,8 @@ digits, but disagree thereafter. For exact arithmetic, order doesn't
 matter. For floating-point arithmetic, it does. For example, a Log
 Likelihood is rounded to 15 digits as Log Likelihoods for each
 observation are added. Changing the order changes the rounding and may
-give slightly different answers. The TBB scheduler determines the order.
+give slightly different answers. Intel's Threading Building Blocks (TBB)
+determines the order.
 
 Estimation uses a Nelder-Mead algorithm which calls a log likelihood
 function. The Nelder-Mead algorithm is hopelessly sequential. The log
@@ -280,14 +281,11 @@ times for the data set with 19,312 observations:
                     12   1.5899     756.6424   758.2323
 
 These times are longer than previous measurements. Maybe next time they
-will be shorter. But a curious thing happens. More threads can be slower
-than fewer threads. Monitoring the CPU reveals that all 12 threads are
-used in all estimations. It appears that 'threads' means something else
-that Intel's Threading Building Blocks (TBB) uses to organize the
-calculations. The column for nmstart takes more time if it uses more
-threads. The Nelder-Mead algorithm also takes more time with more
-threads but the log likelihood function takes less time with more
-threads. The sweet spot is somewhere in the middle.
+will be shorter. But curious things happen. Parallel processing of
+nmstart should probably be converted back to sequential processing. The
+sequential Nelder-Mead algorithm calling the parallel log likelihood
+function takes less time and then more time as threads increase. The
+sweet spot is somewhere in the middle.
 
 Estimation could be tweaked by using the RcppParallel commands:
 

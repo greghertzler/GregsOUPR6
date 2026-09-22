@@ -313,4 +313,4 @@ Fonts and colors can also be set. Then clicking a button on the plot
 downloads it. SVG files are editable for fonts and colors and are
 manageable for small 2D plots. Large 2D and 3D plots are rendered with
 WebGL and downloaded by a screen capture to become a PNG file. The PNG
-file may we wrapped in an SVG file, but it is still just a PNG file.
+file may be wrapped in an SVG file, but it is still just a PNG file.

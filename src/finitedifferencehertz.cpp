@@ -105,8 +105,8 @@ using namespace Rcpp;
 //'  and it is much more convenient.  It is reactive.  In other words, it
 //'  stores inputs and outputs and maps inputs to outputs.  Changing an input will
 //'  nullify dependent outputs, eliminating any danger of reporting a stale output.
-//'  Outputs are calculated only as needed and only once. Then they are reused.
-//'  In plots using Plotly, for example.
+//'  Outputs are calculated only as needed and only once. Then they are reused,
+//'  in plots, for example.
 //'
 //' Potentially, the Rcpp functions could be imported into other packages.
 //'

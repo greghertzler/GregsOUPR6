@@ -136,13 +136,15 @@ Entering the demos by number in the list saves typing.
 \section{Discussion:}{
 Monte Carlo simulation of the Ornstein-Uhlenbeck Process can be done with
 either of two methods:  numerically integrating the stochastic differential
-equation, or calculating the stochastic integral equation.  The stochastic
-differential equation is shocked by Brownian Motion, also called a Wiener
-Process, simulated as sigma * dt^0.5 * epsilon, where sigma * dt^0.5 is
-the square root of the instantaneous variance and epsilon are draws from a
-standard normal density. The stochastic integral equation is shocked by the
-integral of the Wiener Process, or H * epsilon, where H is the square-root
-of the variance over a longer time interval.
+equation to approximate the stochastic integral equation, or calculating
+the stochastic integral equation directly.
+
+The stochastic differential equation is shocked by Brownian Motion, also
+called a Wiener Process, simulated as sigma * dt^0.5 * epsilon, where
+sigma * dt^0.5 is the square root of the instantaneous variance and epsilon
+are draws from a standard normal density. The stochastic integral equation
+is shocked by the integral of the Wiener Process, or H * epsilon, where H
+is the square-root of the variance over a longer time interval.
 
 Drawing from a standard normal density is difficult and slow.  First uniform
 pseudo-random numbers are generated.  Then the uniform random numbers are
@@ -172,8 +174,8 @@ To simulate forward paths:
 
 A Forward Path starts from the backward state at the backward time and goes
 forward. A single path, sampled from all possible paths, is a Sample Path.
-Just like the flea trying to understand the elephant, a sample Path is enough
-for Maximum Likelihood Estimation to reveal the Ornstein-Uhlenbeck Process.
+Like contemplating a grain of sand to understand the universe, Maximum
+Likelihood Estimation of a Sample Path reveals the Ornstein-Uhlenbeck Process.
 An ensemble of paths can be counted to approximate Transition Densities and
 Probabilities and Visiting Time Densities and Probabilities. The larger the
 ensemble, the better the approximations.
@@ -228,9 +230,9 @@ To compare  Monte Carlo and Analytical Visiting Times:
 
 Of course, the question is, 'Why bother?' Analytical formulas count much
 faster and more accurately.  One reason is to explain the formulas.  First
-Passage Times make start to make sense if you plot Bounded Paths and count
-the number of paths that have crossed the threshold.  Even in journal
-articles, the method section begins with a Monte Carlo simulation.
+Passage Times are difficult to understand until you plot Bounded Paths and
+count the number of paths that have crossed the threshold.  Even in journal
+articles, the method section may begin with a Monte Carlo simulation.
 
 Another reason is to validate the formulas.  Although an Analytical formula
 will calculate thousands of times faster than a Monte Carlo simulation, arriving

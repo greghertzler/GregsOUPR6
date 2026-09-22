@@ -228,8 +228,6 @@ times along the option envelope. It is subset in R as:
     OOhat <- env[1,,drop=FALSE]
     shat <- env[2,,drop=FALSE]
 
-where t is the terminal time.
-
 The return value:
 
     dOOdszero(4,n+3)
@@ -237,7 +235,7 @@ The return value:
 is a matrix of four row vectors followed by three column vectors. The
 row vectors are for option prices and times where the derivatives of
 option prices with respect to times equal zero. The first and second
-rows are for option prices. and times where option prices are convex in
+rows are for option prices and times where option prices are convex in
 time. The third and fourth rows are where option prices are concave in
 time. The three column vectors are a patch to connect the row vectors
 where the surface of the option prices transform from convex to concave.
@@ -363,8 +361,8 @@ R6+RcppParallel calculates 5.0 times faster than R6+Rcpp and 875.7 times
 faster than R6 single-thread.
 
 Passage Time calculations are expensive. The mode, median and
-percentiles are searches over densities and probabilities. The mean is a
-Gaussian quadrature. Below are the median times for 10,000 Passage
+percentiles require searches over densities and probabilities. The mean
+is a Gaussian quadrature. Below are the median times for 10,000 Passage
 Times:
 
     Unit: milliseconds                    R6      R6+           R6+
@@ -423,8 +421,8 @@ an input changes, dependent outputs are nullified and will be
 recalculated, as requested, but nothing is calculated twice. The console
 stores outputs in the global environment, but there is no map of inputs
 to outputs. Outputs can be stale. Another advantage of the R6 object is
-predefined plots with Plotly. The same simulation can plotted different
-ways without recalculation.
+predefined plots with Plotly. The same result can plotted different ways
+without recalculation.
 
 More threads are faster, but 12 seem to be enough. Here are
 microbenchmark median times for calculating 40,000 Transition
