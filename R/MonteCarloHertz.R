@@ -3822,11 +3822,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>p</i>(<i>t,y</i>|<i>s,x</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>p</i>(<i>t,y</i>)=",format(densities[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>y</i>=",y[j]) }
-        }
         if(x < mu) { spy <- list(x=0.8,y=-2.3,z=0.5) }
         else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=-0.8,y=-2.3,z=0.5) }
@@ -3851,6 +3846,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         densitymarker <- list(color=blu$e,size=4,symbol="square")
         gradient <- list(c(0,blu$c),c(1,blu$c))
         markeropacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_Density3D")
         fig <- plot_ly() %>%
@@ -3858,14 +3854,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         skip<- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
-        fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="pt")
+        fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=markeropacity,hovertemplate=hover3D,legendgroup="pt")
         while(i < m)
         {
           i <- i+skip
           markeropacity <- markeropacity-0.07
-          fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=densities[i,],mode="markers",marker=densitymarker,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="pt",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=densities[i,],mode="markers",marker=densitymarker,opacity=markeropacity,hovertemplate=hover3D,legendgroup="pt",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -3997,11 +3993,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>P</i>(<i>t,y</i>|<i>s,x</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>P</i>(<i>t,y</i>)=",format(probabilities[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>y</i>=",y[j]) }
-        }
         if(psi > 0) { spy <- list(x=0.8,y=-2.3,z=0.5) }
         else if(psi == 0) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=-0.8,y=-2.3,z=0.5) }
@@ -4025,6 +4016,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         probabilitymarker <- list(color=grn$e,size=4,symbol="square")
         gradient <- list(c(0,grn$c),c(1,grn$c))
         markeropacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_Probability3D")
         fig <- plot_ly() %>%
@@ -4032,14 +4024,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         skip <- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
-        fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="Pt",showlegend=TRUE)
+        fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=markeropacity,hovertemplate=hover3D,legendgroup="Pt",showlegend=TRUE)
         while(i < m)
         {
           i <- i+skip
           markeropacity <- markeropacity-0.07
-          fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=probabilities[i,],mode="markers",marker=probabilitymarker,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="Pt",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=probabilities[i,],mode="markers",marker=probabilitymarker,opacity=markeropacity,hovertemplate=hover3D,legendgroup="Pt",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -4170,11 +4162,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "\u2119(<i>t,y</i>|<i>s,x</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n) { coordinates[i,j] <- paste(sep="","\u2119(<i>t,y</i>)=",format(doubleintegrals[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>y</i>=",y[j]) }
-        }
         if(psi > 0) { spy <- list(x=0.8,y=-2.3,z=0.5) }
         else if(psi == 0) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=-0.8,y=-2.3,z=0.5) }
@@ -4199,6 +4186,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         doubleintegralmarker <- list(color=red$e,size=4,symbol="square")
         gradient <- list(c(0,red$c),c(1,red$c))
         markeropacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_DoubleIntegral3D")
         fig <- plot_ly() %>%
@@ -4206,14 +4194,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         skip <- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
-        fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=doubleintegrals[i,],name="\u2119(<i>t,y</i>)",mode="lines",line=doubleintegralline,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="PPt",showlegend=TRUE)
+        fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=doubleintegrals[i,],name="\u2119(<i>t,y</i>)",mode="lines",line=doubleintegralline,opacity=markeropacity,hovertemplate=hover3D,legendgroup="PPt",showlegend=TRUE)
         while(i < m)
         {
           i <- i+skip
           markeropacity <- markeropacity-0.07
-          fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=doubleintegrals[i,],mode="markers",marker=doubleintegralmarker,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="PPt",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=y,y=rep(t[i],n),z=doubleintegrals[i,],mode="markers",marker=doubleintegralmarker,opacity=markeropacity,hovertemplate=hover3D,legendgroup="PPt",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=y,y=t,z=doubleintegrals,name="\u2119(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=y,y=t,z=doubleintegrals,name="\u2119(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -4345,14 +4333,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>x</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>s</i>" }
         if(is.null(zaxis)) { zaxis <- "\uD835\uDD46(<i>s,x</i>|<i>t,y</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n)
-          {
-            coordinates[i,j] <- paste(sep="","\uD835\uDD46(<i>s,x</i>)=",format(options[i,j],digits=4),"<br><i>s</i>=",s[i],"<br><i>x</i>=",x[j])
-          }
-        }
         if(phi > 0) { spy <- list(x=-0.4,y=-2.3,z=0.1) }
         else if(phi == 0) { spy <- list(x=0,y=-2.2,z=0.1) }
         else { spy <- list(x=0.4,y=-2.3,z=0.1) }
@@ -4377,6 +4357,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         optionmarker <- list(color=red$e,size=4,symbol="square")
         gradient <- list(c(0,red$c),c(1,red$c))
         markeropacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_Option3DSurface")
         fig <- plot_ly() %>%
@@ -4384,14 +4365,14 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         skip <- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
-        fig <- add_trace(fig,type="scatter3d",x=x,y=rep(s[i],n),z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="OOt",showlegend=TRUE)
+        fig <- add_trace(fig,type="scatter3d",x=x,y=rep(s[i],n),z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=markeropacity,hovertemplate=hover3D,legendgroup="OOt",showlegend=TRUE)
         while(i < m)
         {
           i <- i+skip
           markeropacity <- markeropacity-0.07
-          fig <- add_trace(fig,type="scatter3d",x=x,y=rep(s[i],n),z=options[i,],mode="markers",marker=optionmarker,opacity=markeropacity,hoverinfo="text",text=coordinates[i,],legendgroup="OOt",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=x,y=rep(s[i],n),z=options[i,],mode="markers",marker=optionmarker,opacity=markeropacity,hovertemplate=hover3D,legendgroup="OOt",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -4801,8 +4782,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>p<sub>v</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        coordinatek <- vector("character",m)
-        for(i in 1:m) { coordinatek[i] <- paste(sep="","<i>p<sub>v</sub></i>(<i>t</i>)=",format(pv[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>k</i>=",k) }
         if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
         else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=0.8,y=-2.3,z=0.5) }
@@ -4824,6 +4803,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
           else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
         }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         pvmesh <- MeshCurtainChunky(rep(k,m),t,pv,rep(0,m))
         pvmarker <- list(size=4,color=blu$d)
@@ -4831,7 +4811,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fig <- plot_ly() %>%
           add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="mesh3d",x=pvmesh$xvertex,y=pvmesh$yvertex,z=pvmesh$zvertex,i=pvmesh$ivertex,j=pvmesh$jvertex,k=pvmesh$kvertex,intensity=pvmesh$zvertex,name="<i>p<sub>v</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
-          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=pv,name="<i>p<sub>v</sub></i>(<i>t</i>)",mode="markers",marker=pvmarker,opacity=0.0,hoverinfo="text",text=coordinatek,showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=pv,name="<i>p<sub>v</sub></i>(<i>t</i>)",mode="markers",marker=pvmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -4955,8 +4935,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>P<sub>v</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        coordinatek <- vector("character",m)
-        for(i in 1:m) { coordinatek[i] <- paste(sep="","<i>P<sub>v</sub></i>(<i>t</i>)=",format(Pv[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>k</i>=",k) }
         if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
         else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=0.8,y=-2.3,z=0.5) }
@@ -4977,6 +4955,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
           else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
         }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         Pvmesh <- MeshCurtainChunky(rep(k,m),t,Pv,rep(0,m))
         Pvmarker <- list(size=4,color=grn$d)
@@ -4984,7 +4963,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fig <- plot_ly() %>%
           add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="mesh3d",x=Pvmesh$xvertex,y=Pvmesh$yvertex,z=Pvmesh$zvertex,i=Pvmesh$ivertex,j=Pvmesh$jvertex,k=Pvmesh$kvertex,intensity=Pvmesh$zvertex,name="<i>P<sub>v</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
-          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=Pv,name="<i>P<sub>v</sub></i>(<i>t</i>)",mode="markers",marker=Pvmarker,opacity=0.0,hoverinfo="text",text=coordinatek,showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=Pv,name="<i>P<sub>v</sub></i>(<i>t</i>)",mode="markers",marker=Pvmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -5388,8 +5367,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>p<sub>f</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        coordinatek <- vector("character",m)
-        for(i in 1:m) { coordinatek[i] <- paste(sep="","<i>p<sub>f</sub></i>(<i>t</i>)=",format(pf[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>k</i>=",k) }
         if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
         else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=0.8,y=-2.3,z=0.5) }
@@ -5411,6 +5388,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
           else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
         }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         pfmesh <- MeshCurtainChunky(rep(k,m),t,pf,rep(0,m))
         pfmarker <- list(size=4,color=blu$d)
@@ -5418,7 +5396,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fig <- plot_ly() %>%
           add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="mesh3d",x=pfmesh$xvertex,y=pfmesh$yvertex,z=pfmesh$zvertex,i=pfmesh$ivertex,j=pfmesh$jvertex,k=pfmesh$kvertex,intensity=pfmesh$zvertex,name="<i>p<sub>f</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
-          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=pf,name="<i>p<sub>f</sub></i>(<i>t</i>)",mode="markers",marker=pfmarker,opacity=0.0,hoverinfo="text",text=coordinatek,showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=pf,name="<i>p<sub>f</sub></i>(<i>t</i>)",mode="markers",marker=pfmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -5542,8 +5520,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>P<sub>f</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        coordinatek <- vector("character",m)
-        for(i in 1:m) { coordinatek[i] <- paste(sep="","<i>P<sub>f</sub></i>(<i>t</i>)=",format(Pf[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>k</i>=",k) }
         if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
         else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=0.8,y=-2.3,z=0.5) }
@@ -5564,6 +5540,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
           else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
         }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         Pfmesh <- MeshCurtainChunky(rep(k,m),t,Pf,rep(0,m))
         Pfmarker <- list(size=4,color=grn$d)
@@ -5571,7 +5548,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fig <- plot_ly() %>%
           add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="mesh3d",x=Pfmesh$xvertex,y=Pfmesh$yvertex,z=Pfmesh$zvertex,i=Pfmesh$ivertex,j=Pfmesh$jvertex,k=Pfmesh$kvertex,intensity=Pfmesh$zvertex,name="<i>P<sub>f</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
-          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=Pf,name="<i>P<sub>f</sub></i>(<i>t</i>)",mode="markers",marker=Pfmarker,opacity=0.0,hoverinfo="text",text=coordinatek,showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=Pf,name="<i>P<sub>f</sub></i>(<i>t</i>)",mode="markers",marker=Pfmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }

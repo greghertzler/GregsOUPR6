@@ -3324,14 +3324,6 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(is.null(xaxis)) { xaxis <- "<i>x</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>s</i>" }
         if(is.null(zaxis)) { zaxis <- "\uD835\uDD46(<i>s,x</i>|<i>g,h</i><sup>2</sup><i>,V</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n)
-          {
-            coordinates[i,j] <- paste(sep="","&#x1D546;(<i>s,x</i>)=",format(options[i,j],digits=4),"<br><i>s</i>=",s[i],"<br><i>x</i>=",x[j])
-          }
-        }
         if(V[n] > V[1]) { spy <- list(x=-0.4,y=-2.3,z=0.1) }
         else if(V[n] == V[1]) { spy <- list(x=0,y=-2.2,z=0.1) }
         else { spy <- list(x=0.4,y=-2.3,z=0.1) }
@@ -3346,6 +3338,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         optionline <- list(color=red$e,width=8)
         gradient <- list(c(0,red$c),c(1,red$c))
         lineopacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions=list(format=file$format,width=file$width,height=file$width,filename="OUP_FD_Option3D")
         fig <- plot_ly()
@@ -3354,15 +3347,15 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(ds < 1) { ds <- 1 }
         i <- 1
         for(j in 1:n) { ss[j] <- s[i] }
-        fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="O",showlegend=TRUE)
+        fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="O",showlegend=TRUE)
         while(i < m)
         {
           i <- i+ds
           lineopacity <- lineopacity-0.07
           for(j in 1:n) { ss[j] <- s[i] }
-          fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],mode="lines",line=optionline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="O",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="O",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -3483,8 +3476,6 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(is.null(zaxis)) { zaxis <- "\u00D4(<i>x</i>|<i>g,h</i><sup>2</sup>,<i>V</i>)" }
         OOhold <- vector("double",n)
         OOexercise <- vector("double",n)
-        coordinatesenv <- vector("character",n)
-        coordinates <- matrix("",m,n)
         for(j in 1:n)
         {
           if(shat[j] == s[1])
@@ -3497,8 +3488,6 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             OOhold[j] <- OOhat[j]
             OOexercise[j] <- NA
           }
-          coordinatesenv[j] <- paste(sep="","\u00D4(<i>x</i>)=",format(OOhat[j],digits=4),"<br><i>x</i>=",format(x[j],digits=4))
-          for(i in 1:m) { coordinates[i,j] <- paste(sep="","\uD835\uDD46(<i>s,x</i>)=",format(options[i,j],digits=4),"<br><i>s</i>=",format(s[i],digits=4),"<br><i>x</i>=",format(x[j],digits=4)) }
         }
         OOholdmesh <- MeshCurtainSmooth(x,shat,OOhold,rep(0,n))
         OOexercisemesh <- MeshCurtainSmooth(x,shat,OOexercise,rep(0,n))
@@ -3518,15 +3507,16 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         OOhatline <- list(dash="dash",color=ylw$e,width=6)
         gradientOO <- list(c(0,ylw$d),c(1,ylw$d))
         gradient <- list(c(0,red$c),c(1,red$c))
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_FD_OptionEnvelope3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=OOhat,name="\u00D4(<i>x</i>)",mode="lines",line=OOhatline,hoverinfo="text",text=coordinatesenv,legendgroup="OOhat",showlegend=TRUE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=OOhold,mode="lines",line=OOholdline,hoverinfo="text",text=coordinatesenv,legendgroup="OOhat",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=OOexercise,mode="lines",line=OOexerciseline,hoverinfo="text",text=coordinatesenv,legendgroup="OOhat",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=OOhat,name="\u00D4(<i>x</i>)",mode="lines",line=OOhatline,hovertemplate=hover3D,legendgroup="OOhat",showlegend=TRUE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=OOhold,mode="lines",line=OOholdline,hovertemplate=hover3D,legendgroup="OOhat",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=OOexercise,mode="lines",line=OOexerciseline,hovertemplate=hover3D,legendgroup="OOhat",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=OOholdmesh$xvertex,y=OOholdmesh$yvertex,z=OOholdmesh$zvertex,i=OOholdmesh$ivertex,j=OOholdmesh$jvertex,k=OOholdmesh$kvertex,intensity=OOholdmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientOO,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="OOhat",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=OOexercisemesh$xvertex,y=OOexercisemesh$yvertex,z=OOexercisemesh$zvertex,i=OOexercisemesh$ivertex,j=OOexercisemesh$jvertex,k=OOexercisemesh$kvertex,intensity=OOexercisemesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientOO,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="OOhat",showlegend=FALSE) %>%
-          add_trace(.,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+          add_trace(.,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }

@@ -2836,28 +2836,20 @@ Analytical <- R6::R6Class("Analytical",
         if(x < mu) { spy <- list(x=0.8,y=-2.3,z=0.5) }
         else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=-0.8,y=-2.3,z=0.5) }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(x=1.0,y=0.5,xanchor="right",yanchor="center",tracegroupgap=0,itemsizing="constant")
         # OUP_A_Mean3DDensity
         if(type < 1.5)
         {
           if(is.null(zaxis)) { zaxis <- "<i>p</i>(<i>t,y</i>|<i>s,x</i>)" }
           pmeans <- vector("double",m)
-          coordinatemeans <- vector("character",m)
-          coordinatepmeans <- vector("character",m)
-          coordinates <- matrix("",m,n)
-          for(i in 1:m)
-          {
-            coordinatemeans[i] <- paste(sep="","<i>G</i>(<i>t</i>)=",format(means[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
-            pmeans[i] <- private$OUPDensity(s,x,t[i],means[i],rho,mu,sigma,dy)
-            coordinatepmeans[i] <- paste(sep="","<i>p</i>(<i>t,G</i>)=",format(pmeans[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G</i>=",format(means[i],digits=4))
-            for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>p</i>(<i>t,y</i>)=",format(densities[i,j],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>y</i>=",format(y[j],digits=4)) }
-          }
-          pmesh <- MeshCurtainSmooth(means,t,pmeans,rep(0,m))
+          for(i in 1:m) { pmeans[i] <- private$OUPDensity(s,x,t[i],means[i],rho,mu,sigma,dy) }
           xview <- list(title=xaxis,color=font$color,linecolor=cyn$c,linewidth=3,gridcolor=cyn$c,gridwidth=2,backgroundcolor=cyn$a,showbackground=walls,range=c(1.03*y[1]-0.03*y[n],1.03*y[n]-0.03*y[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=cyn$c,linewidth=3,gridcolor=cyn$c,gridwidth=2,backgroundcolor=cyn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           if(is.nan(pmax)) { zview <- list(title=zaxis,color=font$color,linecolor=cyn$c,linewidth=3,gridcolor=cyn$c,gridwidth=2,backgroundcolor=cyn$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
           else { zview <- list(title=zaxis,color=font$color,linecolor=cyn$c,linewidth=3,gridcolor=cyn$c,gridwidth=2,backgroundcolor=cyn$b,showbackground=floor,range=c(-0.03*pmax,1.03*pmax),tickmode="auto",nticks=5,mirror=TRUE) }
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          pmesh <- MeshCurtainSmooth(means,t,pmeans,rep(0,m))
           pmeanline <- list(color=cyn$d,width=8)
           densityline <- list(color=blu$d,width=8)
           gradientpmeans <- list(c(0,cyn$b),c(1,cyn$b))
@@ -2866,8 +2858,8 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Mean3DDensity")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="text",text=coordinatemeans) %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=pmeans,name="<i>p</i>(<i>t,G</i>)",mode="lines",line=pmeanline,hoverinfo="text",text=coordinatepmeans,legendgroup="pmeans") %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=pmeans,name="<i>p</i>(<i>t,G</i>)",mode="lines",line=pmeanline,hovertemplate=hover3D,legendgroup="pmeans") %>%
             add_trace(.,type="mesh3d",x=pmesh$xvertex,y=pmesh$yvertex,z=pmesh$zvertex,i=pmesh$ivertex,j=pmesh$jvertex,k=pmesh$kvertex,intensity=pmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientpmeans,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="pmeans",showlegend=FALSE)
           tt <- vector("double",n)
           dt <- as.integer((m-1)/10)
@@ -2875,38 +2867,29 @@ Analytical <- R6::R6Class("Analytical",
           lineopacity <- 1
           i <- 1
           for(j in 1:n) { tt[j] <- t[i] }
-          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="p",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="p",visible="legendonly")
           while(i < m)
           {
             i <- i+dt
             lineopacity <- lineopacity-0.07
             for(j in 1:n) { tt[j] <- t[i] }
-            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],mode="lines",line=densityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="p",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],mode="lines",line=densityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="p",visible="legendonly",showlegend=FALSE)
          }
-          fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         # OUP_A_Mean3DProbability
         else
         {
           if(is.null(zaxis)) { zaxis <- "<i>P</i>(<i>t,y</i>|<i>s,x</i>)" }
           Pmeans <- vector("double",m)
-          coordinatemeans <- vector("character",m)
-          coordinatePmeans <- vector("character",m)
-          coordinates <- matrix("",m,n)
-          for(i in 1:m)
-          {
-            coordinatemeans[i] <- paste(sep="","<i>G</i>(<i>t</i>)=",format(means[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
-            Pmeans[i] <- private$OUPProbability(s,x,t[i],means[i],rho,mu,sigma,psi)
-            coordinatePmeans[i] <- paste(sep="","<i>P</i>(<i>t,G</i>)=",format(Pmeans[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G</i>=",format(means[i],digits=4))
-            for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>P</i>(<i>t,y</i>)=",format(densities[i,j],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>y</i>=",y[j]) }
-          }
-          Pmesh <- MeshCurtainSmooth(means,t,Pmeans,rep(0,m))
+          for(i in 1:m) { Pmeans[i] <- private$OUPProbability(s,x,t[i],means[i],rho,mu,sigma,psi) }
           ygap <- 0.03*(y[n]-y[1])
           tgap <- 0.03*(t[m]-t[1])
           xview <- list(title=xaxis,color=font$color,linecolor=cyn$c,linewidth=3,gridcolor=cyn$c,gridwidth=2,backgroundcolor=cyn$a,showbackground=walls,range=c(1.03*y[1]-0.03*y[n],1.03*y[n]-0.03*y[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=cyn$c,linewidth=3,gridcolor=cyn$c,gridwidth=2,backgroundcolor=cyn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           zview <- list(title=zaxis,color=font$color,linecolor=cyn$c,linewidth=3,gridcolor=cyn$c,gridwidth=2,backgroundcolor=cyn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          Pmesh <- MeshCurtainSmooth(means,t,Pmeans,rep(0,m))
           Pmeanline <- list(color=cyn$d,width=8)
           probabilityline <- list(color=grn$d,width=8)
           gradientPmeans <- list(c(0,cyn$b),c(1,cyn$b))
@@ -2915,8 +2898,8 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Mean3DProbability")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="text",text=coordinatemeans) %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=Pmeans,name="<i>P</i>(<i>t,G</i>)",mode="lines",line=Pmeanline,hoverinfo="text",text=coordinatePmeans,legendgroup="Pmeans") %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=Pmeans,name="<i>P</i>(<i>t,G</i>)",mode="lines",line=Pmeanline,hovertemplate=hover3D,legendgroup="Pmeans") %>%
             add_trace(.,type="mesh3d",x=Pmesh$xvertex,y=Pmesh$yvertex,z=Pmesh$zvertex,i=Pmesh$ivertex,j=Pmesh$jvertex,k=Pmesh$kvertex,intensity=Pmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientPmeans,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="Pmeans",showlegend=FALSE)
           tt <- vector("double",n)
           dt <- as.integer((m-1)/10)
@@ -2924,15 +2907,15 @@ Analytical <- R6::R6Class("Analytical",
           lineopacity <- 1
           i <- 1
           for(j in 1:n) { tt[j] <- t[i] }
-          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="P",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="P",visible="legendonly")
           while(i < m)
           {
             i <- i+dt
             lineopacity <- lineopacity-0.07
             for(j in 1:n) { tt[j] <- t[i] }
-            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],mode="lines",line=probabilityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="P",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],mode="lines",line=probabilityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="P",visible="legendonly",showlegend=FALSE)
           }
-          fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
@@ -3097,6 +3080,7 @@ Analytical <- R6::R6Class("Analytical",
         if(x < mu) { spy <- list(x=0.8,y=-2.3,z=0.5) }
         else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=-0.8,y=-2.3,z=0.5) }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(x=1.0,y=0.5,xanchor="right",yanchor="center",tracegroupgap=0,itemsizing="constant")
         # OUP_A_Variance3DDensity
         if(type < 1.5)
@@ -3105,34 +3089,20 @@ Analytical <- R6::R6Class("Analytical",
           pmeansplus <- vector("double",m)
           pmeans <- vector("double",m)
           pmeansminus <- vector("double",m)
-          coordinatemeansplus <- vector("character",m)
-          coordinatemeans <- vector("character",m)
-          coordinatemeansminus <- vector("character",m)
-          coordinatepmeansplus <- vector("character",m)
-          coordinatepmeans <- vector("character",m)
-          coordinatepmeansminus <- vector("character",m)
-          coordinates <- matrix("",m,n)
           for(i in 1:m)
           {
-            coordinatemeansplus[i] <- paste(sep="","<i>G</i>(<i>t</i>)+<i>H</i>(<i>t</i>)=",format(meansplus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
-            coordinatemeans[i] <- paste(sep="","<i>G</i>(<i>t</i>)=",format(means[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
-            coordinatemeansminus[i] <- paste(sep="","<i>G</i>(<i>t</i>)-<i>H</i>(<i>t</i>)=",format(meansminus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
             pmeansplus[i] <- private$OUPDensity(s,x,t[i],meansplus[i],rho,mu,sigma,dy)
-            coordinatepmeansplus[i] <- paste(sep="","<i>p</i>(<i>t,G</i>+<i>H</i>)=",format(pmeansplus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G+H</i>=",format(meansplus[i],digits=4))
             pmeans[i] <- private$OUPDensity(s,x,t[i],means[i],rho,mu,sigma,dy)
-            coordinatepmeans[i] <- paste(sep="","<i>p</i>(<i>t,G</i>)=",format(pmeans[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G</i>=",format(means[i],digits=4))
             pmeansminus[i] <- private$OUPDensity(s,x,t[i],meansminus[i],rho,mu,sigma,dy)
-            coordinatepmeansminus[i] <- paste(sep="","<i>p</i>(<i>t,G</i>-<i>H</i>)=",format(pmeansminus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G-H</i>=",format(meansminus[i],digits=4))
-            for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>p</i>(<i>t,y</i>)=",format(densities[i,j],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>y</i>=",format(y[j],digits=4)) }
           }
-          pmeshplus <- MeshCurtainSmooth(meansplus,t,pmeansplus,rep(0,m))
-          pmesh <- MeshCurtainSmooth(means,t,pmeans,rep(0,m))
-          pmeshminus <- MeshCurtainSmooth(meansminus,t,pmeansminus,rep(0,m))
           xview <- list(title=xaxis,color=font$color,linecolor=mgn$c,linewidth=3,gridcolor=mgn$c,gridwidth=2,backgroundcolor=mgn$a,showbackground=walls,range=c(1.03*y[1]-0.03*y[n],1.03*y[n]-0.03*y[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=mgn$c,linewidth=3,gridcolor=mgn$c,gridwidth=2,backgroundcolor=mgn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           if(is.nan(pmax)) { zview <- list(title=zaxis,color=font$color,linecolor=mgn$c,linewidth=3,gridcolor=mgn$c,gridwidth=2,backgroundcolor=mgn$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
           else { zview <- list(title=zaxis,color=font$color,linecolor=mgn$c,linewidth=3,gridcolor=mgn$c,gridwidth=2,backgroundcolor=mgn$b,showbackground=floor,range=c(-0.03*pmax,1.03*pmax),tickmode="auto",nticks=5,mirror=TRUE) }
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          pmeshplus <- MeshCurtainSmooth(meansplus,t,pmeansplus,rep(0,m))
+          pmesh <- MeshCurtainSmooth(means,t,pmeans,rep(0,m))
+          pmeshminus <- MeshCurtainSmooth(meansminus,t,pmeansminus,rep(0,m))
           pplusline <- list(color=mgn$d,width=8)
           pmeanline <- list(color=cyn$d,width=8)
           pminusline <- list(color=mgn$d,width=8)
@@ -3145,14 +3115,14 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Variance3DDensity")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=meansplus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)+<i>H</i>(<i>t</i>)",mode="lines",line=plusline,hoverinfo="text",text=coordinatemeansplus) %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="text",text=coordinatemeans) %>%
-            add_trace(.,type="scatter3d",x=meansminus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)-<i>H</i>(<i>t</i>)",mode="lines",line=minusline,hoverinfo="text",text=coordinatemeansminus) %>%
-            add_trace(.,type="scatter3d",x=meansplus,y=t,z=pmeansplus,name="<i>p</i>(<i>G</i>+<i>H</i>)",mode="lines",line=pplusline,hoverinfo="text",text=coordinatepmeansplus,legendgroup="pmeansplus") %>%
+            add_trace(.,type="scatter3d",x=meansplus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)+<i>H</i>(<i>t</i>)",mode="lines",line=plusline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=meansminus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)-<i>H</i>(<i>t</i>)",mode="lines",line=minusline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=meansplus,y=t,z=pmeansplus,name="<i>p</i>(<i>G</i>+<i>H</i>)",mode="lines",line=pplusline,hovertemplate=hover3D,legendgroup="pmeansplus") %>%
             add_trace(.,type="mesh3d",x=pmeshplus$xvertex,y=pmeshplus$yvertex,z=pmeshplus$zvertex,i=pmeshplus$ivertex,j=pmeshplus$jvertex,k=pmeshplus$kvertex,intensity=pmeshplus$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientplus,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="pmeansplus",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=pmeans,name="<i>p</i>(<i>t,G</i>)",mode="lines",line=pmeanline,hoverinfo="text",text=coordinatepmeans,legendgroup="pmeans") %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=pmeans,name="<i>p</i>(<i>t,G</i>)",mode="lines",line=pmeanline,hovertemplate=hover3D,legendgroup="pmeans") %>%
             add_trace(.,type="mesh3d",x=pmesh$xvertex,y=pmesh$yvertex,z=pmesh$zvertex,i=pmesh$ivertex,j=pmesh$jvertex,k=pmesh$kvertex,intensity=pmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmean,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="pmeans",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=meansminus,y=t,z=pmeansminus,name="<i>p</i>(<i>G</i>-<i>H</i>)",mode="lines",line=pminusline,hoverinfo="text",text=coordinatepmeansminus,legendgroup="pmeansminus") %>%
+            add_trace(.,type="scatter3d",x=meansminus,y=t,z=pmeansminus,name="<i>p</i>(<i>G</i>-<i>H</i>)",mode="lines",line=pminusline,hovertemplate=hover3D,legendgroup="pmeansminus") %>%
             add_trace(.,type="mesh3d",x=pmeshminus$xvertex,y=pmeshminus$yvertex,z=pmeshminus$zvertex,i=pmeshminus$ivertex,j=pmeshminus$jvertex,k=pmeshminus$kvertex,intensity=pmeshminus$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientminus,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="pmeansminus",showlegend=FALSE)
           tt <- vector("double",n)
           dt <- as.integer((m-1)/10)
@@ -3160,15 +3130,15 @@ Analytical <- R6::R6Class("Analytical",
           lineopacity <- 1
           i <- 1
           for(j in 1:n) { tt[j] <- t[i] }
-          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="p",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="p",visible="legendonly")
           while(i < m)
           {
             i <- i+dt
             lineopacity <- lineopacity-0.07
             for(j in 1:n) { tt[j] <- t[i] }
-            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],mode="lines",line=densityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="p",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],mode="lines",line=densityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="p",visible="legendonly",showlegend=FALSE)
           }
-          fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         # OUP_A_Variance3DProbability
         else
@@ -3185,30 +3155,13 @@ Analytical <- R6::R6Class("Analytical",
             Pmeansplus <- rep(0.8413447,m)
             Pmeansminus <- rep(0.1586553,m)
           }
-          coordinatemeansplus <- vector("character",m)
-          coordinatemeans <- vector("character",m)
-          coordinatemeansminus <- vector("character",m)
-          coordinatePmeansplus <- vector("character",m)
-          coordinatePmeans <- vector("character",m)
-          coordinatePmeansminus <- vector("character",m)
-          coordinates <- matrix("",m,n)
-          for(i in 1:m)
-          {
-            coordinatemeansplus[i] <- paste(sep="","<i>G</i>(<i>t</i>)+<i>H</i>(<i>t</i>)=",format(meansplus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
-            coordinatemeans[i] <- paste(sep="","<i>G</i>(<i>t</i>)=",format(means[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
-            coordinatemeansminus[i] <- paste(sep="","<i>G</i>(<i>t</i>)-<i>H</i>(<i>t</i>)=",format(meansminus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4))
-            coordinatePmeansplus[i] <- paste(sep="","<i>P</i>(<i>t,G+<i>H</i>)=",format(Pmeansplus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G+H</i>=",format(meansplus[i],digits=4))
-            coordinatePmeans[i] <- paste(sep="","<i>P</i>(<i>t,G</i>)=",format(Pmeans[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G</i>=",format(means[i],digits=4))
-            coordinatePmeansminus[i] <- paste(sep="","<i>P</i>(<i>t,G-<i>H</i>)=",format(Pmeansminus[i],digits=4),"<br><i>t</i>=",format(t[i],digits=4),"<br><i>G-H</i>=",format(meansminus[i],digits=4))
-            for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>P</i>(<i>t,y</i>)=",format(probabilities[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>y</i>=",y[j]) }
-          }
-          Pmeshplus <- MeshCurtainSmooth(meansplus,t,Pmeansplus,rep(0,m))
-          Pmesh <- MeshCurtainSmooth(means,t,Pmeans,rep(0,m))
-          Pmeshminus <- MeshCurtainSmooth(meansminus,t,Pmeansminus,rep(0,m))
           xview <- list(title=xaxis,color=font$color,linecolor=mgn$c,linewidth=3,gridcolor=mgn$c,gridwidth=2,backgroundcolor=mgn$a,showbackground=walls,range=c(1.03*y[1]-0.03*y[n],1.03*y[n]-0.03*y[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=mgn$c,linewidth=3,gridcolor=mgn$c,gridwidth=2,backgroundcolor=mgn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           zview <- list(title=zaxis,color=font$color,linecolor=mgn$c,linewidth=3,gridcolor=mgn$c,gridwidth=2,backgroundcolor=mgn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          Pmeshplus <- MeshCurtainSmooth(meansplus,t,Pmeansplus,rep(0,m))
+          Pmesh <- MeshCurtainSmooth(means,t,Pmeans,rep(0,m))
+          Pmeshminus <- MeshCurtainSmooth(meansminus,t,Pmeansminus,rep(0,m))
           Pplusline <- list(color=mgn$d,width=8)
           Pmeanline <- list(color=cyn$d,width=8)
           Pminusline <- list(color=mgn$d,width=8)
@@ -3221,14 +3174,14 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Variance3DProbability")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=meansplus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)+<i>H</i>(<i>t</i>)",mode="lines",line=plusline,hoverinfo="text",text=coordinatemeansplus) %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="text",text=coordinatemeans) %>%
-            add_trace(.,type="scatter3d",x=meansminus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)-<i>H</i>(<i>t</i>)",mode="lines",line=minusline,hoverinfo="text",text=coordinatemeansminus) %>%
-            add_trace(.,type="scatter3d",x=meansplus,y=t,z=Pmeansplus,name="<i>P</i>(<i>t,G</i>+<i>H</i>)",mode="lines",line=Pplusline,hoverinfo="text",text=coordinatePmeansplus,legendgroup="Pmeansplus") %>%
+            add_trace(.,type="scatter3d",x=meansplus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)+<i>H</i>(<i>t</i>)",mode="lines",line=plusline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=meansminus,y=t,z=rep(0,m),name="<i>G</i>(<i>t</i>)-<i>H</i>(<i>t</i>)",mode="lines",line=minusline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=meansplus,y=t,z=Pmeansplus,name="<i>P</i>(<i>t,G</i>+<i>H</i>)",mode="lines",line=Pplusline,hovertemplate=hover3D,legendgroup="Pmeansplus") %>%
             add_trace(.,type="mesh3d",x=Pmeshplus$xvertex,y=Pmeshplus$yvertex,z=Pmeshplus$zvertex,i=Pmeshplus$ivertex,j=Pmeshplus$jvertex,k=Pmeshplus$kvertex,intensity=Pmeshplus$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientplus,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="Pmeansplus",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=means,y=t,z=Pmeans,name="<i>P</i>(<i>t,G</i>)",mode="lines",line=Pmeanline,hoverinfo="text",text=coordinatePmeans,legendgroup="Pmeans") %>%
+            add_trace(.,type="scatter3d",x=means,y=t,z=Pmeans,name="<i>P</i>(<i>t,G</i>)",mode="lines",line=Pmeanline,hovertemplate=hover3D,legendgroup="Pmeans") %>%
             add_trace(.,type="mesh3d",x=Pmesh$xvertex,y=Pmesh$yvertex,z=Pmesh$zvertex,i=Pmesh$ivertex,j=Pmesh$jvertex,k=Pmesh$kvertex,intensity=Pmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmean,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="Pmeans",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=meansminus,y=t,z=Pmeansminus,name="<i>P</i>(<i>t,G</i>-<i>H</i>)",mode="lines",line=Pminusline,hoverinfo="text",text=coordinatePmeansminus,legendgroup="Pmeansminus") %>%
+            add_trace(.,type="scatter3d",x=meansminus,y=t,z=Pmeansminus,name="<i>P</i>(<i>t,G</i>-<i>H</i>)",mode="lines",line=Pminusline,hovertemplate=hover3D,legendgroup="Pmeansminus") %>%
             add_trace(.,type="mesh3d",x=Pmeshminus$xvertex,y=Pmeshminus$yvertex,z=Pmeshminus$zvertex,i=Pmeshminus$ivertex,j=Pmeshminus$jvertex,k=Pmeshminus$kvertex,intensity=Pmeshminus$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientminus,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="Pmeansminus",showlegend=FALSE)
           tt <- vector("double",n)
           dt <- as.integer((m-1)/10)
@@ -3236,15 +3189,15 @@ Analytical <- R6::R6Class("Analytical",
           lineopacity <- 1
           i <- 1
           for(j in 1:n) { tt[j] <- t[i] }
-          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="P",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="P",visible="legendonly")
           while(i < m)
           {
             i <- i+dt
             lineopacity <- lineopacity-0.07
             for(j in 1:n) { tt[j] <- t[i] }
-            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],mode="lines",line=probabilityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="P",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],mode="lines",line=probabilityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="P",visible="legendonly",showlegend=FALSE)
           }
-          fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
@@ -3383,6 +3336,7 @@ Analytical <- R6::R6Class("Analytical",
         densityline <- list(color=blu$e,width=8)
         gradient <- list(c(0,blu$c),c(1,blu$c))
         lineopacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Density3D")
         fig <- plot_ly()
@@ -3391,15 +3345,15 @@ Analytical <- R6::R6Class("Analytical",
         if(dt < 1) { dt <- 1 }
         i <- 1
         for(j in 1:n) { tt[j] <- t[i] }
-        fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="p")
+        fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],name="<i>p</i>(<i>t,y</i>)",mode="lines",line=densityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="p")
         while(i < m)
         {
           i <- i+dt
           lineopacity <- lineopacity-0.07
           for(j in 1:n) { tt[j] <- t[i] }
-          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],mode="lines",line=densityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="p",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=densities[i,],mode="lines",line=densityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="p",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly", showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=y,y=t,z=densities,name="<i>p</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly", showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -3518,11 +3472,6 @@ Analytical <- R6::R6Class("Analytical",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>P</i>(<i>t,y</i>|<i>s,x</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>P</i>(<i>t,y</i>)=",format(probabilities[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>y</i>=",y[j]) }
-        }
         if(psi > 0) { spy <- list(x=0.8,y=-2.3,z=0.5) }
         else if(psi == 0) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=-0.8,y=-2.3,z=0.5) }
@@ -3535,6 +3484,7 @@ Analytical <- R6::R6Class("Analytical",
         probabilityline <- list(color=grn$e,width=8)
         gradient <- list(c(0,grn$c),c(1,grn$c))
         lineopacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Probability3D")
         fig <- plot_ly()
@@ -3543,15 +3493,15 @@ Analytical <- R6::R6Class("Analytical",
         if(dt < 1) { dt <- 1 }
         i <- 1
         for(j in 1:n) { tt[j] <- t[i] }
-        fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="P")
+        fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],name="<i>P</i>(<i>t,y</i>)",mode="lines",line=probabilityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="P")
         while(i < m)
         {
           i <- i+dt
           lineopacity <- lineopacity-0.07
           for(j in 1:n) { tt[j] <- t[i] }
-          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],mode="lines",line=probabilityline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="P",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=probabilities[i,],mode="lines",line=probabilityline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="P",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly", showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=y,y=t,z=probabilities,name="<i>P</i>(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly", showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -3670,11 +3620,6 @@ Analytical <- R6::R6Class("Analytical",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "\u2119(<i>t,y</i>|<i>s,x</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n) { coordinates[i,j] <- paste(sep="","\u2119(<i>t,y</i>)=",format(doubleintegrals[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>y</i>=",y[j]) }
-        }
         if(psi > 0) { spy <- list(x=0.8,y=-2.3,z=0.5) }
         else if(psi == 0) { spy <- list(x=0,y=-2.4,z=0.5) }
         else { spy <- list(x=-0.8,y=-2.3,z=0.5) }
@@ -3688,6 +3633,7 @@ Analytical <- R6::R6Class("Analytical",
         doubleintegralline <- list(color=red$e,width=8)
         gradient <- list(c(0,red$c),c(1,red$c))
         lineopacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_DoubleIntegral3D")
         fig <- plot_ly()
@@ -3696,15 +3642,15 @@ Analytical <- R6::R6Class("Analytical",
         if(dt < 1) { dt <- 1 }
         i <- 1
         for(j in 1:n) { tt[j] <- t[i] }
-        fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=doubleintegrals[i,],name="\u2119(<i>t,y</i>)",mode="lines",line=doubleintegralline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="PP")
+        fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=doubleintegrals[i,],name="\u2119(<i>t,y</i>)",mode="lines",line=doubleintegralline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="PP")
         while(i < m)
         {
           i <- i+dt
           lineopacity <- lineopacity-0.07
           for(j in 1:n) { tt[j] <- t[i] }
-          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=doubleintegrals[i,],mode="lines",line=doubleintegralline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="PP",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=y,y=tt,z=doubleintegrals[i,],mode="lines",line=doubleintegralline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="PP",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=y,y=t,z=doubleintegrals,name="\u2119(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly", showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=y,y=t,z=doubleintegrals,name="\u2119(<i>t,y</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly", showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -3828,14 +3774,6 @@ Analytical <- R6::R6Class("Analytical",
         if(is.null(xaxis)) { xaxis <- "<i>x</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>s</i>" }
         if(is.null(zaxis)) { zaxis <- "\uD835\uDD46(<i>s,x</i>|<i>t,y</i>)" }
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n)
-          {
-            coordinates[i,j] <- paste(sep="","\uD835\uDD46(<i>s,x</i>)=",format(options[i,j],digits=4),"<br><i>s</i>=",s[i],"<br><i>x</i>=",x[j])
-          }
-        }
         if(phi > 0) { spy <- list(x=-0.4,y=-2.3,z=0.1) }
         else if(phi == 0) { spy <- list(x=0,y=-2.2,z=0.1) }
         else { spy <- list(x=0.4,y=-2.3,z=0.1) }
@@ -3849,6 +3787,7 @@ Analytical <- R6::R6Class("Analytical",
         optionline <- list(color=red$d,width=8)
         gradient <- list(c(0,red$c),c(1,red$c))
         lineopacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Option3D")
         fig <- plot_ly()
@@ -3857,15 +3796,15 @@ Analytical <- R6::R6Class("Analytical",
         if(ds < 1) { ds <- 1 }
         i <- 1
         for(j in 1:n) { ss[j] <- s[i] }
-        fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="OO")
+        fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="OO")
         while(i < m)
         {
           i <- i+ds
           lineopacity <- lineopacity-0.07
           for(j in 1:n) { ss[j] <- s[i] }
-          fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],mode="lines",line=optionline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="OO",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="OO",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly", showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly", showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -4036,10 +3975,6 @@ Analytical <- R6::R6Class("Analytical",
         if(is.null(zaxis)) { zaxis <- "\u00D4(<i>x</i>|<i>y</i>)" }
         OOhold <- vector("double",n)
         OOexercise <- vector("double",n)
-        coordinateshat <- vector("character",n)
-        coordinatesconvex <- vector("character",n)
-        coordinatesconcave <- vector("character",n)
-        coordinates <- matrix("",m,n)
         finite <- TRUE
         for(j in 1:n)
         {
@@ -4055,12 +3990,8 @@ Analytical <- R6::R6Class("Analytical",
               OOhold[j] <- OOhat[j]
               OOexercise[j] <- NA
             }
-            coordinateshat[j] <- paste(sep="","\u00D4(<i>x</i>)=",format(OOhat[j],digits=4),"<br><i>x</i>=",format(x[j],digits=4))
-            coordinatesconvex[j] <- paste(sep="","\u00D4(<i>x</i>)=",format(dOOdsconvex[1,j],digits=4),"<br><i>x</i>=",format(x[j],digits=4))
-            coordinatesconcave[j] <- paste(sep="","\u00D4(<i>x</i>)=",format(dOOdsconcave[1,j],digits=4),"<br><i>x</i>=",format(x[j],digits=4))
           }
           else { finite <- FALSE }
-          for(i in 1:m) { coordinates[i,j] <- paste(sep="","\uD835\uDD46(<i>s,x</i>)=",format(options[i,j],digits=4),"<br><i>s</i>=",format(s[i],digits=4),"<br><i>x</i>=",format(x[j],digits=4)) }
         }
         if(phi > 0) { spy <- list(x=-0.4,y=-2.3,z=0.1) }
         else if(phi == 0) { spy <- list(x=0,y=-2.2,z=0.1) }
@@ -4072,6 +4003,7 @@ Analytical <- R6::R6Class("Analytical",
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview, zaxis=zview,aspectratio=list(x=1,y=1,z=1))
         rise <- list(x=0,y=-300,z=0)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_OptionEnvelope3D")
         gradient <- list(c(0,red$c),c(1,red$c))
@@ -4089,20 +4021,20 @@ Analytical <- R6::R6Class("Analytical",
           dOOdszeroline <- list(color=red$e,width=8)
           gradienthat <- list(c(0,ylw$d),c(1,ylw$d))
           gradientzero <- list(c(0,red$d),c(1,red$d))
-          fig <- add_trace(fig,type="scatter3d",x=x,y=shat,z=OOhat,name="\u00D4(<i>x</i>)",mode="lines",line=OOhatline,hoverinfo="text",text=coordinateshat,legendgroup="OOhat") %>%
-            add_trace(.,type="scatter3d",x=x,y=shat,z=OOhold,mode="lines",line=OOholdline,hoverinfo="text",text=coordinateshat,legendgroup="OOhat",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=x,y=shat,z=OOexercise,mode="lines",line=OOexerciseline,hoverinfo="text",text=coordinateshat,legendgroup="OOhat",showlegend=FALSE) %>%
+          fig <- add_trace(fig,type="scatter3d",x=x,y=shat,z=OOhat,name="\u00D4(<i>x</i>)",mode="lines",line=OOhatline,hovertemplate=hover3D,legendgroup="OOhat") %>%
+            add_trace(.,type="scatter3d",x=x,y=shat,z=OOhold,mode="lines",line=OOholdline,hovertemplate=hover3D,legendgroup="OOhat",showlegend=FALSE) %>%
+            add_trace(.,type="scatter3d",x=x,y=shat,z=OOexercise,mode="lines",line=OOexerciseline,hovertemplate=hover3D,legendgroup="OOhat",showlegend=FALSE) %>%
             add_trace(.,type="mesh3d",x=OOholdmesh$xvertex,y=OOholdmesh$yvertex,z=OOholdmesh$zvertex,i=OOholdmesh$ivertex,j=OOholdmesh$jvertex,k=OOholdmesh$kvertex,intensity=OOholdmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradienthat,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="OOhat",showlegend=FALSE) %>%
             add_trace(.,type="mesh3d",x=OOexercisemesh$xvertex,y=OOexercisemesh$yvertex,z=OOexercisemesh$zvertex,i=OOexercisemesh$ivertex,j=OOexercisemesh$jvertex,k=OOexercisemesh$kvertex,intensity=OOexercisemesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradienthat,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="OOhat",showlegend=FALSE) %>%
-            add_trace(.,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
-            add_trace(.,type="scatter3d",x=x,y=dOOdsconvex[2,],z=dOOdsconvex[1,],name="d\uD835\uDD46/ds=0",mode="lines",line=dOOdszeroline,hoverinfo="text",text=coordinatesconvex,legendgroup="dOOds",visible="legendonly") %>%
-            add_trace(.,type="scatter3d",x=x,y=dOOdsconcave[2,],z=dOOdsconcave[1,],mode="lines",line=dOOdszeroline,hoverinfo="text",text=coordinatesconcave,legendgroup="dOOds",visible="legendonly",showlegend=FALSE) %>%
+            add_trace(.,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
+            add_trace(.,type="scatter3d",x=x,y=dOOdsconvex[2,],z=dOOdsconvex[1,],name="d\uD835\uDD46/ds=0",mode="lines",line=dOOdszeroline,hovertemplate=hover3D,legendgroup="dOOds",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=x,y=dOOdsconcave[2,],z=dOOdsconcave[1,],mode="lines",line=dOOdszeroline,hovertemplate=hover3D,legendgroup="dOOds",visible="legendonly",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=dOOdspatch[3,],y=dOOdspatch[2,],z=dOOdspatch[1,],mode="lines",line=dOOdszeroline,hoverinfo="skip",legendgroup="dOOds",visible="legendonly",showlegend=FALSE) %>%
             add_trace(.,type="mesh3d",x=dzero1mesh$xvertex,y=dzero1mesh$yvertex,z=dzero1mesh$zvertex,i=dzero1mesh$ivertex,j=dzero1mesh$jvertex,k=dzero1mesh$kvertex,intensity=dzero1mesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientzero,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="dOOds",visible="legendonly",showlegend=FALSE) %>%
             add_trace(.,type="mesh3d",x=dzero2mesh$xvertex,y=dzero2mesh$yvertex,z=dzero2mesh$zvertex,i=dzero2mesh$ivertex,j=dzero2mesh$jvertex,k=dzero2mesh$kvertex,intensity=dzero2mesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientzero,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="dOOds",visible="legendonly",showlegend=FALSE) %>%
             add_trace(.,type="mesh3d",x=dzero3mesh$xvertex,y=dzero3mesh$yvertex,z=dzero3mesh$zvertex,i=dzero3mesh$ivertex,j=dzero3mesh$jvertex,k=dzero3mesh$kvertex,intensity=dzero3mesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientzero,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="dOOds",visible="legendonly",showlegend=FALSE)
         }
-        else { fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,showlegend=TRUE) }
+        else { fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,showlegend=TRUE) }
         fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -4391,15 +4323,6 @@ Analytical <- R6::R6Class("Analytical",
         origin <- matrix(0.0,m,n)
         originx <- rep(0.0,n)
         originy <- rep(0.0,m)
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          for(j in 1:n)
-          {
-            if(phi > 0) { coordinates[i,j] <- paste(sep="","\u2102(<i>s,x</i>)=",format(obligations[i,j],digits=4),"<br><i>s</i>=",format(s[i],digits=4),"<br><i>x</i>=",format(x[j],digits=4)) }
-            else { coordinates[i,j] <- paste(sep="","\uD835\uDD39(<i>s,x</i>)=",format(obligations[i,j],digits=4),"<br><i>s</i>=",format(s[i],digits=4),"<br><i>x</i>=",format(x[j],digits=4)) }
-          }
-        }
         if(phi > 0) { tracename <- "\u2102(<i>s,x</i>)" }
         else { tracename <- "\uD835\uDD39(<i>s,x</i>)" }
         if(phi > 0) { spy <- list(x=0.6,y=-2.3,z=0.3) }
@@ -4418,30 +4341,32 @@ Analytical <- R6::R6Class("Analytical",
         zgradient <- list(c(0,ylw$b),c(1,ylw$b))
         originframe <- list(color=ylw$c,width=2)
         lineopacity <- 1
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Obligation3D")
+        # origin
         fig <- plot_ly() %>%
           add_trace(.,type="surface",x=x,y=s,z=origin,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=zgradient,reversescale=reverse,opacity=0.5,hoverinfo="skip",showlegend=FALSE) %>%
           add_trace(.,type="scatter3d",x=x,y=rep(s[1],n),z=originx,mode="lines",line=originframe,hoverinfo="skip",showlegend=FALSE) %>%
           add_trace(.,type="scatter3d",x=x,y=rep(s[m],n),z=originx,mode="lines",line=originframe,hoverinfo="skip",showlegend=FALSE) %>%
           add_trace(.,type="scatter3d",x=rep(x[1],m),y=s,z=originy,mode="lines",line=originframe,hoverinfo="skip",showlegend=FALSE) %>%
           add_trace(.,type="scatter3d",x=rep(x[n],m),y=s,z=originy,mode="lines",line=originframe,hoverinfo="skip",showlegend=FALSE)
-        # # scatter
+        # scatter
         ss <- vector("double",n)
         ds <- as.integer((m-1)/10)
         if(ds < 1) { ds <- 1 }
         i <- 1
         for(j in 1:n) { ss[j] <- s[i] }
-        fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=obligations[i,],name=tracename,mode="lines",line=obligationline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="BC")
+        fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=obligations[i,],name=tracename,mode="lines",line=obligationline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="BC")
         while(i < m)
         {
           i <- i+ds
           lineopacity <- lineopacity-0.07
           for(j in 1:n) { ss[j] <- s[i] }
-          fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=obligations[i,],mode="lines",line=obligationline,opacity=lineopacity,hoverinfo="text",text=coordinates[i,],legendgroup="BC",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=obligations[i,],mode="lines",line=obligationline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="BC",showlegend=FALSE)
         }
-        # # surface
-        fig <- add_trace(fig,type="surface",x=x,y=s,z=obligations,name=tracename,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=obgradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly", showlegend=TRUE)
+        # surface
+        fig <- add_trace(fig,type="surface",x=x,y=s,z=obligations,name=tracename,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=obgradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly", showlegend=TRUE)
         # envelope
         obhat <- vector("double",n)
         obhold <- vector("double",n)
@@ -4452,9 +4377,6 @@ Analytical <- R6::R6Class("Analytical",
         opexercise <- vector("double",n)
         opinterest <- vector("double",n)
         zero <- rep(0,n)
-        coordinatesobhat <- vector("character",n)
-        coordinatesophat <- vector("character",n)
-        coordinateszero <- vector("character",n)
         for(j in 1:n)
         {
           if(shat[j] < s[m])
@@ -4470,9 +4392,6 @@ Analytical <- R6::R6Class("Analytical",
             else { obhat[j] <- exp(-r*(t-shat[j]))*(G-y+b+c) }
             ophat[j] <- OOhat[j]+obhat[j]
           }
-          coordinatesobhat[j] <- paste(sep="","\u00D4(<i>x</i>)=",format(obhat[j],digits=4),"<br><i>x</i>=",format(x[j],digits=4))
-          coordinatesophat[j] <- paste(sep="","\u00D4(<i>x</i>)=",format(ophat[j],digits=4),"<br><i>x</i>=",format(x[j],digits=4))
-          coordinateszero[j] <- paste(sep="","\u00D4(<i>x</i>)=",format(zero[j],digits=4),"<br><i>x</i>=",format(x[j],digits=4))
         }
         if(phi > 0)
         {
@@ -4552,15 +4471,15 @@ Analytical <- R6::R6Class("Analytical",
         zeroline <- list(color=red$c,width=8)
         opgradient <- list(c(0,red$c),c(1,red$c))
         obgradient <- list(c(0,red$b),c(1,red$b))
-        fig <- add_trace(fig,type="scatter3d",x=x,y=shat,z=zero,name="\u00D4(<i>x</i>)",mode="lines",line=zeroline,hoverinfo="text",text=coordinateszero,legendgroup="OOhat",visible="legendonly") %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=obhat,mode="lines",line=obhatline,hoverinfo="text",text=coordinatesobhat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=obhold,mode="lines",line=obholdline,hoverinfo="text",text=coordinatesobhat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=obexercise,mode="lines",line=obexerciseline,hoverinfo="text",text=coordinatesobhat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=obinterest,mode="lines",line=obinterestline,hoverinfo="text",text=coordinatesobhat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=ophat,mode="lines",line=ophatline,hoverinfo="text",text=coordinatesophat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=ophold,mode="lines",line=opholdline,hoverinfo="text",text=coordinatesophat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=opexercise,mode="lines",line=opexerciseline,hoverinfo="text",text=coordinatesophat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
-          add_trace(.,type="scatter3d",x=x,y=shat,z=opinterest,mode="lines",line=opinterestline,hoverinfo="text",text=coordinatesobhat,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+        fig <- add_trace(fig,type="scatter3d",x=x,y=shat,z=zero,name="\u00D4(<i>x</i>)",mode="lines",line=zeroline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly") %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=obhat,mode="lines",line=obhatline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=obhold,mode="lines",line=obholdline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=obexercise,mode="lines",line=obexerciseline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=obinterest,mode="lines",line=obinterestline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=ophat,mode="lines",line=ophatline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=ophold,mode="lines",line=opholdline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=opexercise,mode="lines",line=opexerciseline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
+          add_trace(.,type="scatter3d",x=x,y=shat,z=opinterest,mode="lines",line=opinterestline,hovertemplate=hover3D,legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=opholdmesh$xvertex,y=opholdmesh$yvertex,z=opholdmesh$zvertex,i=opholdmesh$ivertex,j=opholdmesh$jvertex,k=opholdmesh$kvertex,intensity=opholdmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=opgradient,reversescale=reverse,opacity=0.7,hoverinfo="skip",legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=obholdmesh$xvertex,y=obholdmesh$yvertex,z=obholdmesh$zvertex,i=obholdmesh$ivertex,j=obholdmesh$jvertex,k=obholdmesh$kvertex,intensity=obholdmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=obgradient,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=exercisemesh$xvertex,y=exercisemesh$yvertex,z=exercisemesh$zvertex,i=exercisemesh$ivertex,j=exercisemesh$jvertex,k=exercisemesh$kvertex,intensity=exercisemesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=obgradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",legendgroup="OOhat",visible="legendonly",showlegend=FALSE) %>%
@@ -4869,6 +4788,7 @@ Analytical <- R6::R6Class("Analytical",
         else { lookdown <- list(text="",showarrow=FALSE,yref="container",y=0) }
         if(is.null(xaxis)) { xaxis <- "<i>z</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(x=1.0,y=0.5,xanchor="right",yanchor="center",tracegroupgap=0,itemsizing="constant")
         # OUP_A_PassageTimeModeMedianMean3DDensity
         if(type < 1.5)
@@ -4879,14 +4799,6 @@ Analytical <- R6::R6Class("Analytical",
           ptmeans <- vector("double",n)
           ptmedians <- vector("double",n)
           ptmodes <- vector("double",n)
-          coordinatemeans <- vector("character",n)
-          coordinatemedians <- vector("character",n)
-          coordinatemodes <- vector("character",n)
-          coordinateptmeans <- vector("character",n)
-          coordinateptmedians <- vector("character",n)
-          coordinateptmodes <- vector("character",n)
-          coordinatex <- vector("character",m)
-          coordinates <- matrix("",m,n)
           xx <- vector("double",m)
           ptxmmm <- RcppOUPAPassageTimeDensity(c(tmode,tmedian,tmean),k,s,x,omega,rho,mu,sigma)
           ptxmode <- ptxmmm[1]
@@ -4898,39 +4810,28 @@ Analytical <- R6::R6Class("Analytical",
             ptmodes[j] <- ptmmm[1]
             ptmedians[j] <- ptmmm[2]
             ptmeans[j] <- ptmmm[3]
-            if(rho > 0)
-            {
-              coordinatemeans[j] <- paste(sep="","mean=",format(tmeans[j],digits=4),"<br><i>x</i>=",z[j])
-              coordinateptmeans[j] <- paste(sep="","<i>p<sub>t</sub></i>(mean)=",format(ptmeans[j],digits=4),"<br><i>t</i>=",tmeans[j],"<br><i>x</i>=",z[j])
-              if(ptmeans[j] < mindensity) { mindensity <- ptmeans[j] }
-            }
-            coordinatemedians[j] <- paste(sep="","median=",format(tmedians[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinateptmedians[j] <- paste(sep="","<i>p<sub>t</sub></i>(median)=",format(ptmedians[j],digits=4),"<br><i>t</i>=",tmedians[j],"<br><i>x</i>=",z[j])
+            if(rho > 0 && ptmeans[j] < mindensity) { mindensity <- ptmeans[j] }
             if(ptmedians[j] < mindensity) { mindensity <- ptmedians[j] }
-            coordinatemodes[j] <- paste(sep="","mode=",format(tmodes[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinateptmodes[j] <- paste(sep="","<i>p<sub>t</sub></i>(mode)=",format(ptmodes[j],digits=4),"<br><i>t</i>=",tmodes[j],"<br><i>x</i>=",z[j])
             if(ptmodes[j] < mindensity) { mindensity <- ptmodes[j] }
           }
           for(i in 1:m)
           {
             if(ptx[i] < mindensity) { mindensity <- ptx[i] }
-            coordinatex[i] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)=",format(ptx[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>x</i>=",x)
             for(j in 1:n)
             {
               if(pt[i,j] < mindensity) { mindensity <- pt[i,j] }
-              coordinates[i,j] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)=",format(pt[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>z</i>=",z[j])
             }
             xx[i] <- x
           }
-          ptxmesh <- MeshCurtainSmooth(xx,t,ptx,rep(0,m))
-          ptmeshmeans <- MeshCurtainSmooth(z,tmeans,ptmeans,rep(0,m))
-          ptmeshmedians <- MeshCurtainSmooth(z,tmedians,ptmedians,rep(0,m))
-          ptmeshmodes <- MeshCurtainSmooth(z,tmodes,ptmodes,rep(0,m))
           xview <- list(title=xaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           if(is.nan(ptmax)) { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
           else { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,range=c(1.03*mindensity-0.03*ptmax,1.03*ptmax-0.03*mindensity),tickmode="auto",nticks=5,mirror=TRUE) }
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          ptxmesh <- MeshCurtainSmooth(xx,t,ptx,rep(0,m))
+          ptmeshmeans <- MeshCurtainSmooth(z,tmeans,ptmeans,rep(0,m))
+          ptmeshmedians <- MeshCurtainSmooth(z,tmedians,ptmedians,rep(0,m))
+          ptmeshmodes <- MeshCurtainSmooth(z,tmodes,ptmodes,rep(0,m))
           meanline <- list(color=cyn$e,width=8)
           medianline <- list(color=grn$e,width=8)
           modeline <- list(color=blu$e,width=8)
@@ -4953,22 +4854,22 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimeModeMedianMean3DDensity")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=ptxline,hoverinfo="text",text=coordinatex,legendgroup="ptx") %>%
+            add_trace(.,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=ptxline,hovertemplate=hover3D,legendgroup="ptx") %>%
             add_trace(.,type="mesh3d",x=ptxmesh$xvertex,y=ptxmesh$yvertex,z=ptxmesh$zvertex,i=ptxmesh$ivertex,j=ptxmesh$jvertex,k=ptxmesh$kvertex,intensity=ptxmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientptx,reversescale=reverse,opacity=0.7,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE)
           if(rho > 0) { fig <- add_trace(fig,type="scatter3d",x=c(x,x),y=c(tmean,tmean),z=c(0,ptxmean),mode="lines",line=meandashline,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE) }
           fig <- add_trace(fig,type="scatter3d",x=c(x,x),y=c(tmedian,tmedian),z=c(0,ptxmedian),mode="lines",line=mediandashline,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(tmode,tmode),z=c(0,ptxmode),mode="lines",line=modedashline,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE)
-          if(rho > 0) { fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=rep(0,n),name="<i>t</i><sub>mean</sub>(<i>z</i>)",mode="lines",line=meanline,hoverinfo="text",text=coordinatemeans) }
-          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=rep(0,n),name="<i>t</i><sub>medn</sub>(<i>z</i>)",mode="lines",line=medianline,hoverinfo="text",text=coordinatemedians) %>%
-            add_trace(.,type="scatter3d",x=z,y=tmodes,z=rep(0,n),name="<i>t</i><sub>mode</sub>(<i>z</i>)",mode="lines",line=modeline,hoverinfo="text",text=coordinatemodes)
+          if(rho > 0) { fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=rep(0,n),name="<i>t</i><sub>mean</sub>(<i>z</i>)",mode="lines",line=meanline,hovertemplate=hover3D) }
+          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=rep(0,n),name="<i>t</i><sub>medn</sub>(<i>z</i>)",mode="lines",line=medianline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=tmodes,z=rep(0,n),name="<i>t</i><sub>mode</sub>(<i>z</i>)",mode="lines",line=modeline,hovertemplate=hover3D)
           if(rho > 0)
           {
-            fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=ptmeans,name="<i>p<sub>t</sub></i>(mean)",mode="lines",line=ptmeanline,hoverinfo="text",text=coordinateptmeans,legendgroup="ptmeans",visible="legendonly") %>%
+            fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=ptmeans,name="<i>p<sub>t</sub></i>(mean)",mode="lines",line=ptmeanline,hovertemplate=hover3D,legendgroup="ptmeans",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=ptmeshmeans$xvertex,y=ptmeshmeans$yvertex,z=ptmeshmeans$zvertex,i=ptmeshmeans$ivertex,j=ptmeshmeans$jvertex,k=ptmeshmeans$kvertex,intensity=ptmeshmeans$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmean,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="ptmeans",visible="legendonly",showlegend=FALSE)
           }
-          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=ptmedians,name="<i>p<sub>t</sub></i>(medn)",mode="lines",line=ptmedianline,hoverinfo="text",text=coordinateptmedians,legendgroup="ptmedians",visible="legendonly") %>%
+          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=ptmedians,name="<i>p<sub>t</sub></i>(medn)",mode="lines",line=ptmedianline,hovertemplate=hover3D,legendgroup="ptmedians",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=ptmeshmedians$xvertex,y=ptmeshmedians$yvertex,z=ptmeshmedians$zvertex,i=ptmeshmedians$ivertex,j=ptmeshmedians$jvertex,k=ptmeshmedians$kvertex,intensity=ptmeshmedians$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmedian,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="ptmedians",visible="legendonly",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=tmodes,z=ptmodes,name="<i>p<sub>t</sub></i>(mode)",mode="lines",line=ptmodeline,hoverinfo="text",text=coordinateptmodes,legendgroup="ptmodes",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=tmodes,z=ptmodes,name="<i>p<sub>t</sub></i>(mode)",mode="lines",line=ptmodeline,hovertemplate=hover3D,legendgroup="ptmodes",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=ptmeshmodes$xvertex,y=ptmeshmodes$yvertex,z=ptmeshmodes$zvertex,i=ptmeshmodes$ivertex,j=ptmeshmodes$jvertex,k=ptmeshmodes$kvertex,intensity=ptmeshmodes$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmode,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="ptmodes",visible="legendonly",showlegend=FALSE)
           dx <- as.integer((n-1)/10)
           if(dx < 1) { dx <- 1 }
@@ -4976,7 +4877,7 @@ Analytical <- R6::R6Class("Analytical",
           j <- 1
           q <- 1
           for(i in 1:m) { xx[i] <- z[j] }
-          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],name="<i>p<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="ptz",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],name="<i>p<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="ptz",visible="legendonly")
           while(j < n)
           {
             j <- j+dx
@@ -4984,9 +4885,9 @@ Analytical <- R6::R6Class("Analytical",
             if(q < 7) { lineopacity <- lineopacity-0.07 }
             else { lineopacity <- lineopacity+0.07 }
             for(i in 1:m) { xx[i] <- z[j] }
-            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],mode="lines",line=ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="ptz",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],mode="lines",line=ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="ptz",visible="legendonly",showlegend=FALSE)
           }
-          fig <- add_trace(fig,type="surface",x=z,y=t,z=pt,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          fig <- add_trace(fig,type="surface",x=z,y=t,z=pt,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         # OUP_A_PassageTimeModeMedianMean3DProbability
         else
@@ -4996,14 +4897,6 @@ Analytical <- R6::R6Class("Analytical",
           Ptmeans <- vector("double",n)
           Ptmedians <- vector("double",n)
           Ptmodes <- vector("double",n)
-          coordinatemeans <- vector("character",n)
-          coordinatemedians <- vector("character",n)
-          coordinatemodes <- vector("character",n)
-          coordinatePtmeans <- vector("character",n)
-          coordinatePtmedians <- vector("character",n)
-          coordinatePtmodes <- vector("character",n)
-          coordinatex <- vector("character",m)
-          coordinates <- matrix("",m,n)
           xx <- vector("double",m)
           kindex <- 0
           Ptxmmm <- RcppOUPAPassageTimeProbability(c(tmode,tmedian,tmean),k,s,x,omega,rho,mu,sigma)
@@ -5016,40 +4909,23 @@ Analytical <- R6::R6Class("Analytical",
             Ptmodes[j] <- Ptmmm[1]
             Ptmedians[j] <- Ptmmm[2]
             Ptmeans[j] <- Ptmmm[3]
-            if(rho > 0)
-            {
-              coordinatemeans[j] <- paste(sep="","mean=",format(tmeans[j],digits=4),"<br><i>x</i>=",z[j])
-              coordinatePtmeans[j] <- paste(sep="","<i>P<sub>t</sub></i>(mean)=",format(Ptmeans[j],digits=4),"<br><i>t</i>=",tmeans[j],"<br><i>x</i>=",z[j])
-            }
-            coordinatemedians[j] <- paste(sep="","median=",format(tmedians[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatePtmedians[j] <- paste(sep="","<i>P<sub>t</sub></i>(median)=",format(Ptmedians[j],digits=4),"<br><i>t</i>=",tmedians[j],"<br><i>x</i>=",z[j])
-            coordinatemodes[j] <- paste(sep="","mode=",format(tmodes[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatePtmodes[j] <- paste(sep="","<i>P<sub>t</sub></i>(mode)=",format(Ptmodes[j],digits=4),"<br><i>t</i>=",tmodes[j],"<br><i>x</i>=",z[j])
             if(z[j] == k) { kindex <- j }
           }
-          for(i in 1:m)
-          {
-            coordinatex[i] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)=",format(Ptx[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>x</i>=",x)
-            for(j in 1:n)
-            {
-              coordinates[i,j] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)=",format(Pt[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>z</i>=",z[j])
-            }
-            xx[i] <- x
-          }
+          for(i in 1:m) { xx[i] <- x }
           if(kindex > 1 && kindex < n && sigma > 0)
           {
             Ptmeans[kindex] <- 0.5*(Ptmeans[kindex-1]+Ptmeans[kindex+1])
             Ptmedians[kindex] <- 0.5*(Ptmedians[kindex-1]+Ptmedians[kindex+1])
             Ptmodes[kindex] <- 0.5*(Ptmodes[kindex-1]+Ptmodes[kindex+1])
           }
-          Ptxmesh <- MeshCurtainSmooth(xx,t,Ptx,rep(0,m))
-          Ptmeshmeans <- MeshCurtainSmooth(z,tmeans,Ptmeans,rep(0,m))
-          Ptmeshmedians <- MeshCurtainSmooth(z,tmedians,Ptmedians,rep(0,m))
-          Ptmeshmodes <- MeshCurtainSmooth(z,tmodes,Ptmodes,rep(0,m))
           xview <- list(title=xaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           zview <- list(title=zaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          Ptxmesh <- MeshCurtainSmooth(xx,t,Ptx,rep(0,m))
+          Ptmeshmeans <- MeshCurtainSmooth(z,tmeans,Ptmeans,rep(0,m))
+          Ptmeshmedians <- MeshCurtainSmooth(z,tmedians,Ptmedians,rep(0,m))
+          Ptmeshmodes <- MeshCurtainSmooth(z,tmodes,Ptmodes,rep(0,m))
           meanline <- list(color=cyn$e,width=8)
           medianline <- list(color=grn$e,width=8)
           modeline <- list(color=blu$e,width=8)
@@ -5072,22 +4948,22 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimeModeMedianMean3DProbability")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=Ptxline,hoverinfo="text",text=coordinatex,legendgroup="Ptx") %>%
+            add_trace(.,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=Ptxline,hovertemplate=hover3D,legendgroup="Ptx") %>%
             add_trace(.,type="mesh3d",x=Ptxmesh$xvertex,y=Ptxmesh$yvertex,z=Ptxmesh$zvertex,i=Ptxmesh$ivertex,j=Ptxmesh$jvertex,k=Ptxmesh$kvertex,intensity=Ptxmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientPtx,reversescale=reverse,opacity=0.7,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE)
           if(rho > 0) { fig <- add_trace(fig,type="scatter3d",x=c(x,x),y=c(tmean,tmean),z=c(0,Ptxmean),name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=meandashline,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE) }
           fig <- add_trace(fig,type="scatter3d",x=c(x,x),y=c(tmedian,tmedian),z=c(0,Ptxmedian),name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=mediandashline,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(tmode,tmode),z=c(0,Ptxmode),name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=modedashline,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE)
-          if(rho > 0) { fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=rep(0,n),name="<i>t</i><sub>mean</sub>(<i>z</i>)",mode="lines",line=meanline,hoverinfo="text",text=coordinatemeans) }
-          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=rep(0,n),name="<i>t</i><sub>medn</sub>(<i>z</i>)",mode="lines",line=medianline,hoverinfo="text",text=coordinatemedians) %>%
-            add_trace(.,type="scatter3d",x=z,y=tmodes,z=rep(0,n),name="<i>t</i><sub>mode</sub>(<i>z</i>)",mode="lines",line=modeline,hoverinfo="text",text=coordinatemodes)
+          if(rho > 0) { fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=rep(0,n),name="<i>t</i><sub>mean</sub>(<i>z</i>)",mode="lines",line=meanline,hovertemplate=hover3D) }
+          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=rep(0,n),name="<i>t</i><sub>medn</sub>(<i>z</i>)",mode="lines",line=medianline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=tmodes,z=rep(0,n),name="<i>t</i><sub>mode</sub>(<i>z</i>)",mode="lines",line=modeline,hovertemplate=hover3D)
           if(rho > 0)
           {
-            fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=Ptmeans,name="<i>P<sub>t</sub></i>(mean)",mode="lines",line=Ptmeanline,hoverinfo="text",text=coordinatePtmeans,legendgroup="Ptmeans",visible="legendonly") %>%
+            fig <- add_trace(fig,type="scatter3d",x=z,y=tmeans,z=Ptmeans,name="<i>P<sub>t</sub></i>(mean)",mode="lines",line=Ptmeanline,hovertemplate=hover3D,legendgroup="Ptmeans",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=Ptmeshmeans$xvertex,y=Ptmeshmeans$yvertex,z=Ptmeshmeans$zvertex,i=Ptmeshmeans$ivertex,j=Ptmeshmeans$jvertex,k=Ptmeshmeans$kvertex,intensity=Ptmeshmeans$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmean,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="Ptmeans",visible="legendonly",showlegend=FALSE)
           }
-          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=Ptmedians,name="<i>P<sub>t</sub></i>(medn)",mode="lines",line=Ptmedianline,hoverinfo="text",text=coordinatePtmedians,legendgroup="Ptmedians",visible="legendonly") %>%
+          fig <- add_trace(fig,type="scatter3d",x=z,y=tmedians,z=Ptmedians,name="<i>P<sub>t</sub></i>(medn)",mode="lines",line=Ptmedianline,hovertemplate=hover3D,legendgroup="Ptmedians",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=Ptmeshmedians$xvertex,y=Ptmeshmedians$yvertex,z=Ptmeshmedians$zvertex,i=Ptmeshmedians$ivertex,j=Ptmeshmedians$jvertex,k=Ptmeshmedians$kvertex,intensity=Ptmeshmedians$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmedian,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="Ptmedians",visible="legendonly",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=tmodes,z=Ptmodes,name="<i>P<sub>t</sub></i>(mode)",mode="lines",line=Ptmodeline,hoverinfo="text",text=coordinatePtmodes,legendgroup="Ptmodes",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=tmodes,z=Ptmodes,name="<i>P<sub>t</sub></i>(mode)",mode="lines",line=Ptmodeline,hovertemplate=hover3D,legendgroup="Ptmodes",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=Ptmeshmodes$xvertex,y=Ptmeshmodes$yvertex,z=Ptmeshmodes$zvertex,i=Ptmeshmodes$ivertex,j=Ptmeshmodes$jvertex,k=Ptmeshmodes$kvertex,intensity=Ptmeshmodes$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientmode,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="Ptmodes",visible="legendonly",showlegend=FALSE)
           dx <- as.integer((n-1)/10)
           if(dx < 1) { dx <- 1 }
@@ -5095,7 +4971,7 @@ Analytical <- R6::R6Class("Analytical",
           j <- 1
           q <- 1
           for(i in 1:m) { xx[i] <- z[j] }
-          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],name="<i>P<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=Ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="Ptz",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],name="<i>P<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=Ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly")
           while(j < n)
           {
             j <- j+dx
@@ -5103,10 +4979,10 @@ Analytical <- R6::R6Class("Analytical",
             if(q < 7) { lineopacity <- lineopacity-0.07 }
             else { lineopacity <- lineopacity+0.07}
             for(i in 1:m) { xx[i] <- z[j] }
-            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],mode="lines",line=Ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="Ptz",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],mode="lines",line=Ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly",showlegend=FALSE)
           }
-          if(kindex > 0) { fig <- add_trace(fig,type="scatter3d",x=c(k,k),y=c(t[1],t[1]),z=c(0,Pt[1,kindex]),mode="lines",line=Ptline,hoverinfo="text",text=coordinates[1,kindex],legendgroup="Ptz",visible="legendonly",showlegend=FALSE) }
-          fig <-add_trace(fig,type="surface",x=z,y=t,z=Pt,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          if(kindex > 0) { fig <- add_trace(fig,type="scatter3d",x=c(k,k),y=c(t[1],t[1]),z=c(0,Pt[1,kindex]),mode="lines",line=Ptline,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly",showlegend=FALSE) }
+          fig <-add_trace(fig,type="surface",x=z,y=t,z=Pt,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
@@ -5396,6 +5272,7 @@ Analytical <- R6::R6Class("Analytical",
         else { lookdown <- list(text="",showarrow=FALSE,yref="container",y=0) }
         if(is.null(xaxis)) { xaxis <- "<i>z</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(x=1.0,y=0.5,xanchor="right",yanchor="center",tracegroupgap=0,itemsizing="constant")
         # OUP_A_PassageTimePercentiles3DDensity
         if(type < 1.5)
@@ -5406,14 +5283,6 @@ Analytical <- R6::R6Class("Analytical",
           ptuppers <- vector("double",n)
           pthalfs <- vector("double",n)
           ptlowers <- vector("double",n)
-          coordinateuppers <- vector("character",n)
-          coordinatehalfs <- vector("character",n)
-          coordinatelowers <- vector("character",n)
-          coordinateptuppers <- vector("character",n)
-          coordinatepthalfs <- vector("character",n)
-          coordinateptlowers <- vector("character",n)
-          coordinatex <- vector("character",m)
-          coordinates <- matrix("",m,n)
           xx <- vector("double",m)
           ptxlhu <- RcppOUPAPassageTimeDensity(c(tlower,thalf,tupper),k,s,x,omega,rho,mu,sigma)
           ptxlower <- ptxlhu[1]
@@ -5425,33 +5294,25 @@ Analytical <- R6::R6Class("Analytical",
             ptlowers[j] <- ptlhu[1]
             pthalfs[j] <- ptlhu[2]
             ptuppers[j] <- ptlhu[3]
-            coordinateuppers[j] <- paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>=",format(tuppers[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatehalfs[j] <- paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>=",format(thalfs[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatelowers[j] <- paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>=",format(tlowers[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinateptuppers[j] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Pupper,digits=4),"</sub>)=",format(ptuppers[j],digits=4),"<br><i>t</i>=",format(tuppers[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatepthalfs[j] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Phalf,digits=4),"</sub>)=",format(pthalfs[j],digits=4),"<br><i>t</i>=",format(thalfs[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinateptlowers[j] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Plower,digits=4),"</sub>)=",format(ptlowers[j],digits=4),"<br><i>t</i>=",format(tlowers[j],digits=4),"<br><i>x</i>=",z[j])
           }
           for(i in 1:m)
           {
             if(ptx[i] < mindensity) { mindensity <- ptx[i] }
-            coordinatex[i] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)=",format(ptx[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>x</i>=",x)
             for(j in 1:n)
             {
               if(pt[i,j] < mindensity) { mindensity <- pt[i,j] }
-              coordinates[i,j] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)=",format(pt[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>z</i>=",z[j])
             }
             xx[i] <- x
           }
-          ptxmesh <- MeshCurtainSmooth(xx,t,ptx,rep(0,m))
-          ptmeshuppers <- MeshCurtainSmooth(z,tuppers,ptuppers,rep(0,m))
-          ptmeshhalfs <- MeshCurtainSmooth(z,thalfs,pthalfs,rep(0,m))
-          ptmeshlowers <- MeshCurtainSmooth(z,tlowers,ptlowers,rep(0,m))
           xview <- list(title=xaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           if(is.nan(ptmax)) { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
           else { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,range=c(1.03*mindensity-0.03*ptmax,1.03*ptmax-0.03*mindensity),tickmode="auto",nticks=5,mirror=TRUE) }
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          ptxmesh <- MeshCurtainSmooth(xx,t,ptx,rep(0,m))
+          ptmeshuppers <- MeshCurtainSmooth(z,tuppers,ptuppers,rep(0,m))
+          ptmeshhalfs <- MeshCurtainSmooth(z,thalfs,pthalfs,rep(0,m))
+          ptmeshlowers <- MeshCurtainSmooth(z,tlowers,ptlowers,rep(0,m))
           upperline <- list(color=blu$e,width=8)
           halfline <- list(color=blu$e,width=8)
           lowerline <- list(color=blu$e,width=8)
@@ -5474,19 +5335,19 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimePercentiles3DDensity")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=ptxline,hoverinfo="text",text=coordinatex,legendgroup="ptx") %>%
+            add_trace(.,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=ptxline,hovertemplate=hover3D,legendgroup="ptx") %>%
             add_trace(.,type="mesh3d",x=ptxmesh$xvertex,y=ptxmesh$yvertex,z=ptxmesh$zvertex,i=ptxmesh$ivertex,j=ptxmesh$jvertex,k=ptxmesh$kvertex,intensity=ptxmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientptx,reversescale=reverse,opacity=0.7,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(tupper,tupper),z=c(0,ptxupper),name="<i>p<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=upperdashline,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(thalf,thalf),z=c(0,ptxhalf),name="<i>p<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=halfdashline,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(tlower,tlower),z=c(0,ptxlower),name="<i>p<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=lowerdashline,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=tuppers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=upperline,hoverinfo="text",text=coordinateuppers) %>%
-            add_trace(.,type="scatter3d",x=z,y=thalfs,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=halfline,hoverinfo="text",text=coordinatehalfs) %>%
-            add_trace(.,type="scatter3d",x=z,y=tlowers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=lowerline,hoverinfo="text",text=coordinatelowers) %>%
-            add_trace(.,type="scatter3d",x=z,y=tuppers,z=ptuppers,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Pupper,digits=4),"</sub>)"),mode="lines",line=ptupperline,hoverinfo="text",text=coordinateptuppers,legendgroup="ptuppers",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=tuppers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=upperline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=thalfs,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=halfline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=tlowers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=lowerline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=tuppers,z=ptuppers,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Pupper,digits=4),"</sub>)"),mode="lines",line=ptupperline,hovertemplate=hover3D,legendgroup="ptuppers",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=ptmeshuppers$xvertex,y=ptmeshuppers$yvertex,z=ptmeshuppers$zvertex,i=ptmeshuppers$ivertex,j=ptmeshuppers$jvertex,k=ptmeshuppers$kvertex,intensity=ptmeshuppers$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientupper,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="ptuppers",visible="legendonly",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=thalfs,z=pthalfs,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Phalf,digits=4),"</sub>)"),mode="lines",line=pthalfline,hoverinfo="text",text=coordinatepthalfs,legendgroup="pthalfs",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=thalfs,z=pthalfs,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Phalf,digits=4),"</sub>)"),mode="lines",line=pthalfline,hovertemplate=hover3D,legendgroup="pthalfs",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=ptmeshhalfs$xvertex,y=ptmeshhalfs$yvertex,z=ptmeshhalfs$zvertex,i=ptmeshhalfs$ivertex,j=ptmeshhalfs$jvertex,k=ptmeshhalfs$kvertex,intensity=ptmeshhalfs$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradienthalf,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="pthalfs",visible="legendonly",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=tlowers,z=ptlowers,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Plower,digits=4),"</sub>)"),mode="lines",line=ptlowerline,hoverinfo="text",text=coordinateptlowers,legendgroup="ptlowers",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=tlowers,z=ptlowers,name=paste(sep="","<i>p<sub>t</sub></i>(<i>t</i><sub>",format(Plower,digits=4),"</sub>)"),mode="lines",line=ptlowerline,hovertemplate=hover3D,legendgroup="ptlowers",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=ptmeshlowers$xvertex,y=ptmeshlowers$yvertex,z=ptmeshlowers$zvertex,i=ptmeshlowers$ivertex,j=ptmeshlowers$jvertex,k=ptmeshlowers$kvertex,intensity=ptmeshlowers$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientlower,reversescale=reverse,opacity=0.5,hoverinfo="skip",legendgroup="ptlowers",visible="legendonly",showlegend=FALSE)
           dx <- as.integer((n-1)/10)
           if(dx < 1) { dx <- 1 }
@@ -5494,7 +5355,7 @@ Analytical <- R6::R6Class("Analytical",
           j <- 1
           q <- 1
           for(i in 1:m) { xx[i] <- z[j] }
-          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],name="<i>p<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="ptz",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],name="<i>p<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="ptz",visible="legendonly")
           while(j < n)
           {
             j <- j+dx
@@ -5502,9 +5363,9 @@ Analytical <- R6::R6Class("Analytical",
             if(q < 7) { lineopacity <- lineopacity-0.07 }
             else { lineopacity <- lineopacity+0.07 }
             for(i in 1:m) { xx[i] <- z[j] }
-            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],mode="lines",line=ptline,hoverinfo="text",text=coordinates[,j],legendgroup="ptz",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],mode="lines",line=ptline,hovertemplate=hover3D,legendgroup="ptz",visible="legendonly",showlegend=FALSE)
           }
-          fig <- add_trace(fig,type="surface",x=z,y=t,z=pt,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          fig <- add_trace(fig,type="surface",x=z,y=t,z=pt,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         # OUP_A_PassageTimePercentiles3DProbability
         else
@@ -5514,14 +5375,6 @@ Analytical <- R6::R6Class("Analytical",
           Ptuppers <- vector("double",n)
           Pthalfs <- vector("double",n)
           Ptlowers <- vector("double",n)
-          coordinateuppers <- vector("character",n)
-          coordinatehalfs <- vector("character",n)
-          coordinatelowers <- vector("character",n)
-          coordinatePtuppers <- vector("character",n)
-          coordinatePthalfs <- vector("character",n)
-          coordinatePtlowers <- vector("character",n)
-          coordinatex <- vector("character",m)
-          coordinates <- matrix("",m,n)
           xx <- vector("double",m)
           kindex <- 0
           Ptxlhu <- RcppOUPAPassageTimeProbability(c(tlower,thalf,tupper),k,s,x,omega,rho,mu,sigma)
@@ -5534,31 +5387,17 @@ Analytical <- R6::R6Class("Analytical",
             Ptuppers[j] <- Pupper*PInf
             Pthalfs[j] <- Phalf*PInf
             Ptlowers[j] <- Plower*PInf
-            coordinateuppers[j] <- paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>=",format(tuppers[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatehalfs[j] <- paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>=",format(thalfs[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatelowers[j] <- paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>=",format(tlowers[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatePtuppers[j] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Pupper,digits=4),"</sub>)=",format(Ptuppers[j],digits=4),"<br><i>t</i>=",format(tuppers[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatePthalfs[j] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Phalf,digits=4),"</sub>)=",format(Pthalfs[j],digits=4),"<br><i>t</i>=",format(thalfs[j],digits=4),"<br><i>x</i>=",z[j])
-            coordinatePtlowers[j] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Plower,digits=4),"</sub>)=",format(Ptlowers[j],digits=4),"<br><i>t</i>=",format(tlowers[j],digits=4),"<br><i>x</i>=",z[j])
             if(z[j] == k) { kindex <- j }
           }
-          for(i in 1:m)
-          {
-            coordinatex[i] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)=",format(Ptx[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>x</i>=",x)
-            for(j in 1:n)
-            {
-              coordinates[i,j] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)=",format(Pt[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>z</i>=",z[j])
-            }
-            xx[i] <- x
-          }
-          Ptxmesh <- MeshCurtainSmooth(xx,t,Ptx,rep(0,m))
-          Ptmeshuppers <- MeshCurtainSmooth(z,tuppers,Ptuppers,rep(0,m))
-          Ptmeshhalfs <- MeshCurtainSmooth(z,thalfs,Pthalfs,rep(0,m))
-          Ptmeshlowers <- MeshCurtainSmooth(z,tlowers,Ptlowers,rep(0,m))
+          for(i in 1:m) { xx[i] <- x }
           xview <- list(title=xaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           yview <- list(title=yaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
           zview <- list(title=zaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
           view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
+          Ptxmesh <- MeshCurtainSmooth(xx,t,Ptx,rep(0,m))
+          Ptmeshuppers <- MeshCurtainSmooth(z,tuppers,Ptuppers,rep(0,m))
+          Ptmeshhalfs <- MeshCurtainSmooth(z,thalfs,Pthalfs,rep(0,m))
+          Ptmeshlowers <- MeshCurtainSmooth(z,tlowers,Ptlowers,rep(0,m))
           upperline <- list(color=grn$e,width=8)
           halfline <- list(color=grn$e,width=8)
           lowerline <- list(color=grn$e,width=8)
@@ -5581,19 +5420,19 @@ Analytical <- R6::R6Class("Analytical",
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimePercentiles3DProbability")
           fig <- plot_ly() %>%
-            add_trace(.,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=Ptxline,hoverinfo="text",text=coordinatex,legendgroup="Ptx") %>%
+            add_trace(.,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=Ptxline,hovertemplate=hover3D,legendgroup="Ptx") %>%
             add_trace(.,type="mesh3d",x=Ptxmesh$xvertex,y=Ptxmesh$yvertex,z=Ptxmesh$zvertex,i=Ptxmesh$ivertex,j=Ptxmesh$jvertex,k=Ptxmesh$kvertex,intensity=Ptxmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientPtx,reversescale=reverse,opacity=0.7,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(tupper,tupper),z=c(0,Ptxupper),name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=upperdashline,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(thalf,thalf),z=c(0,Ptxhalf),name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=halfdashline,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE) %>%
             add_trace(.,type="scatter3d",x=c(x,x),y=c(tlower,tlower),z=c(0,Ptxlower),name="<i>P<sub>t</sub></i>(t|<i>x</i>)",mode="lines",line=lowerdashline,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=tuppers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=upperline,hoverinfo="text",text=coordinateuppers) %>%
-            add_trace(.,type="scatter3d",x=z,y=thalfs,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=halfline,hoverinfo="text",text=coordinatehalfs) %>%
-            add_trace(.,type="scatter3d",x=z,y=tlowers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=lowerline,hoverinfo="text",text=coordinatelowers) %>%
-            add_trace(.,type="scatter3d",x=z,y=tuppers,z=Ptuppers,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Pupper,digits=4),"</sub>)"),mode="lines",line=Ptupperline,hoverinfo="text",text=coordinatePtuppers,legendgroup="Ptuppers",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=tuppers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Pupper,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=upperline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=thalfs,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Phalf,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=halfline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=tlowers,z=rep(0,n),name=paste(sep="","<i>t</i><sub>",format(Plower,digits=4),"</sub>(<i>z</i>)"),mode="lines",line=lowerline,hovertemplate=hover3D) %>%
+            add_trace(.,type="scatter3d",x=z,y=tuppers,z=Ptuppers,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Pupper,digits=4),"</sub>)"),mode="lines",line=Ptupperline,hovertemplate=hover3D,legendgroup="Ptuppers",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=Ptmeshuppers$xvertex,y=Ptmeshuppers$yvertex,z=Ptmeshuppers$zvertex,i=Ptmeshuppers$ivertex,j=Ptmeshuppers$jvertex,k=Ptmeshuppers$kvertex,intensity=Ptmeshuppers$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientupper,reversescale=reverse,opacity=0.3,hoverinfo="skip",legendgroup="Ptuppers",visible="legendonly",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=thalfs,z=Pthalfs,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Phalf,digits=4),"</sub>)"),mode="lines",line=Pthalfline,hoverinfo="text",text=coordinatePthalfs,legendgroup="Pthalfs",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=thalfs,z=Pthalfs,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Phalf,digits=4),"</sub>)"),mode="lines",line=Pthalfline,hovertemplate=hover3D,legendgroup="Pthalfs",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=Ptmeshhalfs$xvertex,y=Ptmeshhalfs$yvertex,z=Ptmeshhalfs$zvertex,i=Ptmeshhalfs$ivertex,j=Ptmeshhalfs$jvertex,k=Ptmeshhalfs$kvertex,intensity=Ptmeshhalfs$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradienthalf,reversescale=reverse,opacity=0.3,hoverinfo="skip",legendgroup="Pthalfs",visible="legendonly",showlegend=FALSE) %>%
-            add_trace(.,type="scatter3d",x=z,y=tlowers,z=Ptlowers,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Plower,digits=4),"</sub>)"),mode="lines",line=Ptlowerline,hoverinfo="text",text=coordinatePtlowers,legendgroup="Ptlowers",visible="legendonly") %>%
+            add_trace(.,type="scatter3d",x=z,y=tlowers,z=Ptlowers,name=paste(sep="","<i>P<sub>t</sub></i>(<i>t</i><sub>",format(Plower,digits=4),"</sub>)"),mode="lines",line=Ptlowerline,hovertemplate=hover3D,legendgroup="Ptlowers",visible="legendonly") %>%
             add_trace(.,type="mesh3d",x=Ptmeshlowers$xvertex,y=Ptmeshlowers$yvertex,z=Ptmeshlowers$zvertex,i=Ptmeshlowers$ivertex,j=Ptmeshlowers$jvertex,k=Ptmeshlowers$kvertex,intensity=Ptmeshlowers$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientlower,reversescale=reverse,opacity=0.3,hoverinfo="skip",legendgroup="Ptlowers",visible="legendonly",showlegend=FALSE)
           dx <- as.integer((n-1)/10)
           if(dx < 1) { dx <- 1 }
@@ -5601,7 +5440,7 @@ Analytical <- R6::R6Class("Analytical",
           j <- 1
           q <- 1
           for(i in 1:m) { xx[i] <- z[j] }
-          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],name="<i>P<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=Ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="Ptz",visible="legendonly")
+          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],name="<i>P<sub>t</sub></i>(t|<i>z</i>)",mode="lines",line=Ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly")
           while(j < n)
           {
             j <- j+dx
@@ -5609,10 +5448,10 @@ Analytical <- R6::R6Class("Analytical",
             if(q < 7) { lineopacity <- lineopacity-0.07 }
             else { lineopacity <- lineopacity+0.07 }
             for(i in 1:m) { xx[i] <- z[j] }
-            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],mode="lines",line=Ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="Ptz",visible="legendonly",showlegend=FALSE)
+            fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],mode="lines",line=Ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly",showlegend=FALSE)
           }
-          if(kindex > 0) { fig <- add_trace(fig,type="scatter3d",x=c(k,k),y=c(t[1],t[1]),z=c(0,Pt[1,kindex]),mode="lines",line=Ptline,hoverinfo="text",text=coordinates[1,kindex],legendgroup="Ptz",visible="legendonly",showlegend=FALSE) }
-          fig <-add_trace(fig,type="surface",x=z,y=t,z=Pt,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE)
+          if(kindex > 0) { fig <- add_trace(fig,type="scatter3d",x=c(k,k),y=c(t[1],t[1]),z=c(0,Pt[1,kindex]),mode="lines",line=Ptline,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly",showlegend=FALSE) }
+          fig <-add_trace(fig,type="surface",x=z,y=t,z=Pt,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE)
         }
         fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
@@ -5763,15 +5602,11 @@ Analytical <- R6::R6Class("Analytical",
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>p<sub>t</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
         mindensity <- 0
-        coordinatex <- vector("character",m)
-        coordinates <- matrix("",m,n)
         for(i in 1:m)
         {
-          coordinatex[i] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)=",format(ptx[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>x</i>=",x)
           if(ptx[i] < mindensity) { mindensity <- ptx[i] }
           for(j in 1:n)
           {
-            coordinates[i,j] <- paste(sep="","<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)=",format(pt[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>z</i>=",z[j])
             if(pt[i,j] < mindensity) { mindensity <- pt[i,j] }
           }
         }
@@ -5792,10 +5627,11 @@ Analytical <- R6::R6Class("Analytical",
         else if(k == mu) { rise <- list(x=0,y=100,z=0) }
         else { rise <- list(x=-10,y=100,z=0) }
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimeDensity3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=ptxline,hoverinfo="text",text=coordinatex,legendgroup="ptx") %>%
+          add_trace(.,type="scatter3d",x=xx,y=t,z=ptx,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=ptxline,hovertemplate=hover3D,legendgroup="ptx") %>%
           add_trace(.,type="mesh3d",x=ptxmesh$xvertex,y=ptxmesh$yvertex,z=ptxmesh$zvertex,i=ptxmesh$ivertex,j=ptxmesh$jvertex,k=ptxmesh$kvertex,intensity=ptxmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientptx,reversescale=reverse,opacity=0.7,hoverinfo="skip",legendgroup="ptx",showlegend=FALSE)
         dx <- as.integer((n-1)/10)
         if(dx < 1) { dx <- 1 }
@@ -5803,7 +5639,7 @@ Analytical <- R6::R6Class("Analytical",
         j <- 1
         q <- 1
         for(i in 1:m) { xx[i] <- z[j] }
-        fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",mode="lines",line=ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="ptz",visible="legendonly")
+        fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",mode="lines",line=ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="ptz",visible="legendonly")
         while(j < n)
         {
           j <- j+dx
@@ -5811,9 +5647,9 @@ Analytical <- R6::R6Class("Analytical",
           if(q < 7) { lineopacity <- lineopacity-0.07 }
           else { lineopacity <- lineopacity+0.07 }
           for(i in 1:m) { xx[i] <- z[j] }
-          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],mode="lines",line=ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="ptz",visible="legendonly",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=pt[,j],mode="lines",line=ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="ptz",visible="legendonly",showlegend=FALSE)
         }
-        fig <- add_trace(fig,type="surface",x=z,y=t,z=pt,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+        fig <- add_trace(fig,type="surface",x=z,y=t,z=pt,name="<i>p<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
@@ -5956,13 +5792,6 @@ Analytical <- R6::R6Class("Analytical",
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>P<sub>t</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
         kindex <- 0
-        coordinatex <- vector("character",m)
-        coordinates <- matrix("",m,n)
-        for(i in 1:m)
-        {
-          coordinatex[i] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)=",format(Ptx[i],digits=4),"<br><i>t</i>=",t[i],"<br><i>x</i>=",x)
-          for(j in 1:n) { coordinates[i,j] <- paste(sep="","<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)=",format(Pt[i,j],digits=4),"<br><i>t</i>=",t[i],"<br><i>z</i>=",z[j]) }
-        }
         for(j in 1:n) { if(z[j] == k) { kindex <- j } }
         spy <- list(x=2.35,y=-0.85,z=0.5)
         xview <- list(title=xaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
@@ -5980,10 +5809,11 @@ Analytical <- R6::R6Class("Analytical",
         else if(k == mu) { rise <- list(x=0,y=100,z=0) }
         else { rise <- list(x=-10,y=100,z=0) }
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
+        hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimeProbability3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=Ptxline,hoverinfo="text",text=coordinatex,legendgroup="Ptx") %>%
+          add_trace(.,type="scatter3d",x=xx,y=t,z=Ptx,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>x</i>)",mode="lines",line=Ptxline,hovertemplate=hover3D,legendgroup="Ptx") %>%
           add_trace(.,type="mesh3d",x=Ptxmesh$xvertex,y=Ptxmesh$yvertex,z=Ptxmesh$zvertex,i=Ptxmesh$ivertex,j=Ptxmesh$jvertex,k=Ptxmesh$kvertex,intensity=Ptxmesh$zvertex,showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradientPtx,reversescale=reverse,opacity=0.7,hoverinfo="skip",legendgroup="Ptx",showlegend=FALSE)
         dx <- as.integer((n-1)/10)
         if(dx < 1) { dx <- 1 }
@@ -5991,7 +5821,7 @@ Analytical <- R6::R6Class("Analytical",
         j <- 1
         q <- 1
         for(i in 1:m) { xx[i] <- z[j] }
-        fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",mode="lines",line=Ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="Ptz",visible="legendonly")
+        fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",mode="lines",line=Ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly")
         while(j < n)
         {
           j <- j+dx
@@ -5999,10 +5829,10 @@ Analytical <- R6::R6Class("Analytical",
           if(q < 7) { lineopacity <- lineopacity-0.07 }
           else { lineopacity <- lineopacity+0.07 }
           for(i in 1:m) { xx[i] <- z[j] }
-          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],mode="lines",line=Ptline,opacity=lineopacity,hoverinfo="text",text=coordinates[,j],legendgroup="Ptz",visible="legendonly",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=xx,y=t,z=Pt[,j],mode="lines",line=Ptline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly",showlegend=FALSE)
         }
-        if(kindex > 0) { fig <- add_trace(fig,type="scatter3d",x=c(k,k),y=c(t[1],t[1]),z=c(0,Pt[1,kindex]),mode="lines",line=Ptline,hoverinfo="text",text=coordinates[1,kindex],legendgroup="Ptz",visible="legendonly",showlegend=FALSE) }
-        fig <-add_trace(fig,type="surface",x=z,y=t,z=Pt,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hoverinfo="text",text=coordinates,visible="legendonly",showlegend=TRUE) %>%
+        if(kindex > 0) { fig <- add_trace(fig,type="scatter3d",x=c(k,k),y=c(t[1],t[1]),z=c(0,Pt[1,kindex]),mode="lines",line=Ptline,hovertemplate=hover3D,legendgroup="Ptz",visible="legendonly",showlegend=FALSE) }
+        fig <-add_trace(fig,type="surface",x=z,y=t,z=Pt,name="<i>P<sub>t</sub></i>(<i>t</i>|<i>z</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
           layout(.,title=lookup,annotations=lookdown,scene=view,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,margin=list(t=0,r=0,b=0,l=0))
       }
