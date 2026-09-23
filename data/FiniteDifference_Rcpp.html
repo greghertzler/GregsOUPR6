@@ -1,0 +1,284 @@
+<!DOCTYPE html><html><head><title>R: FiniteDifference_Rcpp functions for numerical solutions of an...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>FiniteDifference_Rcpp</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>FiniteDifference_Rcpp functions for numerical solutions of an
+Ornstein-Uhlenbeck Process</h2>
+
+<h3>Description</h3>
+
+<p>Calculations for the R6 class 'FiniteDifference', with sequential processing.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class='language-R'>RcppOUPFDDrift(x,rho,mu)
+
+RcppOUPFDDiffusion(x,sigma)
+
+RcppOUPFDTerminalValue_Linear(x,xo,vs)
+
+RcppOUPFDTerminalValue_Degenerate(x,xo,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_Stepped(x,xo,vs,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_Kinked(x,xo,vs,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_Butterfly(x,xo,xm,vs,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_Mitscherlich(x,xo,vr,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_Gompertz(x,xi,vr,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_Logistic(x,xi,vr,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_Transcendental(x,xo,xi,xm,Vmax,Vmin)
+
+RcppOUPFDTerminalValue_YieldIndex(x,xo,xi,xm,Vmax,Vmin)
+
+RcppOUPFDOption(s,x,V,r,theta,skip,rho,mu,sigma)
+
+RcppOUPFDOptionEnvelope(s,x,V,r,theta,skip,rho,mu,sigma)
+
+RcppOUPFDDecisionThreshold(x,V,OOenv,phi)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table role = "presentation">
+<tr><td><code id="x">x</code></td>
+<td>
+<p>vector of states</p>
+</td></tr>
+<tr><td><code id="rho">rho</code></td>
+<td>
+<p>rate parameter 0&lt;=rho&lt;inf</p>
+</td></tr>
+<tr><td><code id="mu">mu</code></td>
+<td>
+<p>location parameter -inf&lt;mu&lt;inf</p>
+</td></tr>
+<tr><td><code id="sigma">sigma</code></td>
+<td>
+<p>scale parameter -inf&lt;sigma&lt;inf</p>
+</td></tr>
+<tr><td><code id="xo">xo</code></td>
+<td>
+<p>state at the intercept, step, kink or left wing</p>
+</td></tr>
+<tr><td><code id="vs">vs</code></td>
+<td>
+<p>slope</p>
+</td></tr>
+<tr><td><code id="Vmax">Vmax</code></td>
+<td>
+<p>maximum terminal value</p>
+</td></tr>
+<tr><td><code id="Vmin">Vmin</code></td>
+<td>
+<p>minimum terminal value</p>
+</td></tr>
+<tr><td><code id="xm">xm</code></td>
+<td>
+<p>state at the maximum or right wing</p>
+</td></tr>
+<tr><td><code id="vr">vr</code></td>
+<td>
+<p>rate of change</p>
+</td></tr>
+<tr><td><code id="xi">xi</code></td>
+<td>
+<p>state at the inflection point</p>
+</td></tr>
+<tr><td><code id="s">s</code></td>
+<td>
+<p>vector of times</p>
+</td></tr>
+<tr><td><code id="V">V</code></td>
+<td>
+<p>vector of terminal values</p>
+</td></tr>
+<tr><td><code id="r">r</code></td>
+<td>
+<p>discount rate 0&lt;=r&lt;inf</p>
+</td></tr>
+<tr><td><code id="theta">theta</code></td>
+<td>
+<p>weight of current time in time stepping 0.5&lt;=theta&lt;=1</p>
+</td></tr>
+<tr><td><code id="skip">skip</code></td>
+<td>
+<p>subdivide time intervals but report at times s 1&lt;=skip&lt;=1000</p>
+</td></tr>
+<tr><td><code id="OOenv">OOenv</code></td>
+<td>
+<p>envelope of option values</p>
+</td></tr>
+<tr><td><code id="phi">phi</code></td>
+<td>
+<p>search direction for exit or entry options</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>g(n) &lt;- RcppOUPFDDrift()
+</p>
+<p>h2(n) &lt;- RcppOUPFDDiffusion()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Linear()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Degenerate()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Stepped()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Kinked()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Butterfly()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Mitscherlich()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Gompertz()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Logistic()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_Transcendental()
+</p>
+<p>V(n) &lt;- RcppOUPFDTerminalValue_YieldIndex()
+</p>
+<p>c(m,n) &lt;- RcppOUPFDOption()
+</p>
+<p>env(2,n) &lt;- RcppOUPFDOptionEnvelope()
+</p>
+<p>dec(2) &lt;- RcppOUPFDDecisionThreshold()
+</p>
+
+
+<h3>Notes on Values</h3>
+
+<p>Return values are vectors and matrices allocated in Rcpp.  The dimensions are
+shown for information.  Of course, do not include them in R calls.  For example:
+</p>
+<div class="sourceCode"><pre>g &lt;- RcppOUPFDDrift(x,rho,mu)
+</pre></div>
+<p>The return values:
+</p>
+<div class="sourceCode"><pre>g(n)
+h2(n)
+V(n)
+</pre></div>
+<p>are vectors of the same dimension as x.
+</p>
+<p>The return value:
+</p>
+<div class="sourceCode"><pre>c(m,n)
+</pre></div>
+<p>is a matrix with row dimension from s and column dimension from x.
+</p>
+<p>The return value:
+</p>
+<div class="sourceCode"><pre>env(2,n)
+</pre></div>
+<p>is a matrix with two row vectors for the option prices along the envelope
+and the corresponding times.  It is subset in R as:
+</p>
+<div class="sourceCode"><pre>OOhat &lt;- env[1,]
+tshat &lt;- env[2,]
+</pre></div>
+<p>The return value:
+</p>
+<div class="sourceCode"><pre>dec(2)
+</pre></div>
+<p>is a vector with two elements for the state at the decision threshold and
+the option price at that state.  It is subset in R as:
+</p>
+<div class="sourceCode"><pre>k &lt;- dec[1]
+OOhat &lt;- dec[2]
+</pre></div>
+
+
+<h3>Discussion</h3>
+
+<p>First, the finite difference method was implemented in R6 as a
+single-threaded application.  Then the R6 code was translated into Rcpp
+sequential code.  The finite difference method steps backward in time.  For
+each time, it uses LU decomposition, followed by forward and backward
+substitution to solve matrices.  The finite difference method is inherently
+sequential.  Global searches for envelopes of option prices and decision
+thresholds are also sequential.  There is no parallel processing in this
+module.  The R6 single-threaded code has been archived, leaving the Rcpp code.
+</p>
+<p>Below are microbenchmark median times to calculate 400,000 Option Prices.
+Parameter skip=10 and only 40,000 Option Prices are reported.  Other rows
+show median times for the Option Envelope and the Decision Threshold.
+Calculations are on an i7 CPU with a maximum speed of 4.5 GHz.
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds             R6     R6+
+         function   single-thread    Rcpp
+-----------------------------------------
+           Option        342.1143  7.7743
+   OptionEnvelope        608.9655  4.6913
+DecisionThreshold          6.0607  0.1089
+</pre></div>
+<p>The Option Envelope is an input into the calculation of the Decision Threshold.
+If the Decision Threshold is calculated from a standing start, add the two times.
+R6+Rcpp calculates from 44.0 to 129.8 times faster than R6 single-thread.
+The algorithms are not identical.  R6+Rcpp takes advantage of void subroutines
+and call-by-reference to manipulate vectors and matrices without copying.
+</p>
+
+
+<h3>From the Console</h3>
+
+<p>These functions are available in R, the RStudio console and RShiny apps.  For
+example, a  calculation of option prices would be:
+</p>
+<div class="sourceCode"><pre>s &lt;- seq(from=30,to=10,by=-0.1)
+x &lt;- seq(from=-40,to=60,by=0.5)
+n &lt;- length(x)
+V &lt;- vector("double",n)
+for(j in 1:n) { V[j] &lt;- max(0,x[j]) }
+OO &lt;- RcppOUPFDOption(s,x,V,0.05,0.5,10,0.5,15,15)
+</pre></div>
+<p>Calling functions from the console is slightly faster than calling them
+through R6 objects.  The table below compares the R6+Rcpp median times
+above with the median times from the console:
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds     R6+  Console
+         function     Rcpp     Rcpp
+-----------------------------------
+           Option   7.7743   7.3196
+   OptionEnvelope   4.6913   4.5448
+DecisionThreshold   0.1089   0.0174
+</pre></div>
+<p>There is less than half a millisecond time penalty for using the R6 object
+and it is much more convenient.  It is reactive.  In other words, it
+stores inputs and outputs and maps inputs to outputs.  Changing an input will
+nullify dependent outputs, eliminating any danger of reporting a stale output.
+Outputs are calculated only as needed and only once. Then they are reused,
+in plots, for example.
+</p>
+<p>Potentially, the Rcpp functions could be imported into other packages.
+</p>
+
+</main>
+
+</div>
+</body></html>

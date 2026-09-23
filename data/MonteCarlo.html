@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><title>R: R6 Class implementing Monte Carlo simulation</title>
+<!DOCTYPE html><html><head><title>R: R6 class implementing Monte Carlo simulation of the...</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
@@ -16,47 +16,245 @@ function processMathHTML() {
 
 <table style="width: 100%;"><tr><td>MonteCarlo</td><td style="text-align: right;">R Documentation</td></tr></table>
 
-<h2>R6 Class implementing Monte Carlo simulation</h2>
+<h2>R6 class implementing Monte Carlo simulation of the Ornstein-Uhlenbeck Process</h2>
 
 <h3>Description</h3>
 
-<p>This object is a placeholder to be completed in a future version.
+<p>Monte Carlo simulations of Forward Paths, Bounded Paths, Backward Paths,
+Probabilities, Options and Passage Times.  Forward, Backward and Bounded Paths
+are simulated by the stochastic integral equation.  Probabilities, Options
+and Passage Times are various ways of binning and counting the Paths.
 </p>
 
 
 <h3>Methods:</h3>
 
-<p>To be completed.
-</p>
+<div class="sourceCode"><pre>y stochastic
+  ForwardPaths
+  Mean
+  Variance
+  Density
+  Probability
+  DoubleIntegral
+x stochastic
+  BackwardPaths
+  Option
+t stochastic
+  ForwardPaths
+  BoundedPaths
+  VisitingTimeModeMedianMean
+  VisitingTimePercentiles
+  VisitingTimeDensity
+  VisitingTimeProbability
+  FirstPassageTimeModeMedianMean
+  FirstPassageTimePercentiles
+  FirstPassageTimeDensity
+  FirstPassageTimeProbability
+</pre></div>
 
 
 <h3>Plots:</h3>
 
-<p>To be completed,
-</p>
+<div class="sourceCode"><pre>  PlotForwardPaths
+  PlotBackwardPaths
+  PlotBoundedPaths
+  PlotMean
+  PlotVariance
+  PlotDensity
+  PlotProbability
+  PlotDoubleIntegral
+  PlotOption
+  PlotVisitingTimeModeMedianMean
+  PlotVisitingTimePercentiles
+  PlotVisitingTimeDensity
+  PlotVisitingTimeProbability
+  PlotFirstPassageTimeModeMedianMean
+  PlotFirstPassageTimePercentiles
+  PlotFirstPassageTimeDensity
+  PlotFirstPassageTimeProbability
+</pre></div>
 
 
 <h3>Arguments of functions:</h3>
 
 <div class="sourceCode"><pre>  All arguments are optional in all functions.
+OUP parameters
+  rho:    rate parameter 0&lt;=rho&lt;inf
+  mu:     location parameter -inf&lt;mu&lt;inf
+  sigma:  scale parameter -inf&lt;sigma&lt;inf
+y stochastic
+  t:      vector of times s&lt;=t&lt;inf
+  x:      initial state -inf&lt;x&lt;inf
+  psi:    &lt;=0 for integral -inf to y,
+           &gt;0 for integral y to inf
+x stochastic
+  s:      vector of times -inf&lt;s&lt;t
+  y:      terminal state -inf&lt;y&lt;inf
+  r:      discount rate -inf&lt;r&lt;inf
+  phi:    &lt;=0 for exit option,
+           &gt;0 for entry option
+t stochastic
+  t:      vector of times s&lt;=t&lt;inf
+  k:      decision threshold -inf&lt;k&lt;int
+  x:      initial state -inf&lt;x&lt;inf
+  Ppct:   probability for a percentile 0.01&lt;=Ppct&lt;=0.99
+path
+  paths:  number of paths 1&lt;paths&lt;1,000,000
+  skip:   subdivide time interval but report at times t 1&lt;=skip&lt;=50
+  seed:   seed for random number generators -inf&lt;seed&lt;inf
 </pre></div>
-<p>To be completed.
+
+
+<h3>Usage:</h3>
+
+<p>The MonteCarlo object must first be instantiated before its methods are called.
+There are two ways.  The first way instantiates the OUProcess object and
+calls a function to get a pointer:
+</p>
+<div class="sourceCode"><pre>  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  FD &lt;- OUP$get_FiniteDifference()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
+</pre></div>
+<p>The MonteCarlo object will coordinate arguments to functions with the
+Analytial, FiniteDifference and MaximumLikelihood objects.  The second
+way instantiates the MonteCarlo object by itself with no coordination:
+</p>
+<div class="sourceCode"><pre>  MC &lt;- MonteCarlol$new()
+</pre></div>
+<p>Once the object is instantiated, its methods can be called, to simulate
+100,000 Forward Paths, for example:
+</p>
+<div class="sourceCode"><pre>  MC$ForwardPaths(paths=100000)
+</pre></div>
+<p>The plot methods can be used to customize the plots, with a title, for example:
+</p>
+<div class="sourceCode"><pre>  A$PlotForwardPaths(title="My Paths Forward")
+</pre></div>
+<p>An attempt to plot 100,000 paths would choke the computer, so there are tricks.
+One is to select a hundred or so paths for the plot.  Another is to summarise
+the paths as heat maps, just like in a weather report.
+</p>
+<p>Other functions and methods are called in the same way.  To see all the
+possibilities, check out the demos below.
 </p>
 
 
-<h3>Using the methods:</h3>
+<h3>Demos:</h3>
 
-<p>Demonstration scripts are in files in the 'demo' directory. Identify a
-formula and in the console type:
+<p>Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
 </p>
-<div class="sourceCode"><pre>  demo(MC_FormulaName), or
-  demo(MC_PlotFormulaName).
+<div class="sourceCode"><pre>  OUPDemoList()
+  OUPDemoRun(&lt;number of demo in list&gt;)
 </pre></div>
+<p>Entering the demos by number in the list saves typing.
+</p>
 
 
 <h3>Discussion:</h3>
 
-<p>To be completed.
+<p>Monte Carlo simulation of the Ornstein-Uhlenbeck Process can be done with
+either of two methods:  numerically integrating the stochastic differential
+equation to approximate the stochastic integral equation, or calculating
+the stochastic integral equation directly.
+</p>
+<p>The stochastic differential equation is shocked by Brownian Motion, also
+called a Wiener Process, simulated as sigma * dt^0.5 * epsilon, where
+sigma * dt^0.5 is the square root of the instantaneous variance and epsilon
+are draws from a standard normal density. The stochastic integral equation
+is shocked by the integral of the Wiener Process, or H * epsilon, where H
+is the square-root of the variance over a longer time interval.
+</p>
+<p>Drawing from a standard normal density is difficult and slow.  First uniform
+pseudo-random numbers are generated.  Then the uniform random numbers are
+transformed to normal.  If it is installed, the R6 object uses the dqrng
+package.  Otherwise it uses the c++ implementation std::mt19337.  The R
+function rnorm() is slow, not amenable to parallel processing and not
+available in the R6 object.  It is available in the Rcpp functions.
+</p>
+<p>Numerically integrating the stochastic differential equation uses the Euler,
+Marayuma or Runge-Kutta schemes. The Euler and Marayuma schemes are first
+and third-order schemes and less accurate than the fourth-order Runge-Kutta
+scheme.
+</p>
+<p>The fourth-order Runge-Kutta scheme is standard practice.  In tests, shocked
+by the same draws from a standard normal density, the paths from the stochastic
+integral equation and the fourth-order Runge-Kutta scheme were the same to
+within four or five significant digits.  For the same level of accuracy, the
+stochastic integral equation calculates about 10 times faster.  For this reason,
+only the stochastic integral equation is available in the R6 object.  The
+fourth-order Runge-Kutta scheme is an option in the Rcpp functions.
+</p>
+<p>To simulate forward paths:
+</p>
+<div class="sourceCode"><pre>  MC &lt;- MonteCarlo$new()
+  MC$ForwardPaths(paths=100000)
+</pre></div>
+<p>A Forward Path starts from the backward state at the backward time and goes
+forward. A single path, sampled from all possible paths, is a Sample Path.
+Like contemplating a grain of sand to understand the universe, Maximum
+Likelihood Estimation of a Sample Path reveals the Ornstein-Uhlenbeck Process.
+An ensemble of paths can be counted to approximate Transition Densities and
+Probabilities and Visiting Time Densities and Probabilities. The larger the
+ensemble, the better the approximations.
+</p>
+<p>Forward Paths are continuous in the state and time which makes them very hard
+to count. Instead, Forward Paths are treated as discrete and put into bins.
+Counting the number of Forward Paths in each bin and dividing by the total
+number of paths approximates Transition Densities. Summing the Transition
+Densities approximates Transition Probabilities. Summing again approximates
+Double Integrals.  Double Integrals are a curiosity, but if time runs backwards,
+they become Options.
+</p>
+<p>A Forward Path begins from a known state and travels forward into an uncertain
+future.  A Backward Path ends with a known state and trudges backward into an
+uncertain past. Turning around and travelling back to the future resolves the
+uncertainty over time. An example is a Bayesian analysis which begins with a
+Diffuse Prior and ends with certainty. Another example is an Option. Simulating
+and counting Backward Paths approximates Prior Densities, Prior Probabilities
+and Options.
+</p>
+<p>To compare Monte Carlo and Analytical Options:
+</p>
+<div class="sourceCode"><pre>  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
+  ML$Estimates()
+  ao &lt;- A$Option()[[1]]
+  mco &lt;- MC$Option(paths=1000000)[[1]]
+  dif &lt;- ao-mco
+  max(dif)
+  min(dif)
+  sum(dif)
+</pre></div>
+<p>If we count in the time direction instead of the state direction,
+Forward Paths become Visiting Time Densities and Probabilities.
+Bounded Paths become First Passage Time Densities and Probabilities.
+</p>
+<p>To compare  Monte Carlo and Analytical Visiting Times:
+</p>
+<div class="sourceCode"><pre>  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  MC &lt;- OUP$get_MonteCarlo()
+  ad &lt;- A$PassageTimeDensity(omega=0)[[1]]
+  mcd &lt;- MC$VisitingTimeDensity(paths=1000000)[[1]]
+  dif &lt;- ad-mcd
+  max(dif)
+  min(dif)
+  sum(dif)
+</pre></div>
+<p>Of course, the question is, 'Why bother?' Analytical formulas count much
+faster and more accurately.  One reason is to explain the formulas.  First
+Passage Times are difficult to understand until you plot Bounded Paths and
+count the number of paths that have crossed the threshold.  Even in journal
+articles, the method section may begin with a Monte Carlo simulation.
+</p>
+<p>Another reason is to validate the formulas.  Although an Analytical formula
+will calculate thousands of times faster than a Monte Carlo simulation, arriving
+at approximately the same answer both ways is reassuring.
 </p>
 
 
@@ -68,16 +266,55 @@ formula and in the console type:
 
 
 <ul>
-<li> <p><a href="#method-MonteCarlo-new"><code>MonteCarlo$new()</code></a>
+<li> <p><a href="#method-MonteCarlo-initialize"><code>MonteCarlo$new()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-MonteCarlo-set_oup_params"><code>MonteCarlo$set_oup_params()</code></a>
 </p>
 </li>
+<li> <p><a href="#method-MonteCarlo-set_y_stoch_args"><code>MonteCarlo$set_y_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-set_x_stoch_args"><code>MonteCarlo$set_x_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-set_t_stoch_args"><code>MonteCarlo$set_t_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-set_path_args"><code>MonteCarlo$set_path_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-set_plot_args"><code>MonteCarlo$set_plot_args()</code></a>
+</p>
+</li>
 <li> <p><a href="#method-MonteCarlo-set_plot_info"><code>MonteCarlo$set_plot_info()</code></a>
 </p>
 </li>
+<li> <p><a href="#method-MonteCarlo-set_plot_type"><code>MonteCarlo$set_plot_type()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-set_flags"><code>MonteCarlo$set_flags()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_all"><code>MonteCarlo$get_all()</code></a>
+</p>
+</li>
 <li> <p><a href="#method-MonteCarlo-get_oup_params"><code>MonteCarlo$get_oup_params()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_y_stoch_args"><code>MonteCarlo$get_y_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_x_stoch_args"><code>MonteCarlo$get_x_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_t_stoch_args"><code>MonteCarlo$get_t_stoch_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_path_args"><code>MonteCarlo$get_path_args()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_plot_args"><code>MonteCarlo$get_plot_args()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-MonteCarlo-get_plot_info"><code>MonteCarlo$get_plot_info()</code></a>
@@ -85,15 +322,144 @@ formula and in the console type:
 </li>
 <li> <p><a href="#method-MonteCarlo-get_plot_colors"><code>MonteCarlo$get_plot_colors()</code></a>
 </p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_plot_types"><code>MonteCarlo$get_plot_types()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-get_flags"><code>MonteCarlo$get_flags()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-axes_y_stoch"><code>MonteCarlo$axes_y_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-axes_x_stoch"><code>MonteCarlo$axes_x_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-axes_t_stoch"><code>MonteCarlo$axes_t_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-sync_yxt_stoch"><code>MonteCarlo$sync_yxt_stoch()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-undo_clear"><code>MonteCarlo$undo_clear()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-undo_save"><code>MonteCarlo$undo_save()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-undo_undo"><code>MonteCarlo$undo_undo()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-ForwardPaths"><code>MonteCarlo$ForwardPaths()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-BackwardPaths"><code>MonteCarlo$BackwardPaths()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-BoundedPaths"><code>MonteCarlo$BoundedPaths()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-Mean"><code>MonteCarlo$Mean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-Variance"><code>MonteCarlo$Variance()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-Density"><code>MonteCarlo$Density()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-Probability"><code>MonteCarlo$Probability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-DoubleIntegral"><code>MonteCarlo$DoubleIntegral()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-Option"><code>MonteCarlo$Option()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-VisitingTimeModeMedianMean"><code>MonteCarlo$VisitingTimeModeMedianMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-VisitingTimePercentiles"><code>MonteCarlo$VisitingTimePercentiles()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-VisitingTimeDensity"><code>MonteCarlo$VisitingTimeDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-VisitingTimeProbability"><code>MonteCarlo$VisitingTimeProbability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-FirstPassageTimeModeMedianMean"><code>MonteCarlo$FirstPassageTimeModeMedianMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-FirstPassageTimePercentiles"><code>MonteCarlo$FirstPassageTimePercentiles()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-FirstPassageTimeDensity"><code>MonteCarlo$FirstPassageTimeDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-FirstPassageTimeProbability"><code>MonteCarlo$FirstPassageTimeProbability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotForwardPaths"><code>MonteCarlo$PlotForwardPaths()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotBackwardPaths"><code>MonteCarlo$PlotBackwardPaths()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotBoundedPaths"><code>MonteCarlo$PlotBoundedPaths()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotMean"><code>MonteCarlo$PlotMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotVariance"><code>MonteCarlo$PlotVariance()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotDensity"><code>MonteCarlo$PlotDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotProbability"><code>MonteCarlo$PlotProbability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotDoubleIntegral"><code>MonteCarlo$PlotDoubleIntegral()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotOption"><code>MonteCarlo$PlotOption()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotVisitingTimeModeMedianMean"><code>MonteCarlo$PlotVisitingTimeModeMedianMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotVisitingTimePercentiles"><code>MonteCarlo$PlotVisitingTimePercentiles()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotVisitingTimeDensity"><code>MonteCarlo$PlotVisitingTimeDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotVisitingTimeProbability"><code>MonteCarlo$PlotVisitingTimeProbability()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotFirstPassageTimeModeMedianMean"><code>MonteCarlo$PlotFirstPassageTimeModeMedianMean()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotFirstPassageTimePercentiles"><code>MonteCarlo$PlotFirstPassageTimePercentiles()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotFirstPassageTimeDensity"><code>MonteCarlo$PlotFirstPassageTimeDensity()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MonteCarlo-PlotFirstPassageTimeProbability"><code>MonteCarlo$PlotFirstPassageTimeProbability()</code></a>
+</p>
 </li></ul>
 
 
 <hr>
-<a id="method-MonteCarlo-new"></a>
+<a id="method-MonteCarlo-initialize"></a>
 
 
 
-<h4>Method <code>new()</code></h4>
+<h4><code>MonteCarlo$new()</code></h4>
 
 <p>Create a MonteCarlo object
 </p>
@@ -101,7 +467,9 @@ formula and in the console type:
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MonteCarlo$new(OUP = NULL)</pre></div>
+<div class="r">
+<pre>MonteCarlo$new(OUP = NULL)</pre>
+</div>
 
 
 
@@ -124,22 +492,12 @@ formula and in the console type:
 </p>
 
 
-
-<h5>Examples</h5>
-
-<div class="r example copy">
-<pre>  MC &lt;- MonteCarlo$new()
-  MC$get_oup_params()
-</pre>
-</div>
-
-
 <hr>
 <a id="method-MonteCarlo-set_oup_params"></a>
 
 
 
-<h4>Method <code>set_oup_params()</code></h4>
+<h4><code>MonteCarlo$set_oup_params()</code></h4>
 
 <p>Set OUP parameters
 </p>
@@ -147,7 +505,9 @@ formula and in the console type:
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MonteCarlo$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)</pre></div>
+<div class="r">
+<pre>MonteCarlo$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)</pre>
+</div>
 
 
 
@@ -162,7 +522,7 @@ formula and in the console type:
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
 </dd>
 </dl>
 
@@ -177,11 +537,273 @@ formula and in the console type:
 
 
 <hr>
+<a id="method-MonteCarlo-set_y_stoch_args"></a>
+
+
+
+<h4><code>MonteCarlo$set_y_stoch_args()</code></h4>
+
+<p>Set arguments for y as a stochastic state
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$set_y_stoch_args(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  psi = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of n states -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,y,x,psi)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-set_x_stoch_args"></a>
+
+
+
+<h4><code>MonteCarlo$set_x_stoch_args()</code></h4>
+
+<p>Set arguments for x as a stochastic state
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$set_x_stoch_args(
+  s = NULL,
+  x = NULL,
+  y = NULL,
+  r = NULL,
+  phi = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>vector of m times -inf&lt;s&lt;t</p>
+</dd>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(s,x,y,r,phi)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-set_t_stoch_args"></a>
+
+
+
+<h4><code>MonteCarlo$set_t_stoch_args()</code></h4>
+
+<p>Set t stochastic arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$set_t_stoch_args(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  omega = NULL,
+  Ppct = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>threshold -inf&lt;k&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
+</dd>
+<dt><code>Ppct</code></dt><dd><p>passage time probability for a percentile  0.01&lt;=Ppct&lt;=0.99</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,k,x)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-set_path_args"></a>
+
+
+
+<h4><code>MonteCarlo$set_path_args()</code></h4>
+
+<p>Set path arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$set_path_args(paths = NULL, skip = NULL, seed = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time intervals but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(paths,skip,seed)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-set_plot_args"></a>
+
+
+
+<h4><code>MonteCarlo$set_plot_args()</code></h4>
+
+<p>Set plot arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$set_plot_args(
+  pmax = NULL,
+  ptmax = NULL,
+  first = NULL,
+  last = NULL,
+  zbeg = NULL,
+  zend = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>first</code></dt><dd><p>first path to plot</p>
+</dd>
+<dt><code>last</code></dt><dd><p>last path to plot</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(pmax,ptmax,first,last,zbeg,zend)
+</p>
+
+
+<hr>
 <a id="method-MonteCarlo-set_plot_info"></a>
 
 
 
-<h4>Method <code>set_plot_info()</code></h4>
+<h4><code>MonteCarlo$set_plot_info()</code></h4>
 
 <p>Set information for plotting
 </p>
@@ -189,10 +811,8 @@ formula and in the console type:
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MonteCarlo$set_plot_info(
-  type = NULL,
-  pmax = NULL,
-  ptmax = NULL,
+<div class="r">
+<pre>MonteCarlo$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -204,7 +824,8 @@ formula and in the console type:
   floor = NULL,
   labels = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -213,12 +834,6 @@ formula and in the console type:
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3 and 4 for 3D</p>
-</dd>
-<dt><code>pmax</code></dt><dd><p>maximum vertical axis for transition density plot</p>
-</dd>
-<dt><code>ptmax</code></dt><dd><p>maximum vertical axis for passage time density plot</p>
-</dd>
 <dt><code>fontfamily</code></dt><dd><p>font family for plot labels</p>
 </dd>
 <dt><code>fontsize</code></dt><dd><p>font size for plot labels</p>
@@ -239,7 +854,7 @@ formula and in the console type:
 </dd>
 <dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
 </dd>
 </dl>
 
@@ -249,7 +864,114 @@ formula and in the console type:
 
 <h5>Returns</h5>
 
-<p>list(type,font,file,theme,3D,labels)
+<p>list(font,file,theme,3D,labels)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-set_plot_type"></a>
+
+
+
+<h4><code>MonteCarlo$set_plot_type()</code></h4>
+
+<p>Set plot types by group
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$set_plot_type(type = NULL, group = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>a number identifying the type for a group</p>
+</dd>
+<dt><code>group</code></dt><dd><p>identifier for groups of similar plots</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(type,group)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-set_flags"></a>
+
+
+
+<h4><code>MonteCarlo$set_flags()</code></h4>
+
+<p>Set flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$set_flags(plotit = NULL, copyit = NULL, who = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>plotit</code></dt><dd><p>automatic plot after calculation TRUE or FALSE</p>
+</dd>
+<dt><code>copyit</code></dt><dd><p>copy to clipboard TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_all"></a>
+
+
+
+<h4><code>MonteCarlo$get_all()</code></h4>
+
+<p>Get all arguments and information
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_all()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(oup_params,y_stoch_args,x_stoch_args,t_stoch_args,path_args,plot_info)
 </p>
 
 
@@ -258,7 +980,7 @@ formula and in the console type:
 
 
 
-<h4>Method <code>get_oup_params()</code></h4>
+<h4><code>MonteCarlo$get_oup_params()</code></h4>
 
 <p>Get OUP parameters
 </p>
@@ -266,7 +988,9 @@ formula and in the console type:
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MonteCarlo$get_oup_params()</pre></div>
+<div class="r">
+<pre>MonteCarlo$get_oup_params()</pre>
+</div>
 
 
 
@@ -277,11 +1001,136 @@ formula and in the console type:
 
 
 <hr>
+<a id="method-MonteCarlo-get_y_stoch_args"></a>
+
+
+
+<h4><code>MonteCarlo$get_y_stoch_args()</code></h4>
+
+<p>Get arguments for y as a stochastic state
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_y_stoch_args()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,y,x,psi)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_x_stoch_args"></a>
+
+
+
+<h4><code>MonteCarlo$get_x_stoch_args()</code></h4>
+
+<p>Get arguments for x as a stochastic state
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_x_stoch_args()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(s,y,r,phi)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_t_stoch_args"></a>
+
+
+
+<h4><code>MonteCarlo$get_t_stoch_args()</code></h4>
+
+<p>Get arguments for t as a stochastic state
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_t_stoch_args()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(t,k,x,z,omega,Ppct)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_path_args"></a>
+
+
+
+<h4><code>MonteCarlo$get_path_args()</code></h4>
+
+<p>get path arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_path_args()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(paths,skip,seed)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_plot_args"></a>
+
+
+
+<h4><code>MonteCarlo$get_plot_args()</code></h4>
+
+<p>get plot arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_plot_args()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(pmax,ptmax,first,last,zbeg,zend)
+</p>
+
+
+<hr>
 <a id="method-MonteCarlo-get_plot_info"></a>
 
 
 
-<h4>Method <code>get_plot_info()</code></h4>
+<h4><code>MonteCarlo$get_plot_info()</code></h4>
 
 <p>Get information for plotting
 </p>
@@ -289,13 +1138,15 @@ formula and in the console type:
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MonteCarlo$get_plot_info()</pre></div>
+<div class="r">
+<pre>MonteCarlo$get_plot_info()</pre>
+</div>
 
 
 
 <h5>Returns</h5>
 
-<p>list(type,font,file,theme,3D,labels)
+<p>list(font,file,theme,3D,labels)
 </p>
 
 
@@ -304,7 +1155,7 @@ formula and in the console type:
 
 
 
-<h4>Method <code>get_plot_colors()</code></h4>
+<h4><code>MonteCarlo$get_plot_colors()</code></h4>
 
 <p>Get colors for plotting
 </p>
@@ -312,7 +1163,9 @@ formula and in the console type:
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MonteCarlo$get_plot_colors()</pre></div>
+<div class="r">
+<pre>MonteCarlo$get_plot_colors()</pre>
+</div>
 
 
 
@@ -322,18 +1175,2457 @@ formula and in the console type:
 </p>
 
 
+<hr>
+<a id="method-MonteCarlo-get_plot_types"></a>
 
 
-<h3>Examples</h3>
 
-<pre><code class='language-R'>
-## ------------------------------------------------
-## Method `MonteCarlo$new`
-## ------------------------------------------------
+<h4><code>MonteCarlo$get_plot_types()</code></h4>
 
-  MC &lt;- MonteCarlo$new()
-  MC$get_oup_params()
-</code></pre>
+<p>Get current types for plot routines
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_plot_types()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>(list(types,description))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-get_flags"></a>
+
+
+
+<h4><code>MonteCarlo$get_flags()</code></h4>
+
+<p>Get flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$get_flags()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-axes_y_stoch"></a>
+
+
+
+<h4><code>MonteCarlo$axes_y_stoch()</code></h4>
+
+<p>Scale axes for y stochastic paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$axes_y_stoch()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-axes_x_stoch"></a>
+
+
+
+<h4><code>MonteCarlo$axes_x_stoch()</code></h4>
+
+<p>Scale axes for x stochastic paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$axes_x_stoch()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-axes_t_stoch"></a>
+
+
+
+<h4><code>MonteCarlo$axes_t_stoch()</code></h4>
+
+<p>Scale axes for t stochastic paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$axes_t_stoch()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-sync_yxt_stoch"></a>
+
+
+
+<h4><code>MonteCarlo$sync_yxt_stoch()</code></h4>
+
+<p>Synchronize arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$sync_yxt_stoch()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>NULL
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-undo_clear"></a>
+
+
+
+<h4><code>MonteCarlo$undo_clear()</code></h4>
+
+<p>Clear undo list and save current arguments to list
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$undo_clear()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>1
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-undo_save"></a>
+
+
+
+<h4><code>MonteCarlo$undo_save()</code></h4>
+
+<p>Save current arguments to undo list
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$undo_save()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>number of argument sets
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-undo_undo"></a>
+
+
+
+<h4><code>MonteCarlo$undo_undo()</code></h4>
+
+<p>Replace current arguments from undo list
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$undo_undo(updn = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>updn</code></dt><dd><p>positive to move up, negative to move down</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>c(index of this argument set, number of argument sets)
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-ForwardPaths"></a>
+
+
+
+<h4><code>MonteCarlo$ForwardPaths()</code></h4>
+
+<p>Calculate and plot forward paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$ForwardPaths(
+  t = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(forward(m,paths))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-BackwardPaths"></a>
+
+
+
+<h4><code>MonteCarlo$BackwardPaths()</code></h4>
+
+<p>Calculate and plot backward paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$BackwardPaths(
+  s = NULL,
+  y = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>vector of m times -inf&lt;s&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(backward(m,paths))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-BoundedPaths"></a>
+
+
+
+<h4><code>MonteCarlo$BoundedPaths()</code></h4>
+
+<p>Calculate and plot bounded paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$BoundedPaths(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>threshold or bound -inf&lt;k&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(bounded(m,paths))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-Mean"></a>
+
+
+
+<h4><code>MonteCarlo$Mean()</code></h4>
+
+<p>Calculate and plot means
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$Mean(
+  t = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(G(m))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-Variance"></a>
+
+
+
+<h4><code>MonteCarlo$Variance()</code></h4>
+
+<p>Calculate and plot variances
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$Variance(
+  t = NULL,
+  x = NULL,
+  rho = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(H2(m))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-Density"></a>
+
+
+
+<h4><code>MonteCarlo$Density()</code></h4>
+
+<p>Calculate and plot densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$Density(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of n states -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(p(m,n))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-Probability"></a>
+
+
+
+<h4><code>MonteCarlo$Probability()</code></h4>
+
+<p>Calculate and plot probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$Probability(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  psi = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of n states -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(P(m,n))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-DoubleIntegral"></a>
+
+
+
+<h4><code>MonteCarlo$DoubleIntegral()</code></h4>
+
+<p>Calculate and plot double integrals
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$DoubleIntegral(
+  t = NULL,
+  y = NULL,
+  x = NULL,
+  psi = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times -inf&lt;t&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>vector of n states -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(PP(m,n))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-Option"></a>
+
+
+
+<h4><code>MonteCarlo$Option()</code></h4>
+
+<p>Calculate and plot option prices
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$Option(
+  s = NULL,
+  x = NULL,
+  y = NULL,
+  r = NULL,
+  phi = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>s</code></dt><dd><p>vector of m times -inf&lt;s&lt;t</p>
+</dd>
+<dt><code>x</code></dt><dd><p>vector of n states -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
+</dd>
+<dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(OO(mxn))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-VisitingTimeModeMedianMean"></a>
+
+
+
+<h4><code>MonteCarlo$VisitingTimeModeMedianMean()</code></h4>
+
+<p>Calculate and plot visiting time mode, median and mean
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$VisitingTimeModeMedianMean(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(vtmmm(3x3))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-VisitingTimePercentiles"></a>
+
+
+
+<h4><code>MonteCarlo$VisitingTimePercentiles()</code></h4>
+
+<p>Calculate and plot visiting time percentiles
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$VisitingTimePercentiles(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  Ppct = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>Ppct</code></dt><dd><p>probability for a percentile 0.01&lt;=Ppct&lt;=0.99</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(vtpct(3x3))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-VisitingTimeDensity"></a>
+
+
+
+<h4><code>MonteCarlo$VisitingTimeDensity()</code></h4>
+
+<p>Calculate and plot visiting time densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$VisitingTimeDensity(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(pv(m))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-VisitingTimeProbability"></a>
+
+
+
+<h4><code>MonteCarlo$VisitingTimeProbability()</code></h4>
+
+<p>Calculate and plot visiting time probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$VisitingTimeProbability(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(Pv(m))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-FirstPassageTimeModeMedianMean"></a>
+
+
+
+<h4><code>MonteCarlo$FirstPassageTimeModeMedianMean()</code></h4>
+
+<p>Calculate and plot first passage time mode, median and mean
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$FirstPassageTimeModeMedianMean(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(fptmmm(3x3))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-FirstPassageTimePercentiles"></a>
+
+
+
+<h4><code>MonteCarlo$FirstPassageTimePercentiles()</code></h4>
+
+<p>Calculate and plot first passage time percentiles
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$FirstPassageTimePercentiles(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  Ppct = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>Ppct</code></dt><dd><p>probability for a percentile 0.01&lt;=Ppct&lt;=0.99</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(fptpct(3x3))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-FirstPassageTimeDensity"></a>
+
+
+
+<h4><code>MonteCarlo$FirstPassageTimeDensity()</code></h4>
+
+<p>Calculate and plot first passage time densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$FirstPassageTimeDensity(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(pf(m))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-FirstPassageTimeProbability"></a>
+
+
+
+<h4><code>MonteCarlo$FirstPassageTimeProbability()</code></h4>
+
+<p>Calculate and plot first passage time probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$FirstPassageTimeProbability(
+  t = NULL,
+  k = NULL,
+  x = NULL,
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  paths = NULL,
+  skip = NULL,
+  seed = NULL,
+  who = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
+</dd>
+<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
+</dd>
+<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
+</dd>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>paths</code></dt><dd><p>number of paths 1&lt;paths&lt;1,000,000</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time interval but report at times t 1&lt;=skip&lt;=50</p>
+</dd>
+<dt><code>seed</code></dt><dd><p>seed for random number generators -inf&lt;seed&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(Pf(m))
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotForwardPaths"></a>
+
+
+
+<h4><code>MonteCarlo$PlotForwardPaths()</code></h4>
+
+<p>Plot forward paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotForwardPaths(
+  type = NULL,
+  first = NULL,
+  last = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -3,...,0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>first</code></dt><dd><p>first path to plot</p>
+</dd>
+<dt><code>last</code></dt><dd><p>last path to plot</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotBackwardPaths"></a>
+
+
+
+<h4><code>MonteCarlo$PlotBackwardPaths()</code></h4>
+
+<p>Plot backward paths
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotBackwardPaths(
+  type = NULL,
+  first = NULL,
+  last = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  sbeg = NULL,
+  send = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -3,...,0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>first</code></dt><dd><p>first path to plot</p>
+</dd>
+<dt><code>last</code></dt><dd><p>last path to plot</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>sbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>send</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>copyit</code></dt><dd><p>TRUE or FALSE</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+Plot bounded paths
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotBoundedPaths"></a>
+
+
+
+<h4><code>MonteCarlo$PlotBoundedPaths()</code></h4>
+
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotBoundedPaths(
+  type = NULL,
+  first = NULL,
+  last = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -3,...,0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>first</code></dt><dd><p>first path to plot</p>
+</dd>
+<dt><code>last</code></dt><dd><p>last path to plot</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotMean"></a>
+
+
+
+<h4><code>MonteCarlo$PlotMean()</code></h4>
+
+<p>Plot means
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotMean(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotVariance"></a>
+
+
+
+<h4><code>MonteCarlo$PlotVariance()</code></h4>
+
+<p>Plot variances
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotVariance(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotDensity"></a>
+
+
+
+<h4><code>MonteCarlo$PlotDensity()</code></h4>
+
+<p>Plot transition densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotDensity(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotProbability"></a>
+
+
+
+<h4><code>MonteCarlo$PlotProbability()</code></h4>
+
+<p>Plot transition probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotProbability(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotDoubleIntegral"></a>
+
+
+
+<h4><code>MonteCarlo$PlotDoubleIntegral()</code></h4>
+
+<p>Plot double integrals of transition densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotDoubleIntegral(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  ybeg = NULL,
+  yend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>yend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotOption"></a>
+
+
+
+<h4><code>MonteCarlo$PlotOption()</code></h4>
+
+<p>Plot options
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotOption(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  sbeg = NULL,
+  send = NULL,
+  xbeg = NULL,
+  xend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>sbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>send</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>xbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>xend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotVisitingTimeModeMedianMean"></a>
+
+
+
+<h4><code>MonteCarlo$PlotVisitingTimeModeMedianMean()</code></h4>
+
+<p>Plot visiting time mode, median and mean
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotVisitingTimeModeMedianMean(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotVisitingTimePercentiles"></a>
+
+
+
+<h4><code>MonteCarlo$PlotVisitingTimePercentiles()</code></h4>
+
+<p>Plot visiting time lower, median and upper percentiles
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotVisitingTimePercentiles(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotVisitingTimeDensity"></a>
+
+
+
+<h4><code>MonteCarlo$PlotVisitingTimeDensity()</code></h4>
+
+<p>Plot visiting time densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotVisitingTimeDensity(
+  type = NULL,
+  pmax = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotVisitingTimeProbability"></a>
+
+
+
+<h4><code>MonteCarlo$PlotVisitingTimeProbability()</code></h4>
+
+<p>Plot visiting time probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotVisitingTimeProbability(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotFirstPassageTimeModeMedianMean"></a>
+
+
+
+<h4><code>MonteCarlo$PlotFirstPassageTimeModeMedianMean()</code></h4>
+
+<p>Plot first passage time mode, median and mean
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotFirstPassageTimeModeMedianMean(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotFirstPassageTimePercentiles"></a>
+
+
+
+<h4><code>MonteCarlo$PlotFirstPassageTimePercentiles()</code></h4>
+
+<p>Plot first passage time lower, median and upper percentiles
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotFirstPassageTimePercentiles(
+  type = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  tbeg = NULL,
+  tend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotFirstPassageTimeDensity"></a>
+
+
+
+<h4><code>MonteCarlo$PlotFirstPassageTimeDensity()</code></h4>
+
+<p>Plot first passage time densities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotFirstPassageTimeDensity(
+  type = NULL,
+  pmax = NULL,
+  ptmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
+<hr>
+<a id="method-MonteCarlo-PlotFirstPassageTimeProbability"></a>
+
+
+
+<h4><code>MonteCarlo$PlotFirstPassageTimeProbability()</code></h4>
+
+<p>Plot first passage time probabilities
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MonteCarlo$PlotFirstPassageTimeProbability(
+  type = NULL,
+  pmax = NULL,
+  title = NULL,
+  xaxis = NULL,
+  yaxis = NULL,
+  zaxis = NULL,
+  tbeg = NULL,
+  tend = NULL,
+  zbeg = NULL,
+  zend = NULL
+)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
+</dd>
+<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
+</dd>
+<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
+</dd>
+<dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
+</dd>
+<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
+</dd>
+<dt><code>tend</code></dt><dd><p>end value for time axis</p>
+</dd>
+<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
+</dd>
+<dt><code>zend</code></dt><dd><p>end value for state axis</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>plot
+</p>
+
+
 
 </main>
 

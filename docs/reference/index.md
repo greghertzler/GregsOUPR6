@@ -112,6 +112,8 @@
 
 - [`MyData`](https://greghertzler.github.io/GregsOUPR6/reference/MyData.md)
   : Default data for the Ornstein-Uhlenbeck Process
+- [`OUP_BrownianMotion`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_BrownianMotion.md)
+  : Brownian Motion
 - [`OUP_Convergence`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_Convergence.md)
   : Rates of convergence for the Ornstein-Uhlenbeck Process
 - [`OUP_NotMissing`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_NotMissing.md)
@@ -123,6 +125,8 @@
   : Sample sizes for the Ornstein-Uhlenbeck Process
 - [`OUP_SmoothedData`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_SmoothedData.md)
   : Smoothed sample paths for the Ornstein-Uhlenbeck Process
+- [`OUP_StationaryIncrements`](https://greghertzler.github.io/GregsOUPR6/reference/OUP_StationaryIncrements.md)
+  : Stationary increments
 
 ### Agriculture
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><title>R: R6 Class implementing a Finite Difference method.</title>
+<!DOCTYPE html><html><head><title>R: R6 class implementing a Finite Difference method for the...</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
@@ -16,20 +16,19 @@ function processMathHTML() {
 
 <table style="width: 100%;"><tr><td>FiniteDifference</td><td style="text-align: right;">R Documentation</td></tr></table>
 
-<h2>R6 Class implementing a Finite Difference method.</h2>
+<h2>R6 class implementing a Finite Difference method for the Ornstein-Uhlenbeck Process.</h2>
 
 <h3>Description</h3>
 
-<p>A Finite Difference method for the Ornstein-Uhlenbeck Process&ndash;without boundary
-conditions on the state but with arbitrary terminal values&ndash;for the pricing of
-index insurance, perpetual options and sequential options. From the option
-prices, an option envelope and a decision threshold can be calculated.  Drift,
-diffusion and several possible terminal values are pre-programmed.  User-defined
-terminal values can also be entered.
+<p>A Finite Difference method&ndash;without boundary conditions on the state but with
+arbitrary terminal values&ndash;for the pricing of index insurance, perpetual options
+and sequential options. From the option prices, an option envelope and a decision
+threshold can be calculated.  Drift, diffusion and several possible terminal values
+are pre-programmed.  User-defined terminal values can also be entered.
 </p>
 
 
-<h3>Formulas and methods:</h3>
+<h3>Formulas and Methods:</h3>
 
 <div class="sourceCode"><pre>x stochastic
   Drift
@@ -85,27 +84,61 @@ terminal values can also be entered.
 </pre></div>
 
 
-<h3>Using the formulas and methods:</h3>
+<h3>Usage:</h3>
 
-<p>Demonstration scripts are in files in the 'demo' directory. Identify a
-formula and in the console type:
+<p>The FiniteDifference object must first be instantiated before its methods
+are called. There are two ways.  The first way instantiates the OUProcess
+object and calls a function to get a pointer:
 </p>
-<div class="sourceCode"><pre>  demo(FD_FormulaName), or
-  demo(FD_PlotFormulaName).
+<div class="sourceCode"><pre>  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  FD &lt;- OUP$get_FiniteDifference()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
 </pre></div>
+<p>The FiniteDifference object will coordinate arguments to functions with the
+Analytial, MaximumLikelihood and MonteCarlo objects.  The second
+way instantiates the FiniteDifference object by itself with no coordination:
+</p>
+<div class="sourceCode"><pre>  FD &lt;- FiniteDifference$new()
+</pre></div>
+<p>Once the object is instantiated, its methods can be called, to calculate and
+plot a Decision Threshold, for example:
+</p>
+<div class="sourceCode"><pre>  FD$DecisionThreshold()
+</pre></div>
+<p>The plot methods can be used to customize the plots, with a title, for example:
+</p>
+<div class="sourceCode"><pre>  FD$PlotDecisionThreshold(title="My Decision")
+</pre></div>
+<p>Other functions and methods are called in the same way.  To see all the
+possibilities, check out the demos below.
+</p>
+
+
+<h3>Demos:</h3>
+
+<p>Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
+</p>
+<div class="sourceCode"><pre>  OUPDemoList()
+  OUPDemoRun(&lt;number of demo in list&gt;)
+</pre></div>
+<p>Entering the demos by number in the list saves typing.
+</p>
 
 
 <h3>Discussion:</h3>
 
 <p>The Finite Difference Method can solve problems with no analytical solutions.
-As a numerical procedure, it will have errors. Large dif fusions will cause
-larger errors. To manage the errors, the domain for x should be as large as
-practical. The increment between times is ds and skip subdivides time into
-small intervals. Only calculations for ds are reported.  The increment
-between states is dx and ds/skip should be at most dx/100. Increasing skip
-or dx may reduce errors up to a point. If possible, the Finite Difference
-Method should be calibrated against an analytical solution for a simple
-problem before solving more complicated problems.
+As a numerical procedure, it will have errors. The larger the scale parameter,
+the larger the errors.  To manage the errors, the domain for x should be as
+large as practical. The increment between times is ds.  Parameter skip
+subdivides ds into smaller intervals. Only calculations for ds are reported.
+The increment between states is dx and ds/skip should be about dx/100.
+Increasing skip or dx may reduce errors up to a point. If possible, the
+Finite Difference Method should be calibrated against an analytical solution
+for a simpler problem before solving more complicated problems.
 </p>
 <p>The functions include many different types of terminal values, but suppose
 the bottom line is a simple exit option:
@@ -127,8 +160,8 @@ to exit, calculating the exit decision first:
   FD$DecisionThreshold(V=V,phi=1)
 </pre></div>
 <p>The functions all return named lists. Before being used in calculations, a
-list must be stripped of its names, the names Ohat for the option envelope
-and V for the terminal value, in the above example. The functions try to
+list must be stripped of its names.  In the above example, the names are Ohat
+for the option envelope and V for the terminal value. The functions try to
 help by accepting named lists as arguments.  For example:
 </p>
 <div class="sourceCode"><pre>  V &lt;- FD$TerminalValue_Kinked(xo=5,vs=1)
@@ -140,7 +173,7 @@ object, so entering V as as argument does nothing useful in this case.
 <p>You may wish to calculate your own terminal value in the console. You must
 first get rid of the names. The names to get rid of are listed under
 'Returns' in the help for each function. You can also use double brackets
-to eliminate names if you know the position in the list. Both 'Ohat' and 'V'
+to eliminate names if you know the position in the list. Both 'OOhat' and 'V'
 are first in their lists:
 </p>
 <div class="sourceCode"><pre>  FD$TerminalValue_Kinked(xo=0,vs=-1)
@@ -148,18 +181,11 @@ are first in their lists:
   V &lt;- exit+FD$TerminalValue_Kinked(xo=5,vs=1)[[1]]
   FD$DecisionThreshold(V=V,phi=1)
 </pre></div>
+<p>Or you can unlist everything:
+</p>
+<div class="sourceCode"><pre>  V &lt;- unlist(FD$OptionEnvelope())+unlist(FD$TerminalValue_Kinked(xo=5,vs=1))
+</pre></div>
 <p>Sorry.
-</p>
-<p>Examples in R6 don't work the same way as other R modules.  There is only
-one example for an R6 object, not one for each function in the object.
-To run examples, the devtools::run_examples() works, but the R command
-example(&quot;FiniteDifference&quot;) doesn't.  You can copy commands to the clipboard,
-paste into the console and press Enter. Examples in this help and a simple
-example at the bottom can be run in this way.
-</p>
-<p>A better alternative is demo(), but this works sometimes, sometimes not.
-If you don't see the demos for this package, go to Files and demo.  You will
-see the demo names and then type something like demo(FD_DecisionThreshold).
 </p>
 
 
@@ -171,7 +197,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 <ul>
-<li> <p><a href="#method-FiniteDifference-new"><code>FiniteDifference$new()</code></a>
+<li> <p><a href="#method-FiniteDifference-initialize"><code>FiniteDifference$new()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-FiniteDifference-set_oup_params"><code>FiniteDifference$set_oup_params()</code></a>
@@ -217,6 +243,12 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </p>
 </li>
 <li> <p><a href="#method-FiniteDifference-set_plot_info"><code>FiniteDifference$set_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-FiniteDifference-set_plot_type"><code>FiniteDifference$set_plot_type()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-FiniteDifference-set_flags"><code>FiniteDifference$set_flags()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-FiniteDifference-get_all"><code>FiniteDifference$get_all()</code></a>
@@ -268,6 +300,12 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </p>
 </li>
 <li> <p><a href="#method-FiniteDifference-get_plot_colors"><code>FiniteDifference$get_plot_colors()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-FiniteDifference-get_plot_types"><code>FiniteDifference$get_plot_types()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-FiniteDifference-get_flags"><code>FiniteDifference$get_flags()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-FiniteDifference-axes_x_stoch"><code>FiniteDifference$axes_x_stoch()</code></a>
@@ -351,11 +389,11 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 <hr>
-<a id="method-FiniteDifference-new"></a>
+<a id="method-FiniteDifference-initialize"></a>
 
 
 
-<h4>Method <code>new()</code></h4>
+<h4><code>FiniteDifference$new()</code></h4>
 
 <p>Create a new FiniteDifference object
 </p>
@@ -363,7 +401,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$new(OUP = NULL)</pre></div>
+<div class="r">
+<pre>FiniteDifference$new(OUP = NULL)</pre>
+</div>
 
 
 
@@ -386,23 +426,12 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </p>
 
 
-
-<h5>Examples</h5>
-
-<div class="r example copy">
-<pre>  FD &lt;- FiniteDifference$new()
-  FD$TerminalValue_Mitscherlich(plotit=FALSE)
-  FD$DecisionThreshold()
-</pre>
-</div>
-
-
 <hr>
 <a id="method-FiniteDifference-set_oup_params"></a>
 
 
 
-<h4>Method <code>set_oup_params()</code></h4>
+<h4><code>FiniteDifference$set_oup_params()</code></h4>
 
 <p>Set OUP parameters
 </p>
@@ -410,12 +439,14 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_oup_params(
+<div class="r">
+<pre>FiniteDifference$set_oup_params(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -430,7 +461,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
 </dd>
 </dl>
 
@@ -449,7 +480,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_x_stoch_args()</code></h4>
+<h4><code>FiniteDifference$set_x_stoch_args()</code></h4>
 
 <p>Set x as a stochastic state and its arguments
 </p>
@@ -457,7 +488,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_x_stoch_args(
+<div class="r">
+<pre>FiniteDifference$set_x_stoch_args(
   s = NULL,
   x = NULL,
   V = NULL,
@@ -466,7 +498,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
   theta = NULL,
   skip = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -487,9 +520,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>theta</code></dt><dd><p>weight of current time in time stepping 0.5&lt;=theta&lt;=1</p>
 </dd>
-<dt><code>skip</code></dt><dd><p>divide the time interval and report every skip result</p>
+<dt><code>skip</code></dt><dd><p>subdivide time intervals but report at times s 1&lt;=skip&lt;=1000</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
 </dd>
 </dl>
 
@@ -508,7 +541,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_linear_args()</code></h4>
+<h4><code>FiniteDifference$set_V_linear_args()</code></h4>
 
 <p>Set V linear arguments
 </p>
@@ -516,7 +549,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_linear_args(xo = NULL, vs = NULL)</pre></div>
+<div class="r">
+<pre>FiniteDifference$set_V_linear_args(xo = NULL, vs = NULL)</pre>
+</div>
 
 
 
@@ -546,7 +581,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_degenerate_args()</code></h4>
+<h4><code>FiniteDifference$set_V_degenerate_args()</code></h4>
 
 <p>Set V degenerate arguments
 </p>
@@ -554,7 +589,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_degenerate_args(xo = NULL, Vmax = NULL, Vmin = NULL)</pre></div>
+<div class="r">
+<pre>FiniteDifference$set_V_degenerate_args(xo = NULL, Vmax = NULL, Vmin = NULL)</pre>
+</div>
 
 
 
@@ -586,7 +623,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_stepped_args()</code></h4>
+<h4><code>FiniteDifference$set_V_stepped_args()</code></h4>
 
 <p>Set V stepped arguments
 </p>
@@ -594,12 +631,14 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_stepped_args(
+<div class="r">
+<pre>FiniteDifference$set_V_stepped_args(
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -633,7 +672,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_kinked_args()</code></h4>
+<h4><code>FiniteDifference$set_V_kinked_args()</code></h4>
 
 <p>Set V kinked arguments
 </p>
@@ -641,12 +680,14 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_kinked_args(
+<div class="r">
+<pre>FiniteDifference$set_V_kinked_args(
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -680,7 +721,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_butterfly_args()</code></h4>
+<h4><code>FiniteDifference$set_V_butterfly_args()</code></h4>
 
 <p>Set V butterfly arguments
 </p>
@@ -688,13 +729,15 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_butterfly_args(
+<div class="r">
+<pre>FiniteDifference$set_V_butterfly_args(
   xo = NULL,
   xm = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -730,7 +773,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_mitscherlich_args()</code></h4>
+<h4><code>FiniteDifference$set_V_mitscherlich_args()</code></h4>
 
 <p>Set V mitscherlich arguments
 </p>
@@ -738,12 +781,14 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_mitscherlich_args(
+<div class="r">
+<pre>FiniteDifference$set_V_mitscherlich_args(
   xo = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -777,7 +822,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_gompertz_args()</code></h4>
+<h4><code>FiniteDifference$set_V_gompertz_args()</code></h4>
 
 <p>Set V gompertz arguments
 </p>
@@ -785,12 +830,14 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_gompertz_args(
+<div class="r">
+<pre>FiniteDifference$set_V_gompertz_args(
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -824,7 +871,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_logistic_args()</code></h4>
+<h4><code>FiniteDifference$set_V_logistic_args()</code></h4>
 
 <p>Set V logistic arguments
 </p>
@@ -832,12 +879,14 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_logistic_args(
+<div class="r">
+<pre>FiniteDifference$set_V_logistic_args(
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -871,7 +920,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_transcendental_args()</code></h4>
+<h4><code>FiniteDifference$set_V_transcendental_args()</code></h4>
 
 <p>Set V transcendental arguments
 </p>
@@ -879,13 +928,15 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_transcendental_args(
+<div class="r">
+<pre>FiniteDifference$set_V_transcendental_args(
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -921,7 +972,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_yieldindex_args()</code></h4>
+<h4><code>FiniteDifference$set_V_yieldindex_args()</code></h4>
 
 <p>Set V yield index arguments
 </p>
@@ -929,13 +980,15 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_yieldindex_args(
+<div class="r">
+<pre>FiniteDifference$set_V_yieldindex_args(
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -971,7 +1024,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_args()</code></h4>
+<h4><code>FiniteDifference$set_V_args()</code></h4>
 
 <p>Set V arguments by position in list
 </p>
@@ -979,7 +1032,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_args(
+<div class="r">
+<pre>FiniteDifference$set_V_args(
   Ix = NULL,
   name = NULL,
   v1 = NULL,
@@ -987,7 +1041,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
   v3 = NULL,
   v4 = NULL,
   v5 = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -1027,7 +1082,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_V_info()</code></h4>
+<h4><code>FiniteDifference$set_V_info()</code></h4>
 
 <p>Set information for terminal value
 </p>
@@ -1035,7 +1090,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_V_info(Ix = NULL, name = NULL)</pre></div>
+<div class="r">
+<pre>FiniteDifference$set_V_info(Ix = NULL, name = NULL)</pre>
+</div>
 
 
 
@@ -1065,7 +1122,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>set_plot_info()</code></h4>
+<h4><code>FiniteDifference$set_plot_info()</code></h4>
 
 <p>Set information for plotting
 </p>
@@ -1073,8 +1130,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$set_plot_info(
-  type = NULL,
+<div class="r">
+<pre>FiniteDifference$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -1086,7 +1143,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
   floor = NULL,
   labels = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -1095,8 +1153,6 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3 and 4 for 3D</p>
-</dd>
 <dt><code>fontfamily</code></dt><dd><p>font family for plot labels</p>
 </dd>
 <dt><code>fontsize</code></dt><dd><p>font size for plot labels</p>
@@ -1117,7 +1173,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
 </dd>
 </dl>
 
@@ -1127,7 +1183,89 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(type,font,file,theme,3D)
+<p>list(font,file,theme,3D,labels)
+</p>
+
+
+<hr>
+<a id="method-FiniteDifference-set_plot_type"></a>
+
+
+
+<h4><code>FiniteDifference$set_plot_type()</code></h4>
+
+<p>Set plot types by group
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>FiniteDifference$set_plot_type(type = NULL, group = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>a number identifying the type for a group</p>
+</dd>
+<dt><code>group</code></dt><dd><p>identifier for groups of similar plots</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(types,group)
+</p>
+
+
+<hr>
+<a id="method-FiniteDifference-set_flags"></a>
+
+
+
+<h4><code>FiniteDifference$set_flags()</code></h4>
+
+<p>Set flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>FiniteDifference$set_flags(plotit = NULL, copyit = NULL, who = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>plotit</code></dt><dd><p>automatic plot after calculation TRUE or FALSE</p>
+</dd>
+<dt><code>copyit</code></dt><dd><p>copy to clipboard TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
 </p>
 
 
@@ -1136,15 +1274,17 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_all()</code></h4>
+<h4><code>FiniteDifference$get_all()</code></h4>
 
-<p>Get all arguments and parameters
+<p>Get all arguments and information
 </p>
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_all()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_all()</pre>
+</div>
 
 
 
@@ -1159,7 +1299,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_oup_params()</code></h4>
+<h4><code>FiniteDifference$get_oup_params()</code></h4>
 
 <p>Get OUP parameters
 </p>
@@ -1167,7 +1307,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_oup_params()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_oup_params()</pre>
+</div>
 
 
 
@@ -1182,7 +1324,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_x_stoch_args()</code></h4>
+<h4><code>FiniteDifference$get_x_stoch_args()</code></h4>
 
 <p>Get x as a stochastic state and its arguments
 </p>
@@ -1190,7 +1332,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_x_stoch_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_x_stoch_args()</pre>
+</div>
 
 
 
@@ -1205,7 +1349,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_linear_args()</code></h4>
+<h4><code>FiniteDifference$get_V_linear_args()</code></h4>
 
 <p>Get V linear arguments
 </p>
@@ -1213,7 +1357,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_linear_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_linear_args()</pre>
+</div>
 
 
 
@@ -1228,7 +1374,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_degenerate_args()</code></h4>
+<h4><code>FiniteDifference$get_V_degenerate_args()</code></h4>
 
 <p>Get V degenerate arguments
 </p>
@@ -1236,7 +1382,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_degenerate_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_degenerate_args()</pre>
+</div>
 
 
 
@@ -1251,7 +1399,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_stepped_args()</code></h4>
+<h4><code>FiniteDifference$get_V_stepped_args()</code></h4>
 
 <p>Get V stepped arguments
 </p>
@@ -1259,7 +1407,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_stepped_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_stepped_args()</pre>
+</div>
 
 
 
@@ -1274,7 +1424,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_kinked_args()</code></h4>
+<h4><code>FiniteDifference$get_V_kinked_args()</code></h4>
 
 <p>Get V kinked arguments
 </p>
@@ -1282,7 +1432,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_kinked_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_kinked_args()</pre>
+</div>
 
 
 
@@ -1297,7 +1449,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_butterfly_args()</code></h4>
+<h4><code>FiniteDifference$get_V_butterfly_args()</code></h4>
 
 <p>Get V butterfly arguments
 </p>
@@ -1305,7 +1457,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_butterfly_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_butterfly_args()</pre>
+</div>
 
 
 
@@ -1320,7 +1474,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_mitscherlich_args()</code></h4>
+<h4><code>FiniteDifference$get_V_mitscherlich_args()</code></h4>
 
 <p>Get V mitscherlich arguments
 </p>
@@ -1328,7 +1482,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_mitscherlich_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_mitscherlich_args()</pre>
+</div>
 
 
 
@@ -1343,7 +1499,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_gompertz_args()</code></h4>
+<h4><code>FiniteDifference$get_V_gompertz_args()</code></h4>
 
 <p>Get V gompertz arguments
 </p>
@@ -1351,7 +1507,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_gompertz_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_gompertz_args()</pre>
+</div>
 
 
 
@@ -1366,7 +1524,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_logistic_args()</code></h4>
+<h4><code>FiniteDifference$get_V_logistic_args()</code></h4>
 
 <p>Get V logistic arguments
 </p>
@@ -1374,7 +1532,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_logistic_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_logistic_args()</pre>
+</div>
 
 
 
@@ -1389,7 +1549,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_transcendental_args()</code></h4>
+<h4><code>FiniteDifference$get_V_transcendental_args()</code></h4>
 
 <p>Get V transcendental arguments
 </p>
@@ -1397,7 +1557,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_transcendental_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_transcendental_args()</pre>
+</div>
 
 
 
@@ -1412,7 +1574,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_yieldindex_args()</code></h4>
+<h4><code>FiniteDifference$get_V_yieldindex_args()</code></h4>
 
 <p>Get V yield index arguments
 </p>
@@ -1420,7 +1582,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_yieldindex_args()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_yieldindex_args()</pre>
+</div>
 
 
 
@@ -1435,7 +1599,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_args()</code></h4>
+<h4><code>FiniteDifference$get_V_args()</code></h4>
 
 <p>Get V arguments by index or name
 </p>
@@ -1443,7 +1607,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_args(Ix = NULL, name = NULL)</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_args(Ix = NULL, name = NULL)</pre>
+</div>
 
 
 
@@ -1473,7 +1639,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_V_info()</code></h4>
+<h4><code>FiniteDifference$get_V_info()</code></h4>
 
 <p>Get information for terminal values
 </p>
@@ -1481,13 +1647,15 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_V_info()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_V_info()</pre>
+</div>
 
 
 
 <h5>Returns</h5>
 
-<p>list(Ix,names)
+<p>list(Ix,name,names,text)
 </p>
 
 
@@ -1496,7 +1664,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_plot_info()</code></h4>
+<h4><code>FiniteDifference$get_plot_info()</code></h4>
 
 <p>Get information for plotting options
 </p>
@@ -1504,13 +1672,15 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_plot_info()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_plot_info()</pre>
+</div>
 
 
 
 <h5>Returns</h5>
 
-<p>list(type,font,file,theme,3D,labels)
+<p>list(font,file,theme,3D,labels)
 </p>
 
 
@@ -1519,7 +1689,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>get_plot_colors()</code></h4>
+<h4><code>FiniteDifference$get_plot_colors()</code></h4>
 
 <p>Get colors for plotting
 </p>
@@ -1527,7 +1697,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$get_plot_colors()</pre></div>
+<div class="r">
+<pre>FiniteDifference$get_plot_colors()</pre>
+</div>
 
 
 
@@ -1538,11 +1710,61 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 <hr>
+<a id="method-FiniteDifference-get_plot_types"></a>
+
+
+
+<h4><code>FiniteDifference$get_plot_types()</code></h4>
+
+<p>Get current types for plot routines
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>FiniteDifference$get_plot_types()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(types,description)
+</p>
+
+
+<hr>
+<a id="method-FiniteDifference-get_flags"></a>
+
+
+
+<h4><code>FiniteDifference$get_flags()</code></h4>
+
+<p>Get flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>FiniteDifference$get_flags()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
+</p>
+
+
+<hr>
 <a id="method-FiniteDifference-axes_x_stoch"></a>
 
 
 
-<h4>Method <code>axes_x_stoch()</code></h4>
+<h4><code>FiniteDifference$axes_x_stoch()</code></h4>
 
 <p>Scale axes for x stochastic arguments
 </p>
@@ -1550,7 +1772,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$axes_x_stoch()</pre></div>
+<div class="r">
+<pre>FiniteDifference$axes_x_stoch()</pre>
+</div>
 
 
 
@@ -1565,7 +1789,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>undo_clear()</code></h4>
+<h4><code>FiniteDifference$undo_clear()</code></h4>
 
 <p>Clear undo list and save current arguments to list
 </p>
@@ -1573,7 +1797,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$undo_clear()</pre></div>
+<div class="r">
+<pre>FiniteDifference$undo_clear()</pre>
+</div>
 
 
 
@@ -1588,7 +1814,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>undo_save()</code></h4>
+<h4><code>FiniteDifference$undo_save()</code></h4>
 
 <p>Save current arguments to undo list
 </p>
@@ -1596,7 +1822,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$undo_save()</pre></div>
+<div class="r">
+<pre>FiniteDifference$undo_save()</pre>
+</div>
 
 
 
@@ -1611,7 +1839,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>undo_undo()</code></h4>
+<h4><code>FiniteDifference$undo_undo()</code></h4>
 
 <p>Replace current arguments from undo list
 </p>
@@ -1619,7 +1847,22 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$undo_undo()</pre></div>
+<div class="r">
+<pre>FiniteDifference$undo_undo(updn = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>updn</code></dt><dd><p>positive to move up, negative to move down</p>
+</dd>
+</dl>
+
+</div>
 
 
 
@@ -1634,7 +1877,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>Drift()</code></h4>
+<h4><code>FiniteDifference$Drift()</code></h4>
 
 <p>Calculate, plot and return drifts
 </p>
@@ -1642,7 +1885,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$Drift(x = NULL, rho = NULL, mu = NULL, plotit = TRUE)</pre></div>
+<div class="r">
+<pre>FiniteDifference$Drift(x = NULL, rho = NULL, mu = NULL, who = NULL)</pre>
+</div>
 
 
 
@@ -1657,7 +1902,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1676,7 +1921,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>Diffusion()</code></h4>
+<h4><code>FiniteDifference$Diffusion()</code></h4>
 
 <p>Calculate, plot and return diffusions
 </p>
@@ -1684,7 +1929,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$Diffusion(x = NULL, sigma = NULL, plotit = TRUE)</pre></div>
+<div class="r">
+<pre>FiniteDifference$Diffusion(x = NULL, sigma = NULL, who = NULL)</pre>
+</div>
 
 
 
@@ -1697,7 +1944,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1716,7 +1963,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Linear()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Linear()</code></h4>
 
 <p>Create and plot linear terminal values
 </p>
@@ -1724,12 +1971,14 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Linear(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Linear(
   x = NULL,
   xo = NULL,
   vs = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1744,7 +1993,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>vs</code></dt><dd><p>slope</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1763,7 +2012,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Degenerate()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Degenerate()</code></h4>
 
 <p>Create and plot degenerate terminal values
 </p>
@@ -1771,13 +2020,15 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Degenerate(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Degenerate(
   x = NULL,
   xo = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1794,7 +2045,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1813,7 +2064,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Stepped()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Stepped()</code></h4>
 
 <p>Create and plot stepped terminal values
 </p>
@@ -1821,14 +2072,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Stepped(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Stepped(
   x = NULL,
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1847,7 +2100,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1866,7 +2119,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Kinked()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Kinked()</code></h4>
 
 <p>Create and plot kinked terminal values
 </p>
@@ -1874,14 +2127,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Kinked(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Kinked(
   x = NULL,
   xo = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1900,7 +2155,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1919,7 +2174,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Butterfly()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Butterfly()</code></h4>
 
 <p>Create and plot butterfly terminal values
 </p>
@@ -1927,15 +2182,17 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Butterfly(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Butterfly(
   x = NULL,
   xo = NULL,
   xm = NULL,
   vs = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1956,7 +2213,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1975,7 +2232,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Mitscherlich()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Mitscherlich()</code></h4>
 
 <p>Create and plot Mitscherlich terminal values
 </p>
@@ -1983,14 +2240,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Mitscherlich(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Mitscherlich(
   x = NULL,
   xo = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2009,7 +2268,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2028,7 +2287,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Gompertz()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Gompertz()</code></h4>
 
 <p>Create and plot Gompertz terminal values
 </p>
@@ -2036,14 +2295,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Gompertz(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Gompertz(
   x = NULL,
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2062,7 +2323,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2081,7 +2342,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Logistic()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Logistic()</code></h4>
 
 <p>Create and plot Logistic terminal values
 </p>
@@ -2089,14 +2350,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Logistic(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Logistic(
   x = NULL,
   xi = NULL,
   vr = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2115,7 +2378,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2134,7 +2397,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_Transcendental()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_Transcendental()</code></h4>
 
 <p>Create and plot Transcendental terminal values
 </p>
@@ -2142,15 +2405,17 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_Transcendental(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_Transcendental(
   x = NULL,
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2171,7 +2436,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2190,7 +2455,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue_YieldIndex()</code></h4>
+<h4><code>FiniteDifference$TerminalValue_YieldIndex()</code></h4>
 
 <p>Create and plot Yield Index terminal values
 </p>
@@ -2198,15 +2463,17 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue_YieldIndex(
+<div class="r">
+<pre>FiniteDifference$TerminalValue_YieldIndex(
   x = NULL,
   xo = NULL,
   xi = NULL,
   xm = NULL,
   Vmax = NULL,
   Vmin = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2227,7 +2494,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>Vmin</code></dt><dd><p>minimum terminal value</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2246,7 +2513,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>TerminalValue()</code></h4>
+<h4><code>FiniteDifference$TerminalValue()</code></h4>
 
 <p>Retrieves and plots terminal values
 </p>
@@ -2254,7 +2521,9 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$TerminalValue(Ix = NULL, name = NULL, plotit = TRUE)</pre></div>
+<div class="r">
+<pre>FiniteDifference$TerminalValue(Ix = NULL, name = NULL, who = NULL)</pre>
+</div>
 
 
 
@@ -2267,7 +2536,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>name</code></dt><dd><p>name of terminal values</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2286,7 +2555,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>Option()</code></h4>
+<h4><code>FiniteDifference$Option()</code></h4>
 
 <p>Calculate and plot option prices
 </p>
@@ -2294,18 +2563,20 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$Option(
+<div class="r">
+<pre>FiniteDifference$Option(
   s = NULL,
   x = NULL,
   V = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   theta = NULL,
   skip = NULL,
-  plotit = TRUE
-)</pre></div>
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2320,19 +2591,19 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>V</code></dt><dd><p>vector of n terminal values</p>
 </dd>
+<dt><code>r</code></dt><dd><p>discount rate 0&lt;=r&lt;inf</p>
+</dd>
+<dt><code>theta</code></dt><dd><p>weight of current time in time stepping 0.5&lt;=theta&lt;=1</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time intervals but report at times s 1&lt;=skip&lt;=1000</p>
+</dd>
 <dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
 </dd>
 <dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>r</code></dt><dd><p>discount rate 0&lt;=r&lt;inf</p>
-</dd>
-<dt><code>theta</code></dt><dd><p>weight of current time in time stepping 0.5&lt;=theta&lt;=1</p>
-</dd>
-<dt><code>skip</code></dt><dd><p>divide the time interval and report every skip result</p>
-</dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2342,7 +2613,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(O(mxn))
+<p>list(OO(mxn))
 </p>
 
 
@@ -2351,7 +2622,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>OptionEnvelope()</code></h4>
+<h4><code>FiniteDifference$OptionEnvelope()</code></h4>
 
 <p>Calculate and plot the envelope of option prices
 </p>
@@ -2359,17 +2630,20 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$OptionEnvelope(
+<div class="r">
+<pre>FiniteDifference$OptionEnvelope(
+  s = NULL,
   x = NULL,
   V = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   theta = NULL,
   skip = NULL,
-  plotit = TRUE
-)</pre></div>
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2378,9 +2652,17 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
+<dt><code>s</code></dt><dd><p>vector of m times</p>
+</dd>
 <dt><code>x</code></dt><dd><p>vector of n states</p>
 </dd>
 <dt><code>V</code></dt><dd><p>vector of n terminal values</p>
+</dd>
+<dt><code>r</code></dt><dd><p>discount rate 0&lt;=r&lt;inf</p>
+</dd>
+<dt><code>theta</code></dt><dd><p>weight of current time in time stepping 0.5&lt;=theta&lt;=1</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>subdivide time intervals but report at times s 1&lt;=skip&lt;=1000</p>
 </dd>
 <dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
 </dd>
@@ -2388,13 +2670,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>r</code></dt><dd><p>discount rate 0&lt;=r&lt;inf</p>
-</dd>
-<dt><code>theta</code></dt><dd><p>weight of current time in time stepping 0.5&lt;=theta&lt;=1</p>
-</dd>
-<dt><code>skip</code></dt><dd><p>divide the time interval and report every skip result</p>
-</dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2404,7 +2680,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(Ohat(1xn))
+<p>list(OOhat(1xn))
 </p>
 
 
@@ -2413,7 +2689,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>DecisionThreshold()</code></h4>
+<h4><code>FiniteDifference$DecisionThreshold()</code></h4>
 
 <p>Calculate and plot the decision threshold
 </p>
@@ -2421,18 +2697,21 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$DecisionThreshold(
+<div class="r">
+<pre>FiniteDifference$DecisionThreshold(
+  s = NULL,
   x = NULL,
   V = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   phi = NULL,
   theta = NULL,
   skip = NULL,
-  plotit = TRUE
-)</pre></div>
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2441,15 +2720,11 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
+<dt><code>s</code></dt><dd><p>vector of m times</p>
+</dd>
 <dt><code>x</code></dt><dd><p>vector of n states</p>
 </dd>
 <dt><code>V</code></dt><dd><p>vector of n terminal values</p>
-</dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
-</dd>
-<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
 <dt><code>r</code></dt><dd><p>discount rate 0&lt;=r&lt;inf</p>
 </dd>
@@ -2457,9 +2732,15 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </dd>
 <dt><code>theta</code></dt><dd><p>weight of current time in time stepping 0.5&lt;=theta&lt;=1</p>
 </dd>
-<dt><code>skip</code></dt><dd><p>divide the time interval and report every skip result</p>
+<dt><code>skip</code></dt><dd><p>subdivide time intervals but report at times s 1&lt;=skip&lt;=1000</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2469,7 +2750,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(k,Ohat)
+<p>list(k,OO)
 </p>
 
 
@@ -2478,7 +2759,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotDrift()</code></h4>
+<h4><code>FiniteDifference$PlotDrift()</code></h4>
 
 <p>Plot drifts
 </p>
@@ -2486,13 +2767,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$PlotDrift(
+<div class="r">
+<pre>FiniteDifference$PlotDrift(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2501,6 +2785,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
+<dt><code>type</code></dt><dd><p>= 0</p>
+</dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
 <dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
@@ -2528,7 +2814,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotDiffusion()</code></h4>
+<h4><code>FiniteDifference$PlotDiffusion()</code></h4>
 
 <p>Plot diffusions
 </p>
@@ -2536,14 +2822,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$PlotDiffusion(
+<div class="r">
+<pre>FiniteDifference$PlotDiffusion(
   type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2552,7 +2840,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 and 3 for 2D</p>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2581,7 +2869,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotTerminalValue()</code></h4>
+<h4><code>FiniteDifference$PlotTerminalValue()</code></h4>
 
 <p>Plot terminal values
 </p>
@@ -2589,13 +2877,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$PlotTerminalValue(
+<div class="r">
+<pre>FiniteDifference$PlotTerminalValue(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2604,6 +2895,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
+<dt><code>type</code></dt><dd><p>= 0</p>
+</dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
 <dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
@@ -2631,7 +2924,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotOption()</code></h4>
+<h4><code>FiniteDifference$PlotOption()</code></h4>
 
 <p>Plot options
 </p>
@@ -2639,7 +2932,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$PlotOption(
+<div class="r">
+<pre>FiniteDifference$PlotOption(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2649,7 +2943,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2658,7 +2953,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2693,7 +2988,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotOptionEnvelope()</code></h4>
+<h4><code>FiniteDifference$PlotOptionEnvelope()</code></h4>
 
 <p>Plot the option envelope
 </p>
@@ -2701,7 +2996,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$PlotOptionEnvelope(
+<div class="r">
+<pre>FiniteDifference$PlotOptionEnvelope(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2711,7 +3007,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2720,7 +3017,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 3 for 2D, 4 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1, or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2755,7 +3052,7 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotDecisionThreshold()</code></h4>
+<h4><code>FiniteDifference$PlotDecisionThreshold()</code></h4>
 
 <p>Plot the decision threshold
 </p>
@@ -2763,13 +3060,16 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>FiniteDifference$PlotDecisionThreshold(
+<div class="r">
+<pre>FiniteDifference$PlotDecisionThreshold(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2778,6 +3078,8 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 <div class="arguments">
 
 <dl>
+<dt><code>type</code></dt><dd><p>= 0</p>
+</dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
 <dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
@@ -2800,19 +3102,6 @@ see the demo names and then type something like demo(FD_DecisionThreshold).
 </p>
 
 
-
-
-<h3>Examples</h3>
-
-<pre><code class='language-R'>
-## ------------------------------------------------
-## Method `FiniteDifference$new`
-## ------------------------------------------------
-
-  FD &lt;- FiniteDifference$new()
-  FD$TerminalValue_Mitscherlich(plotit=FALSE)
-  FD$DecisionThreshold()
-</code></pre>
 
 </main>
 

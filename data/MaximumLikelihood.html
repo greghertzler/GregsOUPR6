@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><title>R: R6 Class implementing Maximum Likelihood estimation</title>
+<!DOCTYPE html><html><head><title>R: R6 class implementing Maximum Likelihood estimation of the...</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
@@ -16,16 +16,16 @@ function processMathHTML() {
 
 <table style="width: 100%;"><tr><td>MaximumLikelihood</td><td style="text-align: right;">R Documentation</td></tr></table>
 
-<h2>R6 Class implementing Maximum Likelihood estimation</h2>
+<h2>R6 class implementing Maximum Likelihood estimation of the Ornstein-Uhlenbeck Process.</h2>
 
 <h3>Description</h3>
 
-<p>Maximum Likelihood estimation of the Ornstein-Uhlenbeck Process, using a
-robust estimation algorithm and with testing for simple hypotheses.
+<p>Maximum Likelihood estimation using a modified Nelder-Mead algorithm with testing
+for simple hypotheses.
 </p>
 
 
-<h3>Methods:</h3>
+<h3>Formulas and Methods:</h3>
 
 <div class="sourceCode"><pre>rho, mu and sigma random
   LogLikelihood
@@ -60,21 +60,55 @@ robust estimation algorithm and with testing for simple hypotheses.
   mus:    starting value for the location parameter -inf&lt;mus&lt;inf
   sigmas: starting value the scale parameter -inf&lt;sigmas&lt;inf
   lnLu:   unrestricted log likelihood -inf&lt;lnLu&lt;=0
-  alphau: identifies distribution of lnLu 1&lt;=alphau&lt;=2
+  alphau: identifies distribution of lnLu 0&lt;=alphau&lt;=1
   lnLr:   restricted log likelihood -inf&lt;lnLr&lt;=lnLu
-  alpha: identifies distribution of lnLu 1&lt;=alpha&lt;=2
+  alphar: identifies distribution of lnLr 0&lt;=alphar&lt;=1
   m1:     number of observations 0&lt;m1=m-1
 </pre></div>
 
 
-<h3>Using the methods:</h3>
+<h3>Usage:</h3>
 
-<p>Demonstration scripts are in files in the 'demo' directory. Identify a
-formula and in the console type:
+<p>The MaximumLikelihood object must first be instantiated before its methods
+are called.  There are two ways.  The first way instantiates the OUProcess
+object and calls a function to get a pointer:
 </p>
-<div class="sourceCode"><pre>  demo(ML_FormulaName), or
-  demo(ML_PlotFormulaName).
+<div class="sourceCode"><pre>  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  FD &lt;- OUP$get_FiniteDifference()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
 </pre></div>
+<p>The MaximumLikelihood object will coordinate arguments to functions with the
+Analytical, FiniteDifference and MonteCarlo objects.  The second way
+instantiates the MaximumLikelihood object by itself with no coordination:
+</p>
+<div class="sourceCode"><pre>  ML &lt;- MaximumLikelihood$new()
+</pre></div>
+<p>Once the object is instantiated, its methods can be called, to estimate the
+parameters of the Ornstein-Uhlenbeck Process, for example:
+</p>
+<div class="sourceCode"><pre>  ML$Estimate()
+</pre></div>
+<p>The plot methods can be used to customize the plots, with a title, for example:
+</p>
+<div class="sourceCode"><pre>  ML$PlotEstimates(title="My Estimates")
+</pre></div>
+<p>Other functions and methods are called in the same way.  To see all the
+possibilities and, in particular, how to read in data, check out the demos below.
+</p>
+
+
+<h3>Demos:</h3>
+
+<p>Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
+</p>
+<div class="sourceCode"><pre>  OUPDemoList()
+  OUPDemoRun(&lt;number of demo in list&gt;)
+</pre></div>
+<p>Entering the demos by number in the list saves typing.
+</p>
 
 
 <h3>Discussion:</h3>
@@ -86,7 +120,7 @@ If spread across a bumpy surface, the amoeba pulls itself over bumps and out
 of hollows and flows down to the lowest level.  There it contracts around
 its center.  If spread across a flat surface, the amoeba shrinks without
 flowing.  Once the amoeba contracts or shrinks, it is spread across the
-surface opposite from where is came.  Again it flows, contracts and shrinks.
+surface opposite from where it came.  Again it flows, contracts and shrinks.
 Spreading, flowing, contracting and shrinking continue until the amoeba
 contracts around the same point or shrinks at the same level at least twice.
 </p>
@@ -115,7 +149,7 @@ case the data is faked or artificially smoothed.
 
 <p>Once the unrestricted estimates are found, the arguments for restricting the
 parameters can be set for simple hypothesis tests. By default, starting
-values are calculated from the data and are then updated automatically. The
+values are calculated from the data and can be updated automatically. The
 arguments for starting values should seldom be needed.
 </p>
 <p>Data are entered as a data frame with columns for tau, a vector of times, and
@@ -125,36 +159,36 @@ a data frame containing many columns.
 <p>To read a csv file into a data frame, create a MaximumLikelihood object,
 estimate parameters and test the goodness-of-fit:
 </p>
-<div class="sourceCode"><pre>  df &lt;- read.csv("data/ML_OUP_SimulatedData.csv")
+<div class="sourceCode"><pre>  df &lt;- read.csv("data/MyData.csv")
   ML &lt;- MaximumLikelihood$new()
   ML$Estimates(df)
   ML$GoodnessOfFit()
 </pre></div>
-<p>In this example, the 'data' directory is one level below the working
-directory. The taucol and zcol arguments are optional and will default to 1
-and 2. Continue on by restricting a parameter and performing a likelihood
-ratio test:
+<p>In this example, the 'data' directory is in the working directory. The taucol
+and zcol arguments are optional and will default to 1 and 2. Continue on by
+restricting a parameter and performing a likelihood ratio test:
 </p>
 <div class="sourceCode"><pre>  ML$Estimates(rhor=0.5)
   ML$LikelihoodRatioTest()
 </pre></div>
-<p>The available data sets are documented. To see the documentation, type:
+<p>You can also list and read from available data sets using:
 </p>
-<div class="sourceCode"><pre>  ?
+<div class="sourceCode"><pre> OUPDataList()
+ df &lt;- OUPDataRead(27)
 </pre></div>
-<p>and then select from the drop-down list.
+<p>Number 27 in the list is the data set &quot;OUP_Convergence&quot;.  The available data
+sets are documented. Type one of the following categories:
 </p>
-<p>Examples in R6 don't work the same way as other R modules.  There is only
-one example for an R6 object, not one for each function in the object.
-To run examples, the devtools::run_examples() works, but the R command
-example(&quot;MaximumLikelihood&quot;) doesn't.  You can copy commands to the clipboard,
-paste into the console and press Enter. Examples in this help and a simple
-example at the bottom can be run in this way.  A better alternative is demo().
+<div class="sourceCode"><pre>  ?Agric_
+  ?Climate_
+  ?Ecosys_
+  ?Finance_
+  ?OUP_
+</pre></div>
+<p>and then select from the drop-down list.  Or use the function:
 </p>
-<p>A better alternative is demo(), but this works sometimes, sometimes not.
-If you don't see the demos for this package, go to Files and demo.  You will
-see the demo names and then type something like demo(ML_Estimates).
-</p>
+<div class="sourceCode"><pre>  OUPDataHelp(27)
+</pre></div>
 
 
 <h3>Methods</h3>
@@ -165,7 +199,7 @@ see the demo names and then type something like demo(ML_Estimates).
 
 
 <ul>
-<li> <p><a href="#method-MaximumLikelihood-new"><code>MaximumLikelihood$new()</code></a>
+<li> <p><a href="#method-MaximumLikelihood-initialize"><code>MaximumLikelihood$new()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-MaximumLikelihood-set_oup_params"><code>MaximumLikelihood$set_oup_params()</code></a>
@@ -177,9 +211,6 @@ see the demo names and then type something like demo(ML_Estimates).
 <li> <p><a href="#method-MaximumLikelihood-set_oup_params_start"><code>MaximumLikelihood$set_oup_params_start()</code></a>
 </p>
 </li>
-<li> <p><a href="#method-MaximumLikelihood-set_oup_stats"><code>MaximumLikelihood$set_oup_stats()</code></a>
-</p>
-</li>
 <li> <p><a href="#method-MaximumLikelihood-set_timeseries"><code>MaximumLikelihood$set_timeseries()</code></a>
 </p>
 </li>
@@ -189,22 +220,19 @@ see the demo names and then type something like demo(ML_Estimates).
 <li> <p><a href="#method-MaximumLikelihood-set_plot_info"><code>MaximumLikelihood$set_plot_info()</code></a>
 </p>
 </li>
+<li> <p><a href="#method-MaximumLikelihood-set_flags"><code>MaximumLikelihood$set_flags()</code></a>
+</p>
+</li>
 <li> <p><a href="#method-MaximumLikelihood-get_all"><code>MaximumLikelihood$get_all()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-MaximumLikelihood-get_oup_params"><code>MaximumLikelihood$get_oup_params()</code></a>
 </p>
 </li>
-<li> <p><a href="#method-MaximumLikelihood-get_oup_params_unrestr"><code>MaximumLikelihood$get_oup_params_unrestr()</code></a>
-</p>
-</li>
 <li> <p><a href="#method-MaximumLikelihood-get_oup_params_restr"><code>MaximumLikelihood$get_oup_params_restr()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-MaximumLikelihood-get_oup_params_start"><code>MaximumLikelihood$get_oup_params_start()</code></a>
-</p>
-</li>
-<li> <p><a href="#method-MaximumLikelihood-get_oup_stats"><code>MaximumLikelihood$get_oup_stats()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-MaximumLikelihood-get_timeseries"><code>MaximumLikelihood$get_timeseries()</code></a>
@@ -217,6 +245,9 @@ see the demo names and then type something like demo(ML_Estimates).
 </p>
 </li>
 <li> <p><a href="#method-MaximumLikelihood-get_plot_colors"><code>MaximumLikelihood$get_plot_colors()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-MaximumLikelihood-get_flags"><code>MaximumLikelihood$get_flags()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-MaximumLikelihood-LogLikelihood"><code>MaximumLikelihood$LogLikelihood()</code></a>
@@ -240,11 +271,11 @@ see the demo names and then type something like demo(ML_Estimates).
 
 
 <hr>
-<a id="method-MaximumLikelihood-new"></a>
+<a id="method-MaximumLikelihood-initialize"></a>
 
 
 
-<h4>Method <code>new()</code></h4>
+<h4><code>MaximumLikelihood$new()</code></h4>
 
 <p>Create a MaximumLikelihood object
 </p>
@@ -252,7 +283,9 @@ see the demo names and then type something like demo(ML_Estimates).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$new(OUP = NULL)</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$new(OUP = NULL)</pre>
+</div>
 
 
 
@@ -275,25 +308,12 @@ see the demo names and then type something like demo(ML_Estimates).
 </p>
 
 
-
-<h5>Examples</h5>
-
-<div class="r example copy">
-<pre>  ML &lt;- MaximumLikelihood$new()
-  ML$Estimates()
-  ML$GoodnessOfFit()
-  ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
-  ML$LikelihoodRatioTest()
-</pre>
-</div>
-
-
 <hr>
 <a id="method-MaximumLikelihood-set_oup_params"></a>
 
 
 
-<h4>Method <code>set_oup_params()</code></h4>
+<h4><code>MaximumLikelihood$set_oup_params()</code></h4>
 
 <p>Set OUP parameters
 </p>
@@ -301,12 +321,14 @@ see the demo names and then type something like demo(ML_Estimates).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$set_oup_params(
+<div class="r">
+<pre>MaximumLikelihood$set_oup_params(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -321,7 +343,7 @@ see the demo names and then type something like demo(ML_Estimates).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
 </dd>
 </dl>
 
@@ -341,13 +363,15 @@ Set OUP parameter restrictions
 
 
 
-<h4>Method <code>set_oup_params_restr()</code></h4>
+<h4><code>MaximumLikelihood$set_oup_params_restr()</code></h4>
 
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$set_oup_params_restr(rhor = NULL, mur = NULL, sigmar = NULL)</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$set_oup_params_restr(rhor = NULL, mur = NULL, sigmar = NULL)</pre>
+</div>
 
 
 
@@ -380,13 +404,15 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>set_oup_params_start()</code></h4>
+<h4><code>MaximumLikelihood$set_oup_params_start()</code></h4>
 
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$set_oup_params_start(rhos = NULL, mus = NULL, sigmas = NULL)</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$set_oup_params_start(rhos = NULL, mus = NULL, sigmas = NULL)</pre>
+</div>
 
 
 
@@ -414,61 +440,11 @@ Set OUP parameter starting values
 
 
 <hr>
-<a id="method-MaximumLikelihood-set_oup_stats"></a>
-
-
-
-<h4>Method <code>set_oup_stats()</code></h4>
-
-<p>Set OUP statistics for estimation and hypothesis tests
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>MaximumLikelihood$set_oup_stats(
-  lnLu = NULL,
-  alphau = NULL,
-  lnLr = NULL,
-  alphar = NULL,
-  m1 = NULL
-)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>lnLu</code></dt><dd><p>unrestricted log likelihood -inf&lt;lnLu&lt;=0</p>
-</dd>
-<dt><code>alphau</code></dt><dd><p>identifies the distribution of lnLu, 0.5&lt;=alphau&lt;=1</p>
-</dd>
-<dt><code>lnLr</code></dt><dd><p>restricted log likelihood -inf&lt;lnLr&lt;=lnLu</p>
-</dd>
-<dt><code>alphar</code></dt><dd><p>identifies the distribution of lnLr, 0.5&lt;=alphar&lt;=1</p>
-</dd>
-<dt><code>m1</code></dt><dd><p>number of observations 0&lt;m1</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>list(lnLu,alphau,lnLr,alphar,m1)
-</p>
-
-
-<hr>
 <a id="method-MaximumLikelihood-set_timeseries"></a>
 
 
 
-<h4>Method <code>set_timeseries()</code></h4>
+<h4><code>MaximumLikelihood$set_timeseries()</code></h4>
 
 <p>Set time series data for time tau and state z
 </p>
@@ -476,7 +452,9 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$set_timeseries(df = NULL, taucol = NULL, zcol = NULL)</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$set_timeseries(df = NULL, taucol = NULL, zcol = NULL)</pre>
+</div>
 
 
 
@@ -508,7 +486,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>set_timeseries_info()</code></h4>
+<h4><code>MaximumLikelihood$set_timeseries_info()</code></h4>
 
 <p>Set information for plotting times series and estimates
 </p>
@@ -516,14 +494,16 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$set_timeseries_info(
+<div class="r">
+<pre>MaximumLikelihood$set_timeseries_info(
   tbeg = NULL,
   tend = NULL,
   dataname = NULL,
   timename = NULL,
   statename = NULL,
   estimation = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -561,7 +541,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>set_plot_info()</code></h4>
+<h4><code>MaximumLikelihood$set_plot_info()</code></h4>
 
 <p>Set information for plotting
 </p>
@@ -569,7 +549,8 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$set_plot_info(
+<div class="r">
+<pre>MaximumLikelihood$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -579,7 +560,8 @@ Set OUP parameter starting values
   opaque = NULL,
   labels = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -604,7 +586,7 @@ Set OUP parameter starting values
 </dd>
 <dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
 </dd>
 </dl>
 
@@ -614,7 +596,49 @@ Set OUP parameter starting values
 
 <h5>Returns</h5>
 
-<p>list(font,file,theme)
+<p>list(font,file,theme,labels)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-set_flags"></a>
+
+
+
+<h4><code>MaximumLikelihood$set_flags()</code></h4>
+
+<p>Set flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MaximumLikelihood$set_flags(plotit = NULL, copyit = NULL, who = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>plotit</code></dt><dd><p>automatic plot after calculation TRUE or FALSE</p>
+</dd>
+<dt><code>copyit</code></dt><dd><p>copy to clipboard TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of sender</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
 </p>
 
 
@@ -623,7 +647,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>get_all()</code></h4>
+<h4><code>MaximumLikelihood$get_all()</code></h4>
 
 <p>Get all arguments, time series and information
 </p>
@@ -631,13 +655,15 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_all()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_all()</pre>
+</div>
 
 
 
 <h5>Returns</h5>
 
-<p>list(oup_params,oup_params_unrestr,oup_params_restr,oup_params_start,oup_stats,timeseries,timeseries_info,plot_info)
+<p>list(oup_params,oup_params_restr,oup_params_start,timeseries,timeseries_info,plot_info)
 </p>
 
 
@@ -646,7 +672,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>get_oup_params()</code></h4>
+<h4><code>MaximumLikelihood$get_oup_params()</code></h4>
 
 <p>Get OUP parameters
 </p>
@@ -654,7 +680,9 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_oup_params()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_oup_params()</pre>
+</div>
 
 
 
@@ -665,34 +693,11 @@ Set OUP parameter starting values
 
 
 <hr>
-<a id="method-MaximumLikelihood-get_oup_params_unrestr"></a>
-
-
-
-<h4>Method <code>get_oup_params_unrestr()</code></h4>
-
-<p>Get OUP parameters unrestricted estimates
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>MaximumLikelihood$get_oup_params_unrestr()</pre></div>
-
-
-
-<h5>Returns</h5>
-
-<p>list(rhohat,muhat,sigmahat)
-</p>
-
-
-<hr>
 <a id="method-MaximumLikelihood-get_oup_params_restr"></a>
 
 
 
-<h4>Method <code>get_oup_params_restr()</code></h4>
+<h4><code>MaximumLikelihood$get_oup_params_restr()</code></h4>
 
 <p>Get OUP parameter restrictions
 </p>
@@ -700,7 +705,9 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_oup_params_restr()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_oup_params_restr()</pre>
+</div>
 
 
 
@@ -715,7 +722,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>get_oup_params_start()</code></h4>
+<h4><code>MaximumLikelihood$get_oup_params_start()</code></h4>
 
 <p>Get OUP parameter starting values
 </p>
@@ -723,7 +730,9 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_oup_params_start()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_oup_params_start()</pre>
+</div>
 
 
 
@@ -734,34 +743,11 @@ Set OUP parameter starting values
 
 
 <hr>
-<a id="method-MaximumLikelihood-get_oup_stats"></a>
-
-
-
-<h4>Method <code>get_oup_stats()</code></h4>
-
-<p>Get OUP statistics for estimation and hypothesis tests
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>MaximumLikelihood$get_oup_stats()</pre></div>
-
-
-
-<h5>Returns</h5>
-
-<p>list(lnLu,alphau,lnLr,alphar,m1)
-</p>
-
-
-<hr>
 <a id="method-MaximumLikelihood-get_timeseries"></a>
 
 
 
-<h4>Method <code>get_timeseries()</code></h4>
+<h4><code>MaximumLikelihood$get_timeseries()</code></h4>
 
 <p>Get time series data for time tau and state z
 </p>
@@ -769,7 +755,9 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_timeseries()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_timeseries()</pre>
+</div>
 
 
 
@@ -784,7 +772,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>get_timeseries_info()</code></h4>
+<h4><code>MaximumLikelihood$get_timeseries_info()</code></h4>
 
 <p>Get information for times series
 </p>
@@ -792,13 +780,15 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_timeseries_info()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_timeseries_info()</pre>
+</div>
 
 
 
 <h5>Returns</h5>
 
-<p>list(tbeg,Ixbeg,tend,Ixend,datename,timename,statename,estimation)
+<p>list(tbeg,tend,datename,timename,statename,estimation)
 </p>
 
 
@@ -807,7 +797,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>get_plot_info()</code></h4>
+<h4><code>MaximumLikelihood$get_plot_info()</code></h4>
 
 <p>Get information for plotting
 </p>
@@ -815,7 +805,9 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_plot_info()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_plot_info()</pre>
+</div>
 
 
 
@@ -830,7 +822,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>get_plot_colors()</code></h4>
+<h4><code>MaximumLikelihood$get_plot_colors()</code></h4>
 
 <p>Get colors for plotting
 </p>
@@ -838,13 +830,40 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$get_plot_colors()</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$get_plot_colors()</pre>
+</div>
 
 
 
 <h5>Returns</h5>
 
-<p>list(red,ylw,grn,cyn,blu,mgn,gry,background,font,reverse)
+<p>list(red,ylw,grn,cyn,blu,mgn,gry,background,font)
+</p>
+
+
+<hr>
+<a id="method-MaximumLikelihood-get_flags"></a>
+
+
+
+<h4><code>MaximumLikelihood$get_flags()</code></h4>
+
+<p>Get flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>MaximumLikelihood$get_flags()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
 </p>
 
 
@@ -853,7 +872,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>LogLikelihood()</code></h4>
+<h4><code>MaximumLikelihood$LogLikelihood()</code></h4>
 
 <p>Calculate the log likelihood of estimates
 </p>
@@ -861,14 +880,16 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$LogLikelihood(
+<div class="r">
+<pre>MaximumLikelihood$LogLikelihood(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   df = NULL,
   taucol = NULL,
   zcol = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -897,7 +918,7 @@ Set OUP parameter starting values
 
 <h5>Returns</h5>
 
-<p>list(lnL)
+<p>list(rho,mu,sigma,lnL,k,alpha,m1)
 </p>
 
 
@@ -906,7 +927,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>Estimates()</code></h4>
+<h4><code>MaximumLikelihood$Estimates()</code></h4>
 
 <p>Calculate unrestricted or restricted maximum likelihood estimates
 </p>
@@ -914,7 +935,8 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$Estimates(
+<div class="r">
+<pre>MaximumLikelihood$Estimates(
   df = NULL,
   taucol = NULL,
   zcol = NULL,
@@ -923,9 +945,9 @@ Set OUP parameter starting values
   sigmar = NULL,
   rhos = NULL,
   mus = NULL,
-  sigmas = NULL,
-  plotit = TRUE
-)</pre></div>
+  sigmas = NULL
+)</pre>
+</div>
 
 
 
@@ -952,8 +974,6 @@ Set OUP parameter starting values
 </dd>
 <dt><code>sigmas</code></dt><dd><p>starting value the scale parameter -inf&lt;sigmas&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
-</dd>
 </dl>
 
 </div>
@@ -971,22 +991,24 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>GoodnessOfFit()</code></h4>
+<h4><code>MaximumLikelihood$GoodnessOfFit()</code></h4>
 
-<p>Calculate the goodness of fit compared with invariant and scaled brownian motion estimates
+<p>Compare maximum likeliood estimates with invariant and scaled brownian motion estimates
 </p>
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$GoodnessOfFit(
+<div class="r">
+<pre>MaximumLikelihood$GoodnessOfFit(
   rho = NULL,
   mu = NULL,
   sigma = NULL,
   df = NULL,
   taucol = NULL,
   zcol = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -1005,7 +1027,7 @@ Set OUP parameter starting values
 </dd>
 <dt><code>taucol</code></dt><dd><p>index of a column containing tau</p>
 </dd>
-<dt><code>zcol</code></dt><dd><p>index a column containing z</p>
+<dt><code>zcol</code></dt><dd><p>index of a column containing z</p>
 </dd>
 </dl>
 
@@ -1015,7 +1037,7 @@ Set OUP parameter starting values
 
 <h5>Returns</h5>
 
-<p>list(Inv,SBM) with Inv=list(R2,Pval) and SBM=list(R2,Pval)
+<p>list(theta,theta_i,theta_s,Inv,SBM) with Inv=list(R2,Pval) and SBM=list(R2,Pval)
 </p>
 
 
@@ -1024,20 +1046,24 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>LikelihoodRatioTest()</code></h4>
+<h4><code>MaximumLikelihood$LikelihoodRatioTest()</code></h4>
 
-<p>Test for significant difference between two likelihoods
+<p>Test for significant difference between restricted and unrestricted likelihoods
 </p>
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$LikelihoodRatioTest(
-  lnLu = NULL,
-  lnLr = NULL,
-  alphau = NULL,
-  m1 = NULL
-)</pre></div>
+<div class="r">
+<pre>MaximumLikelihood$LikelihoodRatioTest(
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  df = NULL,
+  taucol = NULL,
+  zcol = NULL
+)</pre>
+</div>
 
 
 
@@ -1046,13 +1072,17 @@ Set OUP parameter starting values
 <div class="arguments">
 
 <dl>
-<dt><code>lnLu</code></dt><dd><p>unrestricted log likelihood -inf&lt;lnLu&lt;=0</p>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
 </dd>
-<dt><code>lnLr</code></dt><dd><p>restricted log likelihood -inf&lt;lnLr&lt;=lnLu</p>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
-<dt><code>alphau</code></dt><dd><p>identifies distribution of LnLu 0.5&lt;=alphau&lt;=1</p>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>m1</code></dt><dd><p>number of observations 0&lt;m1=m-1</p>
+<dt><code>df</code></dt><dd><p>data frame containing columns for tau and z</p>
+</dd>
+<dt><code>taucol</code></dt><dd><p>index of a column containing tau</p>
+</dd>
+<dt><code>zcol</code></dt><dd><p>index of a column containing z</p>
 </dd>
 </dl>
 
@@ -1062,7 +1092,7 @@ Set OUP parameter starting values
 
 <h5>Returns</h5>
 
-<p>list(R2,Pval)
+<p>list(theta_u,theta,R2,Pval)
 </p>
 
 
@@ -1071,7 +1101,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>PlotTimeSeries()</code></h4>
+<h4><code>MaximumLikelihood$PlotTimeSeries()</code></h4>
 
 <p>Plot time series
 </p>
@@ -1079,7 +1109,8 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$PlotTimeSeries(
+<div class="r">
+<pre>MaximumLikelihood$PlotTimeSeries(
   df = NULL,
   taucol = NULL,
   zcol = NULL,
@@ -1088,7 +1119,8 @@ Set OUP parameter starting values
   title = NULL,
   xaxis = NULL,
   yaxis = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -1130,7 +1162,7 @@ Set OUP parameter starting values
 
 
 
-<h4>Method <code>PlotEstimates()</code></h4>
+<h4><code>MaximumLikelihood$PlotEstimates()</code></h4>
 
 <p>Plot time series with estimated means and variances
 </p>
@@ -1138,13 +1170,15 @@ Set OUP parameter starting values
 
 <h5>Usage</h5>
 
-<div class="r"><pre>MaximumLikelihood$PlotEstimates(
+<div class="r">
+<pre>MaximumLikelihood$PlotEstimates(
   tbeg = NULL,
   tend = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -1175,21 +1209,6 @@ Set OUP parameter starting values
 </p>
 
 
-
-
-<h3>Examples</h3>
-
-<pre><code class='language-R'>
-## ------------------------------------------------
-## Method `MaximumLikelihood$new`
-## ------------------------------------------------
-
-  ML &lt;- MaximumLikelihood$new()
-  ML$Estimates()
-  ML$GoodnessOfFit()
-  ML$Estimates(rhor=0.5,mur=-15,sigmar=15)
-  ML$LikelihoodRatioTest()
-</code></pre>
 
 </main>
 

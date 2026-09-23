@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><title>R: R6 Class implementing Analytical formulas for an...</title>
+<!DOCTYPE html><html><head><title>R: R6 class implementing Analytical formulas for the...</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
@@ -16,7 +16,7 @@ function processMathHTML() {
 
 <table style="width: 100%;"><tr><td>Analytical</td><td style="text-align: right;">R Documentation</td></tr></table>
 
-<h2>R6 Class implementing Analytical formulas for an Ornstein-Uhlenbeck Process</h2>
+<h2>R6 class implementing Analytical formulas for the Ornstein-Uhlenbeck Process</h2>
 
 <h3>Description</h3>
 
@@ -26,16 +26,14 @@ simple exit and entry options in a Real Options Analysis.
 </p>
 
 
-<h3>Formulas:</h3>
+<h3>Formulas and Methods:</h3>
 
 <div class="sourceCode"><pre>z stochastic
   Drift
   Diffusion
 y stochastic
   Mean
-  MeanToConverge
   Variance
-  VarianceToConverge
   Density
   Probability
   DoubleIntegral
@@ -45,10 +43,7 @@ x stochastic
   DecisionThreshold
   Obligation
 t stochastic
-  PassageTimeMode
-  PassageTimeMedian
-  PassateTimeMean
-  PassageTimeVariance
+  PassageTimeModeMedianMean
   PassageTimePercentiles
   PassageTimeDensity
   PassageTimeProbability
@@ -60,9 +55,7 @@ t stochastic
 <div class="sourceCode"><pre>  PlotDrift
   PlotDiffusion
   PlotMean
-  PlotMeanToConverge
   PlotVariance
-  PlotVarianceToConverge
   PlotDensity
   PlotProbability
   PlotDoubleIntegral
@@ -71,7 +64,6 @@ t stochastic
   PlotDecisionThreshold
   PlotObligation
   PlotPassageTimeModeMedianMean
-  PlotPassageTimeVariance
   PlotPassageTimePercentiles
   PlotPassageTimeDensity
   PlotPassageTimeProbability
@@ -109,17 +101,52 @@ t stochastic
   s:      initial time -inf&lt;s&lt;inf
   x:      initial state -inf&lt;x&lt;inf
   omega:  degree of irreversibility 0&lt;=omega&lt;=1
+  Ppct:   passage time probability for a percentile 0.01&lt;=Ppct&lt;=0.99
 </pre></div>
 
 
-<h3>Using the formulas:</h3>
+<h3>Usage:</h3>
 
-<p>Demonstration scripts are files in the 'demo' directory. Identify a formula
-and in the console type:
+<p>The Analytical object must first be instantiated before its methods are called.
+There are two ways.  The first way instantiates the OUProcess object and
+calls a function to get a pointer:
 </p>
-<div class="sourceCode"><pre>  demo(A_FormulaName), or
-  demo(A_PlotFormulaName).
+<div class="sourceCode"><pre>  OUP &lt;- OUProcess$new()
+  A &lt;- OUP$get_Analytical()
+  FD &lt;- OUP$get_FiniteDifference()
+  ML &lt;- OUP$get_MaximumLikelihood()
+  MC &lt;- OUP$get_MonteCarlo()
 </pre></div>
+<p>The Analytical object will coordinate arguments to functions with the
+FiniteDifference, MaximumLikelihood and MonteCarlo objects.  The second
+way instantiates the Analytical object by itself with no coordination:
+</p>
+<div class="sourceCode"><pre>  A &lt;- Analytical$new()
+</pre></div>
+<p>Once the object is instantiated, its methods can be called, to calculate and
+plot a Decision Threshold, for example:
+</p>
+<div class="sourceCode"><pre>  A$DecisionThreshold()
+</pre></div>
+<p>The plot methods can be used to customize the plots, with a title, for example:
+</p>
+<div class="sourceCode"><pre>  A$PlotDecisionThreshold(title="My Decision")
+</pre></div>
+<p>Other functions and methods are called in the same way.  To see all the
+possibilities, check out the demos below.
+</p>
+
+
+<h3>Demos:</h3>
+
+<p>Demonstration scripts are in files in the 'demo' directory. The most
+convenient way to list and run demos are the commands:
+</p>
+<div class="sourceCode"><pre>  OUPDemoList()
+  OUPDemoRun(&lt;number of demo in list&gt;)
+</pre></div>
+<p>Entering the demos by number in the list saves typing.
+</p>
 
 
 <h3>Discussion:</h3>
@@ -137,42 +164,28 @@ reasonable looking solutions that diverge from the true answers.
 more than one way. This is one reason for analytical formulas.
 </p>
 <p>Another reason is to speed the calculations. Compared with the Finite
-Difference method, an analytical formula can calculate an option price
-up to 10,000 times quicker. Compared with Monte Carlo simulation, an
-analytical formula can calculate passage time probabilities up to
-100,000 times quicker.
+Difference method, an analytical formula can calculate option prices
+2 to 3 times quicker. Compared with Monte Carlo simulation, an
+analytical formula can calculate 800 to 1,000 times quicker.
 </p>
 <p>The bottom line of a real options analysis is the decision threshold
-and the mode, median and mean passage times. The many functions available
-are used in the calculations, but to go straight to the bottom line:
+and the time to crossing the decision threshold. The many functions available
+are used in the calculations, but they all accumulate to the bottom line:
 </p>
 <div class="sourceCode"><pre>  A &lt;- Analytical$new()
   A$DecisionThreshold()
-  A$PassageTimeMean()
-  A$PassageTimeVariance()
-  A$PlotPassageTimePercentiles(type=1)
-  A$PlotPassageTimePercentiles(type=2)
+  A$PassageTimeModeMedianMean()
+  A$PassageTimePercentiles()
 </pre></div>
-<p>Perhaps a better measure of passage times are the percentiles. The mean
+<p>Perhaps the better measure of passage times are the percentiles. The mean
 does not exist if rho is zero and the variance does not exist if rho is
 small. The mode and median always exist.  Percentiles, which include the
-median, always exist.
+median, always exist.  The formulas don't calculate the variance.
 </p>
 <p>The passage time calculations are challenging. For example, the passage
 time density is too complicated to explain in this short discussion.
 But don't be surprised if it is bi-modal or even negative. Care must be
 taken in interpreting passage times.
-</p>
-<p>Examples in R6 don't work the same way as other R modules.  There is only
-one example for an R6 object, not one for each function in the object.
-To run examples, the devtools::run_examples() works, but the R command
-example(&quot;Analytical&quot;) doesn't.  You can copy commands to the clipboard,
-paste into the console and press Enter. Examples in this help and a simple
-example at the bottom can be run in this way.
-</p>
-<p>A better alternative is demo(), but this works sometimes, sometimes not.
-If you don't see the demos for this package, go to Files and demo.  You will
-see the demo names and then type something like demo(A_DecisionThreshold).
 </p>
 
 
@@ -184,7 +197,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <ul>
-<li> <p><a href="#method-Analytical-new"><code>Analytical$new()</code></a>
+<li> <p><a href="#method-Analytical-initialize"><code>Analytical$new()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-Analytical-set_oup_params"><code>Analytical$set_oup_params()</code></a>
@@ -202,7 +215,16 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <li> <p><a href="#method-Analytical-set_t_stoch_args"><code>Analytical$set_t_stoch_args()</code></a>
 </p>
 </li>
+<li> <p><a href="#method-Analytical-set_plot_args"><code>Analytical$set_plot_args()</code></a>
+</p>
+</li>
 <li> <p><a href="#method-Analytical-set_plot_info"><code>Analytical$set_plot_info()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_plot_type"><code>Analytical$set_plot_type()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-set_flags"><code>Analytical$set_flags()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-Analytical-get_all"><code>Analytical$get_all()</code></a>
@@ -223,10 +245,19 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <li> <p><a href="#method-Analytical-get_t_stoch_args"><code>Analytical$get_t_stoch_args()</code></a>
 </p>
 </li>
+<li> <p><a href="#method-Analytical-get_plot_args"><code>Analytical$get_plot_args()</code></a>
+</p>
+</li>
 <li> <p><a href="#method-Analytical-get_plot_info"><code>Analytical$get_plot_info()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-Analytical-get_plot_colors"><code>Analytical$get_plot_colors()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_plot_types"><code>Analytical$get_plot_types()</code></a>
+</p>
+</li>
+<li> <p><a href="#method-Analytical-get_flags"><code>Analytical$get_flags()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-Analytical-axes_z_stoch"><code>Analytical$axes_z_stoch()</code></a>
@@ -262,13 +293,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <li> <p><a href="#method-Analytical-Mean"><code>Analytical$Mean()</code></a>
 </p>
 </li>
-<li> <p><a href="#method-Analytical-MeanToConverge"><code>Analytical$MeanToConverge()</code></a>
-</p>
-</li>
 <li> <p><a href="#method-Analytical-Variance"><code>Analytical$Variance()</code></a>
-</p>
-</li>
-<li> <p><a href="#method-Analytical-VarianceToConverge"><code>Analytical$VarianceToConverge()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-Analytical-Density"><code>Analytical$Density()</code></a>
@@ -292,16 +317,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <li> <p><a href="#method-Analytical-Obligation"><code>Analytical$Obligation()</code></a>
 </p>
 </li>
-<li> <p><a href="#method-Analytical-PassageTimeMode"><code>Analytical$PassageTimeMode()</code></a>
-</p>
-</li>
-<li> <p><a href="#method-Analytical-PassageTimeMedian"><code>Analytical$PassageTimeMedian()</code></a>
-</p>
-</li>
-<li> <p><a href="#method-Analytical-PassageTimeMean"><code>Analytical$PassageTimeMean()</code></a>
-</p>
-</li>
-<li> <p><a href="#method-Analytical-PassageTimeVariance"><code>Analytical$PassageTimeVariance()</code></a>
+<li> <p><a href="#method-Analytical-PassageTimeModeMedianMean"><code>Analytical$PassageTimeModeMedianMean()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-Analytical-PassageTimePercentiles"><code>Analytical$PassageTimePercentiles()</code></a>
@@ -322,13 +338,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <li> <p><a href="#method-Analytical-PlotMean"><code>Analytical$PlotMean()</code></a>
 </p>
 </li>
-<li> <p><a href="#method-Analytical-PlotMeanToConverge"><code>Analytical$PlotMeanToConverge()</code></a>
-</p>
-</li>
 <li> <p><a href="#method-Analytical-PlotVariance"><code>Analytical$PlotVariance()</code></a>
-</p>
-</li>
-<li> <p><a href="#method-Analytical-PlotVarianceToConverge"><code>Analytical$PlotVarianceToConverge()</code></a>
 </p>
 </li>
 <li> <p><a href="#method-Analytical-PlotDensity"><code>Analytical$PlotDensity()</code></a>
@@ -355,9 +365,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <li> <p><a href="#method-Analytical-PlotPassageTimeModeMedianMean"><code>Analytical$PlotPassageTimeModeMedianMean()</code></a>
 </p>
 </li>
-<li> <p><a href="#method-Analytical-PlotPassageTimeVariance"><code>Analytical$PlotPassageTimeVariance()</code></a>
-</p>
-</li>
 <li> <p><a href="#method-Analytical-PlotPassageTimePercentiles"><code>Analytical$PlotPassageTimePercentiles()</code></a>
 </p>
 </li>
@@ -370,11 +377,11 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
-<a id="method-Analytical-new"></a>
+<a id="method-Analytical-initialize"></a>
 
 
 
-<h4>Method <code>new()</code></h4>
+<h4><code>Analytical$new()</code></h4>
 
 <p>Create an Analytical object
 </p>
@@ -382,7 +389,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$new(OUP = NULL)</pre></div>
+<div class="r">
+<pre>Analytical$new(OUP = NULL)</pre>
+</div>
 
 
 
@@ -405,22 +414,12 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </p>
 
 
-
-<h5>Examples</h5>
-
-<div class="r example copy">
-<pre>  A &lt;- Analytical$new()
-  A$DecisionThreshold()
-</pre>
-</div>
-
-
 <hr>
 <a id="method-Analytical-set_oup_params"></a>
 
 
 
-<h4>Method <code>set_oup_params()</code></h4>
+<h4><code>Analytical$set_oup_params()</code></h4>
 
 <p>Set OUP parameters
 </p>
@@ -428,7 +427,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)</pre></div>
+<div class="r">
+<pre>Analytical$set_oup_params(rho = NULL, mu = NULL, sigma = NULL, who = NULL)</pre>
+</div>
 
 
 
@@ -443,7 +444,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -462,7 +463,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>set_z_stoch_args()</code></h4>
+<h4><code>Analytical$set_z_stoch_args()</code></h4>
 
 <p>Set z as a stochastic state
 </p>
@@ -470,7 +471,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$set_z_stoch_args(z = NULL)</pre></div>
+<div class="r">
+<pre>Analytical$set_z_stoch_args(z = NULL)</pre>
+</div>
 
 
 
@@ -498,7 +501,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>set_y_stoch_args()</code></h4>
+<h4><code>Analytical$set_y_stoch_args()</code></h4>
 
 <p>Set y as a stochastic state and its arguments
 </p>
@@ -506,14 +509,17 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$set_y_stoch_args(
+<div class="r">
+<pre>Analytical$set_y_stoch_args(
   t = NULL,
   y = NULL,
   s = NULL,
   x = NULL,
   psi = NULL,
-  eps = NULL
-)</pre></div>
+  eps = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -534,6 +540,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>eps</code></dt><dd><p>proportion remaining after convergence 0&lt;=eps&lt;=1</p>
 </dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
 </dl>
 
 </div>
@@ -551,7 +559,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>set_x_stoch_args()</code></h4>
+<h4><code>Analytical$set_x_stoch_args()</code></h4>
 
 <p>Set x as a stochastic state and its arguments
 </p>
@@ -559,7 +567,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$set_x_stoch_args(
+<div class="r">
+<pre>Analytical$set_x_stoch_args(
   s = NULL,
   x = NULL,
   t = NULL,
@@ -569,7 +578,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   b = NULL,
   c = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -594,7 +604,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -613,7 +623,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>set_t_stoch_args()</code></h4>
+<h4><code>Analytical$set_t_stoch_args()</code></h4>
 
 <p>Set t stochastic arguments
 </p>
@@ -621,15 +631,18 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$set_t_stoch_args(
+<div class="r">
+<pre>Analytical$set_t_stoch_args(
   t = NULL,
   k = NULL,
   s = NULL,
   x = NULL,
   z = NULL,
   omega = NULL,
-  Ppct = NULL
-)</pre></div>
+  Ppct = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -640,7 +653,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <dl>
 <dt><code>t</code></dt><dd><p>vector of m times s&lt;=t&lt;inf</p>
 </dd>
-<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;inf</p>
+<dt><code>k</code></dt><dd><p>threshold -inf&lt;k&lt;inf</p>
 </dd>
 <dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
 </dd>
@@ -651,6 +664,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
 </dd>
 <dt><code>Ppct</code></dt><dd><p>passage time probability for a percentile  0.01&lt;=Ppct&lt;=0.99</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -665,11 +680,53 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
+<a id="method-Analytical-set_plot_args"></a>
+
+
+
+<h4><code>Analytical$set_plot_args()</code></h4>
+
+<p>Set plot arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>Analytical$set_plot_args(pmax = NULL, ptmax = NULL, who = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>pmax</code></dt><dd><p>maximum transition density</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum visiting time and first passage time densities</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(pmax,ptmax)
+</p>
+
+
+<hr>
 <a id="method-Analytical-set_plot_info"></a>
 
 
 
-<h4>Method <code>set_plot_info()</code></h4>
+<h4><code>Analytical$set_plot_info()</code></h4>
 
 <p>Set information for plotting
 </p>
@@ -677,10 +734,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$set_plot_info(
-  type = NULL,
-  pmax = NULL,
-  ptmax = NULL,
+<div class="r">
+<pre>Analytical$set_plot_info(
   fontfamily = NULL,
   fontsize = NULL,
   fileformat = NULL,
@@ -692,7 +747,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   floor = NULL,
   labels = NULL,
   who = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -701,12 +757,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3 and 4 for 3D</p>
-</dd>
-<dt><code>pmax</code></dt><dd><p>maximum vertical axis for transition density plot</p>
-</dd>
-<dt><code>ptmax</code></dt><dd><p>maximum vertical axis for passage time density plot</p>
-</dd>
 <dt><code>fontfamily</code></dt><dd><p>font family for plot labels</p>
 </dd>
 <dt><code>fontsize</code></dt><dd><p>font size for plot labels</p>
@@ -727,7 +777,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>labels</code></dt><dd><p>title and parameters TRUE or FALSE</p>
 </dd>
-<dt><code>who</code></dt><dd><p>identifier for object sending the parameters</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -742,19 +792,103 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
-<a id="method-Analytical-get_all"></a>
+<a id="method-Analytical-set_plot_type"></a>
 
 
 
-<h4>Method <code>get_all()</code></h4>
+<h4><code>Analytical$set_plot_type()</code></h4>
 
-<p>Get all arguments, time series and information
+<p>Set plot types by group
 </p>
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_all()</pre></div>
+<div class="r">
+<pre>Analytical$set_plot_type(type = NULL, group = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>type</code></dt><dd><p>a number identifying the type for a group</p>
+</dd>
+<dt><code>group</code></dt><dd><p>identifier for groups of similar plots</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(type,group)
+</p>
+
+
+<hr>
+<a id="method-Analytical-set_flags"></a>
+
+
+
+<h4><code>Analytical$set_flags()</code></h4>
+
+<p>Set flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>Analytical$set_flags(plotit = NULL, copyit = NULL, who = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>plotit</code></dt><dd><p>automatic plot after calculation TRUE or FALSE</p>
+</dd>
+<dt><code>copyit</code></dt><dd><p>copy to clipboard TRUE or FALSE</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
+</dd>
+</dl>
+
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_all"></a>
+
+
+
+<h4><code>Analytical$get_all()</code></h4>
+
+<p>Get all arguments and information
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>Analytical$get_all()</pre>
+</div>
 
 
 
@@ -769,7 +903,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>get_oup_params()</code></h4>
+<h4><code>Analytical$get_oup_params()</code></h4>
 
 <p>Get OUP parameters
 </p>
@@ -777,7 +911,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_oup_params()</pre></div>
+<div class="r">
+<pre>Analytical$get_oup_params()</pre>
+</div>
 
 
 
@@ -792,7 +928,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>get_z_stoch_args()</code></h4>
+<h4><code>Analytical$get_z_stoch_args()</code></h4>
 
 <p>Get z as a stochastic state
 </p>
@@ -800,7 +936,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_z_stoch_args()</pre></div>
+<div class="r">
+<pre>Analytical$get_z_stoch_args()</pre>
+</div>
 
 
 
@@ -815,7 +953,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>get_y_stoch_args()</code></h4>
+<h4><code>Analytical$get_y_stoch_args()</code></h4>
 
 <p>Get y as a stochastic state and its arguments
 </p>
@@ -823,7 +961,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_y_stoch_args()</pre></div>
+<div class="r">
+<pre>Analytical$get_y_stoch_args()</pre>
+</div>
 
 
 
@@ -838,7 +978,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>get_x_stoch_args()</code></h4>
+<h4><code>Analytical$get_x_stoch_args()</code></h4>
 
 <p>Get x as a stochastic state and its arguments
 </p>
@@ -846,7 +986,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_x_stoch_args()</pre></div>
+<div class="r">
+<pre>Analytical$get_x_stoch_args()</pre>
+</div>
 
 
 
@@ -861,7 +1003,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>get_t_stoch_args()</code></h4>
+<h4><code>Analytical$get_t_stoch_args()</code></h4>
 
 <p>Get t stochastic arguments
 </p>
@@ -869,7 +1011,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_t_stoch_args()</pre></div>
+<div class="r">
+<pre>Analytical$get_t_stoch_args()</pre>
+</div>
 
 
 
@@ -880,11 +1024,36 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
+<a id="method-Analytical-get_plot_args"></a>
+
+
+
+<h4><code>Analytical$get_plot_args()</code></h4>
+
+<p>Get plot arguments
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>Analytical$get_plot_args()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(pmax,ptmax)
+</p>
+
+
+<hr>
 <a id="method-Analytical-get_plot_info"></a>
 
 
 
-<h4>Method <code>get_plot_info()</code></h4>
+<h4><code>Analytical$get_plot_info()</code></h4>
 
 <p>Get information for plotting
 </p>
@@ -892,7 +1061,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_plot_info()</pre></div>
+<div class="r">
+<pre>Analytical$get_plot_info()</pre>
+</div>
 
 
 
@@ -907,7 +1078,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>get_plot_colors()</code></h4>
+<h4><code>Analytical$get_plot_colors()</code></h4>
 
 <p>Get colors for plotting
 </p>
@@ -915,7 +1086,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$get_plot_colors()</pre></div>
+<div class="r">
+<pre>Analytical$get_plot_colors()</pre>
+</div>
 
 
 
@@ -926,11 +1099,61 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
+<a id="method-Analytical-get_plot_types"></a>
+
+
+
+<h4><code>Analytical$get_plot_types()</code></h4>
+
+<p>Get current types for plot routines
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>Analytical$get_plot_types()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>(list(types,descriptioon))
+</p>
+
+
+<hr>
+<a id="method-Analytical-get_flags"></a>
+
+
+
+<h4><code>Analytical$get_flags()</code></h4>
+
+<p>Get flags for plotting and copying
+</p>
+
+
+<h5>Usage</h5>
+
+<div class="r">
+<pre>Analytical$get_flags()</pre>
+</div>
+
+
+
+<h5>Returns</h5>
+
+<p>list(plotit,copyit)
+</p>
+
+
+<hr>
 <a id="method-Analytical-axes_z_stoch"></a>
 
 
 
-<h4>Method <code>axes_z_stoch()</code></h4>
+<h4><code>Analytical$axes_z_stoch()</code></h4>
 
 <p>Scale axes for z stochastic arguments
 </p>
@@ -938,7 +1161,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$axes_z_stoch()</pre></div>
+<div class="r">
+<pre>Analytical$axes_z_stoch()</pre>
+</div>
 
 
 
@@ -953,7 +1178,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>axes_y_stoch()</code></h4>
+<h4><code>Analytical$axes_y_stoch()</code></h4>
 
 <p>Scale axes for y stochastic arguments
 </p>
@@ -961,7 +1186,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$axes_y_stoch()</pre></div>
+<div class="r">
+<pre>Analytical$axes_y_stoch()</pre>
+</div>
 
 
 
@@ -976,7 +1203,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>axes_x_stoch()</code></h4>
+<h4><code>Analytical$axes_x_stoch()</code></h4>
 
 <p>Scale axes for x stochastic arguments
 </p>
@@ -984,7 +1211,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$axes_x_stoch()</pre></div>
+<div class="r">
+<pre>Analytical$axes_x_stoch()</pre>
+</div>
 
 
 
@@ -999,7 +1228,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>axes_t_stoch()</code></h4>
+<h4><code>Analytical$axes_t_stoch()</code></h4>
 
 <p>Scale axes for t stochastic arguments
 </p>
@@ -1007,7 +1236,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$axes_t_stoch()</pre></div>
+<div class="r">
+<pre>Analytical$axes_t_stoch()</pre>
+</div>
 
 
 
@@ -1022,7 +1253,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>sync_zyxt_stoch()</code></h4>
+<h4><code>Analytical$sync_zyxt_stoch()</code></h4>
 
 <p>Synchronize states
 </p>
@@ -1030,7 +1261,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$sync_zyxt_stoch()</pre></div>
+<div class="r">
+<pre>Analytical$sync_zyxt_stoch()</pre>
+</div>
 
 
 
@@ -1045,7 +1278,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>undo_clear()</code></h4>
+<h4><code>Analytical$undo_clear()</code></h4>
 
 <p>Clear undo list and save current arguments to list
 </p>
@@ -1053,7 +1286,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$undo_clear()</pre></div>
+<div class="r">
+<pre>Analytical$undo_clear()</pre>
+</div>
 
 
 
@@ -1068,7 +1303,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>undo_save()</code></h4>
+<h4><code>Analytical$undo_save()</code></h4>
 
 <p>Save current arguments to undo list
 </p>
@@ -1076,7 +1311,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$undo_save()</pre></div>
+<div class="r">
+<pre>Analytical$undo_save()</pre>
+</div>
 
 
 
@@ -1091,7 +1328,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>undo_undo()</code></h4>
+<h4><code>Analytical$undo_undo()</code></h4>
 
 <p>Replace current arguments from undo list
 </p>
@@ -1099,7 +1336,22 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$undo_undo()</pre></div>
+<div class="r">
+<pre>Analytical$undo_undo(updn = NULL)</pre>
+</div>
+
+
+
+<h5>Arguments</h5>
+
+<div class="arguments">
+
+<dl>
+<dt><code>updn</code></dt><dd><p>positive to move up, negative to move down</p>
+</dd>
+</dl>
+
+</div>
 
 
 
@@ -1114,7 +1366,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Drift()</code></h4>
+<h4><code>Analytical$Drift()</code></h4>
 
 <p>Calculate, plot and return drifts
 </p>
@@ -1122,7 +1374,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Drift(z = NULL, rho = NULL, mu = NULL, plotit = TRUE)</pre></div>
+<div class="r">
+<pre>Analytical$Drift(z = NULL, rho = NULL, mu = NULL, who = NULL)</pre>
+</div>
 
 
 
@@ -1137,7 +1391,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1156,7 +1410,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Diffusion()</code></h4>
+<h4><code>Analytical$Diffusion()</code></h4>
 
 <p>Calculate, plot and return diffusions
 </p>
@@ -1164,7 +1418,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Diffusion(z = NULL, sigma = NULL, plotit = TRUE)</pre></div>
+<div class="r">
+<pre>Analytical$Diffusion(z = NULL, sigma = NULL, who = NULL)</pre>
+</div>
 
 
 
@@ -1177,7 +1433,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1196,22 +1452,25 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Mean()</code></h4>
+<h4><code>Analytical$Mean()</code></h4>
 
-<p>Calculate and plot means
+<p>Calculate and plot means and time for means to converge
 </p>
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Mean(
+<div class="r">
+<pre>Analytical$Mean(
   t = NULL,
   s = NULL,
   x = NULL,
   rho = NULL,
   mu = NULL,
-  plotit = TRUE
-)</pre></div>
+  eps = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1230,49 +1489,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>list(G(mx1))
-</p>
-
-
-<hr>
-<a id="method-Analytical-MeanToConverge"></a>
-
-
-
-<h4>Method <code>MeanToConverge()</code></h4>
-
-<p>Calculate and plot time for mean to converge
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$MeanToConverge(s = NULL, rho = NULL, eps = NULL, plotit = TRUE)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
-</dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
 <dt><code>eps</code></dt><dd><p>proportion remaining after convergence 0&lt;=eps&lt;=1</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1282,7 +1501,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(Gteps)
+<p>list(G(mx1),Gteps)
 </p>
 
 
@@ -1291,21 +1510,24 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Variance()</code></h4>
+<h4><code>Analytical$Variance()</code></h4>
 
-<p>Calculate and plot variances
+<p>Calculate and plot variances and time for variances to converge
 </p>
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Variance(
+<div class="r">
+<pre>Analytical$Variance(
   t = NULL,
   s = NULL,
   rho = NULL,
   sigma = NULL,
-  plotit = TRUE
-)</pre></div>
+  eps = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1322,49 +1544,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>list(H2(mx1))
-</p>
-
-
-<hr>
-<a id="method-Analytical-VarianceToConverge"></a>
-
-
-
-<h4>Method <code>VarianceToConverge()</code></h4>
-
-<p>Calculate and plot time for variance to converge
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$VarianceToConverge(s = NULL, rho = NULL, eps = NULL, plotit = TRUE)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
-</dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
 <dt><code>eps</code></dt><dd><p>proportion remaining after convergence 0&lt;=eps&lt;=1</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1374,7 +1556,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(H2teps)
+<p>list(H2(mx1),H2teps)
 </p>
 
 
@@ -1383,7 +1565,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Density()</code></h4>
+<h4><code>Analytical$Density()</code></h4>
 
 <p>Calculate and plot transition densities
 </p>
@@ -1391,7 +1573,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Density(
+<div class="r">
+<pre>Analytical$Density(
   t = NULL,
   y = NULL,
   s = NULL,
@@ -1399,8 +1582,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1423,7 +1607,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1442,7 +1626,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Probability()</code></h4>
+<h4><code>Analytical$Probability()</code></h4>
 
 <p>Calculate and plot transition probabilities
 </p>
@@ -1450,17 +1634,19 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Probability(
+<div class="r">
+<pre>Analytical$Probability(
   t = NULL,
   y = NULL,
   s = NULL,
   x = NULL,
+  psi = NULL,
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  psi = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1477,15 +1663,15 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
 </dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
 <dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
 </dd>
 <dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
-</dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1504,7 +1690,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>DoubleIntegral()</code></h4>
+<h4><code>Analytical$DoubleIntegral()</code></h4>
 
 <p>Calculate and plot double integrals of transition densities
 </p>
@@ -1512,17 +1698,19 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$DoubleIntegral(
+<div class="r">
+<pre>Analytical$DoubleIntegral(
   t = NULL,
   y = NULL,
   s = NULL,
   x = NULL,
+  psi = NULL,
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  psi = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1539,15 +1727,15 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
 </dd>
+<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</dd>
 <dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
 </dd>
 <dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>psi</code></dt><dd><p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
-</dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1566,7 +1754,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Option()</code></h4>
+<h4><code>Analytical$Option()</code></h4>
 
 <p>Calculate and plot option prices
 </p>
@@ -1574,20 +1762,22 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Option(
+<div class="r">
+<pre>Analytical$Option(
   s = NULL,
   x = NULL,
   t = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)</pre></div>
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1604,12 +1794,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
 </dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
-</dd>
-<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
-</dd>
 <dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
 </dd>
 <dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
@@ -1618,7 +1802,13 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1628,7 +1818,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(O(mxn))
+<p>list(OO(mxn))
 </p>
 
 
@@ -1637,7 +1827,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>OptionEnvelope()</code></h4>
+<h4><code>Analytical$OptionEnvelope()</code></h4>
 
 <p>Calculate and plot the envelope of option prices
 </p>
@@ -1645,18 +1835,20 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$OptionEnvelope(
+<div class="r">
+<pre>Analytical$OptionEnvelope(
   x = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)</pre></div>
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1669,12 +1861,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
 </dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
-</dd>
-<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
-</dd>
 <dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
 </dd>
 <dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
@@ -1683,7 +1869,13 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1693,7 +1885,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(Ohat(1xn),shat(1xn))
+<p>list(OOhat(1xn),shat(1xn))
 </p>
 
 
@@ -1702,7 +1894,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>DecisionThreshold()</code></h4>
+<h4><code>Analytical$DecisionThreshold()</code></h4>
 
 <p>Calculate and plot the decision threshold
 </p>
@@ -1710,18 +1902,20 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$DecisionThreshold(
+<div class="r">
+<pre>Analytical$DecisionThreshold(
   x = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)</pre></div>
+  rho = NULL,
+  mu = NULL,
+  sigma = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1734,12 +1928,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
 </dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
-</dd>
-<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
-</dd>
 <dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
 </dd>
 <dt><code>phi</code></dt><dd><p>&lt;=0 for exit option, &gt;0 for entry option</p>
@@ -1748,7 +1936,13 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1758,7 +1952,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(k,O)
+<p>list(k,OO)
 </p>
 
 
@@ -1767,7 +1961,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>Obligation()</code></h4>
+<h4><code>Analytical$Obligation()</code></h4>
 
 <p>Calculate and plot obligations and prohibitions, ie. benefit/cost analysis
 </p>
@@ -1775,19 +1969,21 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$Obligation(
+<div class="r">
+<pre>Analytical$Obligation(
   s = NULL,
   x = NULL,
   t = NULL,
   y = NULL,
-  rho = NULL,
-  mu = NULL,
   r = NULL,
   phi = NULL,
   b = NULL,
   c = NULL,
-  plotit = TRUE
-)</pre></div>
+  rho = NULL,
+  mu = NULL,
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1803,10 +1999,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <dt><code>t</code></dt><dd><p>terminal time -inf&lt;t&lt;inf</p>
 </dd>
 <dt><code>y</code></dt><dd><p>terminal state -inf&lt;y&lt;inf</p>
-</dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
 </dd>
 <dt><code>r</code></dt><dd><p>discount rate -inf&lt;r&lt;inf</p>
 </dd>
@@ -1816,7 +2008,11 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>c</code></dt><dd><p>lump-sum cost for exit option</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
+</dd>
+<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
+</dd>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1831,19 +2027,20 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
-<a id="method-Analytical-PassageTimeMode"></a>
+<a id="method-Analytical-PassageTimeModeMedianMean"></a>
 
 
 
-<h4>Method <code>PassageTimeMode()</code></h4>
+<h4><code>Analytical$PassageTimeModeMedianMean()</code></h4>
 
-<p>Calculate and plot passage time modes
+<p>Calculate and plot passage time modes, medians and means
 </p>
 
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PassageTimeMode(
+<div class="r">
+<pre>Analytical$PassageTimeModeMedianMean(
   k = NULL,
   s = NULL,
   x = NULL,
@@ -1852,8 +2049,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -1868,7 +2066,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
 </dd>
-<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;z&lt;inf</p>
 </dd>
 <dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
 </dd>
@@ -1878,7 +2076,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -1888,193 +2086,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(tmode(1xn),tmodes(mxn))
-</p>
-
-
-<hr>
-<a id="method-Analytical-PassageTimeMedian"></a>
-
-
-
-<h4>Method <code>PassageTimeMedian()</code></h4>
-
-<p>Calculate and plot passage time medians
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$PassageTimeMedian(
-  k = NULL,
-  s = NULL,
-  x = NULL,
-  z = NULL,
-  omega = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
-  plotit = TRUE
-)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
-</dd>
-<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
-</dd>
-<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
-</dd>
-<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
-</dd>
-<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
-</dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
-</dd>
-<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
-</dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>list(tmedian(1xn),tmedians(mxn))
-</p>
-
-
-<hr>
-<a id="method-Analytical-PassageTimeMean"></a>
-
-
-
-<h4>Method <code>PassageTimeMean()</code></h4>
-
-<p>Calculate and plot passage time means
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$PassageTimeMean(
-  k = NULL,
-  s = NULL,
-  x = NULL,
-  z = NULL,
-  omega = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
-  plotit = TRUE
-)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
-</dd>
-<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
-</dd>
-<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
-</dd>
-<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
-</dd>
-<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
-</dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
-</dd>
-<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
-</dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>list(tmean(1xn),tmeans(mxn))
-</p>
-
-
-<hr>
-<a id="method-Analytical-PassageTimeVariance"></a>
-
-
-
-<h4>Method <code>PassageTimeVariance()</code></h4>
-
-<p>Calculate and plot passage time variances
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$PassageTimeVariance(
-  k = NULL,
-  s = NULL,
-  x = NULL,
-  z = NULL,
-  omega = NULL,
-  rho = NULL,
-  mu = NULL,
-  sigma = NULL,
-  plotit = TRUE
-)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>k</code></dt><dd><p>decision threshold -inf&lt;k&lt;int</p>
-</dd>
-<dt><code>s</code></dt><dd><p>initial time -inf&lt;s&lt;inf</p>
-</dd>
-<dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
-</dd>
-<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
-</dd>
-<dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
-</dd>
-<dt><code>rho</code></dt><dd><p>rate parameter 0&lt;=rho&lt;inf</p>
-</dd>
-<dt><code>mu</code></dt><dd><p>location parameter -inf&lt;mu&lt;inf</p>
-</dd>
-<dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
-</dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>(tvariance(1xn),tvariances(mxn))
+<p>list(tmodemedianmean,tmodesmediansmeans(n),)
 </p>
 
 
@@ -2083,7 +2095,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PassageTimePercentiles()</code></h4>
+<h4><code>Analytical$PassageTimePercentiles()</code></h4>
 
 <p>Calculate and plot passage time percentiles
 </p>
@@ -2091,7 +2103,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PassageTimePercentiles(
+<div class="r">
+<pre>Analytical$PassageTimePercentiles(
   k = NULL,
   s = NULL,
   x = NULL,
@@ -2101,8 +2114,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2117,7 +2131,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
 </dd>
-<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;z&lt;inf</p>
 </dd>
 <dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
 </dd>
@@ -2129,7 +2143,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2139,7 +2153,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(tpercentile(1xn),tpercentiles(mxn))
+<p>list(tpercentile(3),tpercentiles(3xn))
 </p>
 
 
@@ -2148,7 +2162,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PassageTimeDensity()</code></h4>
+<h4><code>Analytical$PassageTimeDensity()</code></h4>
 
 <p>Calculate and plot passage time densities
 </p>
@@ -2156,7 +2170,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PassageTimeDensity(
+<div class="r">
+<pre>Analytical$PassageTimeDensity(
   t = NULL,
   k = NULL,
   s = NULL,
@@ -2166,8 +2181,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2184,7 +2200,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
 </dd>
-<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;z&lt;inf</p>
 </dd>
 <dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
 </dd>
@@ -2194,7 +2210,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2204,7 +2220,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Returns</h5>
 
-<p>list(ptx(1xn),pt(mxn))
+<p>list(ptx(mx1),pt(mxn))
 </p>
 
 
@@ -2213,7 +2229,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PassageTimeProbability()</code></h4>
+<h4><code>Analytical$PassageTimeProbability()</code></h4>
 
 <p>Calculate and plot passage time probabilities
 </p>
@@ -2221,7 +2237,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PassageTimeProbability(
+<div class="r">
+<pre>Analytical$PassageTimeProbability(
   t = NULL,
   k = NULL,
   s = NULL,
@@ -2231,8 +2248,9 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   rho = NULL,
   mu = NULL,
   sigma = NULL,
-  plotit = TRUE
-)</pre></div>
+  who = NULL
+)</pre>
+</div>
 
 
 
@@ -2249,7 +2267,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>x</code></dt><dd><p>initial state -inf&lt;x&lt;inf</p>
 </dd>
-<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;x&lt;inf</p>
+<dt><code>z</code></dt><dd><p>vector of alternate initial states -inf&lt;z&lt;inf</p>
 </dd>
 <dt><code>omega</code></dt><dd><p>degree of irreversibility 0&lt;=omega&lt;=1</p>
 </dd>
@@ -2259,7 +2277,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </dd>
 <dt><code>sigma</code></dt><dd><p>scale parameter -inf&lt;sigma&lt;inf</p>
 </dd>
-<dt><code>plotit</code></dt><dd><p>TRUE or FALSE</p>
+<dt><code>who</code></dt><dd><p>object id of caller</p>
 </dd>
 </dl>
 
@@ -2278,7 +2296,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotDrift()</code></h4>
+<h4><code>Analytical$PlotDrift()</code></h4>
 
 <p>Plot drifts
 </p>
@@ -2286,13 +2304,16 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotDrift(
+<div class="r">
+<pre>Analytical$PlotDrift(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   zbeg = NULL,
   zend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2301,6 +2322,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
+<dt><code>type</code></dt><dd><p>= 0</p>
+</dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
 <dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
@@ -2328,7 +2351,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotDiffusion()</code></h4>
+<h4><code>Analytical$PlotDiffusion()</code></h4>
 
 <p>Plot diffusions
 </p>
@@ -2336,14 +2359,16 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotDiffusion(
+<div class="r">
+<pre>Analytical$PlotDiffusion(
   type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   zbeg = NULL,
   zend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2352,7 +2377,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 and 3 for 2D</p>
+<dt><code>type</code></dt><dd><p>= -1, 0, or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2381,7 +2406,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotMean()</code></h4>
+<h4><code>Analytical$PlotMean()</code></h4>
 
 <p>Plot means
 </p>
@@ -2389,7 +2414,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotMean(
+<div class="r">
+<pre>Analytical$PlotMean(
   type = NULL,
   pmax = NULL,
   title = NULL,
@@ -2400,7 +2426,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2409,7 +2436,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 3 for 2D, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= -1,...,2 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>pmax</code></dt><dd><p>maximum scale for vertical axis</p>
 </dd>
@@ -2428,56 +2455,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <dt><code>ybeg</code></dt><dd><p>begin value for state axis</p>
 </dd>
 <dt><code>yend</code></dt><dd><p>end value for state axis</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>plot
-</p>
-
-
-<hr>
-<a id="method-Analytical-PlotMeanToConverge"></a>
-
-
-
-<h4>Method <code>PlotMeanToConverge()</code></h4>
-
-<p>Plot the mean to converge
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$PlotMeanToConverge(
-  title = NULL,
-  xaxis = NULL,
-  yaxis = NULL,
-  tbeg = NULL,
-  tend = NULL
-)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>title</code></dt><dd><p>text for plot title</p>
-</dd>
-<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
-</dd>
-<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
-</dd>
-<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
-</dd>
-<dt><code>tend</code></dt><dd><p>end value for time axis</p>
 </dd>
 </dl>
 
@@ -2496,7 +2473,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotVariance()</code></h4>
+<h4><code>Analytical$PlotVariance()</code></h4>
 
 <p>Plot variances
 </p>
@@ -2504,7 +2481,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotVariance(
+<div class="r">
+<pre>Analytical$PlotVariance(
   type = NULL,
   pmax = NULL,
   title = NULL,
@@ -2515,7 +2493,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2524,7 +2503,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 and 3 for 2D, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= -1,...,2 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>pmax</code></dt><dd><p>maximum scale for vertical axis</p>
 </dd>
@@ -2557,61 +2536,11 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
-<a id="method-Analytical-PlotVarianceToConverge"></a>
-
-
-
-<h4>Method <code>PlotVarianceToConverge()</code></h4>
-
-<p>Plot the variance to converge
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$PlotVarianceToConverge(
-  title = NULL,
-  xaxis = NULL,
-  yaxis = NULL,
-  tbeg = NULL,
-  tend = NULL
-)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>title</code></dt><dd><p>text for plot title</p>
-</dd>
-<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
-</dd>
-<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
-</dd>
-<dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
-</dd>
-<dt><code>tend</code></dt><dd><p>end value for time axis</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>plot
-</p>
-
-
-<hr>
 <a id="method-Analytical-PlotDensity"></a>
 
 
 
-<h4>Method <code>PlotDensity()</code></h4>
+<h4><code>Analytical$PlotDensity()</code></h4>
 
 <p>Plot transition densities
 </p>
@@ -2619,7 +2548,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotDensity(
+<div class="r">
+<pre>Analytical$PlotDensity(
   type = NULL,
   pmax = NULL,
   title = NULL,
@@ -2630,7 +2560,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2639,7 +2570,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>pmax</code></dt><dd><p>maximum scale for vertical axis</p>
 </dd>
@@ -2676,7 +2607,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotProbability()</code></h4>
+<h4><code>Analytical$PlotProbability()</code></h4>
 
 <p>Plot transition probabilities
 </p>
@@ -2684,7 +2615,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotProbability(
+<div class="r">
+<pre>Analytical$PlotProbability(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2694,7 +2626,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2703,7 +2636,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2738,7 +2671,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotDoubleIntegral()</code></h4>
+<h4><code>Analytical$PlotDoubleIntegral()</code></h4>
 
 <p>Plot double integrals of transition densities
 </p>
@@ -2746,7 +2679,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotDoubleIntegral(
+<div class="r">
+<pre>Analytical$PlotDoubleIntegral(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2756,7 +2690,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   ybeg = NULL,
   yend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2765,7 +2700,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2800,7 +2735,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotOption()</code></h4>
+<h4><code>Analytical$PlotOption()</code></h4>
 
 <p>Plot options
 </p>
@@ -2808,7 +2743,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotOption(
+<div class="r">
+<pre>Analytical$PlotOption(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2818,7 +2754,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2827,7 +2764,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2862,7 +2799,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotOptionEnvelope()</code></h4>
+<h4><code>Analytical$PlotOptionEnvelope()</code></h4>
 
 <p>Plot the option envelope
 </p>
@@ -2870,7 +2807,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotOptionEnvelope(
+<div class="r">
+<pre>Analytical$PlotOptionEnvelope(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2880,7 +2818,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2889,7 +2828,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 3 for 2D, 4, 5 and 6 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -2924,7 +2863,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotDecisionThreshold()</code></h4>
+<h4><code>Analytical$PlotDecisionThreshold()</code></h4>
 
 <p>Plot the decision threshold
 </p>
@@ -2932,13 +2871,16 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotDecisionThreshold(
+<div class="r">
+<pre>Analytical$PlotDecisionThreshold(
+  type = NULL,
   title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -2947,6 +2889,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
+<dt><code>type</code></dt><dd><p>= 0</p>
+</dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
 <dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
@@ -2974,7 +2918,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotObligation()</code></h4>
+<h4><code>Analytical$PlotObligation()</code></h4>
 
 <p>Plot obligations
 </p>
@@ -2982,7 +2926,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotObligation(
+<div class="r">
+<pre>Analytical$PlotObligation(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -2992,7 +2937,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   send = NULL,
   xbeg = NULL,
   xend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -3001,7 +2947,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 2 for 2D, 3, 4, 5 and 6 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -3036,7 +2982,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotPassageTimeModeMedianMean()</code></h4>
+<h4><code>Analytical$PlotPassageTimeModeMedianMean()</code></h4>
 
 <p>Plot passage time modes, medians and means
 </p>
@@ -3044,18 +2990,20 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotPassageTimeModeMedianMean(
+<div class="r">
+<pre>Analytical$PlotPassageTimeModeMedianMean(
   type = NULL,
+  ptmax = NULL,
+  title = NULL,
   xaxis = NULL,
   yaxis = NULL,
   zaxis = NULL,
-  ptmax = NULL,
-  title = NULL,
   tbeg = NULL,
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -3064,17 +3012,17 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 1, 2, 3 and 4 for 2D, 5 and 6 for 3D</p>
+<dt><code>type</code></dt><dd><p>= -3,...,2 or 'n','p','d' for next, previous, default</p>
+</dd>
+<dt><code>ptmax</code></dt><dd><p>maximum scale for vertical axis</p>
+</dd>
+<dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
 <dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
 </dd>
 <dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
 </dd>
 <dt><code>zaxis</code></dt><dd><p>text for z-axis label</p>
-</dd>
-<dt><code>ptmax</code></dt><dd><p>maximum scale for vertical axis</p>
-</dd>
-<dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
 <dt><code>tbeg</code></dt><dd><p>begin value for time axis</p>
 </dd>
@@ -3097,64 +3045,11 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 <hr>
-<a id="method-Analytical-PlotPassageTimeVariance"></a>
-
-
-
-<h4>Method <code>PlotPassageTimeVariance()</code></h4>
-
-<p>Plot passage time variances
-</p>
-
-
-<h5>Usage</h5>
-
-<div class="r"><pre>Analytical$PlotPassageTimeVariance(
-  type = NULL,
-  xaxis = NULL,
-  yaxis = NULL,
-  title = NULL,
-  zbeg = NULL,
-  zend = NULL
-)</pre></div>
-
-
-
-<h5>Arguments</h5>
-
-<div class="arguments">
-
-<dl>
-<dt><code>type</code></dt><dd><p>= 3 and 4 for 2D</p>
-</dd>
-<dt><code>xaxis</code></dt><dd><p>text for x-axis label</p>
-</dd>
-<dt><code>yaxis</code></dt><dd><p>text for y-axis label</p>
-</dd>
-<dt><code>title</code></dt><dd><p>text for plot title</p>
-</dd>
-<dt><code>zbeg</code></dt><dd><p>begin value for state axis</p>
-</dd>
-<dt><code>zend</code></dt><dd><p>end value for state axis</p>
-</dd>
-</dl>
-
-</div>
-
-
-
-<h5>Returns</h5>
-
-<p>plot
-</p>
-
-
-<hr>
 <a id="method-Analytical-PlotPassageTimePercentiles"></a>
 
 
 
-<h4>Method <code>PlotPassageTimePercentiles()</code></h4>
+<h4><code>Analytical$PlotPassageTimePercentiles()</code></h4>
 
 <p>Plot passage time lower, median and upper percentiles
 </p>
@@ -3162,7 +3057,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotPassageTimePercentiles(
+<div class="r">
+<pre>Analytical$PlotPassageTimePercentiles(
   type = NULL,
   ptmax = NULL,
   title = NULL,
@@ -3173,7 +3069,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -3182,7 +3079,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 1, 2, 3 and 4 for 2D, 5 and 6 for 3D</p>
+<dt><code>type</code></dt><dd><p>= -3,...,2 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>ptmax</code></dt><dd><p>maximum scale for vertical axis</p>
 </dd>
@@ -3219,7 +3116,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotPassageTimeDensity()</code></h4>
+<h4><code>Analytical$PlotPassageTimeDensity()</code></h4>
 
 <p>Plot passage time densities
 </p>
@@ -3227,7 +3124,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotPassageTimeDensity(
+<div class="r">
+<pre>Analytical$PlotPassageTimeDensity(
   type = NULL,
   ptmax = NULL,
   title = NULL,
@@ -3238,7 +3136,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -3247,7 +3146,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>ptmax</code></dt><dd><p>maximum scale for vertical axis</p>
 </dd>
@@ -3284,7 +3183,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 
 
-<h4>Method <code>PlotPassageTimeProbability()</code></h4>
+<h4><code>Analytical$PlotPassageTimeProbability()</code></h4>
 
 <p>Plot passage time probabilities
 </p>
@@ -3292,7 +3191,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 
 <h5>Usage</h5>
 
-<div class="r"><pre>Analytical$PlotPassageTimeProbability(
+<div class="r">
+<pre>Analytical$PlotPassageTimeProbability(
   type = NULL,
   title = NULL,
   xaxis = NULL,
@@ -3302,7 +3202,8 @@ see the demo names and then type something like demo(A_DecisionThreshold).
   tend = NULL,
   zbeg = NULL,
   zend = NULL
-)</pre></div>
+)</pre>
+</div>
 
 
 
@@ -3311,7 +3212,7 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 <div class="arguments">
 
 <dl>
-<dt><code>type</code></dt><dd><p>= 1 and 2 for 2D, 3, 4 and 5 for 3D</p>
+<dt><code>type</code></dt><dd><p>= 0, 1 or 'n','p','d' for next, previous, default</p>
 </dd>
 <dt><code>title</code></dt><dd><p>text for plot title</p>
 </dd>
@@ -3341,18 +3242,6 @@ see the demo names and then type something like demo(A_DecisionThreshold).
 </p>
 
 
-
-
-<h3>Examples</h3>
-
-<pre><code class='language-R'>
-## ------------------------------------------------
-## Method `Analytical$new`
-## ------------------------------------------------
-
-  A &lt;- Analytical$new()
-  A$DecisionThreshold()
-</code></pre>
 
 </main>
 

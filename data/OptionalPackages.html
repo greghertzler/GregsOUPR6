@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><title>R: Optional packages</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>OptionalPackages</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Optional packages</h2>
+
+<h3>Description</h3>
+
+<p>Queries whether functions are compiled with RcppParallel or fall back
+to Rcpp only.  Also queries whether random number packages dqrng and sitmo
+are installed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class='language-R'>RcppParallelInstalled()
+
+RcppdqrngInstalled()
+
+RcppsitmoInstalled()
+
+RcppParallelThreads()
+</code></pre>
+
+
+<h3>Value</h3>
+
+<p>bool &lt;- RcppParallelInstalled()
+</p>
+<p>bool &lt;- RcppdqrngInstalled()
+</p>
+<p>bool &lt;- RcppsitmoInstalled()
+</p>
+<p>int &lt;- RcppParallelThreads()
+</p>
+
+
+<h3>Discussion</h3>
+
+<p>Rcpp calculates hundreds of times faster than R6 objects.  RcppParallel
+calculates five to eight times faster than Rcpp on a typical laptop and
+thousands of times faster than R6 objects.  Random number generation with
+the R function rnorm() is slow.  The packages dqrng and sitmo are
+alternatives:
+</p>
+<div class="sourceCode"><pre> install.packages("RcppParallel", "dqrng", "sitmo")
+</pre></div>
+<p>If RcppParallel is installed it will be used for almost every calculation.
+If dqrng is installed, it will be the default for random number generation.
+Otherwise, the default is std::mt19937.  If sitmo is installed, it can be
+selected as an option in the function RcppOUPStandardNormal().
+</p>
+
+</main>
+
+</div>
+</body></html>

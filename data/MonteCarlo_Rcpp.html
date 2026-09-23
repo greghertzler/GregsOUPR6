@@ -1,0 +1,472 @@
+<!DOCTYPE html><html><head><title>R: MonteCarlo_Rcpp functions for simulating an...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>MonteCarlo_Rcpp</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>MonteCarlo_Rcpp functions for simulating an Ornstein-Uhlenbeck Process</h2>
+
+<h3>Description</h3>
+
+<p>Calculations for the R6 class 'MonteCarlo', with parallel processing.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class='language-R'>RcppOUPMCMinMax(matPaths)
+
+RcppOUPMCStandardNormal(m,skip,paths,seed,engine)
+
+RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,method)
+
+RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,method)
+
+RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
+
+RcppOUPMCForwardCountY(forward,y,psi)
+
+RcppOUPMCBackwardCountX(backward,x,phi,rho,r,ds)
+
+RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
+
+RcppOUPMCBoundedCountT(fpt,m,dt,Ppct)
+
+RcppOUPMCHeatCountZ(matPaths,z)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table role = "presentation">
+<tr><td><code id="matPaths">matPaths</code></td>
+<td>
+<p>matrix of paths</p>
+</td></tr>
+<tr><td><code id="m">m</code></td>
+<td>
+<p>number of rows for states over time</p>
+</td></tr>
+<tr><td><code id="skip">skip</code></td>
+<td>
+<p>subdivide time interval but report every ds or dt 0&lt;skip&lt;20</p>
+</td></tr>
+<tr><td><code id="paths">paths</code></td>
+<td>
+<p>number of columns for paths</p>
+</td></tr>
+<tr><td><code id="seed">seed</code></td>
+<td>
+<p>seed for reproducibility</p>
+</td></tr>
+<tr><td><code id="engine">engine</code></td>
+<td>
+<p>random number generator, 1 dqrng, 2 mt19937, 3 sitmo, 4 rnorm</p>
+</td></tr>
+<tr><td><code id="stdnorm">stdnorm</code></td>
+<td>
+<p>matrix of standard normal shocks</p>
+</td></tr>
+<tr><td><code id="x">x</code></td>
+<td>
+<p>initial state or vector of backward states</p>
+</td></tr>
+<tr><td><code id="dt">dt</code></td>
+<td>
+<p>time interval for initial value problems</p>
+</td></tr>
+<tr><td><code id="rho">rho</code></td>
+<td>
+<p>rate parameter 0&lt;=rho&lt;inf</p>
+</td></tr>
+<tr><td><code id="mu">mu</code></td>
+<td>
+<p>location parameter -inf&lt;mu&lt;inf</p>
+</td></tr>
+<tr><td><code id="sigma">sigma</code></td>
+<td>
+<p>scale parameter -inf&lt;sigma&lt;inf</p>
+</td></tr>
+<tr><td><code id="method">method</code></td>
+<td>
+<p>4 for 4th order Runge-Kutta, 5 for integral equation</p>
+</td></tr>
+<tr><td><code id="y">y</code></td>
+<td>
+<p>terminal state or vector of forward states</p>
+</td></tr>
+<tr><td><code id="ds">ds</code></td>
+<td>
+<p>time interval for terminal value problems</p>
+</td></tr>
+<tr><td><code id="k">k</code></td>
+<td>
+<p>threshold -inf&lt;k&lt;inf</p>
+</td></tr>
+<tr><td><code id="forward">forward</code></td>
+<td>
+<p>matrix of forward paths</p>
+</td></tr>
+<tr><td><code id="psi">psi</code></td>
+<td>
+<p>&lt;=0 for integral -inf to y, &gt;0 for integral y to inf</p>
+</td></tr>
+<tr><td><code id="backward">backward</code></td>
+<td>
+<p>matrix of backward paths</p>
+</td></tr>
+<tr><td><code id="phi">phi</code></td>
+<td>
+<p>&lt;=0 for integral -inf to x, &gt;0 for integral x to inf</p>
+</td></tr>
+<tr><td><code id="r">r</code></td>
+<td>
+<p>discount rate 0&lt;r</p>
+</td></tr>
+<tr><td><code id="Ppct">Ppct</code></td>
+<td>
+<p>probability for a percentile 0.01&lt;pct&lt;0.99</p>
+</td></tr>
+<tr><td><code id="fpt">fpt</code></td>
+<td>
+<p>vector of first passage times</p>
+</td></tr>
+<tr><td><code id="z">z</code></td>
+<td>
+<p>vector of states</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>minmax(2) &lt;- RcppOUPMCMinMax()
+</p>
+<p>stdnorm((m-1)*skip,paths) &lt;- RcppOUPMCStandardNormal()
+</p>
+<p>forward(m,paths) &lt;- RcppOUPMCForwardPaths()
+</p>
+<p>backward(m,paths) &lt;- RcppOUPMCBackwardPaths()
+</p>
+<p>bndfpt(m+1,paths) &lt;- RcppOUPMCBoundedPaths()
+</p>
+<p>mvdpd(m,3*n+2) &lt;- RcppOUPMCForwardCountY()
+</p>
+<p>dpo(m,3*n) &lt;- RcppOUPMCBackwardCountX()
+</p>
+<p>pctdp(m,5) &lt;- RcppOUPMCForwardCountT()
+</p>
+<p>pctdp(m,5) &lt;- RcppOUPMCBoundedCountT()
+</p>
+<p>heat(m,n) &lt;- RcppOUPMCHeatCountZ()
+</p>
+
+
+<h3>Notes on Values</h3>
+
+<p>Return values are vectors and matrices allocated in Rcpp.  The dimensions are
+shown for information.  Of course, do not include them in R calls.  For example:
+</p>
+<div class="sourceCode"><pre>stdnorm &lt;- RcppOUPMCStandardNormal(m,skip,paths,seed,engine)
+</pre></div>
+<p>The return values:
+</p>
+<div class="sourceCode"><pre>stdnorm((m-1)*skip,paths)
+forward(m,paths)
+backward(m,paths)
+heat(m,n)
+</pre></div>
+<p>are matrices of pseudo-random standard normal variables, forward paths,
+backward paths and heat maps.
+</p>
+<p>The return value:
+</p>
+<div class="sourceCode"><pre>minmax(2)
+</pre></div>
+<p>is a vector of minimum and maximum values, subset in R as:
+</p>
+<div class="sourceCode"><pre>minmax &lt;- RcppOUPMCMinMax(matPaths)
+min &lt;- minmax[1]
+max &lt;- minmax[2]
+</pre></div>
+<p>The return value:
+</p>
+<div class="sourceCode"><pre>bndfpt(m+1,paths)
+</pre></div>
+<p>is a matrix of bounded paths with a vector of first passage times for each
+path in row m+1.  There are NA entries for paths which previously hit the
+threshold and NA entries in row m+1 for paths which have yet to hit the
+threshold.  Subset in R as:
+</p>
+<div class="sourceCode"><pre>bndfpt &lt;- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
+bounded &lt;- bndfpt[1:m,,drop=FALSE]
+fpt &lt;- bndfpt[m+1,,drop=FALSE]
+</pre></div>
+<p>The return value:
+</p>
+<div class="sourceCode"><pre>mvdpd(m,3*n+2)
+</pre></div>
+<p>is a composite matrix containing two vectors for means and variances and three
+matrices for densities, probabilities and double integrals.  The vectors and
+matrices are subset in R as:
+</p>
+<div class="sourceCode"><pre>mvdpd &lt;- RcppOUPMCForwardCountY(forward,y,psi)
+means &lt;- mvdpd[,1,drop=FALSE]
+variances &lt;- mvdpd[,2,drop=FALSE]
+densities &lt;- mvdpd[,3:(n+2),drop=FALSE]
+probabilities &lt;- mvdpd[,(n+3):(2*n+2),drop=FALSE]
+doubleintegrals &lt;- mvdpd[,(2*n+3):(3*n+2),drop=FALSE]
+</pre></div>
+<p>Similarly, the return value:
+</p>
+<div class="sourceCode"><pre>dpo(m,3*n)
+</pre></div>
+<p>is a composite of three contiguous matrices for prior densities, prior
+probabilities and options, subset in R as:
+</p>
+<div class="sourceCode"><pre>dpo &lt;- RcppOUPMCBackwardCountX(backward,x,phi,rho,r,ds)
+densities &lt;- dpo[,1:n,drop=FALSE]
+probabilities &lt;- dpo[,(n+1):(2*n),drop=FALSE]
+options &lt;- dpo[,(2*n+1):(3*n),drop=FALSE]
+</pre></div>
+<p>The return values:
+</p>
+<div class="sourceCode"><pre>pctdp(m,5)
+</pre></div>
+<p>are matrices of five columns.  The first column has only five entries for
+times at the mode, median, mean, lower percentile, and upper percentile. The
+second and third columns each have five entries containing the corresponding
+densities and probabilities.  The fourth and fifth columns contain contain m
+entries for either visiting time or first passage time densities and
+probabilities.  The columns are subset in R as:
+</p>
+<div class="sourceCode"><pre>pctdp &lt;- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
+mode &lt;- pctdp[1,1:3,drop=FALSE]
+median &lt;- pctdp[2,1:3,drop=FALSE]
+mean &lt;- pctdp[3,1:3,drop=FALSE]
+lowerpct &lt;- pctdp[4,1:3,drop=FALSE]
+upperpct &lt;- pctdp[5,1:3,drop=FALSE]
+densities &lt;- pctdp[,4,drop=FALSE]
+probabilities &lt;- pctdp[,5,drop=FALSE]
+</pre></div>
+
+
+<h3>Discussion</h3>
+
+<p>A single-threaded R6 object is fast enough for many calculations, but not
+for Monte-Carlo simulations.  Attempts at parallel processing using parApply()
+and future_apply() failed.  The whole R6 object is copied to each thread,
+which locks up the computer.  Rccp can be hundreds of times faster and makes
+Monte-Carlo simulations practical for interactive applications such as RStudio
+and RShiny. RcppParallel speeds the calculations another five to eight times.
+</p>
+<p>Monte Carlo simulations are possible paths taken by the stochastic integral
+equation.  Paths can go forward or backward and may be bounded.  Paths are
+binned and counted to approximate several solutions. The approximations
+converge to analytical solutions as the number of paths increases.  Binning
+and counting 1,000,000 paths will be accurate to 3 or 4 significant digits.
+</p>
+<p>Here are microbenchmark median times for 100,000 and 1,000,000 paths over
+100 time intervals, as calculated by  R6+RccpParallel on an i7 CPU with
+12 threads running at a maximum of 4.5 GHz:
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds     paths                paths
+          function   100,000            1,000,000
+------------------------------------------------------------
+    StandardNormal   21.6702             218.0919
+      ForwardPaths   19.6883  ________   189.7758  _________
+          Subtotal             41.4642              407.8677
+       Probability   54.8138  ________   965.1143  _________
+             Total             96.2780             1372.9820
+</pre></div>
+<p>The R6 object is reactive and will call the StandardNormal function only once.
+After that the standard normal variables will be passed to ForwardPaths and
+the forward paths will be passed to Probability.  To calculate a median time,
+the R6 object is tricked into recalculating by changing an input, calculating,
+changing the input back to the original, and calculating the original again.
+Do this 11 times and record the sixth fastest time as the median.  Times for
+ForwardPaths, the Subtotal and the Total are calculating by trickery. Times
+for StandardNormal and Probability are inferred by subtraction.
+</p>
+<p>Times for StandardNormal and ForwardPaths go up approximately ten-fold with
+a ten-fold increase in paths.  Times for Probability go up almost 18-fold
+with a ten-fold increase in paths.
+</p>
+<p>The R6 function Probability calls the Rcpp function ForwardCountY which bins
+and counts means, variances, transition densities, transition probabilities
+and  double integrals.  So five sets of plots can be drawn from one simulation
+followed by a count.
+</p>
+<p>The R6 object manages inputs and outputs and draws plots.  All calculations
+are in Rcpp and RcppParallel functions.  RccpParallel uses Intel's Threading
+Building Blocks (TBB) on the CPU.  Unlike parallel processing on a GPU or
+accelerator, memory isn't copied and there is less overhead.  On trivially
+small problems, sequential versions calculate faster.  On large problems,
+parallel versions calculate much faster.
+</p>
+<p>RcppParallel is an optional package.  If it is installed, it will be used.
+Function RcppParallelInstalled() will enquire whether code is compiled with
+RcppParallel or has fallen back to Rcpp.  Function RcppParallelThreads will
+return the number of threads. Optional packages for random number generation
+are dqrng and sitmo.  The functions RcppdqrngInstalled() and
+RcppsitmoInstalled() will enquire whether they are installed.
+</p>
+
+
+<h3>From the Console</h3>
+
+<p>Rcpp and RcppParallel functions are available in R, the RStudio console and
+RShiny apps.  From the console, a simulation of 1,000,000 forward paths
+over 100 time intervals would be:
+</p>
+<div class="sourceCode"><pre> stdnorm &lt;- RcppOUPMCStandardNormal(101,1,1000000,9999,1)
+ fwd &lt;- RcppOUPMCForwardPaths(stdnorm,15,101,1,0.1,0.5,-15,15,5)
+</pre></div>
+<p>The R6 object doesn't give users a choice, but from the console there are four
+random number generators available: dqrng, std::mt19937, sitmo, and rnorm.
+In the last argument of the function, these are requested as engine
+1, 2, 3 or 4, respectively.  Microbenchmark median times for 100,000,000
+standard normal variables are:
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds
+          language        engine    transform  StandardNormal
+-------------------------------------------------------------
+              Rcpp         rnorm    inversion       4145.0140
+              Rcpp   sitmo::prng   Box-Muller       3937.8950
+              Rcpp  std::mt19937   Box-Muller       3231.4860
+              Rcpp  dqrng::pcg64     Ziggurat        727.3865
+      RcppParallel   sitmo::prng   Box-Muller        585.1609
+      RcppParallel  std::mt19937   Box-Muller        547.9659
+      RcppParallel  dqrng::pcg64     Ziggurat        247.1802
+</pre></div>
+<p>The random number generators generate uniform random variables.  More time is
+spent transforming uniform to normal random variables.  The method of transform
+is also listed.  These include inverting the cumulative normal, the Polar
+Box-Muller transform and the Ziggurat transform.  The Ziggurat transform is
+a sophisticated lookup table and much faster.  Results on your computer may
+vary. On Unix-alike operating systems, the Polar Box-Muller transform has been
+replaced with the Ziggurat transform.
+</p>
+<p>Both dqrng and sitmo have other random number generators, but dqrng::pcg64 and
+sitmo::prng are the defaults.  Both packages are optional.  If dqrng is not
+installed, the fall back is std::mt19937, which is always available.  Therefore,
+sitmo::prng and rnorm will only used if requested as engines 3 and 4.  If
+sitmo::prng is requested but not installed the fallback is rnorm.
+</p>
+<p>Another choice available from the console is the method of simulation, either
+a 4th-order Runge-Kutta numerical integration or the stochastic integral
+equation, itself.  The last argument of the function is the method, with 4
+for 4th-order Runge-Kutta and 5 for stochastic integral equation.  Arguments
+1, 2 and 3 are reserved for possible future implementations of 1st-order
+Euler and 2nd and 3rd order Maryuma or Runge-Kutta methods.  But this could
+be dangerous. Users might use them.  The purpose would be to demonstrate that
+low-order numerical methods only converge with short time intervals.
+</p>
+<p>In the function above, the skip argument divides the time intervals.  For example,
+if the number of times is 101, there are 100 time intervals.  Argument
+skip=10 subdivides 100 into 1000 time intervals for the calculations and
+reports results at the 101 times.
+</p>
+<p>Here are microbenchmark times for 1,000,000 paths over 100 time intervals with
+increasing skips.  Also shown are the maximum and minimum differences.
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds   Standard   Integral     Runge-
+              skip     Normal   Equation      Kutta  max dif  min dif
+---------------------------------------------------------------------
+                 1   208.6749   190.2418   360.3870  8.4e-03  -8.9e-03
+                 2   431.8739   214.1760   608.2229  2.1e-03  -2.1e-03
+                 4   978.7199   295.2814  1120.7290  5.3e-04  -5.3e-04
+                 8  2132.0220   424.4842  2086.3920  1.3e-04  -1.3e-04
+</pre></div>
+<p>Even larger skips will calculate, but microbenchmark becomes pac man and
+starts chomping memory.  For skip=8, the paths are the same to within four
+significant digits.  But the Runge-Kutta method is much slower.  The time
+for the standard normal variables plus the time fore the Runge-Kutta
+simulation is 4.2 seconds.  The integral equation is not improved by larger
+skips.  For skip=1, the integral equation does the job in 0.4 seconds.
+</p>
+<p>A microbenchmark comparison of indirectly calling RcppParallel functions
+from R6 with directly calling them from the console is:
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds            R6+       Console
+          function   RcppParallel  RcppParallel
+-----------------------------------------------
+      ForwardPaths       540.7106      587.6297
+     BackwardPaths       543.9790      584.8225
+      BoundedPaths       845.6546      579.5391
+</pre></div>
+<p>These timings are from a standing start, generating the standard normal variables
+before simulating the paths.  For Forward and Backward Paths, the R6 object is faster,
+but for Bounded Paths, it is much slower.  Bounded Paths hit the boundary and have
+NA values thereafter.  We might speculate that R6 is slow with NA values.
+</p>
+<p>The R6 object has advantages over the console.  All inputs are optional and are
+coordinated across functions.  Enter an input once and calculate several outputs.
+The R6 object is reactive.  In other words, it stores the inputs and outputs and
+maps inputs to outputs.  If an input changes, dependent outputs are nullified and
+will be recalculated, as requested, but nothing is calculated twice.  The console
+stores outputs in the global environment, but there is no map of inputs to outputs
+and outputs can be stale.  Another advantage of the R6 object are pre-programmed plots
+with Plotly.  The same simulation can be plotted different ways without recalculation.
+</p>
+<p>Parallel processing has more overhead and is slower on small problems. Here
+are microbenchmark median times for simulating a small number of Forward Paths
+by calling the Rcpp and RcppParallel functions from the console:
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds  Console       Console
+             paths     Rcpp   RcppParallel
+------------------------------------------
+               100  0.06970        0.07600
+             1,000  0.55425        0.23540
+</pre></div>
+<p>For 100 paths, the Rcpp sequential function takes less time, but for 1,000 paths
+it takes over twice as long.  Most simulations will have more than 1,000 paths.
+So users get no choice.  RcppParallel functions are compiled if RcppParallel
+is installed. Otherwise compilation falls back to Rcpp.
+</p>
+<p>More threads may be faster but also have more overhead.  Here are microbenchmark
+median times by number of threads for generating standard normal variables and
+simulating 1,000,000 Forward Paths over 100 time intervals:
+</p>
+<div class="sourceCode"><pre>Unit: milliseconds
+           threads   stdnorm  ForwardPaths      total
+-----------------------------------------------------
+                 1	742.8735	    497.8163	1240.6898
+                 2	422.2265	    307.3954	 729.6219
+                 3	396.3184	    307.5473	 703.8657
+                 4	257.9281	    214.4442	 472.3723
+                 5	260.6473	    197.7865	 458.4338
+                 6	248.4076	    197.5342	 445.9418
+                 7	246.5812	    191.5214	 438.1026
+                 8	231.4124	    191.8745	 423.2869
+                 9	232.0408	    194.9968	 427.0376
+                10	235.8238	    191.1864	 427.0102
+                11	216.9428	    192.1811	 409.1239
+                12	211.6724	    191.6413	 403.3137
+</pre></div>
+<p>More is better, but a few is pretty good.  You could set fewer threads using
+the RcppParallel commands:
+</p>
+<div class="sourceCode"><pre> library(RcppParallel)
+ defaultNumThreads()
+ setThreadOptions(numThreads=8)
+</pre></div>
+<p>Potentially, the Rcpp functions could be imported into other packages.
+</p>
+
+</main>
+
+</div>
+</body></html>

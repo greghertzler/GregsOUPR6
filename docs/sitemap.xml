@@ -105,11 +105,13 @@
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/MyData.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OptionalPackages.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUProcess.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_BrownianMotion.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_Convergence.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_NotMissing.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_ObservationInterval.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_SampleSize.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_SmoothedData.html</loc></url>
+<url><loc>https://greghertzler.github.io/GregsOUPR6/reference/OUP_StationaryIncrements.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCBackwardPathIntegralEquation.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCBackwardPathRungeKutta.html</loc></url>
 <url><loc>https://greghertzler.github.io/GregsOUPR6/reference/RcppOUPMCBoundedPathIntegralEquation.html</loc></url>

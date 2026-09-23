@@ -405,7 +405,7 @@ OUPDataRead = function(file="MyData")
     if(file.exists(filepath))
     {
       message(file)
-      df <- utils::read.csv(filepath,fileEncoding="UTF-8-BOM")
+      df <- utils::read.csv(filepath,fileEncoding="UTF-8-BOM",check.names=FALSE)
     }
     else { message(paste0(file," not found.  Try entering by number in the list.")) }
   }
@@ -421,7 +421,7 @@ OUPDataRead = function(file="MyData")
       else if(i > m) { i <- m }
       filename <- paste0(filelist[i],".csv")
       filepath <- paste0(datapath,filename)
-      df <- utils::read.csv(filepath,fileEncoding="UTF-8-BOM")
+      df <- utils::read.csv(filepath,fileEncoding="UTF-8-BOM",check.names=FALSE)
       df$dfname = filelist[i]
       message(filelist[i])
     }
