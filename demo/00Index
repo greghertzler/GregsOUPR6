@@ -67,6 +67,7 @@ CaseStudy_YieldIndex   index insurance for wheat
 Adoption_EntryOption   real options entry option
 Adoption_ExitOption   real options exit option
 Adoption_Obligation   real options investment
+Estimation_BrownianMotion   Brownian Motion from stationary increments
 Estimation_HypothesisTests   Ornstein-Uhlenbeck Process hypothesis tests
 Estimation_MyData   estimating user supplied data
 Estimation_NoMissingObservations   Ornstein-Uhlenbeck Process estimation without stationarity
@@ -74,6 +75,7 @@ Estimation_ObservationInterval   Ornstein-Uhlenbeck Process parameters and the o
 Estimation_RateOfConvergence   Ornstein-Uhlenbeck Process from brownian motion to stationary process
 Estimation_SampleSize   effects sample size
 Estimation_SmoothedData   artificially smoothed data
+Estimation_StationaryIncrements   stationary increments from pseudo-random standard normal variables
 Finance_BearSpread   Ornstein-Uhlenbeck Process bear spread
 Finance_ContractsToDeliver   Ornstein-Uhlenbeck Process contracts
 Finance_OtherOptions   Ornstein-Uhlenbeck Process exotic options
