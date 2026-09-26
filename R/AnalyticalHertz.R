@@ -1477,6 +1477,7 @@ Analytical <- R6::R6Class("Analytical",
         zto <- zfrom+100*zby
       }
       zseq <- seq(from=zfrom,to=zto,by=zby)
+      self$set_t_stoch_args(NULL,NULL,NULL,NULL,zseq,NULL,NULL)
       # time
       tpercentiles <- self$PassageTimePercentiles(who="A")[[2]]
       tuppers <- tpercentiles[[3]]
@@ -1493,9 +1494,7 @@ Analytical <- R6::R6Class("Analytical",
       tto <- t+s
       tby <- t/100
       tseq <- seq(from=tfrom,to=tto,by=tby)
-
-      self$set_t_stoch_args(tseq,NULL,NULL,NULL,zseq,NULL,NULL)
-
+      self$set_t_stoch_args(tseq,NULL,NULL,NULL,NULL,NULL,NULL)
       # density
       tmodemedianmean <- self$PassageTimeModeMedianMean(who="A")[[1]]
       tmode <- tmodemedianmean[[1]]

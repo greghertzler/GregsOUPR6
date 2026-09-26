@@ -1460,29 +1460,71 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     axes_t_stoch = function()
     {
       # time
-      pctv <- self$VisitingTimePercentiles(who="MC")[[1]]
-      pctf <- self$FirstPassageTimePercentiles(who="MC")[[1]]
       t <- private$t_stoch_args[[1]]
       m <- length(t)
-      if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
-      else { dt <- 0.05 }
-      s <- t[1]
-      if(is.na(pctv[3,1] && is.na(pctf[3,1]))) { tup <- 1.5*(t[m]-s) }
-      else if(is.na(pctv[3,1])) { tup <- pctf[3,1]-s }
-      else if(is.na(pctf[3,1])) { tup <- pctv[3,1]-s }
-      else { tup <- max(pctv[3,1],pctf[3,1])-s }
-      if(tup > 0.6*m*dt || tup < 0.4*m*dt)
+      if(m > 1) { s <- t[1] }
+      else { s <- t[1]-1 }
+      tup <- t[m]-s
+      Ppct <- private$t_stoch_args[[5]]
+      pct <- Ppct
+      if(pct < 0.5) { pct <- 1-pct }
+      pctf <- self$FirstPassageTimePercentiles(who="MC")[[1]][3,1]
+      cntf <- 0
+      while(is.na(pctf) && cntf < 5)
       {
-        tup <- 2*tup
+        Pf - self$FirstPassageTimeProbability(who="MC")[[1]]
+        if(Pf[m] > 0.000999500166624978) { b <- -log(1-Pf[m])/(t[m]-s) }
+        else{ b <- 0.001/(t[m]-s) }
+        tup <- -log(1-pct)/b
+        tfrom <- s
+        tto <- tup+s
+        tby <- tup/100
+        if(is.finite(tto))
+        {
+          t <- seq(from=tfrom,to=tto,by=tby)
+          m <- 101
+          self$set_t_stoch_args(t,NULL,NULL,NULL,NULL)
+          pctf <- self$FirstPassageTimePercentiles(who="MC")[[1]][3,1]
+          cntf <- cntf+1
+        }
+        else { cntf <- 5 }
+      }
+      pctv <- self$VisitingTimePercentiles(who="MC")[[1]][3,1]
+      cntv <- 0
+      while(is.na(pctv) && cntv < 5)
+      {
+        tup <- 2*(t[m]-s)
+        tfrom <- s
+        tto <- tup+s
+        tby <- tup/100
+        if(is.finite(tto))
+        {
+          t <- seq(from=tfrom,to=tto,by=tby)
+          m <- 101
+          self$set_t_stoch_args(t,NULL,NULL,NULL,NULL)
+          pctv <- self$VisitingTimePercentiles(who="MC")[[1]][3,1]
+          cntv <- cntv+1
+        }
+        else { cntv <- 5 }
+      }
+      if(cntf < 5 || cntv < 5)
+      {
+        if(cntf < 5 && cntv < 5)
+        {
+          if(pctf > pctv) { tup <- pctf/0.75 }
+          else { tup <- pctv/0.75 }
+        }
+        else if(cntf < 5) { tup <- pctf/0.75 }
+        else if(cntv < 5) { tup <- pctv/0.75 }
         if(tup < 1) { tup <- 1 }
         tscale <- 1
         while(tup > tscale) { tscale <- 10*tscale }
         tup <- round(tup/tscale,2)*tscale
         tfrom <- s
         tto <- tup+s
-        tby <- tup/100
-        tseq <- seq(from=tfrom,to=tto,by=tby)
-        self$set_t_stoch_args(t=tseq,NULL,NULL,NULL,NULL)
+        tby <- tup/(m-1)
+        t <- seq(from=tfrom,to=tto,by=tby)
+        self$set_t_stoch_args(t,NULL,NULL,NULL,NULL)
       }
       # density
       mmmv <- self$VisitingTimeModeMedianMean(who="MC")[[1]]
