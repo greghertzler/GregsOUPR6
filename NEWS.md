@@ -15,6 +15,7 @@
 * Add clipboard write to R6 objects.
 * Add functions to launch RShiny, tutorials and help and to read curated data from the console.
 * Conditionally compile optional packages.
+* Create pkgdown website.
 
 # Version 1.3.5.0
 
@@ -25,4 +26,4 @@
 * RShiny app using bslib.
 * RShiny tutorials in HTML.
 * Real Options for Adoption and Resilience (ROAR) reference in HTML.
-* Curated data for Maximum Likelihood Estimation
+* Curated data for Maximum Likelihood Estimation.
