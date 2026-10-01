@@ -272,7 +272,7 @@ struct NMlnL : public Worker
 double NMLogLikelihood(NumericVector tau, NumericVector z, double rho, double mu, double sigma)
 {
   std::size_t m = tau.size();
-  double sgma = sigma;
+  double sgma = std::abs(sigma);
   if(sgma < 0.000001) { sgma = 0.000001; }
   double logL = 0.0;
   if(std::abs(rho) < 0.0000000001)
@@ -394,7 +394,7 @@ struct ROMLPlnL : public Worker
 NumericVector RcppOUPMLLogLikelihood(NumericVector tau, NumericVector z, double rho, double mu, double sigma)
 {
   std::size_t m = tau.size();
-  double sgma = sigma;
+  double sgma = std::abs(sigma);
   if(sgma < 0.000001) { sgma = 0.000001; }
   NumericVector logL(4);
   logL[1] = NA_REAL;
