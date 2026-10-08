@@ -804,6 +804,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               message("MC:  paths set to 1,000,000.")
             }
             private$path_args$paths <- sca
+            private$plot_args$first <- 1
+            if(sca < 101) { private$plot_args$last <- sca }
+            else { private$plot_args$last <- 100 }
             private$ystdnorm <- NULL
             private$xstdnorm <- NULL
             private$tstdnorm <- NULL

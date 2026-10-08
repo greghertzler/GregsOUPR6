@@ -27,3 +27,6 @@ https://github.com/greghertzler/GregsOUPShiny.git<br>
 bug reports:<br>
 https://github.com/greghertzler/GregsOUPR6/issues/<br>
 https://github.com/greghertzler/GregsOUPShiny/issues/<br>
+
+install R6 objects and Rcpp/RcppParallel modules:<br>
+pak::pak("github::greghertzler/GregsOUPR6?reinstall")<br>
