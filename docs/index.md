@@ -15,15 +15,19 @@ Version:
 Code:  
 GregsOUPR6 package contains R6 objects and Rcpp/RcppParallel modules.  
 
+Install R6 objects and Rcpp/RcppParallel modules in RStudio:  
+pak::pak(“github::greghertzler/GregsOUPR6?reinstall”)  
+library(GregsOUPR6)  
+
+Shiny app:  
+<https://real-options-adoption-resilience.shinyapps.io/GregsOUPShiny/>  
+
 This document:  
 <https://greghertzler.github.io/GregsOUPR6/>  
 
 Other documents:  
 <https://greghertzler.github.io/GregsOUPR6/OUP_Help.html>  
 <https://greghertzler.github.io/GregsOUPShiny/OUP_Shiny.html>  
-
-Shiny app:  
-<https://real-options-adoption-resilience.shinyapps.io/GregsOUPShiny/>  
 
 repos:  
 <https://github.com/greghertzler/GregsOUPR6.git>  
