@@ -371,10 +371,10 @@ differences.
 Even larger skips will calculate, but microbenchmark becomes pac man and
 starts chomping memory. For skip=8, the paths are the same to within
 four significant digits. But the Runge-Kutta method is much slower. The
-time for the standard normal variables plus the time fore the
-Runge-Kutta simulation is 4.2 seconds. The integral equation is not
-improved by larger skips. For skip=1, the integral equation does the job
-in 0.4 seconds.
+time for the standard normal variables plus the time for the Runge-Kutta
+simulation is 4.2 seconds. The integral equation is not improved by
+larger skips. For skip=1, the integral equation does the job in 0.4
+seconds.
 
 A microbenchmark comparison of indirectly calling RcppParallel functions
 from R6 with directly calling them from the console is:

@@ -235,7 +235,7 @@ using namespace RcppParallel;
 //' Even larger skips will calculate, but microbenchmark becomes pac man and
 //'  starts chomping memory.  For skip=8, the paths are the same to within four
 //'  significant digits.  But the Runge-Kutta method is much slower.  The time
-//'  for the standard normal variables plus the time fore the Runge-Kutta
+//'  for the standard normal variables plus the time for the Runge-Kutta
 //'  simulation is 4.2 seconds.  The integral equation is not improved by larger
 //'  skips.  For skip=1, the integral equation does the job in 0.4 seconds.
 //'
@@ -1378,12 +1378,11 @@ struct ROMCPoOOO : public Worker
           dens(i,j-1) = dens(i,j-1)/width;
         }
       }
-      double exprhods = std::exp(rho*i*ds);
       double exprhords= std::exp(-(rho+r)*i*ds);
       for(std::size_t j = 0; j < n; j++)
       {
-        dpo(i,j+n0) = exprhods*dens(i,j+offset);
-        dpo(i,j+n1) = prob(i,j+offset);
+        dpo(i,j+n0) = exprhords*dens(i,j+offset);
+        dpo(i,j+n1) = exprhords*prob(i,j+offset);
         dpo(i,j+n2) = exprhords*optn(i,j+offset);
       }
     }
@@ -1515,12 +1514,11 @@ NumericMatrix RcppOUPMCBackwardCountX(NumericMatrix backward, NumericVector x, d
         dens(i,j-1) = dens(i,j-1)/width;
       }
     }
-    double exprhods = std::exp(rho*i*ds);
     double exprhords= std::exp(-(rho+r)*i*ds);
     for(std::size_t j = 0; j < n; j++)
     {
-      dpo(i,j+n0) = exprhods*dens(i,j+offset);
-      dpo(i,j+n1) = prob(i,j+offset);
+      dpo(i,j+n0) = exprhords*dens(i,j+offset);
+      dpo(i,j+n1) = exprhords*prob(i,j+offset);
       dpo(i,j+n2) = exprhords*optn(i,j+offset);
     }
   }

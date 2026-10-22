@@ -2853,7 +2853,7 @@ Analytical <- R6::R6Class("Analytical",
           densityline <- list(color=blu$d,width=8)
           gradientpmeans <- list(c(0,cyn$b),c(1,cyn$b))
           gradient <- list(c(0,blu$c),c(1,blu$c))
-          rise <- list(x=0,y=-800,z=0)
+          rise <- list(x=0,y=-300,z=100)
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Mean3DDensity")
           fig <- plot_ly() %>%
@@ -2893,7 +2893,7 @@ Analytical <- R6::R6Class("Analytical",
           probabilityline <- list(color=grn$d,width=8)
           gradientPmeans <- list(c(0,cyn$b),c(1,cyn$b))
           gradient <- list(c(0,grn$c),c(1,grn$c))
-          rise <- list(x=0,y=-800,z=0)
+          rise <- list(x=0,y=-300,z=100)
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Mean3DProbability")
           fig <- plot_ly() %>%
@@ -3110,7 +3110,7 @@ Analytical <- R6::R6Class("Analytical",
           gradientmean <- list(c(0,cyn$b),c(1,cyn$b))
           gradientminus <- list(c(0,mgn$b),c(1,mgn$b))
           gradient <- list(c(0,blu$c),c(1,blu$c))
-          rise <- list(x=0,y=-800,z=0)
+          rise <- list(x=0,y=-300,z=100)
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Variance3DDensity")
           fig <- plot_ly() %>%
@@ -3169,7 +3169,7 @@ Analytical <- R6::R6Class("Analytical",
           gradientmean <- list(c(0,cyn$b),c(1,cyn$b))
           gradientminus <- list(c(0,mgn$b),c(1,mgn$b))
           gradient <- list(c(0,grn$c),c(1,grn$c))
-          rise <- list(x=0,y=-800,z=0)
+          rise <- list(x=0,y=-300,z=100)
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_Variance3DProbability")
           fig <- plot_ly() %>%
@@ -3330,7 +3330,7 @@ Analytical <- R6::R6Class("Analytical",
         if(is.nan(pmax)) { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
         else { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,range=c(-0.03*pmax,1.03*pmax),tickmode="auto",nticks=5,mirror=TRUE) }
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         densityline <- list(color=blu$e,width=8)
         gradient <- list(c(0,blu$c),c(1,blu$c))
@@ -3478,7 +3478,7 @@ Analytical <- R6::R6Class("Analytical",
         yview <- list(title=yaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview, zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         probabilityline <- list(color=grn$e,width=8)
         gradient <- list(c(0,grn$c),c(1,grn$c))
@@ -3627,7 +3627,7 @@ Analytical <- R6::R6Class("Analytical",
         yview <- list(title=yaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$b,showbackground=floor,range=c(-0.03*PPmax,1.03*PPmax),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         doubleintegralline <- list(color=red$e,width=8)
         gradient <- list(c(0,red$c),c(1,red$c))
@@ -3781,7 +3781,7 @@ Analytical <- R6::R6Class("Analytical",
         yview <- list(title=yaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$a,showbackground=walls,range=c(1.03*s[m]-0.03*s[1],1.03*s[1]-0.03*s[m]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$b,showbackground=floor,range=c(-0.03*OOmax,1.03*OOmax),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         optionline <- list(color=red$d,width=8)
         gradient <- list(c(0,red$c),c(1,red$c))
@@ -4000,7 +4000,7 @@ Analytical <- R6::R6Class("Analytical",
         yview <- list(title=yaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$a,showbackground=walls,range=c(1.03*s[m]-0.03*s[1],1.03*s[1]-0.03*s[m]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$b,showbackground=floor,range=c(-0.03*OOmax,1.03*OOmax),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview, zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
@@ -4333,7 +4333,7 @@ Analytical <- R6::R6Class("Analytical",
         yview <- list(title=yaxis,color=font$color,linecolor=ylw$c,linewidth=3,gridcolor=ylw$c,gridwidth=2,backgroundcolor=ylw$a,showbackground=walls,range=c(1.03*s[m]-0.03*s[1],1.03*s[1]-0.03*s[m]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=ylw$c,linewidth=3,gridcolor=ylw$c,gridwidth=2,backgroundcolor=ylw$b,showbackground=floor,range=c(1.03*BCmin-0.03*BCmax,1.03*BCmax-0.03*BCmin),tickmode="auto",nticks=5,zeroline=TRUE,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         obligationline <- list(color=ylw$d,width=8)
         obgradient <- list(c(0,ylw$c),c(1,ylw$b))
@@ -4842,14 +4842,14 @@ Analytical <- R6::R6Class("Analytical",
           ptmodeline <- list(color=blu$d,width=8)
           ptxline <- list(color=gry$e,width=8)
           ptline <- list(color=blu$e,width=8)
-          gradientptx <- list(c(0,blu$a),c(1,blu$a))
+          gradientptx <- list(c(0,blu$b),c(1,blu$b))
           gradient <- list(c(0,blu$c),c(1,blu$c))
           gradientmean <- list(c(0,cyn$d),c(1,cyn$d))
           gradientmedian <- list(c(0,grn$c),c(1,grn$c))
           gradientmode <- list(c(0,blu$b),c(1,blu$b))
-          if(k > mu) { rise <- list(x=10,y=100,z=0) }
-          else if(k == mu) { rise <- list(x=0,y=100,z=0) }
-          else { rise <- list(x=-10,y=100,z=0) }
+          if(k > mu) { rise <- list(x=10,y=100,z=100) }
+          else if(k == mu) { rise <- list(x=0,y=100,z=100) }
+          else { rise <- list(x=-10,y=100,z=100) }
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimeModeMedianMean3DDensity")
           fig <- plot_ly() %>%
@@ -4936,14 +4936,14 @@ Analytical <- R6::R6Class("Analytical",
           Ptmodeline <- list(color=blu$d,width=8)
           Ptxline <- list(color=gry$e,width=8)
           Ptline <- list(color=grn$e,width=8)
-          gradientPtx <- list(c(0,grn$a),c(1,grn$a))
+          gradientPtx <- list(c(0,grn$b),c(1,grn$b))
           gradient <- list(c(0,grn$c),c(1,grn$c))
           gradientmean <- list(c(0,cyn$b),c(1,cyn$b))
           gradientmedian <- list(c(0,grn$b),c(1,grn$b))
           gradientmode <- list(c(0,blu$b),c(1,blu$b))
-          if(k > mu) { rise <- list(x=10,y=100,z=0) }
-          else if(k == mu) { rise <- list(x=0,y=100,z=0) }
-          else { rise <- list(x=-10,y=100,z=0) }
+          if(k > mu) { rise <- list(x=10,y=100,z=100) }
+          else if(k == mu) { rise <- list(x=0,y=100,z=100) }
+          else { rise <- list(x=-10,y=100,z=100) }
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimeModeMedianMean3DProbability")
           fig <- plot_ly() %>%
@@ -5323,14 +5323,14 @@ Analytical <- R6::R6Class("Analytical",
           ptlowerline <- list(color=blu$d,width=8)
           ptxline <- list(color=gry$e,width=8)
           ptline <- list(color=blu$e,width=8)
-          gradientptx <- list(c(0,blu$a),c(1,blu$a))
+          gradientptx <- list(c(0,blu$b),c(1,blu$b))
           gradient <- list(c(0,blu$c),c(1,blu$c))
           gradientupper <- list(c(0,blu$d),c(1,blu$d))
           gradienthalf <- list(c(0,blu$c),c(1,blu$c))
           gradientlower <- list(c(0,blu$b),c(1,blu$b))
-          if(k > mu) { rise <- list(x=10,y=100,z=0) }
-          else if(k == mu) { rise <- list(x=0,y=100,z=0) }
-          else { rise <- list(x=-10,y=100,z=0) }
+          if(k > mu) { rise <- list(x=10,y=100,z=100) }
+          else if(k == mu) { rise <- list(x=0,y=100,z=100) }
+          else { rise <- list(x=-10,y=100,z=100) }
           shine <- list(ambient=0.9,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimePercentiles3DDensity")
           fig <- plot_ly() %>%
@@ -5408,14 +5408,14 @@ Analytical <- R6::R6Class("Analytical",
           Ptlowerline <- list(color=grn$d,width=8)
           Ptxline <- list(color=gry$e,width=8)
           Ptline <- list(color=grn$e,width=8)
-          gradientPtx <- list(c(0,grn$a),c(1,grn$a))
+          gradientPtx <- list(c(0,grn$b),c(1,grn$b))
           gradient <- list(c(0,grn$c),c(1,grn$c))
           gradientupper <- list(c(0,grn$b),c(1,grn$b))
           gradienthalf <- list(c(0,grn$c),c(1,grn$c))
           gradientlower <- list(c(0,grn$d),c(1,grn$d))
-          if(k > mu) { rise <- list(x=10,y=100,z=0) }
-          else if(k == mu) { rise <- list(x=0,y=100,z=0) }
-          else { rise <- list(x=-10,y=100,z=0) }
+          if(k > mu) { rise <- list(x=10,y=100,z=100) }
+          else if(k == mu) { rise <- list(x=0,y=100,z=100) }
+          else { rise <- list(x=-10,y=100,z=100) }
           shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
           imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_A_PassageTimePercentiles3DProbability")
           fig <- plot_ly() %>%
@@ -5620,11 +5620,11 @@ Analytical <- R6::R6Class("Analytical",
         ptxmesh <- MeshCurtainSmooth(xx,t,ptx,rep(0,m))
         ptxline <- list(color=font$color,width=8)
         ptline <- list(color=blu$d,width=8)
-        gradientptx <- list(c(0,blu$a),c(1,blu$a))
+        gradientptx <- list(c(0,blu$b),c(1,blu$b))
         gradient <- list(c(0,blu$c),c(1,blu$c))
-        if(k > mu) { rise <- list(x=10,y=100,z=0) }
-        else if(k == mu) { rise <- list(x=0,y=100,z=0) }
-        else { rise <- list(x=-10,y=100,z=0) }
+        if(k > mu) { rise <- list(x=10,y=100,z=100) }
+        else if(k == mu) { rise <- list(x=0,y=100,z=100) }
+        else { rise <- list(x=-10,y=100,z=100) }
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
@@ -5802,11 +5802,11 @@ Analytical <- R6::R6Class("Analytical",
         Ptxmesh <- MeshCurtainSmooth(xx,t,Ptx,rep(0,m))
         Ptxline <- list(color=gry$d,width=8)
         Ptline <- list(color=grn$e,width=8)
-        gradientPtx <- list(c(0,grn$a),c(1,grn$a))
+        gradientPtx <- list(c(0,grn$b),c(1,grn$b))
         gradient <- list(c(0,grn$c),c(1,grn$c))
-        if(k > mu) { rise <- list(x=10,y=100,z=0) }
-        else if(k == mu) { rise <- list(x=0,y=100,z=0) }
-        else { rise <- list(x=-10,y=100,z=0) }
+        if(k > mu) { rise <- list(x=10,y=100,z=100) }
+        else if(k == mu) { rise <- list(x=0,y=100,z=100) }
+        else { rise <- list(x=-10,y=100,z=100) }
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")

@@ -291,6 +291,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     set_oup_params = function(rho=NULL,mu=NULL,sigma=NULL,who=NULL)
     {
       if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_oup_params(rho,mu,sigma,"MC") }
+      hit <- FALSE
       if(!is.null(rho))
       {
         sca <- private$extract_scalar(rho)
@@ -303,6 +304,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           }
           if(sca != private$oup_params$rho)
           {
+            hit <- TRUE
             private$oup_params$rho <- sca
             private$yforward <- NULL
             private$xbackward <- NULL
@@ -385,6 +387,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(sca != private$oup_params$sigma)
           {
+            hit <- TRUE
             private$oup_params$sigma <- sca
             private$yforward <- NULL
             private$xbackward <- NULL
@@ -418,6 +421,155 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           }
         }
         else { message("MC:  sigma not set.") }
+        if(hit)
+        {
+          rho <- private$oup_params$rho
+          sigma <- private$oup_params$sigma
+          # y stochastic times
+          t <- private$y_stoch_args$t
+          m <- length(t)
+          maxtime <- t[m]-t[1]
+          if(rho < 0.0000000001)
+          {
+            if(sigma^2*maxtime > 2250) { maxtime <- 2250/sigma^2 }
+          }
+          else
+          {
+            if(sigma^2/(2*rho)*(1-exp(-2*rho*maxtime)) > 2250) { maxtime <- -log(1-2*rho*2250/sigma^2)/(2*rho) }
+          }
+          if(maxtime < t[m]-t[1])
+          {
+            tscale <- 1
+            if(maxtime < 1)
+            {
+              while(maxtime < tscale) { tscale <- tscale/10 }
+            }
+            else
+            {
+              while(maxtime > tscale) { tscale <- 10*tscale }
+            }
+            maxtime <- round(maxtime/tscale,1)*tscale
+          }
+          if(maxtime < t[m]-t[1])
+          {
+            tFrom <- t[1]
+            tBy <- maxtime/(m-1)
+            tTo <- t[1]+maxtime
+            vec <- seq(from=tFrom,to=tTo,by=tBy)
+            message("MC:  t shortened for numerical stability.")
+            private$y_stoch_args$t <- vec
+            private$ystdnorm <- NULL
+            private$yforward <- NULL
+            private$G <- NULL
+            private$H2 <- NULL
+            private$p <- NULL
+            private$Pneg <- NULL
+            private$Ppos <- NULL
+            private$PPneg <- NULL
+            private$PPpos <- NULL
+          }
+          # x stochastic times
+          s <- private$x_stoch_args$s
+          m <- length(s)
+          maxtime <- s[1]-s[m]
+          if(rho > 0.0000000001)
+          {
+            time <- 5/rho
+            if(maxtime > time) { maxtime <- time }
+          }
+          if(sigma > 0.000001)
+          {
+            if(rho > 0.0000000001)
+            {
+              time <- log(2*rho*4955729.80383151/sigma^2+1)/(2*rho)
+              if(maxtime > time) { maxtime <- time }
+            }
+            else
+            {
+              time <- 2250/sigma^2
+              if(maxtime > time) { maxtime <- time }
+            }
+          }
+          if(maxtime < s[1]-s[m])
+          {
+            tscale <- 1
+            if(maxtime < 1)
+            {
+              while(maxtime < tscale) { tscale <- tscale/10 }
+            }
+            else
+            {
+              while(maxtime > tscale) { tscale <- 10*tscale }
+            }
+            maxtime <- round(maxtime/tscale,1)*tscale
+          }
+          if(maxtime < s[1]-s[m])
+          {
+            sTo <- s[1]
+            sBy <- maxtime/(m-1)
+            sFrom <- s[1]-maxtime
+            vec <- seq(from=sTo,to=sFrom,by=-sBy)
+            message("MC:  s shortened for numerical stability.")
+            private$x_stoch_args$s <- vec
+            private$xstdnorm <- NULL
+            private$xbackward <- NULL
+            private$o <- NULL
+            private$Oneg <- NULL
+            private$Opos <- NULL
+            private$OOneg <- NULL
+            private$OOpos <- NULL
+          }
+          # t stochastic times
+          t <- private$t_stoch_args$t
+          m <- length(t)
+          maxtime <- t[m]-t[1]
+          if(rho < 0.0000000001)
+          {
+            if(sigma^2*maxtime > 2250) { maxtime <- 2250/sigma^2 }
+          }
+          else
+          {
+            if(sigma^2/(2*rho)*(1-exp(-2*rho*maxtime)) > 2250) { maxtime <- -log(1-2*rho*2250/sigma^2)/(2*rho) }
+          }
+          if(maxtime < t[m]-t[1])
+          {
+            tscale <- 1
+            if(maxtime < 1)
+            {
+              while(maxtime < tscale) { tscale <- tscale/10 }
+            }
+            else
+            {
+              while(maxtime > tscale) { tscale <- 10*tscale }
+            }
+            maxtime <- round(maxtime/tscale,1)*tscale
+          }
+          if(maxtime < t[m]-t[1])
+          {
+            tFrom <- t[1]
+            tBy <- maxtime/(m-1)
+            tTo <- t[1]+maxtime
+            vec <- seq(from=tFrom,to=tTo,by=tBy)
+            message("MC:  t shortened for numerical stability.")
+            private$t_stoch_args$t <- vec
+            private$tstdnorm <- NULL
+            private$tforward <- NULL
+            private$tbounded <- NULL
+            private$tfpt <- NULL
+            private$vtmmm <- NULL
+            private$vtpct <- NULL
+            private$pv <- NULL
+            private$Pv <- NULL
+            private$fheat <- NULL
+            private$fz <- NULL
+            private$fptmmm <- NULL
+            private$fptpct <- NULL
+            private$pf <- NULL
+            private$Pf <- NULL
+            private$bheat <- NULL
+            private$bz <- NULL
+          }
+        }
       }
       return(private$oup_params)
     },
@@ -431,7 +583,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @return list(t,y,x,psi)
     set_y_stoch_args = function(t=NULL,y=NULL,x=NULL,psi=NULL,who=NULL)
     {
-      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_y_stoch_args(t,y,x,psi,"MC") }
       if(!is.null(t))
       {
         vec <- private$extract_vector(t,1)
@@ -439,8 +590,41 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(!private$vecs_equal(vec,private$y_stoch_args$t))
           {
-            if(length(vec) < 102)
+            m <- length(vec)
+            if(m < 102)
             {
+              rho <- private$oup_params$rho
+              sigma <- private$oup_params$sigma
+              maxtime <- vec[m]-vec[1]
+              if(rho < 0.0000000001)
+              {
+                if(sigma^2*maxtime > 2250) { maxtime <- 2250/sigma^2 }
+              }
+              else
+              {
+                if(sigma^2/(2*rho)*(1-exp(-2*rho*maxtime)) > 2250) { maxtime <- -log(1-2*rho*2250/sigma^2)/(2*rho) }
+              }
+              if(maxtime < vec[m]-vec[1])
+              {
+                tscale <- 1
+                if(maxtime < 1)
+                {
+                  while(maxtime < tscale) { tscale <- tscale/10 }
+                }
+                else
+                {
+                  while(maxtime > tscale) { tscale <- 10*tscale }
+                }
+                maxtime <- round(maxtime/tscale,1)*tscale
+              }
+              if(maxtime < vec[m]-vec[1])
+              {
+                tFrom <- vec[1]
+                tBy <- maxtime/(m-1)
+                tTo <- vec[1]+maxtime
+                vec <- seq(from=tFrom,to=tTo,by=tBy)
+                message("MC:  t shortened for numerical stability.")
+              }
               private$y_stoch_args$t <- vec
               private$ystdnorm <- NULL
               private$yforward <- NULL
@@ -524,6 +708,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       }
       private$syncyxt <- 1
       private$forwardyt <- 1
+      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_y_stoch_args(t,y,x,psi,"MC") }
       return(private$y_stoch_args)
     },
     #' @description
@@ -537,7 +722,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @return list(s,x,y,r,phi)
     set_x_stoch_args = function(s=NULL,x=NULL,y=NULL,r=NULL,phi=NULL,who=NULL)
     {
-      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_x_stoch_args(s,x,y,r,phi,"MC") }
       if(!is.null(s))
       {
         vec <- private$extract_vector(s,-1)
@@ -545,8 +729,51 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(!private$vecs_equal(vec,private$x_stoch_args$s))
           {
-            if(length(vec) < 102)
+            m <- length(vec)
+            if(m < 102)
             {
+              rho <- private$oup_params$rho
+              sigma <- private$oup_params$sigma
+              maxtime <- vec[1]-vec[m]
+              if(rho > 0.0000000001)
+              {
+                time <- 5/rho
+                if(maxtime > time) { maxtime <- time }
+              }
+              if(sigma > 0.000001)
+              {
+                if(rho > 0.0000000001)
+                {
+                  time <- log(2*rho*4955729.80383151/sigma^2+1)/(2*rho)
+                  if(maxtime > time) { maxtime <- time }
+                }
+                else
+                {
+                  time <- 2250/sigma^2
+                  if(maxtime > time) { maxtime <- time }
+                }
+              }
+              if(maxtime < vec[1]-vec[m])
+              {
+                tscale <- 1
+                if(maxtime < 1)
+                {
+                  while(maxtime < tscale) { tscale <- tscale/10 }
+                }
+                else
+                {
+                  while(maxtime > tscale) { tscale <- 10*tscale }
+                }
+                maxtime <- round(maxtime/tscale,1)*tscale
+              }
+              if(maxtime < vec[1]-vec[m])
+              {
+                sTo <- vec[1]
+                sBy <- maxtime/(m-1)
+                sFrom <- vec[1]-maxtime
+                vec <- seq(from=sTo,to=sFrom,by=-sBy)
+                message("MC:  s shortened for numerical stability.")
+              }
               private$x_stoch_args$s <- vec
               private$xstdnorm <- NULL
               private$xbackward <- NULL
@@ -651,6 +878,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         else { message("MC:  phi not set.") }
       }
       private$syncyxt <- 2
+      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_x_stoch_args(s,x,y,r,phi,"MC") }
       return(private$x_stoch_args)
     },
     #' @description
@@ -664,7 +892,6 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     #' @return list(t,k,x)
     set_t_stoch_args = function(t=NULL,k=NULL,x=NULL,omega=NULL,Ppct=NULL,who=NULL)
     {
-      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_t_stoch_args(t,k,x,omega,Ppct,"MC") }
       if(!is.null(t))
       {
         vec <- private$extract_vector(t,1)
@@ -672,8 +899,41 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(!private$vecs_equal(vec,private$t_stoch_args$t))
           {
-            if(length(vec) < 102)
+            m <- length(vec)
+            if(m < 102)
             {
+              rho <- private$oup_params$rho
+              sigma <- private$oup_params$sigma
+              maxtime <- vec[m]-vec[1]
+              if(rho < 0.0000000001)
+              {
+                if(sigma^2*maxtime > 2250) { maxtime <- 2250/sigma^2 }
+              }
+              else
+              {
+                if(sigma^2/(2*rho)*(1-exp(-2*rho*maxtime)) > 2250) { maxtime <- -log(1-2*rho*2250/sigma^2)/(2*rho) }
+              }
+              if(maxtime < vec[m]-vec[1])
+              {
+                tscale <- 1
+                if(maxtime < 1)
+                {
+                  while(maxtime < tscale) { tscale <- tscale/10 }
+                }
+                else
+                {
+                  while(maxtime > tscale) { tscale <- 10*tscale }
+                }
+                maxtime <- round(maxtime/tscale,1)*tscale
+              }
+              if(maxtime < vec[m]-vec[1])
+              {
+                tFrom <- vec[1]
+                tBy <- maxtime/(m-1)
+                tTo <- vec[1]+maxtime
+                vec <- seq(from=tFrom,to=tTo,by=tBy)
+                message("MC:  t shortened for numerical stability.")
+              }
               private$t_stoch_args$t <- vec
               private$tstdnorm <- NULL
               private$tforward <- NULL
@@ -776,6 +1036,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       }
       private$syncyxt <- 3
       private$forwardyt <- 3
+      if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_t_stoch_args(t,k,x,omega,Ppct,"MC") }
       return(private$t_stoch_args)
     },
     #' @description
@@ -1267,7 +1528,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       {
         if(group == 2) # Mean, Variance
         {
-          least <- -1
+          least <- -3
           most <- 0
         }
         else if(group == 3) # Density, Probability, Double Integral, Option
@@ -1280,7 +1541,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           least <- -1
           most <- 0
         }
-        else if(group ==5) # Visiting Time Density, Visiting Time Probability, First Passage Time Density, First Passage Time Probability
+        else if(group == 5) # Visiting Time Density, Visiting Time Probability, First Passage Time Density, First Passage Time Probability
         {
           least <- 0
           most <- 1
@@ -3013,18 +3274,18 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       seed <- private$path_args[[3]]
       if(type < -1.5)
       {
-        private$forwardyt <- 1
-        t <- private$y_stoch_args[[1]]
-        x <- private$y_stoch_args[[3]]
-        forward <- private$yforward #protect against recursive call
-      }
-      else
-      {
         private$forwardyt <- 3
         t <- private$t_stoch_args[[1]]
         k <- private$t_stoch_args[[2]]
         x <- private$t_stoch_args[[3]]
         forward <- private$tforward #protect against recursive call
+      }
+      else
+      {
+        private$forwardyt <- 1
+        t <- private$y_stoch_args[[1]]
+        x <- private$y_stoch_args[[3]]
+        forward <- private$yforward #protect against recursive call
       }
       p1 <- private$plot_args$first
       pn <- private$plot_args$last
@@ -3056,8 +3317,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       # copy ----
       if(copyit == TRUE)
       {
-        if(type < -1.5) { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
-        else { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
+        if(type < -1.5) { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("k",k,rep("",pn-p1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
+        else { clip <- rbind(c("Monte Carlo",rep("",pn-p1+1)),c("Forward Paths",rep("",pn-p1+1)),c("s",s,rep("",pn-p1)),c("x",x,rep("",pn-p1)),c("rho",rho,rep("",pn-p1)),c("mu",mu,rep("",pn-p1)),c("sigma",sigma,rep("",pn-p1)),c("paths",paths,rep("",pn-p1)),c("skip",skip,rep("",pn-p1)),c("seed",seed,rep("",pn-p1)),c("t",paste0("path",p1:pn)),cbind(t,forward)) }
         private$CopyToClipboard(clip)
       }
       # plot ----
@@ -3071,60 +3332,19 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       }
       else if(is.null(title)) { title <- "" }
       lookup <- list(text=title,yref="container",y=0.95)
-      if(n < 6) { pathline <- list(color=red$d,width=4) }
-      else if(n < 16) { pathline <- list(color=red$d,width=3) }
-      else if(n < 31) { pathline <- list(color=red$d,width=2) }
-      else { pathline <- list(color=red$d,width=1) }
+      if(n < 6) { pathline <- list(color=red$c,width=4) }
+      else if(n < 16) { pathline <- list(color=red$c,width=3) }
+      else if(n < 31) { pathline <- list(color=red$c,width=2) }
+      else { pathline <- list(color=red$c,width=1) }
       threshline <- list(color=gry$c,width=4)
-      if(Ixend-Ixbeg < 6) { pathmarker <- list(color=red$b,size=6,symbol="square") }
-      else if(Ixend-Ixbeg < 16) { pathmarker <- list(color=red$b,size=5,symbol="square") }
-      else if(Ixend-Ixbeg < 31) { pathmarker <- list(color=red$b,size=4,symbol="square") }
-      else { pathmarker <- list(color=red$b,size=3,symbol="square") }
+      if(Ixend-Ixbeg < 6) { pathmarker <- list(color=red$d,size=6,symbol="square") }
+      else if(Ixend-Ixbeg < 16) { pathmarker <- list(color=red$d,size=5,symbol="square") }
+      else if(Ixend-Ixbeg < 31) { pathmarker <- list(color=red$d,size=4,symbol="square") }
+      else { pathmarker <- list(color=red$d,size=3,symbol="square") }
       #OUP_MC_ForwardPaths2Dtmark and OUP_MC_ForwardPaths2Dtline
       if(type < -1.5)
       {
-        if(labels == TRUE)
-        {
-          syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",<i>x</i>",bsym,"=",esym,format(x,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
-          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>y</i><br>",syms) }
-          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
-        }
-        else if(is.null(xaxis)) { xaxis <- "<i>y</i><br>" }
-        lookdown <- list(text=xaxis)
-        if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
-        lookleft <- list(text=yaxis)
-        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        fig <- plot_ly()
-        #OUP_MC_ForwardPaths2Dtmark
-        if(type < -2.5)
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_ForwardPaths2Dtmark")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=forward[,j],y=t,mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        #OUP_MC_ForwardPaths2Dtline
-        else
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_ForwardPaths2Dtline")
-          fig <- plot_ly()
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=forward[,j],y=t,mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
-      }
-      #OUP_MC_ForwardPaths2Dymark and OUP_MC_ForwardPaths2Dyline
-      else
-      {
+        bowtiemarker <- list(color=red$c,size=20,symbol="bowtie")
         if(labels == TRUE)
         {
           syms <- paste(sep="",bsml,"(<i>k</i>",bsym,"=",esym,format(k,digits=4),",<i>s</i>",bsym,"=",esym,format(s,digits=4),",<i>x</i>",bsym,"=",esym,format(x,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
@@ -3136,9 +3356,52 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(yaxis)) { yaxis <- "<i>y</i>" }
         lookleft <- list(text=yaxis)
         horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,side="right")
         fig <- plot_ly() %>%
           add_trace(.,type="scattergl",x=c(t[1],t[m]),y=c(k,k),name="<i>k</i>",mode="lines",line=threshline,hoverinfo="x+y")
+        #OUP_MC_ForwardPaths2Dtmark
+        if(type < -2.5)
+        {
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_ForwardPaths2Dtmark")
+          j <- 0
+          while(j < n)
+          {
+            j <- j+1
+            fig <- add_trace(fig,type="scattergl",x=t,y=forward[,j],mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
+          }
+        }
+        #OUP_MC_ForwardPaths2Dtline
+        else
+        {
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_ForwardPaths2Dtline")
+          j <- 0
+          while(j < n)
+          {
+            j <- j+1
+            fig <- add_trace(fig,type="scattergl",x=t,y=forward[,j],mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
+          }
+        }
+        fig <- add_trace(fig,type="scattergl",x=t[1],y=x,mode="markers",marker=bowtiemarker,hoverinfo="skip") %>%
+          config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+          layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+      }
+      #OUP_MC_ForwardPaths2Dymark and OUP_MC_ForwardPaths2Dyline
+      else
+      {
+        hourglassmarker <- list(color=red$c,size=20,symbol="hourglass")
+        if(labels == TRUE)
+        {
+          syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",<i>x</i>",bsym,"=",esym,format(x,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
+          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>y</i><br>",syms) }
+          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+        }
+        else if(is.null(xaxis)) { xaxis <- "<i>y</i><br>" }
+        lookdown <- list(text=xaxis)
+        if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
+        lookleft <- list(text=yaxis)
+        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,autorange="reversed")
+        fig <- plot_ly()
         #OUP_MC_ForwardPaths2Dymark
         if(type < -0.5)
         {
@@ -3147,7 +3410,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           while(j < n)
           {
             j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=t,y=forward[,j],mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
+            fig <- add_trace(fig,type="scattergl",x=forward[,j],y=t,mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
           }
         }
         #OUP_MC_ForwardPaths2Dyline
@@ -3158,16 +3421,16 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           while(j < n)
           {
             j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=t,y=forward[,j],mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
+            fig <- add_trace(fig,type="scattergl",x=forward[,j],y=t,mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
           }
         }
-        fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+        fig <- add_trace(fig,type="scattergl",x=x,y=t[1],mode="markers",marker=hourglassmarker,hoverinfo="skip") %>%
+          config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
           layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
-      fig <- fig %>% toWebGL()
       return(fig)
     },
-     #' @description
+    #' @description
     #' Plot backward paths
     #' @param type = -3,...,0, or 'n','p','d' for next, previous, default
     #' @param first  first path to plot
@@ -3183,6 +3446,11 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     {
       # set/get ----
       type <- self$set_plot_type(type,1)[[1]]
+      if(type < -1.5)
+      {
+        type <- type+2
+        private$plot_types[1] <- type
+      }
       self$set_plot_args(NULL,NULL,first,last,NULL,NULL)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
@@ -3236,95 +3504,54 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(title)) { title <- paste(sep="","Backward Paths[",p1,":",pn,"]") }
       }
       else if(is.null(title)) { title <- "" }
-      lookup <- list(text=title,yref="container",y=0.95)
-      if(n < 6) { pathline <- list(color=red$d,width=4) }
-      else if(n < 16) { pathline <- list(color=red$d,width=3) }
-      else if(n < 31) { pathline <- list(color=red$d,width=2) }
-      else { pathline <- list(color=red$d,width=1) }
-      if(Ixend-Ixbeg < 6) { pathmarker <- list(color=red$b,size=4,symbol="square") }
-      else if(Ixend-Ixbeg < 16) { pathmarker <- list(color=red$b,size=3,symbol="square") }
-      else if(Ixend-Ixbeg < 31) { pathmarker <- list(color=red$b,size=2,symbol="square") }
-      else { pathmarker <- list(color=red$b,size=1,symbol="square") }
-      #OUP_MC_BackwardPaths2Dsmark and OUP_MC_BackwardPaths2Dsline
-      if(type < -1.5)
+      lookup <- list(text=title,yref="container",y=0.05)
+      if(n < 6) { pathline <- list(color=red$c,width=4) }
+      else if(n < 16) { pathline <- list(color=red$c,width=3) }
+      else if(n < 31) { pathline <- list(color=red$c,width=2) }
+      else { pathline <- list(color=red$c,width=1) }
+      if(Ixend-Ixbeg < 6) { pathmarker <- list(color=red$d,size=6,symbol="square") }
+      else if(Ixend-Ixbeg < 16) { pathmarker <- list(color=red$d,size=5,symbol="square") }
+      else if(Ixend-Ixbeg < 31) { pathmarker <- list(color=red$d,size=4,symbol="square") }
+      else { pathmarker <- list(color=red$d,size=3,symbol="square") }
+      hourglassmarker <- list(color=red$c,size=20,symbol="hourglass")
+      if(labels == TRUE)
       {
-        if(labels == TRUE)
-        {
-          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>x</i><br>",syms) }
-          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
-        }
-        else if(is.null(xaxis)) { xaxis <- "<i>x</i><br>" }
-        lookdown <- list(text=xaxis)
-        if(is.null(yaxis)) { yaxis <- "<i>s</i>" }
-        lookleft <- list(text=yaxis)
-        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        fig <- plot_ly()
-        #OUP_MC_BackwardPaths2Dsmark
-        if(type < -2.5)
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BackwardPaths2Dsmark")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=backward[,j],y=s,mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        #OUP_MC_BackwardPaths2Dsline
-        else
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BackwardPaths2Dsline")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=backward[,j],y=s,mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        if(is.null(xaxis)) { xaxis <- paste(sep="",syms,"<br><i>x</i>") }
+        else{ xaxis <- paste(sep="",syms,"<br>",xaxis) }
       }
-      #OUP_MC_BackwardPaths2Dxmark and OUP_MC_BackwardPaths2Dxline
+      else if(is.null(xaxis)) { xaxis <- "<br><i>x</i>" }
+      lookdown <- list(text=xaxis)
+      if(is.null(yaxis)) { yaxis <- "<i>s</i>" }
+      lookleft <- list(text=yaxis)
+      horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,side="top")
+      vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,autorange="reversed")
+      fig <- plot_ly()
+      #OUP_MC_BackwardPaths2Dmark
+      if(type < -0.5)
+      {
+        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BackwardPaths2Dmark")
+        j <- 0
+        while(j < n)
+        {
+          j <- j+1
+          fig <- add_trace(fig,type="scattergl",x=backward[,j],y=s,mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
+        }
+      }
+      #OUP_MC_BackwardPaths2Dline
       else
       {
-        if(labels == TRUE)
+        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BackwardPaths2Dline")
+        j <- 0
+        while(j < n)
         {
-          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>s</i><br>",syms) }
-          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          j <- j+1
+          fig <- add_trace(fig,type="scattergl",x=backward[,j],y=s,mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
         }
-        else if(is.null(xaxis)) { xaxis <- "<i>s</i><br>" }
-        lookdown <- list(text=xaxis)
-        if(is.null(yaxis)) { yaxis <- "<i>x</i>" }
-        lookleft <- list(text=yaxis)
-        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        fig <- plot_ly()
-        #OUP_MC_BackwardPaths2Dxmark
-        if(type < -0.5)
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BackwardPaths2Dxmark")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=s,y=backward[,j],mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        #OUP_MC_BackwardPaths2Dxline
-        else
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BackwardPaths2Dxline")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=s,y=backward[,j],mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
+      fig <- add_trace(fig,type="scattergl",x=y,y=s[1],mode="markers",marker=hourglassmarker,hoverinfo="skip") %>%
+        config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+        layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+
       return(fig)
     },
     #' Plot bounded paths
@@ -3341,6 +3568,11 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     {
       # set/get ----
       type <- self$set_plot_type(type,1)[[1]]
+      if(type >= -1.5)
+      {
+        type <- type-2
+        private$plot_types[1] <- type
+      }
       self$set_plot_args(NULL,NULL,first,last,NULL,NULL)
       rho <- private$oup_params[[1]]
       mu <- private$oup_params[[2]]
@@ -3398,97 +3630,55 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       }
       else if(is.null(title)) { title <- "" }
       lookup <- list(text=title,yref="container",y=0.95)
-      if(n < 6) { pathline <- list(color=red$d,width=4) }
-      else if(n < 16) { pathline <- list(color=red$d,width=3) }
-      else if(n < 31) { pathline <- list(color=red$d,width=2) }
-      else { pathline <- list(color=red$d,width=1) }
+      if(n < 6) { pathline <- list(color=red$c,width=4) }
+      else if(n < 16) { pathline <- list(color=red$c,width=3) }
+      else if(n < 31) { pathline <- list(color=red$c,width=2) }
+      else { pathline <- list(color=red$c,width=1) }
       threshline <- list(color=gry$c,width=4)
-      if(Ixend-Ixbeg < 6) { pathmarker <- list(color=red$b,size=6,symbol="square") }
-      else if(Ixend-Ixbeg < 16) { pathmarker <- list(color=red$b,size=5,symbol="square") }
-      else if(Ixend-Ixbeg < 31) { pathmarker <- list(color=red$b,size=4,symbol="square") }
-      else { pathmarker <- list(color=red$b,size=3,symbol="square") }
-      #OUP_MC_BoundedPaths2Dtmark and OUP_MC_BoundedPaths2Dtline
-      if(type < -1.5)
+      if(Ixend-Ixbeg < 6) { pathmarker <- list(color=red$d,size=6,symbol="square") }
+      else if(Ixend-Ixbeg < 16) { pathmarker <- list(color=red$d,size=5,symbol="square") }
+      else if(Ixend-Ixbeg < 31) { pathmarker <- list(color=red$d,size=4,symbol="square") }
+      else { pathmarker <- list(color=red$d,size=3,symbol="square") }
+      bowtiemarker <- list(color=red$c,size=20,symbol="bowtie")
+      if(labels == TRUE)
       {
-        if(labels == TRUE)
-        {
-          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>y</i><br>",syms) }
-          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
-        }
-        else if(is.null(xaxis)) { xaxis <- "<i>y</i><br>" }
-        lookdown <- list(text=xaxis)
-        if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
-        lookleft <- list(text=yaxis)
-        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        fig <- plot_ly() %>%
-          add_trace(.,type="scattergl",x=c(k,k),y=c(t[1],t[m]),name="<i>k</i>",mode="lines",line=threshline,hoverinfo="x+y")
-        #OUP_MC_BoundedPaths2Dtmark
-        if(type < -2.5)
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BoundedPaths2Dtmark")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=bounded[,j],y=t,mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        #OUP_MC_BoundedPaths2Dtline
-        else
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BoundedPaths2Dtline")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=bounded[,j],y=t,mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
+        else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
       }
-      #OUP_MC_BoundedPaths2Dymark and OUP_MC_BoundedPaths2Dyline
+      else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
+      lookdown <- list(text=xaxis)
+      if(is.null(yaxis)) { yaxis <- "<i>y</i>" }
+      lookleft <- list(text=yaxis)
+      horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+      vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,side="right")
+      fig <- plot_ly() %>%
+        add_trace(.,type="scattergl",x=c(t[1],t[m]),y=c(k,k),name="<i>k</i>",mode="lines",line=threshline,hoverinfo="x+y")
+      #OUP_MC_BoundedPaths2Dmark
+      if(type < -2.5)
+      {
+        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BoundedPaths2Dmark")
+        j <- 0
+        while(j < n)
+        {
+          j <- j+1
+          fig <- add_trace(fig,type="scattergl",x=t,y=bounded[,j],mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
+        }
+      }
+      #OUP_MC_BoundedPaths2Dline
       else
       {
-        if(labels == TRUE)
+        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BoundedPaths2Dline")
+        j <- 0
+        while(j < n)
         {
-          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
-          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          j <- j+1
+          fig <- add_trace(fig,type="scattergl",x=t,y=bounded[,j],mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
         }
-        else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
-        lookdown <- list(text=xaxis)
-        if(is.null(yaxis)) { yaxis <- "<i>y</i>" }
-        lookleft <- list(text=yaxis)
-        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        fig <- plot_ly() %>%
-          add_trace(.,type="scattergl",x=c(t[1],t[m]),y=c(k,k),name="<i>k</i>",mode="lines",line=threshline,hoverinfo="x+y")
-        #OUP_MC_BoundedPaths2Dymark
-        if(type < -0.5)
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BoundedPaths2Dymark")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=t,y=bounded[,j],mode="markers",marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        #OUP_MC_BoundedPaths2Dyline
-        else
-        {
-          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_BoundedPaths2Dyline")
-          j <- 0
-          while(j < n)
-          {
-            j <- j+1
-            fig <- add_trace(fig,type="scattergl",x=t,y=bounded[,j],mode="lines+markers",line=pathline,marker=pathmarker,hoverinfo="text",hovertext=paste0("path[",j+p1-1,"]"))
-          }
-        }
-        fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
+      fig <- add_trace(fig,type="scattergl",x=t[1],y=x,mode="markers",marker=bowtiemarker,hoverinfo="skip") %>%
+        config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+        layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+
       return(fig)
     },
     #' @description
@@ -3559,50 +3749,112 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       }
       else if(is.null(title)) { title <- "" }
       lookup <- list(text=title,yref="container",y=0.95)
-      if(labels == TRUE)
+      #OUP_MC_Means2Dtpaths and OUP_MC_Means2Dt
+      if(type < -1.5)
       {
-        if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
-        else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
-      }
-      else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
-      lookdown <- list(text=xaxis)
-      if(is.null(yaxis)) { yaxis <- "<i>G</i>(<i>t</i>|<i>s,x</i>)" }
-      lookleft <- list(text=yaxis)
-      horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-      vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-      meanline <- list(color=cyn$d,width=4)
-      horzline <- list(color=gry$d,width=1)
-      #OUP_MC_Means2Dpaths
-      if(type < -0.5)
-      {
-        if(reverse)
+        if(labels == TRUE)
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
-          else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
+          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
         }
+        else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
+        lookdown <- list(text=xaxis)
+        if(is.null(yaxis)) { yaxis <- "<i>G</i>(<i>t</i>|<i>s,x</i>)" }
+        lookleft <- list(text=yaxis)
+        meanline <- list(color=cyn$d,width=4)
+        horzline <- list(color=gry$d,width=1)
+        #OUP_MC_Means2Dtpaths
+        if(type < -2.5)
+        {
+          horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+          vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,side="right")
+          bowtiemarker <- list(color=red$c,size=20,symbol="bowtie")
+          if(reverse)
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          }
+          else
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          }
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Means2Dtpaths")
+          if(means[m] < (y[1]+y[m])/2) { legendpos <- list(orientation="h",x=0.95,y=1.0,xanchor="right") }
+          else{ legendpos <- list(orientation="h",x=0.95,y=0.15,xanchor="right") }
+          fig <- plot_ly() %>%
+            add_trace(.,type="heatmap",x=t,y=y,z=t(densities),name="paths",showscale=FALSE,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+            add_trace(.,type="scatter",x=t[1],y=x,mode="markers",marker=bowtiemarker,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y",legendgroup="G") %>%
+            add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,hoverinfo="x+y",legendgroup="G",showlegend=FALSE) %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        }
+        #OUP_MC_Means2Dy
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+          vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Means2Dt")
+          fig <- plot_ly() %>%
+            add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",hoverinfo="x+y",line=meanline) %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
-        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Means2Dpaths")
-        legendpos <- list(orientation="h",x=0.5,y=1.0,xanchor="center")
-        fig <- plot_ly() %>%
-          add_trace(.,type="heatmap",x=t,y=y,z=t(densities),name="paths",showscale=FALSE,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
-          add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y",legendgroup="G") %>%
-          add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,hoverinfo="x+y",legendgroup="G",showlegend=FALSE) %>%
-          config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
-      #OUP_MC_Means2D
+      #OUP_MC_Means2Dypaths and OUP_MC_Means2Dy
       else
       {
-        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Means2D")
-        fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,hoverinfo="x+y") %>%
-          add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",hoverinfo="x+y",line=meanline) %>%
-          config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        if(labels == TRUE)
+        {
+          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>G</i>(<i>t</i>|<i>s,x</i>)<br>",syms) }
+          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+        }
+        else if(is.null(xaxis)) { xaxis <- "<i>G</i>(<i>t</i>|<i>s,x</i>)<br>" }
+        lookdown <- list(text=xaxis)
+        if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
+        lookleft <- list(text=yaxis)
+        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,autorange="reversed")
+        meanline <- list(color=cyn$d,width=4)
+        horzline <- list(color=gry$d,width=1)
+        #OUP_MC_Means2Dypaths
+        if(type < -0.5)
+        {
+          hourglassmarker <- list(color=red$c,size=20,symbol="hourglass")
+          if(reverse)
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          }
+          else
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          }
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Means2Dypaths")
+          n <- length(y)
+          if(x < (y[1]+y[m])/2) { legendpos <- list(orientation="h",x=0.95,y=1.0,xanchor="right") }
+          else{ legendpos <- list(orientation="h",x=0.05,y=1.0,xanchor="left") }
+          fig <- plot_ly() %>%
+            add_trace(.,type="heatmap",x=y,y=t,z=densities,name="paths",showscale=FALSE,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+            add_trace(.,type="scatter",x=x,y=t[1],mode="markers",marker=hourglassmarker,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=means,y=t,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y",legendgroup="G") %>%
+            add_trace(.,type="scatter",x=c(mu,mu),y=c(t[1],t[m]),mode="lines",line=horzline,hoverinfo="x+y",legendgroup="G",showlegend=FALSE) %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        }
+        #OUP_MC_Means2Dt
+        else
+        {
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Means2Dy")
+          fig <- plot_ly() %>%
+            add_trace(.,type="scatter",x=c(mu,mu),y=c(t[1],t[m]),mode="lines",line=horzline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=means,y=t,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y") %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        }
       }
       return(fig)
     },
@@ -3683,68 +3935,146 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       }
       else if(is.null(title)) { title <- "" }
       lookup <- list(text=title,yref="container",y=0.95)
-      #OUP_MC_Variances2Dpaths
-      if(type < -0.5)
+      #OUP_MC_Variances2Dtpaths and OUP_MC_Variances2Dt
+      if(type < -1.5)
       {
-        if(labels == TRUE)
+        #OUP_MC_Variances2Dtpaths
+        if(type < -2.5)
         {
-          syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",<i>x</i>",bsym,"=",esym,format(x,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
-          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
-          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          if(labels == TRUE)
+          {
+            syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",<i>x</i>",bsym,"=",esym,format(x,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
+            if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
+            else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          }
+          else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
+          lookdown <- list(text=xaxis)
+          if(is.null(yaxis)) { yaxis <- "<i>G</i>(<i>t</i>|<i>s,x</i>)&plusmn;<i>H</i>(<i>t</i>|<i>s</i>)" }
+          lookleft <- list(text=yaxis)
+          horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+          vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,side="right")
+          meanline <- list(color=cyn$d,width=4)
+          varianceline <- list(color=mgn$d,width=4)
+          horzline <- list(color=gry$d,width=1)
+          bowtiemarker <- list(color=red$c,size=20,symbol="bowtie")
+          if(reverse)
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          }
+          else
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          }
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Variances2Dtpaths")
+          if(means[m] < (y[1]+y[m])/2) { legendpos <- list(orientation="h",x=0.95,y=1.0,xanchor="right") }
+          else{ legendpos <- list(orientation="h",x=0.95,y=0.15,xanchor="right") }
+          fig <- plot_ly() %>%
+            add_trace(.,type="heatmap",x=t,y=y,z=t(densities),name="paths",showscale=FALSE,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+            add_trace(.,type="scatter",x=t[1],y=x,mode="markers",marker=bowtiemarker,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=t,y=meansplus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y",legendgroup="G+H") %>%
+            add_trace(.,type="scatter",x=t,y=meansminus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
-        else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
-        lookdown <- list(text=xaxis)
-        if(is.null(yaxis)) { yaxis <- "<i>G</i>(<i>t</i>|<i>s,x</i>)&plusmn;<i>H</i>(<i>t</i>|<i>s</i>)" }
-        lookleft <- list(text=yaxis)
-        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        meanline <- list(color=cyn$d,width=4)
-        varianceline <- list(color=mgn$d,width=4)
-        horzline <- list(color=gry$d,width=1)
-        if(reverse)
-        {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
-          else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
-        }
+        #OUP_MC_Variances2Dt
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(labels == TRUE)
+          {
+            syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
+            if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
+            else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          }
+          else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
+          lookdown <- list(text=xaxis)
+          if(is.null(yaxis)) { yaxis <- "<i>H</i><sup>2</sup>(<i>t</i>|<i>s</i>)" }
+          lookleft <- list(text=yaxis)
+          horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+          vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",rangemode="tozero")
+          varianceline <- list(color=mgn$d,width=4)
+          horzline <- list(color=gry$d,width=1)
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Variance2Dt")
+          fig <- plot_ly() %>%
+            add_trace(.,type="scatter",x=t,y=variances,name="<i>H</i><sup>2</sup>(<i>t</i>)",mode="lines",line=varianceline) %>%
+            add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(varsigma2,varsigma2),mode="lines",line=horzline,hoverinfo="x+y",showlegend=FALSE) %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
-        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Variances2Dpaths")
-        legendpos <- list(orientation="h",x=0.5,y=1.0,xanchor="center")
-        fig <- plot_ly() %>%
-          add_trace(.,type="heatmap",x=t,y=y,z=t(densities),name="paths",showscale=FALSE,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
-          add_trace(.,type="scatter",x=t,y=meansplus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y",legendgroup="G+H") %>%
-          add_trace(.,type="scatter",x=t,y=meansminus,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
-          add_trace(.,type="scatter",x=t,y=means,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
-          add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(mu,mu),mode="lines",line=horzline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
-          config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
       }
-      #OUP_MC_Variances2D
+      #OUP_MC_Variances2Dypaths and OUP_MC_Variances2Dy
       else
       {
-        if(labels == TRUE)
+        #OUP_MC_Variances2Dypaths
+        if(type < -0.5)
         {
-        syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
-          if(is.null(xaxis)) { xaxis <- paste(sep="","<i>t</i><br>",syms) }
-          else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          if(labels == TRUE)
+          {
+            syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",<i>x</i>",bsym,"=",esym,format(x,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
+            if(is.null(xaxis)) { xaxis <- paste(sep="","<i>G</i>(<i>t</i>|<i>s,x</i>)&plusmn;<i>H</i>(<i>t</i>|<i>s</i>)<br>",syms) }
+            else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          }
+          else if(is.null(xaxis)) { xaxis <- "<i>G</i>(<i>t</i>|<i>s,x</i>)&plusmn;<i>H</i>(<i>t</i>|<i>s</i>)<br>" }
+          lookdown <- list(text=xaxis)
+          if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
+          lookleft <- list(text=yaxis)
+          horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+          vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,autorange="reversed")
+          meanline <- list(color=cyn$d,width=4)
+          varianceline <- list(color=mgn$d,width=4)
+          horzline <- list(color=gry$d,width=1)
+          hourglassmarker <- list(color=red$c,size=20,symbol="hourglass")
+          if(reverse)
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          }
+          else
+          {
+            if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+            else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          }
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_MC_Variances2Dypaths")
+          n <- length(y)
+          if(x < (y[1]+y[m])/2) { legendpos <- list(orientation="h",x=0.95,y=1.0,xanchor="right") }
+          else{ legendpos <- list(orientation="h",x=0.05,y=1.0,xanchor="left") }
+          fig <- plot_ly() %>%
+            add_trace(.,type="heatmap",x=y,y=t,z=densities,name="paths",showscale=FALSE,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+            add_trace(.,type="scatter",x=x,y=t[1],mode="markers",marker=hourglassmarker,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=meansplus,y=t,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y",legendgroup="G+H") %>%
+            add_trace(.,type="scatter",x=meansminus,y=t,name="<i>G</i>(<i>t</i>)&plusmn;<i>H</i>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=means,y=t,name="<i>G</i>(<i>t</i>)",mode="lines",line=meanline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
+            add_trace(.,type="scatter",x=c(mu,mu),y=c(t[1],t[m]),mode="lines",line=horzline,hoverinfo="x+y",legendgroup="G+H",showlegend=FALSE) %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,legend=legendpos,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
         }
-        else if(is.null(xaxis)) { xaxis <- "<i>t</i><br>" }
-        lookdown <- list(text=xaxis)
-        if(is.null(yaxis)) { yaxis <- "<i>H</i><sup>2</sup>(<i>t</i>|<i>s</i>)" }
-        lookleft <- list(text=yaxis)
-        horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
-        vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",rangemode="tozero")
-        varianceline <- list(color=mgn$d,width=4)
-        horzline <- list(color=gry$d,width=1)
-        imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Variance2D")
-        fig <- plot_ly() %>%
-          add_trace(.,type="scatter",x=t,y=variances,name="<i>H</i><sup>2</sup>(<i>t</i>)",mode="lines",line=varianceline) %>%
-          add_trace(.,type="scatter",x=c(t[1],t[m]),y=c(varsigma2,varsigma2),mode="lines",line=horzline,hoverinfo="x+y",showlegend=FALSE) %>%
-          config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
-          layout(.,title=lookup,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        #OUP_MC_Variances2Dy
+        else
+        {
+          if(labels == TRUE)
+          {
+            syms <- paste(sep="",bsml,"(<i>s</i>",bsym,"=",esym,format(s,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
+            if(is.null(xaxis)) { xaxis <- paste(sep="","<i>H</i><sup>2</sup>(<i>t</i>|<i>s</i>)<br>",syms) }
+            else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
+          }
+          else if(is.null(xaxis)) { xaxis <- "<i>H</i><sup>2</sup>(<i>t</i>|<i>s</i>)<br>" }
+          lookdown <- list(text=xaxis)
+          if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
+          lookleft <- list(text=yaxis)
+          horz <- list(title=lookdown,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE)
+          vert <- list(title=lookleft,color=font$color,linewidth=1,showgrid=FALSE,ticks="outside",zeroline=FALSE,autorange="reversed")
+          varianceline <- list(color=mgn$d,width=4)
+          horzline <- list(color=gry$d,width=1)
+          imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_A_Variance2Dy")
+          fig <- plot_ly() %>%
+            add_trace(.,type="scatter",x=c(varsigma2,varsigma2),y=c(t[1],t[m]),mode="lines",line=horzline,hoverinfo="x+y") %>%
+            add_trace(.,type="scatter",x=variances,y=t,name="<i>H</i><sup>2</sup>(<i>t</i>)",mode="lines",line=varianceline,hoverinfo="x+y") %>%
+            config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
+            layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
+        }
       }
       return(fig)
     },
@@ -3877,17 +4207,19 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.nan(pmax)) { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
         else { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,range=c(-0.03*pmax,1.03*pmax),tickmode="auto",nticks=5,mirror=TRUE) }
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
           else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         densityline <- list(color=blu$e,width=8)
         densitymarker <- list(color=blu$e,size=4,symbol="square")
@@ -3897,7 +4229,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_Density3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=y,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE)
+          add_trace(.,type="surface",x=y,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=x,y=(t[m]-t[1])/50,z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=x,y=(t[1]-t[m])/50,z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE)
         skip<- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
@@ -4047,17 +4381,19 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         yview <- list(title=yaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview, zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
           else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         probabilityline <- list(color=grn$e,width=8)
         probabilitymarker <- list(color=grn$e,size=4,symbol="square")
@@ -4067,7 +4403,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_Probability3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=y,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE)
+          add_trace(.,type="surface",x=y,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=x,y=(t[m]-t[1])/50,z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=x,y=(t[1]-t[m])/50,z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE)
         skip <- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
@@ -4217,17 +4555,19 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         yview <- list(title=yaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$b,showbackground=floor,range=c(-0.03*PPmax,1.03*PPmax),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
           else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         doubleintegralline <- list(color=red$e,width=8)
         doubleintegralmarker <- list(color=red$e,size=4,symbol="square")
@@ -4237,7 +4577,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_DoubleIntegral3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=y,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE)
+          add_trace(.,type="surface",x=y,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=x,y=(t[m]-t[1])/50,z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=x,y=(t[1]-t[m])/50,z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE)
         skip <- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
@@ -4388,17 +4730,19 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         yview <- list(title=yaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$a,showbackground=walls,range=c(1.03*s[m]-0.03*s[1],1.03*s[1]-0.03*s[m]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=red$c,linewidth=3,gridcolor=red$c,gridwidth=2,backgroundcolor=red$b,showbackground=floor,range=c(-0.03*OOmax,1.03*OOmax),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
-          else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.0025,red$a),c(0.005,red$b),c(0.01,red$c),c(0.02,red$d),c(0.04,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.025*pmax,red$a),c(0.05*pmax,red$b),c(0.1*pmax,red$c),c(0.2*pmax,red$d),c(0.4*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.00125,red$a),c(0.00375,red$b),c(0.00875,red$c),c(0.01875,red$d),c(0.03875,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.0125*pmax,red$a),c(0.0375*pmax,red$b),c(0.0875*pmax,red$c),c(0.1875*pmax,red$d),c(0.3875*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         optionline <- list(color=red$e,width=8)
         optionmarker <- list(color=red$e,size=4,symbol="square")
@@ -4408,7 +4752,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_Option3DSurface")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=x,y=s,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE)
+          add_trace(.,type="surface",x=x,y=s,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=densities,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=y,y=1.02*(s[1]-s[m]),z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=y,y=0.98*(s[1]-s[m]),z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE)
         skip <- as.integer((m-1)/10)
         if(skip < 1) { skip <- 1 }
         i <- 1
@@ -4829,26 +5175,26 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>p<sub>v</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
-        else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
-        else { spy <- list(x=0.8,y=-2.3,z=0.5) }
+        spy <- list(x=2.35,y=-0.85,z=0.5)
         xview <- list(title=xaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         yview <- list(title=yaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         if(is.nan(ptmax)) { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
         else { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,range=c(1.03*pvmin-0.03*ptmax,1.03*ptmax-0.03*pvmin),tickmode="auto",nticks=5,mirror=TRUE) }
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
         gradient <- list(c(0,blu$d),c(1,blu$b))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
           else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
@@ -4856,7 +5202,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         pvmarker <- list(size=4,color=blu$d)
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_VisitingTimeDensity3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
+          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=x,y=(t[m]-t[1])/50,z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=x,y=(t[1]-t[m])/50,z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=pvmesh$xvertex,y=pvmesh$yvertex,z=pvmesh$zvertex,i=pvmesh$ivertex,j=pvmesh$jvertex,k=pvmesh$kvertex,intensity=pvmesh$zvertex,name="<i>p<sub>v</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=pv,name="<i>p<sub>v</sub></i>(<i>t</i>)",mode="markers",marker=pvmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
@@ -4982,25 +5330,25 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>P<sub>v</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
-        else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
-        else { spy <- list(x=0.8,y=-2.3,z=0.5) }
+        spy <- list(x=2.35,y=-0.85,z=0.5)
         xview <- list(title=xaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         yview <- list(title=yaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
         gradient <- list(c(0,grn$d),c(1,grn$b))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
           else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
@@ -5008,7 +5356,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         Pvmarker <- list(size=4,color=grn$d)
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_VisitingTimeProbability3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
+          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=x,y=(t[m]-t[1])/50,z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=x,y=(t[1]-t[m])/50,z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=Pvmesh$xvertex,y=Pvmesh$yvertex,z=Pvmesh$zvertex,i=Pvmesh$ivertex,j=Pvmesh$jvertex,k=Pvmesh$kvertex,intensity=Pvmesh$zvertex,name="<i>P<sub>v</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=Pv,name="<i>P<sub>v</sub></i>(<i>t</i>)",mode="markers",marker=Pvmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
@@ -5414,26 +5764,26 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>p<sub>f</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
-        else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
-        else { spy <- list(x=0.8,y=-2.3,z=0.5) }
+        spy <- list(x=2.35,y=-0.85,z=0.5)
         xview <- list(title=xaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         yview <- list(title=yaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         if(is.nan(ptmax)) { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,rangemode="tozero",tickmode="auto",nticks=5,mirror=TRUE) }
         else { zview <- list(title=zaxis,color=font$color,linecolor=blu$c,linewidth=3,gridcolor=blu$c,gridwidth=2,backgroundcolor=blu$b,showbackground=floor,range=c(-0.03*ptmax,1.03*ptmax),tickmode="auto",nticks=5,mirror=TRUE) }
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
         gradient <- list(c(0,blu$e),c(1,blu$b))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
           else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
@@ -5441,7 +5791,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         pfmarker <- list(size=4,color=blu$d)
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_FirstPassageTimeDensity3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
+          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=x,y=(t[m]-t[1])/50,z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=x,y=(t[1]-t[m])/50,z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=pfmesh$xvertex,y=pfmesh$yvertex,z=pfmesh$zvertex,i=pfmesh$ivertex,j=pfmesh$jvertex,k=pfmesh$kvertex,intensity=pfmesh$zvertex,name="<i>p<sub>f</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=pf,name="<i>p<sub>f</sub></i>(<i>t</i>)",mode="markers",marker=pfmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
@@ -5567,25 +5919,25 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(is.null(xaxis)) { xaxis <- "<i>y</i>" }
         if(is.null(yaxis)) { yaxis <- "<i>t</i>" }
         if(is.null(zaxis)) { zaxis <- "<i>P<sub>f</sub></i>(<i>t</i>|<i>k,s,x</i>)" }
-        if(x < mu) { spy <- list(x=-0.8,y=-2.3,z=0.5) }
-        else if(x == mu) { spy <- list(x=0,y=-2.4,z=0.5) }
-        else { spy <- list(x=0.8,y=-2.3,z=0.5) }
+        spy <- list(x=2.35,y=-0.85,z=0.5)
         xview <- list(title=xaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*z[1]-0.03*z[n],1.03*z[n]-0.03*z[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         yview <- list(title=yaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$a,showbackground=walls,range=c(1.03*t[1]-0.03*t[m],1.03*t[m]-0.03*t[1]),tickmode="auto",nticks=5,zeroline=FALSE,mirror=TRUE)
         zview <- list(title=zaxis,color=font$color,linecolor=grn$c,linewidth=3,gridcolor=grn$c,gridwidth=2,backgroundcolor=grn$b,showbackground=floor,range=c(-0.03,1.03),tickmode="auto",nticks=5,mirror=TRUE)
         view <- list(camera=list(eye=spy),xaxis=xview,yaxis=yview,zaxis=zview,aspectratio=list(x=1,y=1,z=1))
         gradient <- list(c(0,grn$e),c(1,grn$b))
-        rise <- list(x=0,y=-300,z=0)
+        rise <- list(x=0,y=-300,z=100)
         shine <- list(ambient=0.7,diffuse=0.5,fresnel=0.2,roughness=0.5,specular=0.1)
         if(reverse)
         {
           if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.01,red$a),c(0.02,red$b),c(0.03,red$c),c(0.04,red$d),c(0.05,red$e),c(1,red$e)) }
           else { heatgradient <- list(c(0,gry$a),c(0.1*pmax,red$a),c(0.2*pmax,red$b),c(0.3*pmax,red$c),c(0.4*pmax,red$d),c(0.5*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$c),c(1,red$e))
         }
         else
         {
-          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$e),c(0.01,red$e),c(0.02,red$d),c(0.03,red$c),c(0.04,red$b),c(0.05,red$a),c(1,red$a)) }
-          else { heatgradient <- list(c(0,gry$e),c(0.1*pmax,red$e),c(0.2*pmax,red$d),c(0.3*pmax,red$c),c(0.4*pmax,red$b),c(0.5*pmax,red$a),c(1,red$a)) }
+          if(is.nan(pmax)) { heatgradient <- list(c(0,gry$a),c(0.005,red$a),c(0.015,red$b),c(0.025,red$c),c(0.035,red$d),c(0.045,red$e),c(1,red$e)) }
+          else { heatgradient <- list(c(0,gry$a),c(0.05*pmax,red$a),c(0.15*pmax,red$b),c(0.25*pmax,red$c),c(0.35*pmax,red$d),c(0.45*pmax,red$e),c(1,red$e)) }
+          conegradient <- list(c(0,red$e),c(1,red$c))
         }
         hover3D <- "%{x:.2f}, %{y:.2f}, %{z:.4f}<extra></extra>"
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
@@ -5593,7 +5945,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         Pfmarker <- list(size=4,color=grn$d)
         imageoptions <- list(format=file$format,width=file$width,height=file$width,filename="OUP_MC_FirstPassageTimeProbability3D")
         fig <- plot_ly() %>%
-          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",showlegend=TRUE) %>%
+          add_trace(.,type="surface",x=z,y=t,z=matrix(0.0,m,n),name="paths",showscale=FALSE,lighting=shine,lightposition=rise,surfacecolor=heat,colorscale=heatgradient,hoverinfo="skip",legendgroup="paths",showlegend=TRUE) %>%
+          add_trace(.,type="cone",x=x,y=(t[m]-t[1])/50,z=0,u=1,v=10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
+          add_trace(.,type="cone",x=x,y=(t[1]-t[m])/50,z=0,u=1,v=-10.0,w=0,colorscale=conegradient,showscale=FALSE,sizemode="absolute",sizeref=0.5,anchor="tip",lighting=shine,lightposition=rise,hoverinfo="skip",legendgroup="paths",showlegend=FALSE) %>%
           add_trace(.,type="mesh3d",x=Pfmesh$xvertex,y=Pfmesh$yvertex,z=Pfmesh$zvertex,i=Pfmesh$ivertex,j=Pfmesh$jvertex,k=Pfmesh$kvertex,intensity=Pfmesh$zvertex,name="<i>P<sub>f</sub></i>(<i>t</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,opacity=0.9,hoverinfo="skip",showlegend=TRUE) %>%
           add_trace(.,type="scatter3d",x=rep(k,m),y=t,z=Pf,name="<i>P<sub>f</sub></i>(<i>t</i>)",mode="markers",marker=Pfmarker,opacity=0.0,hovertemplate=hover3D,showlegend=FALSE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%
