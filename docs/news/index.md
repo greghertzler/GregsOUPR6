@@ -16,6 +16,7 @@
 - Stabilise timings in the RShiny app.
 - Reorganise RShiny Maximum Likelihood tab to improve workflow.
 - Add clipboard copy to RShiny app.
+- Add full screen view for RShiny plots.
 - Update and consolidate R6 plots.
 - Add clipboard write to R6 objects.
 - Add functions to launch RShiny, tutorials and help and to read curated
