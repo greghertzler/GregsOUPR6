@@ -4677,7 +4677,11 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         bsym <- "<span style='font-family: Symbol;'>"
         esym <- "</span>"
         syms <- paste(sep="",bsml,"(<i>t</i>",bsym,"=",esym,format(t,digits=4),",<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",paths",bsym,"=",esym,format(paths,big.mark=","),")",esml)
-        if(is.null(title)) { title <- "Options" }
+        if(is.null(title))
+        {
+          if(phi > 0){ title <- "Options:  Entry" }
+          else { title <- "Options:  Exit" }
+        }
       }
       else if(is.null(title)) { title <- "" }
       lookup <- list(text=title,yref="container",y=0.95)

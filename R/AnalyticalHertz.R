@@ -3728,9 +3728,16 @@ Analytical <- R6::R6Class("Analytical",
         esml <- "</span>"
         bsym <- "<span style='font-family: Symbol;'>"
         esym <- "</span>"
-        if(phi > 0) { syms <- paste(sep="",bsml,"(<i>t</i>",bsym,"=",esym,format(t,digits=4),",<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>b</i>",bsym,"=",esym,format(b,digits=4),")",esml) }
-        else { syms <- paste(sep="",bsml,"(<i>t</i>",bsym,"=",esym,format(t,digits=4),",<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>c</i>",bsym,"=",esym,format(c,digits=4),")",esml) }
-        if(is.null(title)) { title <- "Options" }
+        if(phi > 0)
+        {
+          syms <- paste(sep="",bsml,"(<i>t</i>",bsym,"=",esym,format(t,digits=4),",<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>b</i>",bsym,"=",esym,format(b,digits=4),")",esml)
+          if(is.null(title)) { title <- "Options:  Entry" }
+        }
+        else
+        {
+          syms <- paste(sep="",bsml,"(<i>t</i>",bsym,"=",esym,format(t,digits=4),",<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>c</i>",bsym,"=",esym,format(c,digits=4),")",esml)
+          if(is.null(title)) { title <- "Options:  Exit" }
+        }
       }
       else if(is.null(title)) { title <- "" }
       lookup <- list(text=title,yref="container",y=0.95)
@@ -4108,9 +4115,16 @@ Analytical <- R6::R6Class("Analytical",
       esym <- "</span>"
       if(labels == TRUE)
       {
-        if(phi > 0) { syms <- paste(sep="",bsml,"(<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>b</i>",bsym,"=",esym,format(b,digits=4),")",esml) }
-        else { syms <- paste(sep="",bsml,"(<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>c</i>",bsym,"=",esym,format(c,digits=4),")",esml) }
-        if(is.null(title)) { title <- "Decision Threshold" }
+        if(phi > 0)
+        {
+          syms <- paste(sep="",bsml,"(<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>b</i>",bsym,"=",esym,format(b,digits=4),")",esml)
+          if(is.null(title)) { title <- "Decision Threshold:  Entry" }
+        }
+        else
+        {
+          syms <- paste(sep="",bsml,"(<i>y</i>",bsym,"=",esym,format(y,digits=4),",",bsym,"<i>r</i>=",esym,format(rho,digits=4),",",bsym,"<i>m</i>=",esym,format(mu,digits=4),",",bsym,"<i>s</i>=",esym,format(sigma,digits=4),",<i>r</i>",bsym,"=",esym,format(r,digits=4),",",bsym,"<i>f</i>=",esym,format(phi,digits=4),",<i>c</i>",bsym,"=",esym,format(c,digits=4),")",esml)
+          if(is.null(title)) { title <- "Decision Threshold:  Exit" }
+        }
         if(is.null(xaxis)) { xaxis <- paste(sep="","<i>x</i><br>",syms) }
         else{ xaxis <- paste(sep="",xaxis,"<br>",syms) }
       }
