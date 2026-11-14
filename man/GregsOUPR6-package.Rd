@@ -4,7 +4,7 @@
 \name{GregsOUPR6-package}
 \alias{GregsOUPR6}
 \alias{GregsOUPR6-package}
-\title{GregsOUPR6: Real Options for Adoption and Resilience: Ornstein-Uhlenbeck Process: R6 Objects}
+\title{GregsOUPR6: Real Options for Adoption and Resilience: Ornstein-Uhlenbeck Process}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 

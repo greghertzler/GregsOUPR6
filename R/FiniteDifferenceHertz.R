@@ -1990,24 +1990,37 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       if(!is.null(kOO)) { k <- kOO[[1]] }
       else { k <- mu }
       # time
-      t <- 100
-      if(rho > 0) { t <- -1.6*log(0.05)/rho }
-      if(t > 100) { t <- 100 }
-      else if(t < 1) { t <- 1}
+      t <- 10
+      if(rho > 0.0000000001) { t <- 5/rho }
       tscale <- 1
-      while(t > tscale) { tscale <- 10*tscale }
-      t <- round(t/tscale,1)*tscale
+      if(t < 1)
+      {
+        while(t < tscale) { tscale <- tscale/10 }
+      }
+      else
+      {
+        while(t > tscale) { tscale <- 10*tscale }
+      }
+      t <- round(t/tscale,2)*tscale
+      if(t < 0.001) { t <- 0.001 }
       sfrom <- s[1]
       sto <- sfrom-t
       sby <- -t/100
       sseq <-seq(from=sfrom,to=sto,by=sby)
       # state
-      if(rho > 0) { x <- 8*abs(sigma)/(2*rho)^0.5 }
+      if(rho > 0.000000001) { x <- 8*abs(sigma)/(2*rho)^0.5 }
       else { x <- 8*abs(sigma) }
-      if(x < 1) { x <- 1}
       xscale <- 1
-      while(x > xscale) { xscale <- 10*xscale }
-      x <- round(x/xscale,1)*xscale
+      if(x < 1)
+      {
+        while(x < xscale) { xscale <- xscale/10 }
+      }
+      else
+      {
+        while(x > xscale) { xscale <- 10*xscale }
+      }
+      x <- round(x/xscale,2)*xscale
+      if(x < 0.001) { x <- 0.001 }
       xby <- x/50
       xscale <- 1
       while(abs(k) > xscale) { xscale <- 10*xscale }
@@ -3303,15 +3316,15 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         optionline <- list(color=red$d,width=4)
         lineopacity <- 1
         imageoptions <- list(format=file$format,width=file$width,height=file$height,filename="OUP_FD_Option2D")
-        ds <- as.integer((m-1)/10)
-        if(ds < 1) { ds <- 1 }
         fig <- plot_ly()
+        skip <- as.integer((m+8)/10)
         i <- 1
-        while(i <= m)
+        fig <- add_trace(fig,type="scatter",x=x,y=options[i,],name=paste(sep="","\uD835\uDD46(",s[i],"<i>,x</i>)"),mode="lines",line=optionline,opacity=lineopacity,hoverinfo="x+y")
+        while(i < m-skip+1)
         {
-          fig <- add_trace(fig,type="scatter",x=x,y=options[i,],name=paste(sep="","\uD835\uDD46(",s[i],"<i>,x</i>)"),mode="lines",line=optionline,opacity=lineopacity,hoverinfo="x+y")
-          i <- i+ds
+          i <- i+skip
           lineopacity <- lineopacity-0.07
+          fig <- add_trace(fig,type="scatter",x=x,y=options[i,],name=paste(sep="","\uD835\uDD46(",s[i],"<i>,x</i>)"),mode="lines",line=optionline,opacity=lineopacity,hoverinfo="x+y")
         }
         fig <- config(fig,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_2D,displaylogo=FALSE) %>%
           layout(.,title=lookup,showlegend=FALSE,font=font,paper_bgcolor=background,plot_bgcolor=background,xaxis=horz,yaxis=vert,margin=list(t=50,r=40,b=100,l=40))
@@ -3342,18 +3355,14 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         legendpos <- list(orientation="h",x=0.5,y=0.92,xanchor="center")
         imageoptions=list(format=file$format,width=file$width,height=file$width,filename="OUP_FD_Option3D")
         fig <- plot_ly()
-        ss <- vector("double",n)
-        ds <- as.integer((m-1)/10)
-        if(ds < 1) { ds <- 1 }
+        skip <- as.integer((m+8)/10)
         i <- 1
-        for(j in 1:n) { ss[j] <- s[i] }
-        fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="O",showlegend=TRUE)
-        while(i < m)
+        fig <- add_trace(fig,type="scatter3d",x=x,y=rep(s[i],n),z=options[i,],name="\uD835\uDD46(<i>s,x</i>)",mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="O",showlegend=TRUE)
+        while(i < m-skip+1)
         {
-          i <- i+ds
+          i <- i+skip
           lineopacity <- lineopacity-0.07
-          for(j in 1:n) { ss[j] <- s[i] }
-          fig <- add_trace(fig,type="scatter3d",x=x,y=ss,z=options[i,],mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="O",showlegend=FALSE)
+          fig <- add_trace(fig,type="scatter3d",x=x,y=rep(s[i],n),z=options[i,],mode="lines",line=optionline,opacity=lineopacity,hovertemplate=hover3D,legendgroup="O",showlegend=FALSE)
         }
         fig <- add_trace(fig,type="surface",x=x,y=s,z=options,name="\uD835\uDD46(<i>s,x</i>)",showscale=FALSE,lighting=shine,lightposition=rise,colorscale=gradient,reversescale=reverse,hovertemplate=hover3D,visible="legendonly",showlegend=TRUE) %>%
           config(.,toImageButtonOptions=imageoptions,modeBarButtons=private$modebar_3D,displaylogo=FALSE) %>%

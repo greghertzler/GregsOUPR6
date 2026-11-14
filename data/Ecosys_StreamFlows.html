@@ -1,0 +1,86 @@
+<!DOCTYPE html><html><head><title>R: Annual Total Streamflows in Australia</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>Ecosys_StreamFlows</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Annual Total Streamflows in Australia</h2>
+
+<h3>Description</h3>
+
+<p>Australian Bureau of Meteorology, Hydrologic Reference Stations.
+</p>
+
+
+<h3>Format</h3>
+
+<p>csv file with 75 rows and 10 columns
+</p>
+
+
+<h3>Details</h3>
+
+
+<ul>
+<li><p> Water Year: time variable for years from 1951
+</p>
+</li>
+<li><p> Williams River: Tillegra (210011) gigalitres per water year
+</p>
+</li>
+<li><p> Adelaide River: Railway Bridge (G8170002) gigalitres per water year
+</p>
+</li>
+<li><p> Stanley River: Peachester (143303A) gigalitres per water year
+</p>
+</li>
+<li><p> Mosquito Creek: Struan (A2390519) gigalitres per water year
+</p>
+</li>
+<li><p> Snug River: Snug Tiers Road Bridge (305202) gigalitres per water year
+</p>
+</li>
+<li><p> Lerderderg River: Sardine Creek O'Brian Crossing (231213) gigalitres per water year
+</p>
+</li>
+<li><p> Yarrigil Brook: Yarrigil Formation (614044) gigalitres per water year
+</p>
+</li>
+<li><p> Wooroloo Brook: Karls Ranch (616001) gigalitres per water year
+</p>
+</li>
+<li><p> Brockman River: Yalliawirra (616019) gigalitres per water year
+</p>
+</li></ul>
+
+<p>Annual total streamflow for water years September 1 to August 31.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Australian Bureau of Meteorology
+</p>
+
+
+<h3>Source</h3>
+
+<p>https://www.bom.gov.au/water/hrs
+</p>
+
+</main>
+
+</div>
+</body></html>

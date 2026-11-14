@@ -570,16 +570,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // RcppOUPMLGoodnessOfFit
-NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, double lnL, double alpha);
-RcppExport SEXP _GregsOUPR6_RcppOUPMLGoodnessOfFit(SEXP tauSEXP, SEXP zSEXP, SEXP lnLSEXP, SEXP alphaSEXP) {
+NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, NumericVector theta);
+RcppExport SEXP _GregsOUPR6_RcppOUPMLGoodnessOfFit(SEXP tauSEXP, SEXP zSEXP, SEXP thetaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type tau(tauSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
-    Rcpp::traits::input_parameter< double >::type lnL(lnLSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(RcppOUPMLGoodnessOfFit(tau, z, lnL, alpha));
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(RcppOUPMLGoodnessOfFit(tau, z, theta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -609,16 +608,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // RcppOUPMCStandardNormal
-Rcpp::NumericMatrix RcppOUPMCStandardNormal(int64_t m, int64_t skip, int64_t paths, uint64_t seed, uint64_t engine);
+NumericMatrix RcppOUPMCStandardNormal(std::size_t m, std::size_t skip, std::size_t paths, std::size_t seed, std::size_t engine);
 RcppExport SEXP _GregsOUPR6_RcppOUPMCStandardNormal(SEXP mSEXP, SEXP skipSEXP, SEXP pathsSEXP, SEXP seedSEXP, SEXP engineSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int64_t >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int64_t >::type skip(skipSEXP);
-    Rcpp::traits::input_parameter< int64_t >::type paths(pathsSEXP);
-    Rcpp::traits::input_parameter< uint64_t >::type seed(seedSEXP);
-    Rcpp::traits::input_parameter< uint64_t >::type engine(engineSEXP);
+    Rcpp::traits::input_parameter< std::size_t >::type m(mSEXP);
+    Rcpp::traits::input_parameter< std::size_t >::type skip(skipSEXP);
+    Rcpp::traits::input_parameter< std::size_t >::type paths(pathsSEXP);
+    Rcpp::traits::input_parameter< std::size_t >::type seed(seedSEXP);
+    Rcpp::traits::input_parameter< std::size_t >::type engine(engineSEXP);
     rcpp_result_gen = Rcpp::wrap(RcppOUPMCStandardNormal(m, skip, paths, seed, engine));
     return rcpp_result_gen;
 END_RCPP
@@ -819,7 +818,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GregsOUPR6_RcppOUPMLLogLikelihood", (DL_FUNC) &_GregsOUPR6_RcppOUPMLLogLikelihood, 5},
     {"_GregsOUPR6_RcppOUPMLNMStart", (DL_FUNC) &_GregsOUPR6_RcppOUPMLNMStart, 8},
     {"_GregsOUPR6_RcppOUPMLNelderMead", (DL_FUNC) &_GregsOUPR6_RcppOUPMLNelderMead, 4},
-    {"_GregsOUPR6_RcppOUPMLGoodnessOfFit", (DL_FUNC) &_GregsOUPR6_RcppOUPMLGoodnessOfFit, 4},
+    {"_GregsOUPR6_RcppOUPMLGoodnessOfFit", (DL_FUNC) &_GregsOUPR6_RcppOUPMLGoodnessOfFit, 3},
     {"_GregsOUPR6_RcppOUPMLLikelihoodRatioTest", (DL_FUNC) &_GregsOUPR6_RcppOUPMLLikelihoodRatioTest, 4},
     {"_GregsOUPR6_RcppOUPMCMinMax", (DL_FUNC) &_GregsOUPR6_RcppOUPMCMinMax, 1},
     {"_GregsOUPR6_RcppOUPMCStandardNormal", (DL_FUNC) &_GregsOUPR6_RcppOUPMCStandardNormal, 5},

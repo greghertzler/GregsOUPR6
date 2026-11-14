@@ -1,4 +1,4 @@
-# GregsOUPR6: Real Options for Adoption and Resilience: Ornstein-Uhlenbeck Process: R6 Objects
+# GregsOUPR6: Real Options for Adoption and Resilience: Ornstein-Uhlenbeck Process
 
 A complete set of functions for maximum likelihood estimation and for
 the calculation of probabilities, option prices, decision thresholds,

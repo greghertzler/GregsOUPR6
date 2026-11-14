@@ -567,7 +567,7 @@ NULL
 #' @keywords datasets
 #' @name Climate_SeaLevel_PortKembla
 #' @format csv file with 7985 rows and 5 columns
-#' @author Bureau of Meteorology
+#' @author Australian Bureau of Meteorology
 #' @source http://www.bom.gov.au/oceanography/projects/abslmp/data/data.shtml
 NULL
 
@@ -605,7 +605,7 @@ NULL
 #' @keywords datasets
 #' @name Climate_TempsMax_CapeOtway
 #' @format csv file with 8888 rows and 2 columns
-#' @author Bureau of Meteorology
+#' @author Australian Bureau of Meteorology
 #' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 090015
 NULL
 
@@ -624,7 +624,7 @@ NULL
 #' @keywords datasets
 #' @name Climate_TempsMax_Darwin
 #' @format csv file with 9127 rows and 2 columns
-#' @author Bureau of Meteorology
+#' @author AUstralian Bureau of Meteorology
 #' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 014040
 NULL
 
@@ -643,7 +643,7 @@ NULL
 #' @keywords datasets
 #' @name Climate_TempsMax_TennantCreek
 #' @format csv file with 9115 rows and 2 columns
-#' @author Bureau of Meteorology
+#' @author Australian Bureau of Meteorology
 #' @source http://www.bom.gov.au/climate/data/?ref=ftr, Station number 015135
 NULL
 
@@ -668,21 +668,30 @@ NULL
 #' @source https://tsx.org.au/tsx2024
 NULL
 
-#' Water Supply for Irrigated Agriculture in Eastern Australia
+#' Water Supply for Irrigated Agriculture in Australia
 #'
 #' National data for Australia's ecosystem services: irrigated agricultural water supply (250 m resolution): 2000-01 to 2022-23. v7. CSIRO. Data Collection.
 #'
 #' \itemize{
 #'   \item Fin Year: time variable for financial year 1 July to 30 June
-#'   \item WaterSupply: irrigation water supplied in Australia in megalitres
+#'   \item Queensland: irrigation water supplied in megalitres
+#'   \item New South Wales:  irrigation water supplied in megalitres
+#'   \item Australian Capital Territory: irrigation water supplied in megalitres
+#'   \item Victoria:  irrigation water supplied in megalitres
+#'   \item South Australia: irrigation water supplied in megalitres
+#'   \item Eastern States:  sum of irrigation water supplied in megalitres
+#'   \item Tasmania: irrigation water supplied in megalitres
+#'   \item Western Australia:  irrigation water supplied in megalitres
+#'   \item Norther Territory: irrigation water supplied in megalitres
+#'   \item Australia: sum of irrigation water supplied in megalitres
 #' }
 #'
-#' Regions are aggregated for Eastern Australia.
+#' Eastern States include Queensland, New South Wales, Australian Capital Territory, Victoria and South Australia.
 #'
 #' @docType data
 #' @keywords datasets
 #' @name Ecosys_IrrigationWaterSupply
-#' @format csv file with 13 rows and 2 columns
+#' @format csv file with 23 rows and 11 columns
 #' @author Liu, Ning; Smith, Greg; Evans, David; Tetreault Campbell, Sally; Pascoe, Sean; & Schmidt, Becky, 2024
 #' @source https://doi.org/10.25919/7jj7-8826
 NULL
@@ -730,6 +739,33 @@ NULL
 #' @format csv file with 22 rows and 4 columns
 #' @author Pascoe, Sean; Liu, Ning; Scheufele, Gabriela; Tetreault Campbell, Sally; & Schmidt, Becky, 2024
 #' @source https://doi.org/10.25919/nzrp-6702
+NULL
+
+#' Annual Total Streamflows in Australia
+#'
+#' Australian Bureau of Meteorology, Hydrologic Reference Stations.
+#'
+#' \itemize{
+#'   \item Water Year: time variable for years from 1951
+#'   \item Williams River: Tillegra (210011) gigalitres per water year
+#'   \item Adelaide River: Railway Bridge (G8170002) gigalitres per water year
+#'   \item Stanley River: Peachester (143303A) gigalitres per water year
+#'   \item Mosquito Creek: Struan (A2390519) gigalitres per water year
+#'   \item Snug River: Snug Tiers Road Bridge (305202) gigalitres per water year
+#'   \item Lerderderg River: Sardine Creek O'Brian Crossing (231213) gigalitres per water year
+#'   \item Yarrigil Brook: Yarrigil Formation (614044) gigalitres per water year
+#'   \item Wooroloo Brook: Karls Ranch (616001) gigalitres per water year
+#'   \item Brockman River: Yalliawirra (616019) gigalitres per water year
+#' }
+#'
+#' Annual total streamflow for water years September 1 to August 31.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name Ecosys_StreamFlows
+#' @format csv file with 75 rows and 10 columns
+#' @author Australian Bureau of Meteorology
+#' @source https://www.bom.gov.au/water/hrs
 NULL
 
 #' Sydney Drinking Water Catchment

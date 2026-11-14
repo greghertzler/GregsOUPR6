@@ -52,7 +52,7 @@ processing.</p>
 <span></span>
 <span><span class="fu">RcppOUPMLNelderMead</span><span class="op">(</span><span class="va">tau</span>,<span class="va">z</span>,<span class="va">theta</span>,<span class="va">steps</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">RcppOUPMLGoodnessOfFit</span><span class="op">(</span><span class="va">tau</span>,<span class="va">z</span>,<span class="va">lnL</span>,<span class="va">alpha</span><span class="op">)</span></span>
+<span><span class="fu">RcppOUPMLGoodnessOfFit</span><span class="op">(</span><span class="va">tau</span>,<span class="va">z</span>,<span class="va">theta</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">RcppOUPMLLikelihoodRatioTest</span><span class="op">(</span><span class="va">lnL</span>,<span class="va">alpha</span>,<span class="va">m</span>,<span class="va">lnLr</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -106,7 +106,7 @@ processing.</p>
 
 
 <dt id="arg-theta">theta<a class="anchor" aria-label="anchor" href="#arg-theta"></a></dt>
-<dd><p>vector containing rho, mu and sigma</p></dd>
+<dd><p>vector with rho,mu,sigma,lnL,k,alpha,m1</p></dd>
 
 
 <dt id="arg-steps">steps<a class="anchor" aria-label="anchor" href="#arg-steps"></a></dt>
@@ -134,7 +134,7 @@ processing.</p>
     <p>logL(4) &lt;- RcppOUPMLLogLikelihood()</p>
 <p>start(2,4) &lt;- RcppOUPMLNMStart()</p>
 <p>theta(3) &lt;- RcppOUPMLNelderMead()</p>
-<p>gof(2,6) &lt;- RcppOUPMLGoodnessOfFit()</p>
+<p>gof(3,10) &lt;- RcppOUPMLGoodnessOfFit()</p>
 <p>lrt(2) &lt;- RcppOUPMLLikelihoodRatioTest()</p>
     </div>
     <div class="section level2">
@@ -168,14 +168,17 @@ parameter in theta.  Subset in R as:</p>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>mu <span class="ot">&lt;-</span> theta[<span class="dv">2</span>]</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> theta[<span class="dv">3</span>]</span></code></pre><p></p></div>
 <p>The return value:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">gof</span>(<span class="dv">2</span>,<span class="dv">6</span>)</span></code></pre><p></p></div>
-<p>is a matrix containing two vectors for Invariant and Scaled Brownian Motion
-comparisons.  In R, the results are combined into four lists:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>gof <span class="ot">&lt;-</span> <span class="fu">RcppOUPMLGoodnessOfFit</span>(tau,z,lnL,alpha)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>theta_i <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">rhor=</span>gof[<span class="dv">1</span>,<span class="dv">1</span>],<span class="at">mu=</span>gof[<span class="dv">1</span>,<span class="dv">2</span>],<span class="at">sigma=</span>gof[<span class="dv">1</span>,<span class="dv">3</span>],<span class="at">lnLr=</span>gof[<span class="dv">1</span>,<span class="dv">4</span>],<span class="at">k=</span>gof[<span class="dv">1</span>,<span class="dv">5</span>],<span class="at">alphar=</span>gof[<span class="dv">1</span>,<span class="dv">6</span>],<span class="at">m1=</span>gof[<span class="dv">1</span>,<span class="dv">7</span>])</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>Inv <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">R2=</span>gof[<span class="dv">1</span>,<span class="dv">8</span>],<span class="at">PVal=</span>gof[<span class="dv">1</span>,<span class="dv">9</span>])</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>theta_s <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">rhor=</span>gof[<span class="dv">2</span>,<span class="dv">1</span>],<span class="at">mur=</span>gof[<span class="dv">2</span>,<span class="dv">2</span>],<span class="at">sigma=</span>gof[<span class="dv">2</span>,<span class="dv">3</span>],<span class="at">lnLr=</span>gof[<span class="dv">2</span>,<span class="dv">4</span>],<span class="at">k=</span>gof[<span class="dv">2</span>,<span class="dv">5</span>],<span class="at">alphar=</span>gof[<span class="dv">2</span>,<span class="dv">6</span>],<span class="at">m1=</span>gof[<span class="dv">2</span>,<span class="dv">7</span>])</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>SBM <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">R2=</span>gof[<span class="dv">2</span>,<span class="dv">8</span>],<span class="at">Pval=</span>gof[<span class="dv">2</span>,<span class="dv">9</span>])</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">gof</span>(<span class="dv">3</span>,<span class="dv">10</span>)</span></code></pre><p></p></div>
+<p>is a matrix containing three row vectors.  The estimates for comparison are in row 0.  The Invariant
+estimates are in row 1 and the Scaled Brownian Motion estimates are in row 2.  The last column contains
+the R2 and P values.  In R, the results are combined into five lists:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>gof <span class="ot">&lt;-</span> <span class="fu">RcppOUPMLGoodnessOfFit</span>(tau,z,theta)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>theta_e <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">rho=</span>gof[<span class="dv">1</span>,<span class="dv">1</span>],<span class="at">mu=</span>gof[<span class="dv">1</span>,<span class="dv">2</span>],<span class="at">sigma=</span>gof[<span class="dv">1</span>,<span class="dv">3</span>],<span class="at">varsigma=</span>gof[<span class="dv">1</span>,<span class="dv">4</span>],<span class="at">lnL=</span>gof[<span class="dv">1</span>,<span class="dv">5</span>],<span class="at">k=</span>gof[<span class="dv">1</span>,<span class="dv">6</span>],<span class="at">alpha=</span>gof[<span class="dv">1</span>,<span class="dv">7</span>],<span class="at">m1=</span>gof[<span class="dv">1</span>,<span class="dv">8</span>])</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>theta_i <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">rhor=</span>gof[<span class="dv">2</span>,<span class="dv">1</span>],<span class="at">mu=</span>gof[<span class="dv">2</span>,<span class="dv">2</span>],<span class="at">sigma=</span>gof[<span class="dv">2</span>,<span class="dv">3</span>],<span class="at">varsigma=</span>gof[<span class="dv">2</span>,<span class="dv">4</span>],<span class="at">lnLr=</span>gof[<span class="dv">2</span>,<span class="dv">5</span>],<span class="at">kr=</span>gof[<span class="dv">2</span>,<span class="dv">6</span>],<span class="at">alphar=</span>gof[<span class="dv">2</span>,<span class="dv">7</span>],<span class="at">m1=</span>gof[<span class="dv">2</span>,<span class="dv">8</span>])</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>theta_s <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">rhor=</span>gof[<span class="dv">3</span>,<span class="dv">1</span>],<span class="at">mur=</span>gof[<span class="dv">3</span>,<span class="dv">2</span>],<span class="at">sigma=</span>gof[<span class="dv">3</span>,<span class="dv">3</span>],<span class="at">varsigma=</span>gof[<span class="dv">3</span>,<span class="dv">4</span>],<span class="at">lnLr=</span>gof[<span class="dv">3</span>,<span class="dv">5</span>],<span class="at">kr=</span>gof[<span class="dv">3</span>,<span class="dv">6</span>],<span class="at">alphar=</span>gof[<span class="dv">3</span>,<span class="dv">7</span>],<span class="at">m1=</span>gof[<span class="dv">3</span>,<span class="dv">8</span>])</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>Inv <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">R2=</span>gof[<span class="dv">2</span>,<span class="dv">9</span>],<span class="at">PVal=</span>gof[<span class="dv">2</span>,<span class="dv">10</span>])</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>SBM <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">R2=</span>gof[<span class="dv">3</span>,<span class="dv">9</span>],<span class="at">Pval=</span>gof[<span class="dv">3</span>,<span class="dv">10</span>])</span></code></pre><p></p></div>
+<p>The fourth column contains varsigma.  If it exists, varsigma is the long-term variance, sigma/sqrt(2rho).</p>
 <p>The return value:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">lrt</span>(<span class="dv">2</span>)</span></code></pre><p></p></div>
 <p>is a vector containing R2 and Pval, subset in R as:</p>

@@ -4,7 +4,15 @@
 
 echo "Configuring conditional compilation..."
 
+# --- Sys.setenv(DISABLE_RCPP_PARALLEL = "1") ---
+DISABLE_FLAG=${DISABLE_RCPP_PARALLEL:-0}
+if [ "$DISABLE_FLAG" = "1" ]; then
+    echo "  RcppParallel manually disabled — building with Rcpp only."
+    PKG_CPPFLAGS="-DNO_PARALLEL"
+    PKG_LIBS=""
+
 # --- Detect RcppParallel ---
+else
 RCPP_PARALLEL_HOME=$(Rscript -e "cat(system.file(package='RcppParallel',lib.loc=.libPaths()))" 2>/dev/null)
 if [ -n "$RCPP_PARALLEL_HOME" ]; then
     echo "  RcppParallel found at: $RCPP_PARALLEL_HOME"
@@ -14,6 +22,7 @@ else
     echo "  RcppParallel not found — building with Rcpp only."
     PKG_CPPFLAGS="-DNO_PARALLEL"
     PKG_LIBS=""
+fi
 fi
 
 # --- Detect dqrng ---
@@ -36,10 +45,10 @@ else
     PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_SITMO"
 fi
 
-# Ensure src directory exists
+# --- Ensure src directory exists ---
 mkdir -p src
 
-# Write Makevars (Unix) and Makevars.win (Windows)
+# --- Write Makevars (Unix) and Makevars.win (Windows) ---
 {
     echo "PKG_CPPFLAGS += $PKG_CPPFLAGS"
     echo "PKG_LIBS += $PKG_LIBS"

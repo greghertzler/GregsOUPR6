@@ -15,7 +15,7 @@ RcppOUPMLNMStart(tau,z,rhor,mur,sigmar,rhos,mus,sigmas)
 
 RcppOUPMLNelderMead(tau,z,theta,steps)
 
-RcppOUPMLGoodnessOfFit(tau,z,lnL,alpha)
+RcppOUPMLGoodnessOfFit(tau,z,theta)
 
 RcppOUPMLLikelihoodRatioTest(lnL,alpha,m,lnLr)
 }
@@ -42,7 +42,7 @@ RcppOUPMLLikelihoodRatioTest(lnL,alpha,m,lnLr)
 
 \item{sigmas}{optional starting value the scale parameter -inf<sigmas<inf}
 
-\item{theta}{vector containing rho, mu and sigma}
+\item{theta}{vector with rho,mu,sigma,lnL,k,alpha,m1}
 
 \item{steps}{vector of 0's or 1's, 0 for fixed, 1 for variable}
 
@@ -61,7 +61,7 @@ start(2,4) <- RcppOUPMLNMStart()
 
 theta(3) <- RcppOUPMLNelderMead()
 
-gof(2,6) <- RcppOUPMLGoodnessOfFit()
+gof(3,10) <- RcppOUPMLGoodnessOfFit()
 
 lrt(2) <- RcppOUPMLLikelihoodRatioTest()
 }
@@ -121,18 +121,22 @@ sigma <- theta[3]
 
 The return value:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{gof(2,6)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{gof(3,10)
 }\if{html}{\out{</div>}}
 
-is a matrix containing two vectors for Invariant and Scaled Brownian Motion
-comparisons.  In R, the results are combined into four lists:
+is a matrix containing three row vectors.  The estimates for comparison are in row 0.  The Invariant
+estimates are in row 1 and the Scaled Brownian Motion estimates are in row 2.  The last column contains
+the R2 and P values.  In R, the results are combined into five lists:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{gof <- RcppOUPMLGoodnessOfFit(tau,z,lnL,alpha)
-theta_i <- list(rhor=gof[1,1],mu=gof[1,2],sigma=gof[1,3],lnLr=gof[1,4],k=gof[1,5],alphar=gof[1,6],m1=gof[1,7])
-Inv <- list(R2=gof[1,8],PVal=gof[1,9])
-theta_s <- list(rhor=gof[2,1],mur=gof[2,2],sigma=gof[2,3],lnLr=gof[2,4],k=gof[2,5],alphar=gof[2,6],m1=gof[2,7])
-SBM <- list(R2=gof[2,8],Pval=gof[2,9])
+\if{html}{\out{<div class="sourceCode">}}\preformatted{gof <- RcppOUPMLGoodnessOfFit(tau,z,theta)
+theta_e <- list(rho=gof[1,1],mu=gof[1,2],sigma=gof[1,3],varsigma=gof[1,4],lnL=gof[1,5],k=gof[1,6],alpha=gof[1,7],m1=gof[1,8])
+theta_i <- list(rhor=gof[2,1],mu=gof[2,2],sigma=gof[2,3],varsigma=gof[2,4],lnLr=gof[2,5],kr=gof[2,6],alphar=gof[2,7],m1=gof[2,8])
+theta_s <- list(rhor=gof[3,1],mur=gof[3,2],sigma=gof[3,3],varsigma=gof[3,4],lnLr=gof[3,5],kr=gof[3,6],alphar=gof[3,7],m1=gof[3,8])
+Inv <- list(R2=gof[2,9],PVal=gof[2,10])
+SBM <- list(R2=gof[3,9],Pval=gof[3,10])
 }\if{html}{\out{</div>}}
+
+The fourth column contains varsigma.  If it exists, varsigma is the long-term variance, sigma/sqrt(2rho).
 
 The return value:
 

@@ -61,16 +61,20 @@ using namespace RcppParallel;
 //'
 //' The return value:
 //'
-//'     gof(2,6)
+//'     gof(3,10)
 //'
-//'  is a matrix containing two vectors for Invariant and Scaled Brownian Motion
-//'  comparisons.  In R, the results are combined into four lists:
+//'  is a matrix containing three row vectors.  The estimates for comparison are in row 0.  The Invariant
+//'  estimates are in row 1 and the Scaled Brownian Motion estimates are in row 2.  The last column contains
+//'  the R2 and P values.  In R, the results are combined into five lists:
 //'
-//'     gof <- RcppOUPMLGoodnessOfFit(tau,z,lnL,alpha)
-//'     theta_i <- list(rhor=gof[1,1],mu=gof[1,2],sigma=gof[1,3],lnLr=gof[1,4],k=gof[1,5],alphar=gof[1,6],m1=gof[1,7])
-//'     Inv <- list(R2=gof[1,8],PVal=gof[1,9])
-//'     theta_s <- list(rhor=gof[2,1],mur=gof[2,2],sigma=gof[2,3],lnLr=gof[2,4],k=gof[2,5],alphar=gof[2,6],m1=gof[2,7])
-//'     SBM <- list(R2=gof[2,8],Pval=gof[2,9])
+//'     gof <- RcppOUPMLGoodnessOfFit(tau,z,theta)
+//'     theta_e <- list(rho=gof[1,1],mu=gof[1,2],sigma=gof[1,3],varsigma=gof[1,4],lnL=gof[1,5],k=gof[1,6],alpha=gof[1,7],m1=gof[1,8])
+//'     theta_i <- list(rhor=gof[2,1],mu=gof[2,2],sigma=gof[2,3],varsigma=gof[2,4],lnLr=gof[2,5],kr=gof[2,6],alphar=gof[2,7],m1=gof[2,8])
+//'     theta_s <- list(rhor=gof[3,1],mur=gof[3,2],sigma=gof[3,3],varsigma=gof[3,4],lnLr=gof[3,5],kr=gof[3,6],alphar=gof[3,7],m1=gof[3,8])
+//'     Inv <- list(R2=gof[2,9],PVal=gof[2,10])
+//'     SBM <- list(R2=gof[3,9],Pval=gof[3,10])
+//'
+//' The fourth column contains varsigma.  If it exists, varsigma is the long-term variance, sigma/sqrt(2rho).
 //'
 //' The return value:
 //'
@@ -923,18 +927,17 @@ struct ROMLPGoF : public Worker
 #endif
 
 //' @rdname MaximumLikelihood_Rcpp
-//' @usage  RcppOUPMLGoodnessOfFit(tau,z,lnL,alpha)
+//' @usage  RcppOUPMLGoodnessOfFit(tau,z,theta)
 //' @param  tau   vector of times
 //' @param  z     vector of states
-//' @param  lnL   log likelihood of estimates lnL<0
-//' @param  alpha identifies the distribution of lnL 0.5<alpha<1
-//' @return gof(2,6) <- RcppOUPMLGoodnessOfFit()
+//' @param  theta vector with rho,mu,sigma,lnL,k,alpha,m1
+//' @return gof(3,10) <- RcppOUPMLGoodnessOfFit()
 //' @export
 // [[Rcpp::export]]
-NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, double lnL, double alpha)
+NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, NumericVector theta)
 {
   std::size_t m = tau.size();
-  NumericMatrix gof(2,9);
+  NumericMatrix gof(3,10);
 #ifdef USE_PARALLEL
   ROMLPGoF worker(tau,z);
   parallelReduce(0,m-1,worker);
@@ -958,43 +961,55 @@ NumericMatrix RcppOUPMLGoodnessOfFit(NumericVector tau, NumericVector z, double 
   invsq = invsq/(m-1)-sum*sum;
   sbmsq /= (m-1);
 #endif
+  gof(0,0) = theta[0];
+  gof(0,1) = theta[1];
+  gof(0,2) = theta[2];
+  gof(0,3) = theta[2]/sqrt(2*theta[0]);
+  gof(0,4) = theta[3];
+  gof(0,5) = theta[4];
+  gof(0,6) = theta[5];
+  gof(0,7) = theta[6];
+  gof(0,8) = NA_REAL;
+  gof(0,9) = NA_REAL;
   double lnLinv = -0.5*(m-1)*(std::log(2*3.14159265358979*invsq)+1);
-  double upsinv = 2*(lnL-lnLinv);
+  double upsinv = 2*(theta[3]-lnLinv);
   double lnLsbm = -0.5*(m-1)*(std::log(2*3.14159265358979*sbmsq)+1)-0.5*sumlntau;
-  double upssbm = 2*(lnL-lnLsbm);
-  gof(0,0) = NA_REAL;
-  gof(0,1) = sum;
-  gof(0,2) = std::sqrt(invsq);
-  gof(0,3) = lnLinv;
-  gof(0,4) = 2;
-  gof(0,5) = 0.5;
-  gof(0,6) = m-1;
+  double upssbm = 2*(theta[3]-lnLsbm);
+  gof(1,0) = NA_REAL;
+  gof(1,1) = sum;
+  gof(1,2) = NA_REAL;
+  gof(1,3) = std::sqrt(invsq);
+  gof(1,4) = lnLinv;
+  gof(1,5) = 2;
+  gof(1,6) = 0.5;
+  gof(1,7) = m-1;
   if(upsinv < 0)
   {
-    gof(0,7) = NA_REAL;
-    gof(0,8) = NA_REAL;
+    gof(1,8) = NA_REAL;
+    gof(1,9) = NA_REAL;
   }
   else
   {
-    gof(0,7) = 1-std::exp(-std::log(2)*0.5*upsinv/(alpha*(m-1)));
-    gof(0,8) = GammaBigRatio(alpha*(m-1),0.5*upsinv);
+    gof(1,8) = 1-std::exp(-std::log(2)*0.5*upsinv/(theta[5]*(m-1)));
+    gof(1,9) = GammaBigRatio(theta[5]*(m-1),0.5*upsinv);
   }
-  gof(1,0) = 0.0;
-  gof(1,1) = NA_REAL;
-  gof(1,2) = std::sqrt(sbmsq);
-  gof(1,3) = lnLsbm;
-  gof(1,4) = 1;
-  gof(1,5) = 1.0;
-  gof(1,6) = m-1;
+  gof(2,0) = 0.0;
+  gof(2,1) = NA_REAL;
+  gof(2,2) = std::sqrt(sbmsq);
+  gof(2,3) = NA_REAL;
+  gof(2,4) = lnLsbm;
+  gof(2,5) = 1;
+  gof(2,6) = 1.0;
+  gof(2,7) = m-1;
   if(upssbm < 0)
   {
-    gof(1,7) = NA_REAL;
-    gof(1,8) = NA_REAL;
+    gof(2,8) = NA_REAL;
+    gof(2,9) = NA_REAL;
   }
   else
   {
-    gof(1,7) = 1-std::exp(-std::log(2)*0.5*upssbm/(alpha*(m-1)));
-    gof(1,8) = GammaBigRatio(alpha*(m-1),0.5*upssbm);
+    gof(2,8) = 1-std::exp(-std::log(2)*0.5*upssbm/(theta[5]*(m-1)));
+    gof(2,9) = GammaBigRatio(theta[5]*(m-1),0.5*upssbm);
   }
   return gof;
 }

@@ -22,6 +22,6 @@ Climate Data Online
 Raw (Unhomogenized) data.
 }
 \author{
-Bureau of Meteorology
+AUstralian Bureau of Meteorology
 }
 \keyword{datasets}

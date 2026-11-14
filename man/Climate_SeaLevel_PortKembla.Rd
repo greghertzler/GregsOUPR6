@@ -27,6 +27,6 @@ Sea levels above Tide Guage Zero for 2023.
 This is radically smoothed data.  Do not use this data for decisions under uncertainty.
 }
 \author{
-Bureau of Meteorology
+Australian Bureau of Meteorology
 }
 \keyword{datasets}

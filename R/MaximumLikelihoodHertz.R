@@ -876,18 +876,19 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
           private$theta_l <- theta
           private$theta <- theta
         }
-        gof <- RcppOUPMLGoodnessOfFit(tau,z,theta[[4]],theta[[6]])
-        theta_i <- list(rhor=gof[1,1],mu=gof[1,2],sigma=gof[1,3],lnLr=gof[1,4],k=gof[1,5],alphar=gof[1,6],m1=gof[1,7])
-        Inv <- list(R2=gof[1,8],PVal=gof[1,9])
-        theta_s <- list(rhor=gof[2,1],mur=gof[2,2],sigma=gof[2,3],lnLr=gof[2,4],k=gof[2,5],alphar=gof[2,6],m1=gof[2,7])
-        SBM <- list(R2=gof[2,8],Pval=gof[2,9])
-        goodness <- list(theta=theta,theta_i=theta_i,theta_s=theta_s,Inv=Inv,SBM=SBM)
+        gof <- RcppOUPMLGoodnessOfFit(tau,z,unlist(theta))
+        theta_e <- list(rho=gof[1,1],mu=gof[1,2],sigma=gof[1,3],varsigma=gof[1,4],lnL=gof[1,5],k=gof[1,6],alpha=gof[1,7],m1=gof[1,8])
+        theta_i <- list(rhor=gof[2,1],mu=gof[2,2],sigma=gof[2,3],varsigma=gof[2,4],lnLr=gof[2,5],kr=gof[2,6],alphar=gof[2,7],m1=gof[2,8])
+        theta_s <- list(rhor=gof[3,1],mur=gof[3,2],sigma=gof[3,3],varsigma=gof[3,4],lnLr=gof[3,5],kr=gof[3,6],alphar=gof[3,7],m1=gof[3,8])
+        Inv <- list(R2=gof[2,9],PVal=gof[2,10])
+        SBM <- list(R2=gof[3,9],Pval=gof[3,10])
+        goodness <- list(theta_e=theta_e,theta_i=theta_i,theta_s=theta_s,Inv=Inv,SBM=SBM)
         private$goodness <- goodness
       }
       # copy ----
       if(copyit == TRUE)
       {
-        theta <- goodness[[1]]
+        theta_e <- goodness[[1]]
         theta_i <- goodness[[2]]
         theta_s <- goodness[[3]]
         Inv <- goodness[[4]]
@@ -896,7 +897,7 @@ MaximumLikelihood <- R6::R6Class("MaximumLikelihood",
         timename <- private$timeseries_info[[4]]
         statename <- private$timeseries_info[[5]]
         estimation <- private$timeseries_info[[6]]
-        clip <- rbind(c("Maximum Likelihood",rep("",3)),c("Goodness of Fit",rep("",3)),c("File:",dataname,rep("",2)),c("Time:",timename,rep("",2)),c("State:",statename,rep("",2)),c("Inv R2",Inv[[1]],rep("",2)),c("Inv 1-P",Inv[[2]],rep("",2)),c("SBM R2",SBM[[1]],rep("",2)),c("SBM 1-P",SBM[[2]],rep("",2)),c("",estimation,"Invariant","Scaled BM"),c("rho",theta[1],theta_i[1],theta_s[1]),c("mu",theta[2],theta_i[2],theta_s[2]),c("sigma",theta[3],theta_i[3],theta_s[3]),c("lnL",theta[4],theta_i[4],theta_s[4]),c("k",theta[5],theta_i[5],theta_s[5]),c("alpha",theta[6],theta_i[6],theta_s[6]),c("m1",theta[7],theta_i[7],theta_s[7]))
+        clip <- rbind(c("Maximum Likelihood",rep("",3)),c("Goodness of Fit",rep("",3)),c("File:",dataname,rep("",2)),c("Time:",timename,rep("",2)),c("State:",statename,rep("",2)),c("Inv R2",Inv[[1]],rep("",2)),c("Inv 1-P",Inv[[2]],rep("",2)),c("SBM R2",SBM[[1]],rep("",2)),c("SBM 1-P",SBM[[2]],rep("",2)),c("",estimation,"Invariant","Scaled BM"),c("rho",theta_e[1],theta_i[1],theta_s[1]),c("mu",theta_e[2],theta_i[2],theta_s[2]),c("sigma",theta_e[3],theta_i[3],theta_s[3]),c("varsigma",theta_e[4],theta_i[4],theta_s[4]),c("lnL",theta_e[5],theta_i[5],theta_s[5]),c("k",theta_e[6],theta_i[6],theta_s[6]),c("alpha",theta_e[7],theta_i[7],theta_s[7]),c("m1",theta_e[8],theta_i[8],theta_s[8]))
         private$CopyToClipboard(clip)
       }
       return(goodness)

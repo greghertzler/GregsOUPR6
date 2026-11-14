@@ -210,11 +210,13 @@ bug reports:
 - [`Ecosys_Albatross`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_Albatross.md)
   : Albatross Egg Counts
 - [`Ecosys_IrrigationWaterSupply`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_IrrigationWaterSupply.md)
-  : Water Supply for Irrigated Agriculture in Eastern Australia
+  : Water Supply for Irrigated Agriculture in Australia
 - [`Ecosys_Kangaroos`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_Kangaroos.md)
   : Kangaroo Population and Harvest in South Australia
 - [`Ecosys_SouthernBluefinTuna`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_SouthernBluefinTuna.md)
   : Southern Bluefin Tuna in Australian Waters
+- [`Ecosys_StreamFlows`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_StreamFlows.md)
+  : Annual Total Streamflows in Australia
 - [`Ecosys_SydneyWater`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_SydneyWater.md)
   : Sydney Drinking Water Catchment
 - [`Ecosys_TropicalRockLobsters`](https://greghertzler.github.io/GregsOUPR6/reference/Ecosys_TropicalRockLobsters.md)

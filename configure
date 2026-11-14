@@ -10,6 +10,18 @@ if [ -n "$SHINY_PORT" ] || [ "$R_CONFIG_ACTIVE" = "shinyapps" ]; then
     PKG_CPPFLAGS="-DNO_PARALLEL"
     PKG_LIBS=""
 
+    echo "  Editing DESCRIPTION for shinyapps.io deployment."
+    sed -i.bak 's/RcppParallel, dqrng, sitmo, //' DESCRIPTION
+    sed -i 's/LinkingTo: Rcpp/LinkingTo: Rcpp, dqrng, sitmo/' DESCRIPTION
+
+# --- Sys.setenv(DISABLE_RCPP_PARALLEL = "1") ---
+else
+DISABLE_FLAG=${DISABLE_RCPP_PARALLEL:-0}
+if [ "$DISABLE_FLAG" = "1" ]; then
+    echo "  RcppParallel manually disabled — building with Rcpp only."
+    PKG_CPPFLAGS="-DNO_PARALLEL"
+    PKG_LIBS=""
+
 # --- Detect RcppParallel ---
 else
 RCPP_PARALLEL_HOME=$(Rscript -e "cat(system.file(package='RcppParallel',lib.loc=.libPaths()))" 2>/dev/null)
@@ -21,6 +33,7 @@ else
     echo "  RcppParallel not found — building with Rcpp only."
     PKG_CPPFLAGS="-DNO_PARALLEL"
     PKG_LIBS=""
+fi
 fi
 fi
 
@@ -44,15 +57,21 @@ else
     PKG_CPPFLAGS="$PKG_CPPFLAGS -DNO_SITMO"
 fi
 
-# Ensure src directory exists
+# --- Ensure src directory exists ---
 mkdir -p src
 
-# Write Makevars (Unix) and Makevars.win (Windows)
+# --- Write Makevars (Unix) and Makevars.win (Windows) ---
 {
     echo "PKG_CPPFLAGS += $PKG_CPPFLAGS"
     echo "PKG_LIBS += $PKG_LIBS"
 } > src/Makevars
 
 cp src/Makevars src/Makevars.win
+
+# --- Restore DESCRIPTION ---
+if [ -n "$SHINY_PORT" ] || [ "$R_CONFIG_ACTIVE" = "shinyapps" ]; then
+    echo "  Restoring original DESCRIPTION."
+    mv DESCRIPTION.bak DESCRIPTION 2>/dev/null || true
+fi
 
 echo "Configuration complete."

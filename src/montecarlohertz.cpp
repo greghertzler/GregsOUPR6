@@ -415,9 +415,9 @@ NumericVector RcppOUPMCMinMax(NumericVector matPaths)
 #ifdef USE_DQRNG
 struct ROMCPSNdqrng : public RcppParallel::Worker {
   RVector<double> stdnorm;
-  uint64_t seed;
+  std::size_t seed;
 
-  ROMCPSNdqrng(Rcpp::NumericVector& stdnorm, uint64_t seed)
+  ROMCPSNdqrng(Rcpp::NumericVector& stdnorm, std::size_t seed)
     : stdnorm(stdnorm), seed(seed) {}
 
   void operator()(std::size_t begin, std::size_t end) {
@@ -431,9 +431,9 @@ struct ROMCPSNdqrng : public RcppParallel::Worker {
 struct ROMCPSNcpp : public Worker
 {
   RVector<double> stdnorm;
-  uint64_t seed;
+  std::size_t seed;
 
-  ROMCPSNcpp(NumericVector& stdnorm, uint64_t seed)
+  ROMCPSNcpp(NumericVector& stdnorm, std::size_t seed)
     : stdnorm(stdnorm), seed(seed) {}
 
   void operator()(std::size_t begin, std::size_t end) {
@@ -447,9 +447,9 @@ struct ROMCPSNcpp : public Worker
 struct ROMCPSNsitmo : public Worker
 {
   RVector<double> stdnorm;
-  uint64_t seed;
+  size_t seed;
 
-  ROMCPSNsitmo(NumericVector& stdnorm, uint64_t seed)
+  ROMCPSNsitmo(NumericVector& stdnorm, size_t seed)
     : stdnorm(stdnorm), seed(seed) {}
 
   void operator()(std::size_t begin, std::size_t end) {
@@ -471,7 +471,7 @@ struct ROMCPSNsitmo : public Worker
 //' @return stdnorm((m-1)*skip,paths) <- RcppOUPMCStandardNormal()
 //' @export
 // [[Rcpp::export]]
-Rcpp::NumericMatrix RcppOUPMCStandardNormal(int64_t m, int64_t skip, int64_t paths, uint64_t seed, uint64_t engine)
+NumericMatrix RcppOUPMCStandardNormal(std::size_t m, std::size_t skip, std::size_t paths, std::size_t seed, std::size_t engine)
 {
 #ifdef USE_PARALLEL
 #ifdef USE_DQRNG

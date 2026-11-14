@@ -20,4 +20,4 @@ Raw (unhomogenized) data.
 
 ## Author
 
-Bureau of Meteorology
+Australian Bureau of Meteorology
