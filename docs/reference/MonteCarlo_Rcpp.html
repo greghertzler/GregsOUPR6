@@ -326,6 +326,11 @@ sitmo::prng are the defaults.  Both packages are optional.  If dqrng is not
 installed, the fall back is std::mt19937, which is always available.  Therefore,
 sitmo::prng and rnorm will only used if requested as engines 3 and 4.  If
 sitmo::prng is requested but not installed the fallback is rnorm.</p>
+<p>To speed the calculations, a matrix of standard normal variables is calculated
+and reused.  The matrix starts small, but can become very big.  For example,
+100,000,000 standard normal variables multiplied by 8 bytes is an 800 MB matrix.
+Limits are imposed.  For the Shiny app, the limit is 400 MB.  For R6 objects,
+Rcpp and RcppParallel, the limit is 16,000 MB.</p>
 <p>Another choice available from the console is the method of simulation, either
 a 4th-order Runge-Kutta numerical integration or the stochastic integral
 equation, itself.  The last argument of the function is the method, with 4

@@ -32,7 +32,7 @@ https://doi.org/10.25919/7jj7-8826
 
 - Western Australia: irrigation water supplied in megalitres
 
-- Norther Territory: irrigation water supplied in megalitres
+- Northern Territory: irrigation water supplied in megalitres
 
 - Australia: sum of irrigation water supplied in megalitres
 

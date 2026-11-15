@@ -1312,6 +1312,12 @@ RcppOUPMLLikelihoodRatioTest <- function(lnL, alpha, m, lnLr) {
 #'  sitmo::prng and rnorm will only used if requested as engines 3 and 4.  If
 #'  sitmo::prng is requested but not installed the fallback is rnorm.
 #'
+#' To speed the calculations, a matrix of standard normal variables is calculated
+#'  and reused.  The matrix starts small, but can become very big.  For example,
+#'  100,000,000 standard normal variables multiplied by 8 bytes is an 800 MB matrix.
+#'  Limits are imposed.  For the Shiny app, the limit is 400 MB.  For R6 objects,
+#'  Rcpp and RcppParallel, the limit is 16,000 MB.
+#'
 #' Another choice available from the console is the method of simulation, either
 #'  a 4th-order Runge-Kutta numerical integration or the stochastic integral
 #'  equation, itself.  The last argument of the function is the method, with 4
@@ -1451,8 +1457,8 @@ RcppOUPMCStandardNormal <- function(m, skip, paths, seed, engine) {
 #' @param  method  4 for 4th order Runge-Kutta, 5 for integral equation
 #' @return forward(m,paths) <- RcppOUPMCForwardPaths()
 #' @export
-RcppOUPMCForwardPaths <- function(stdnorm, x, m, skip, dt, rho, mu, sigma, method) {
-    .Call(`_GregsOUPR6_RcppOUPMCForwardPaths`, stdnorm, x, m, skip, dt, rho, mu, sigma, method)
+RcppOUPMCForwardPaths <- function(stdnorm, x, m, skip, dt, paths, rho, mu, sigma, method) {
+    .Call(`_GregsOUPR6_RcppOUPMCForwardPaths`, stdnorm, x, m, skip, dt, paths, rho, mu, sigma, method)
 }
 
 #' @rdname MonteCarlo_Rcpp
@@ -1468,8 +1474,8 @@ RcppOUPMCForwardPaths <- function(stdnorm, x, m, skip, dt, rho, mu, sigma, metho
 #' @param  method  4 for 4th order Runge-Kutta, 5 for integral equation
 #' @return backward(m,paths) <- RcppOUPMCBackwardPaths()
 #' @export
-RcppOUPMCBackwardPaths <- function(stdnorm, y, m, skip, ds, rho, mu, sigma, method) {
-    .Call(`_GregsOUPR6_RcppOUPMCBackwardPaths`, stdnorm, y, m, skip, ds, rho, mu, sigma, method)
+RcppOUPMCBackwardPaths <- function(stdnorm, y, m, skip, ds, paths, rho, mu, sigma, method) {
+    .Call(`_GregsOUPR6_RcppOUPMCBackwardPaths`, stdnorm, y, m, skip, ds, paths, rho, mu, sigma, method)
 }
 
 #' @rdname MonteCarlo_Rcpp
@@ -1486,8 +1492,8 @@ RcppOUPMCBackwardPaths <- function(stdnorm, y, m, skip, ds, rho, mu, sigma, meth
 #' @param  method  4 for 4th order Runge-Kutta, 5 for integral equation
 #' @return bndfpt(m+1,paths) <- RcppOUPMCBoundedPaths()
 #' @export
-RcppOUPMCBoundedPaths <- function(stdnorm, k, x, m, skip, dt, rho, mu, sigma, method) {
-    .Call(`_GregsOUPR6_RcppOUPMCBoundedPaths`, stdnorm, k, x, m, skip, dt, rho, mu, sigma, method)
+RcppOUPMCBoundedPaths <- function(stdnorm, k, x, m, skip, dt, paths, rho, mu, sigma, method) {
+    .Call(`_GregsOUPR6_RcppOUPMCBoundedPaths`, stdnorm, k, x, m, skip, dt, paths, rho, mu, sigma, method)
 }
 
 #' @rdname MonteCarlo_Rcpp
