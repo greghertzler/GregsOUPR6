@@ -682,7 +682,7 @@ NULL
 #'   \item Eastern States:  sum of irrigation water supplied in megalitres
 #'   \item Tasmania: irrigation water supplied in megalitres
 #'   \item Western Australia:  irrigation water supplied in megalitres
-#'   \item Norther Territory: irrigation water supplied in megalitres
+#'   \item Northern Territory: irrigation water supplied in megalitres
 #'   \item Australia: sum of irrigation water supplied in megalitres
 #' }
 #'

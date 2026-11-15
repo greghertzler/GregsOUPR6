@@ -207,6 +207,12 @@ using namespace RcppParallel;
 //'  sitmo::prng and rnorm will only used if requested as engines 3 and 4.  If
 //'  sitmo::prng is requested but not installed the fallback is rnorm.
 //'
+//' To speed the calculations, a matrix of standard normal variables is calculated
+//'  and reused.  The matrix starts small, but can become very big.  For example,
+//'  100,000,000 standard normal variables multiplied by 8 bytes is an 800 MB matrix.
+//'  Limits are imposed.  For the Shiny app, the limit is 400 MB.  For R6 objects,
+//'  Rcpp and RcppParallel, the limit is 16,000 MB.
+//'
 //' Another choice available from the console is the method of simulation, either
 //'  a 4th-order Runge-Kutta numerical integration or the stochastic integral
 //'  equation, itself.  The last argument of the function is the method, with 4
@@ -642,12 +648,12 @@ struct ROMCPFwIE : public Worker
 //' @return forward(m,paths) <- RcppOUPMCForwardPaths()
 //' @export
 // [[Rcpp::export]]
-NumericMatrix RcppOUPMCForwardPaths(NumericMatrix stdnorm, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma, std::size_t method)
+NumericMatrix RcppOUPMCForwardPaths(NumericMatrix stdnorm, double x, std::size_t m, std::size_t skip, double dt, std::size_t paths, double rho, double mu, double sigma, std::size_t method)
 {
-  std::size_t nrows = stdnorm.nrow();
-  std::size_t paths = stdnorm.ncol();
   NumericMatrix forward(m,paths);
-  if(nrows == (m-1)*skip)
+  std::size_t nrows = stdnorm.nrow();
+  std::size_t ncols = stdnorm.ncol();
+  if(nrows >= (m-1)*skip && ncols >= paths)
   {
     if(method == 4)
     {
@@ -708,7 +714,7 @@ NumericMatrix RcppOUPMCForwardPaths(NumericMatrix stdnorm, double x, std::size_t
 #endif
     }
   }
-  else { Rcout << "stdnorm requires " << (m-1)*skip << " rows but has " << nrows << " rows instead." << std::endl; }
+  else { Rcout << "MCRcpp: stdnorm must be at least " << (m-1)*skip << " x " << paths << "." << std::endl; }
 
   return forward;
 }
@@ -804,12 +810,12 @@ struct ROMCPBkIE : public Worker
 //' @return backward(m,paths) <- RcppOUPMCBackwardPaths()
 //' @export
 // [[Rcpp::export]]
-NumericMatrix RcppOUPMCBackwardPaths(NumericMatrix stdnorm, double y, std::size_t m, std::size_t skip, double ds, double rho, double mu, double sigma, std::size_t method)
+NumericMatrix RcppOUPMCBackwardPaths(NumericMatrix stdnorm, double y, std::size_t m, std::size_t skip, double ds, std::size_t paths, double rho, double mu, double sigma, std::size_t method)
 {
-  std::size_t nrows = stdnorm.nrow();
-  std::size_t paths = stdnorm.ncol();
   NumericMatrix backward(m,paths);
-  if(nrows == (m-1)*skip)
+  std::size_t nrows = stdnorm.nrow();
+  std::size_t ncols = stdnorm.ncol();
+  if(nrows >= (m-1)*skip && ncols >= paths)
   {
     if(method == 4)
     {
@@ -870,7 +876,7 @@ NumericMatrix RcppOUPMCBackwardPaths(NumericMatrix stdnorm, double y, std::size_
 #endif
     }
   }
-  else { Rcout << "stdnorm requires " << (m-1)*skip << " rows but has " << nrows << " rows instead." << std::endl; }
+  else { Rcout << "MCRcpp: stdnorm must be at least " << (m-1)*skip << " x " << paths << "." << std::endl; }
 
   return backward;
 }
@@ -1002,12 +1008,12 @@ struct ROMCPBdIE : public Worker
 //' @return bndfpt(m+1,paths) <- RcppOUPMCBoundedPaths()
 //' @export
 // [[Rcpp::export]]
-NumericMatrix RcppOUPMCBoundedPaths(NumericMatrix stdnorm, double k, double x, std::size_t m, std::size_t skip, double dt, double rho, double mu, double sigma, std::size_t method)
+NumericMatrix RcppOUPMCBoundedPaths(NumericMatrix stdnorm, double k, double x, std::size_t m, std::size_t skip, double dt, std::size_t paths, double rho, double mu, double sigma, std::size_t method)
 {
-  std::size_t nrows = stdnorm.nrow();
-  std::size_t paths = stdnorm.ncol();
   NumericMatrix bndfpt(m+1,paths);
-  if(nrows == (m-1)*skip)
+  std::size_t nrows = stdnorm.nrow();
+  std::size_t ncols = stdnorm.ncol();
+  if(nrows >= (m-1)*skip && ncols >= paths)
   {
     if(method == 4)
     {
@@ -1101,7 +1107,7 @@ NumericMatrix RcppOUPMCBoundedPaths(NumericMatrix stdnorm, double k, double x, s
 #endif
     }
   }
-  else { Rcout << "stdnorm requires " << (m-1)*skip << " rows but has " << nrows << " rows instead." << std::endl; }
+  else { Rcout << "MCRcpp: stdnorm must be at least " << (m-1)*skip << " x " << paths << "." << std::endl; }
 
   return bndfpt;
 }

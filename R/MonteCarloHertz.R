@@ -466,8 +466,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               m <- length(vec)
               if(m < 102)
               {
+                if(m > length(private$y_stoch_args$t)) { private$stdnorm <- NULL }
                 private$y_stoch_args$t <- vec
-                private$ystdnorm <- NULL
                 private$yforward <- NULL
                 private$G <- NULL
                 private$H2 <- NULL
@@ -586,11 +586,15 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
                 smax <- private$Maxs(vec[1])
                 if(vec[m] < smax[m])
                 {
+                  if(101 > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
                   private$x_stoch_args$s <- smax
                   message("MC:  s shortened for numerical stability.")
                 }
-                else { private$x_stoch_args$s <- vec }
-                private$xstdnorm <- NULL
+                else
+                {
+                  if(m > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
+                  private$x_stoch_args$s <- vec
+                }
                 private$xbackward <- NULL
                 private$o <- NULL
                 private$Oneg <- NULL
@@ -718,8 +722,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             m <- length(vec)
             if(m < 102)
             {
+              if(m > length(private$t_stoch_args$t)) { private$stdnorm <- NULL }
               private$t_stoch_args$t <- vec
-              private$tstdnorm <- NULL
               private$tforward <- NULL
               private$tbounded <- NULL
               private$tfpt <- NULL
@@ -851,9 +855,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             private$plot_args$first <- 1
             if(sca < 101) { private$plot_args$last <- sca }
             else { private$plot_args$last <- 100 }
-            private$ystdnorm <- NULL
-            private$xstdnorm <- NULL
-            private$tstdnorm <- NULL
+            if(!is.null(private$stdnorm) && ncol(private$stdnorm) < sca) { private$stdnorm <- NULL }
             private$yforward <- NULL
             private$xbackward <- NULL
             private$tforward <- NULL
@@ -901,13 +903,11 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             }
             else if (sca > 20)
             {
-              sca <- 50
+              sca <- 20
               message("MC:  skip set to 20.")
             }
+            if(sca > private$path_args$skip) { private$stdnorm <- NULL }
             private$path_args$skip <- sca
-            private$ystdnorm <- NULL
-            private$xstdnorm <- NULL
-            private$tstdnorm <- NULL
             private$yforward <- NULL
             private$xbackward <- NULL
             private$tforward <- NULL
@@ -949,9 +949,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           if(sca != private$path_args$seed)
           {
             private$path_args$seed <- sca
-            private$ystdnorm <- NULL
-            private$xstdnorm <- NULL
-            private$tstdnorm <- NULL
+            private$stdnorm <- NULL
             private$yforward <- NULL
             private$xbackward <- NULL
             private$tforward <- NULL
@@ -1705,13 +1703,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           m <- length(t)
           if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
           else { dt <- 0.05 }
-          stdnorm <- private$ystdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$ystdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$yforward <- forward
         }
       }
@@ -1723,13 +1721,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           m <- length(t)
           if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
           else { dt <- 0.05 }
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$tforward <- forward
         }
       }
@@ -1783,13 +1781,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         m <- length(s)
         if(m > 1) { ds <- (s[1]-s[m])/(m-1) }
         else { ds <- 0.05 }
-        stdnorm <- private$xstdnorm
+        stdnorm <- private$stdnorm
         if(is.null(stdnorm))
         {
           stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-          private$xstdnorm <- stdnorm
+          private$stdnorm <- stdnorm
         }
-        backward <- RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,5)
+        backward <- RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,paths,rho,mu,sigma,5)
         private$xbackward <- backward
       }
       # plot or copy ----
@@ -1843,13 +1841,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         m <- length(t)
         if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
         else { dt <- 0.05 }
-        stdnorm <- private$tstdnorm
+        stdnorm <- private$stdnorm
         if(is.null(stdnorm))
         {
           stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-          private$tstdnorm <- stdnorm
+          private$stdnorm <- stdnorm
         }
-        bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
+        bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,5)
         bounded <- bndfpt[1:m,,drop=FALSE]
         fpt <- bndfpt[m+1,,drop=FALSE]
         private$tbounded <- bounded
@@ -1906,13 +1904,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           m <- length(t)
           if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
           else { dt <- 0.05 }
-          stdnorm <- private$ystdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$ystdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$yforward <- forward
         }
         n <- length(y)
@@ -1987,13 +1985,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           m <- length(t)
           if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
           else { dt <- 0.05 }
-          stdnorm <- private$ystdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$ystdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$yforward <- forward
         }
         n <- length(y)
@@ -2071,13 +2069,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
           else { dt <- 0.05 }
-          stdnorm <- private$ystdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$ystdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$yforward <- forward
         }
         mvdpd <- RcppOUPMCForwardCountY(forward,y,psi)
@@ -2156,13 +2154,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
           else { dt <- 0.05 }
-          stdnorm <- private$ystdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$ystdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$yforward <- forward
         }
         mvdpd <- RcppOUPMCForwardCountY(forward,y,psi)
@@ -2241,13 +2239,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(m > 1) { dt <- (t[m]-t[1])/(m-1) }
           else { dt <- 0.05 }
-          stdnorm <- private$ystdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$ystdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$yforward <- forward
         }
         mvdpd <- RcppOUPMCForwardCountY(forward,y,psi)
@@ -2328,13 +2326,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         backward <- private$xbackward
         if(is.null(backward))
         {
-          stdnorm <- private$xstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$xstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          backward <- RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,5)
+          backward <- RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,paths,rho,mu,sigma,5)
           private$xbackward <- backward
         }
         dpo <- RcppOUPMCBackwardCountX(backward,x,phi,rho,r,ds)
@@ -2407,13 +2405,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         forward <- private$tforward
         if(is.null(forward))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2481,13 +2479,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         forward <- private$tforward
         if(is.null(forward))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2554,13 +2552,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         forward <- private$tforward
         if(is.null(forward))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2627,13 +2625,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         forward <- private$tforward
         if(is.null(forward))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
+          forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,5)
           private$tforward <- forward
         }
         pctdp <- RcppOUPMCForwardCountT(forward,k,dt,rho,mu,sigma,Ppct)
@@ -2700,13 +2698,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fpt <- private$tfpt
         if(is.null(fpt))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -2777,13 +2775,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fpt <- private$tfpt
         if(is.null(fpt))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,1)
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,1)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -2853,13 +2851,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fpt <- private$tfpt
         if(is.null(fpt))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -2929,13 +2927,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         fpt <- private$tfpt
         if(is.null(fpt))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
-          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
+          bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
           fpt <- bndfpt[m+1,,drop=FALSE]
           private$tbounded <- bounded
@@ -5620,9 +5618,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     syncyxt = NULL,
     forwardyt = NULL,
     passaget = NULL,
-    ystdnorm = NULL,
-    xstdnorm = NULL,
-    tstdnorm = NULL,
+    stdnorm = NULL,
     tfpt = NULL,
     fheat = NULL,
     fz = NULL,
@@ -6374,11 +6370,11 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         forward <- private$tforward
         if(is.null(forward))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
           forward <- RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,5)
           private$tforward <- forward
@@ -6420,11 +6416,11 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         bounded <- private$tbounded
         if(is.null(bounded))
         {
-          stdnorm <- private$tstdnorm
+          stdnorm <- private$stdnorm
           if(is.null(stdnorm))
           {
             stdnorm <- RcppOUPMCStandardNormal(m,skip,paths,seed,1)
-            private$tstdnorm <- stdnorm
+            private$stdnorm <- stdnorm
           }
           bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,5)
           bounded <- bndfpt[1:m,,drop=FALSE]
