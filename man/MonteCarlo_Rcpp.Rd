@@ -18,11 +18,11 @@ RcppOUPMCMinMax(matPaths)
 
 RcppOUPMCStandardNormal(m,skip,paths,seed,engine)
 
-RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,method)
+RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,method)
 
-RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,method)
+RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,paths,rho,mu,sigma,method)
 
-RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
+RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,method)
 
 RcppOUPMCForwardCountY(forward,y,psi)
 
@@ -147,7 +147,7 @@ path in row m+1.  There are NA entries for paths which previously hit the
 threshold and NA entries in row m+1 for paths which have yet to hit the
 threshold.  Subset in R as:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,method)
 bounded <- bndfpt[1:m,,drop=FALSE]
 fpt <- bndfpt[m+1,,drop=FALSE]
 }\if{html}{\out{</div>}}
@@ -273,7 +273,7 @@ RShiny apps.  From the console, a simulation of 1,000,000 forward paths
 over 100 time intervals would be:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{ stdnorm <- RcppOUPMCStandardNormal(101,1,1000000,9999,1)
- fwd <- RcppOUPMCForwardPaths(stdnorm,15,101,1,0.1,0.5,-15,15,5)
+ fwd <- RcppOUPMCForwardPaths(stdnorm,15,101,1,0.1,0.5,1000000,-15,15,5)
 }\if{html}{\out{</div>}}
 
 The R6 object doesn't give users a choice, but from the console there are four

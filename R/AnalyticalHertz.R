@@ -1436,6 +1436,7 @@ Analytical <- R6::R6Class("Analytical",
       sigma <- private$oup_params[[3]]
       s <- private$x_stoch_args[[1]]
       y <- private$x_stoch_args[[4]]
+      phi <- private$x_stoch_args[[6]]
       # state
       k <- self$DecisionThreshold(who="A")[[1]]
       if(is.finite(k))
@@ -1491,26 +1492,31 @@ Analytical <- R6::R6Class("Analytical",
         xto <- xfrom+100*xby
       }
       xseq <- seq(from=xfrom,to=xto,by=xby)
+      self$set_x_stoch_args(NULL,xseq,NULL,NULL,NULL,NULL,NULL,NULL)
       # time
-      t <- 10
-      if(rho > 0.0000000001) { t <- 5/rho }
-      tscale <- 1
-      if(t < 1)
+      shat <- self$OptionEnvelope(who="A")[[2]]
+      n <- length(shat)
+      if(phi > 0) { t <- 1.5*(s[1]-shat[1]) }
+      else { t <- 1.5*(s[1]-shat[n]) }
+      if(t > 0)
       {
-        while(t < tscale) { tscale <- tscale/10 }
+        tscale <- 1
+        if(t < 1)
+        {
+          while(t < tscale) { tscale <- tscale/10 }
+        }
+        else
+        {
+          while(t > tscale) { tscale <- 10*tscale }
+        }
+        t <- round(t/tscale,2)*tscale
       }
-      else
-      {
-        while(t > tscale) { tscale <- 10*tscale }
-      }
-      t <- round(t/tscale,2)*tscale
-      if(t < 0.001) { t <- 0.001 }
+      else { t <- 0.001 }
       sfrom <- s[1]
       sto <- sfrom-t
       sby <- -t/100
       sseq <-seq(from=sfrom,to=sto,by=sby)
-
-      self$set_x_stoch_args(sseq,xseq,NULL,NULL,NULL,NULL,NULL,NULL)
+      self$set_x_stoch_args(sseq,NULL,NULL,NULL,NULL,NULL,NULL,NULL)
 
       return(NULL)
     },

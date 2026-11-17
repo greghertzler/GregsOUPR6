@@ -47,11 +47,11 @@
 <span></span>
 <span><span class="fu">RcppOUPMCStandardNormal</span><span class="op">(</span><span class="va">m</span>,<span class="va">skip</span>,<span class="va">paths</span>,<span class="va">seed</span>,<span class="va">engine</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">RcppOUPMCForwardPaths</span><span class="op">(</span><span class="va">stdnorm</span>,<span class="va">x</span>,<span class="va">m</span>,<span class="va">skip</span>,<span class="va">dt</span>,<span class="va">rho</span>,<span class="va">mu</span>,<span class="va">sigma</span>,<span class="va">method</span><span class="op">)</span></span>
+<span><span class="fu">RcppOUPMCForwardPaths</span><span class="op">(</span><span class="va">stdnorm</span>,<span class="va">x</span>,<span class="va">m</span>,<span class="va">skip</span>,<span class="va">dt</span>,<span class="va">paths</span>,<span class="va">rho</span>,<span class="va">mu</span>,<span class="va">sigma</span>,<span class="va">method</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">RcppOUPMCBackwardPaths</span><span class="op">(</span><span class="va">stdnorm</span>,<span class="va">y</span>,<span class="va">m</span>,<span class="va">skip</span>,<span class="va">ds</span>,<span class="va">rho</span>,<span class="va">mu</span>,<span class="va">sigma</span>,<span class="va">method</span><span class="op">)</span></span>
+<span><span class="fu">RcppOUPMCBackwardPaths</span><span class="op">(</span><span class="va">stdnorm</span>,<span class="va">y</span>,<span class="va">m</span>,<span class="va">skip</span>,<span class="va">ds</span>,<span class="va">paths</span>,<span class="va">rho</span>,<span class="va">mu</span>,<span class="va">sigma</span>,<span class="va">method</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">RcppOUPMCBoundedPaths</span><span class="op">(</span><span class="va">stdnorm</span>,<span class="va">k</span>,<span class="va">x</span>,<span class="va">m</span>,<span class="va">skip</span>,<span class="va">dt</span>,<span class="va">rho</span>,<span class="va">mu</span>,<span class="va">sigma</span>,<span class="va">method</span><span class="op">)</span></span>
+<span><span class="fu">RcppOUPMCBoundedPaths</span><span class="op">(</span><span class="va">stdnorm</span>,<span class="va">k</span>,<span class="va">x</span>,<span class="va">m</span>,<span class="va">skip</span>,<span class="va">dt</span>,<span class="va">paths</span>,<span class="va">rho</span>,<span class="va">mu</span>,<span class="va">sigma</span>,<span class="va">method</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">RcppOUPMCForwardCountY</span><span class="op">(</span><span class="va">forward</span>,<span class="va">y</span>,<span class="va">psi</span><span class="op">)</span></span>
 <span></span>
@@ -201,7 +201,7 @@ backward paths and heat maps.</p>
 path in row m+1.  There are NA entries for paths which previously hit the
 threshold and NA entries in row m+1 for paths which have yet to hit the
 threshold.  Subset in R as:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>bndfpt <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCBoundedPaths</span>(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)</span>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>bndfpt <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCBoundedPaths</span>(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,method)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>bounded <span class="ot">&lt;-</span> bndfpt[<span class="dv">1</span><span class="sc">:</span>m,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>fpt <span class="ot">&lt;-</span> bndfpt[m<span class="sc">+</span><span class="dv">1</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span></code></pre><p></p></div>
 <p>The return value:</p>
@@ -298,7 +298,7 @@ RcppsitmoInstalled() will enquire whether they are installed.</p>
 RShiny apps.  From the console, a simulation of 1,000,000 forward paths
 over 100 time intervals would be:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a> stdnorm <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCStandardNormal</span>(<span class="dv">101</span>,<span class="dv">1</span>,<span class="dv">1000000</span>,<span class="dv">9999</span>,<span class="dv">1</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a> fwd <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCForwardPaths</span>(stdnorm,<span class="dv">15</span>,<span class="dv">101</span>,<span class="dv">1</span>,<span class="fl">0.1</span>,<span class="fl">0.5</span>,<span class="sc">-</span><span class="dv">15</span>,<span class="dv">15</span>,<span class="dv">5</span>)</span></code></pre><p></p></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a> fwd <span class="ot">&lt;-</span> <span class="fu">RcppOUPMCForwardPaths</span>(stdnorm,<span class="dv">15</span>,<span class="dv">101</span>,<span class="dv">1</span>,<span class="fl">0.1</span>,<span class="fl">0.5</span>,<span class="dv">1000000</span>,<span class="sc">-</span><span class="dv">15</span>,<span class="dv">15</span>,<span class="dv">5</span>)</span></code></pre><p></p></div>
 <p>The R6 object doesn't give users a choice, but from the console there are four
 random number generators available: dqrng, std::mt19937, sitmo, and rnorm.
 In the last argument of the function, these are requested as engine

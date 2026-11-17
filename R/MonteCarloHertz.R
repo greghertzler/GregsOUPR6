@@ -429,16 +429,16 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           yseq <- private$y_stoch_args[[2]]
           ymin <- private$Miny()
           n <- length(yseq)
-          if((yseq[n]-yseq[1])/(n-1) < (ymin[101]-ymin[1])/100) { self$set_y_stoch_args(NULL,ymin,NULL,NULL) }
+          if((yseq[n]-yseq[1])/(n-1) < (ymin[101]-ymin[1])/100) { self$set_y_stoch_args(NULL,ymin,NULL,NULL,"MC") }
           # x_stoch_args
           sseq <- private$x_stoch_args[[1]]
           smax <- private$Maxs()
           m <- length(sseq)
-          if(sseq[1]-sseq[m] > smax[1]-smax[101]) { self$set_x_stoch_args(smax,NULL,NULL,NULL) }
+          if(sseq[1]-sseq[m] > smax[1]-smax[101]) { self$set_x_stoch_args(smax,NULL,NULL,NULL,NULL,"MC") }
           xseq <- private$x_stoch_args[[2]]
           xmin <- private$Minx()
           n <- length(xseq)
-          if((xseq[n]-xseq[1])/(n-1) < (xmin[101]-xmin[1])/100) { self$set_x_stoch_args(NULL,xmin,NULL,NULL) }
+          if((xseq[n]-xseq[1])/(n-1) < (xmin[101]-xmin[1])/100) { self$set_x_stoch_args(NULL,xmin,NULL,NULL,NULL,"MC") }
         }
       }
       return(private$oup_params)

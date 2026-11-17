@@ -58,7 +58,7 @@ using namespace RcppParallel;
 //'  threshold and NA entries in row m+1 for paths which have yet to hit the
 //'  threshold.  Subset in R as:
 //'
-//'     bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
+//'     bndfpt <- RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,method)
 //'     bounded <- bndfpt[1:m,,drop=FALSE]
 //'     fpt <- bndfpt[m+1,,drop=FALSE]
 //'
@@ -174,7 +174,7 @@ using namespace RcppParallel;
 //'  over 100 time intervals would be:
 //'
 //'      stdnorm <- RcppOUPMCStandardNormal(101,1,1000000,9999,1)
-//'      fwd <- RcppOUPMCForwardPaths(stdnorm,15,101,1,0.1,0.5,-15,15,5)
+//'      fwd <- RcppOUPMCForwardPaths(stdnorm,15,101,1,0.1,0.5,1000000,-15,15,5)
 //'
 //' The R6 object doesn't give users a choice, but from the console there are four
 //'  random number generators available: dqrng, std::mt19937, sitmo, and rnorm.
@@ -635,12 +635,13 @@ struct ROMCPFwIE : public Worker
 #endif
 
 //' @rdname MonteCarlo_Rcpp
-//' @usage  RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,rho,mu,sigma,method)
+//' @usage  RcppOUPMCForwardPaths(stdnorm,x,m,skip,dt,paths,rho,mu,sigma,method)
 //' @param  stdnorm matrix of standard normal shocks
 //' @param  x       initial state or vector of backward states
 //' @param  m       number of rows for states over time
 //' @param  skip    subdivide time interval but report every ds or dt 0<skip<50
 //' @param  dt      time interval for initial value problems
+//' @param  paths   number of columns for paths
 //' @param  rho     rate parameter 0<=rho<inf
 //' @param  mu      location parameter -inf<mu<inf
 //' @param  sigma   scale parameter -inf<sigma<inf
@@ -797,12 +798,13 @@ struct ROMCPBkIE : public Worker
 #endif
 
 //' @rdname MonteCarlo_Rcpp
-//' @usage  RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,rho,mu,sigma,method)
+//' @usage  RcppOUPMCBackwardPaths(stdnorm,y,m,skip,ds,paths,rho,mu,sigma,method)
 //' @param  stdnorm matrix of standard normal shocks
 //' @param  y       terminal state or vector of forward states
 //' @param  m       number of rows for states over time
 //' @param  skip    subdivide time interval but report every ds or dt 0<skip<50
 //' @param  ds      time interval for terminal value problems
+//' @param  paths   number of columns for paths
 //' @param  rho     rate parameter 0<=rho<inf
 //' @param  mu      location parameter -inf<mu<inf
 //' @param  sigma   scale parameter -inf<sigma<inf
@@ -994,13 +996,14 @@ struct ROMCPBdIE : public Worker
 #endif
 
 //' @rdname MonteCarlo_Rcpp
-//' @usage  RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,rho,mu,sigma,method)
+//' @usage  RcppOUPMCBoundedPaths(stdnorm,k,x,m,skip,dt,paths,rho,mu,sigma,method)
 //' @param  stdnorm matrix of standard normal shocks
 //' @param  k       threshold -inf<k<inf
 //' @param  x       initial state or vector of backward states
 //' @param  m       number of rows for states over time
 //' @param  skip    subdivide time interval but report every ds or dt 0<skip<20
 //' @param  dt      time interval for initial value problems
+//' @param  paths   number of columns for paths
 //' @param  rho     rate parameter 0<=rho<inf
 //' @param  mu      location parameter -inf<mu<inf
 //' @param  sigma   scale parameter -inf<sigma<inf
