@@ -1309,7 +1309,7 @@ Analytical <- R6::R6Class("Analytical",
       if(rho > 0.0000000001) { z <- 2*abs(sigma)/(2*rho)^0.5 }
       else { z <- 2*abs(sigma) }
       zscale <- 1
-      if(z > 0)
+      if(z > 0.001)
       {
         if(z < 1)
         {
@@ -1319,14 +1319,13 @@ Analytical <- R6::R6Class("Analytical",
         {
           while(z > zscale) { zscale <- 10*zscale }
         }
+        z <- round(z/zscale,1)*zscale
       }
-      else { z <- 1 }
-      z <- round(z/zscale,2)*zscale
-      if(z < 0.001) { z <- 0.001 }
+      else { z <- 0.001 }
       zby <- z/50
       zscale <- 1
       while(abs(mu) > zscale) { zscale <- 10*zscale }
-      z <- round(mu/zscale,2)*zscale
+      z <- round(mu/zscale,1)*zscale
       zfrom <- z-50*zby
       zto <- zfrom+100*zby
       zseq <- seq(from=zfrom,to=zto,by=zby)
@@ -1349,61 +1348,66 @@ Analytical <- R6::R6Class("Analytical",
       # time
       ts <- 10
       if(rho > 0.0000000001) { ts <- 5/rho }
-      tscale <- 1
-      if(ts < 1)
+      if(ts > 0.001)
       {
-        while(ts < tscale) { tscale <- tscale/10 }
+        tscale <- 1
+        if(ts < 1)
+        {
+          while(ts < tscale) { tscale <- tscale/10 }
+        }
+        else
+        {
+          while(ts > tscale) { tscale <- 10*tscale }
+        }
+        ts <- round(ts/tscale,1)*tscale
       }
-      else
-      {
-        while(ts > tscale) { tscale <- 10*tscale }
-      }
-      ts <- round(ts/tscale,2)*tscale
-      if(ts < 0.001) { ts <- 0.001 }
+      else { ts <- 0.001 }
       tfrom <- s
       tto <- s+ts
       tby <- ts/100
       tseq <- seq(from=tfrom,to=tto,by=tby)
       # state
-      if(rho < 0.0000000001)
+      if(rho < 0.0000000001) { H <- sigma*ts^0.5  }
+      else { H <- (sigma^2/(2*rho)*(1-exp(-2*rho*ts)))^0.5 }
+      ydif <- 4*(abs(x-mu)*exp(-rho*ts)+H)
+      if(ydif > 0.001)
       {
-        G <- x
-        H <- sigma*ts^0.5
-      }
-      else
-      {
-        G <- mu+(x-mu)*exp(-rho*ts)
-        H <- (sigma^2/(2*rho)*(1-exp(-2*rho*ts)))^0.5
-      }
-      ydif <- G+H-mu
-      if(ydif < abs(x-mu)) { ydif <- abs(x-mu) }
-      if(ydif > 0)
-      {
-        ydif <- 3*ydif
         yscale <- 1
+        yrnd <- 0
         if(ydif < 1)
         {
-          while(ydif < yscale) { yscale <- yscale/10 }
+          while(ydif < yscale)
+          {
+            yscale <- yscale/10
+            yrnd <- yrnd+1
+          }
         }
         else
         {
-          while(ydif > yscale) { yscale <- 10*yscale }
+          while(ydif > yscale)
+          {
+            yscale <- 10*yscale
+            yrnd <- yrnd+1
+          }
         }
-        ydif <- round(ydif/yscale,2)*yscale
+        ydif <- round(ydif/yscale,1)*yscale
       }
-      else { ydif <- 60 }
+      else { ydif <- 0.001 }
       yby <- ydif/100
       ydif <- 0.5*(x+mu)
-      yscale <- 1
-      if(abs(ydif) < 1)
+      if(abs(ydif) > 0)
       {
-        while(abs(ydif) < yscale) { yscale <- yscale/10 }
+        yscale <- 1
+        if(abs(ydif) < 1)
+        {
+          while(abs(ydif) < yscale) { yscale <- yscale/10 }
+        }
+        else
+        {
+          while(abs(ydif) > yscale) { yscale <- 10*yscale }
+        }
+        ydif <- round(ydif/yscale,yrnd)*yscale
       }
-      else
-      {
-        while(abs(ydif) > yscale) { yscale <- 10*yscale }
-      }
-      ydif <- round(ydif/yscale,2)*yscale
       yfrom <- ydif-50*yby
       yto <- yfrom+100*yby
       yseq <- seq(from=yfrom,to=yto,by=yby)
@@ -1442,25 +1446,33 @@ Analytical <- R6::R6Class("Analytical",
       if(is.finite(k))
       {
         x <- 2*abs(k-y)
-        xscale <- 1
-        if(x > 0)
+        if(x > 0.001)
         {
+          xscale <- 1
+          xrnd <- 0
           if(x < 1)
           {
-            while(x < xscale) { xscale <- xscale/10 }
+            while(x < xscale)
+            {
+              xscale <- xscale/10
+              xrnd <- xrnd+1
+            }
           }
           else
           {
-            while(x > xscale) { xscale <- 10*xscale }
+            while(x > xscale)
+            {
+              xscale <- 10*xscale
+              xrnd <- xrnd+1
+            }
           }
+          x <- round(x/xscale,1)*xscale
         }
-        else { x <- 1 }
-        x <- round(x/xscale,2)*xscale
-        if(x < 0.001) { x <- 0.001 }
+        else { x <- 0.001 }
         xby <- x/50
         xscale <- 1
         while(abs(k) > xscale) { xscale <- 10*xscale }
-        x <- round(k/xscale,2)*xscale
+        x <- round(k/xscale,xrnd)*xscale
         if(k < y) { xfrom <- x-30*xby }
         else { xfrom <- x-70*xby }
         xto <- xfrom+100*xby
@@ -1468,26 +1480,34 @@ Analytical <- R6::R6Class("Analytical",
       else
       {
         x <- 2*abs(sigma)
-        xscale <- 1
-        if(x > 0)
+        if(x > 0.001)
         {
+          xscale <- 1
+          xrnd <- 0
           if(x < 1)
           {
-            while(x < xscale) { xscale <- xscale/10 }
+            while(x < xscale)
+            {
+              xscale <- xscale/10
+              xrnd <- xrnd+1
+            }
           }
           else
           {
-            while(x > xscale) { xscale <- 10*xscale }
+            while(x > xscale)
+            {
+              xscale <- 10*xscale
+              xrnd <- xrnd+1
+            }
           }
+          x <- round(x/xscale,1)*xscale
         }
-        else { x <- 1 }
-        x <- round(x/xscale,2)*xscale
-        if(x < 0.001) { x <- 0.001 }
+        else { x <- 0.001 }
         xby <- x/50
         xscale <- 1
         x <- 0.5*(y+mu)
         while(abs(x) > xscale) { xscale <- 10*xscale }
-        x <- round(x/xscale,2)*xscale
+        x <- round(x/xscale,xrnd)*xscale
         xfrom <- x-50*xby
         xto <- xfrom+100*xby
       }
@@ -1498,7 +1518,7 @@ Analytical <- R6::R6Class("Analytical",
       n <- length(shat)
       if(phi > 0) { t <- 1.5*(s[1]-shat[1]) }
       else { t <- 1.5*(s[1]-shat[n]) }
-      if(t > 0)
+      if(t > 0.001)
       {
         tscale <- 1
         if(t < 1)
@@ -1509,7 +1529,7 @@ Analytical <- R6::R6Class("Analytical",
         {
           while(t > tscale) { tscale <- 10*tscale }
         }
-        t <- round(t/tscale,2)*tscale
+        t <- round(t/tscale,1)*tscale
       }
       else { t <- 0.001 }
       sfrom <- s[1]
@@ -1537,9 +1557,9 @@ Analytical <- R6::R6Class("Analytical",
       if(is.finite(k))
       {
         z <- 2*abs(k-x)
-        zscale <- 1
-        if(z > 0)
+        if(z > 0.001)
         {
+          zscale <- 1
           if(z < 1)
           {
             while(z < zscale) { zscale <- zscale/10 }
@@ -1548,9 +1568,9 @@ Analytical <- R6::R6Class("Analytical",
           {
             while(z > zscale) { zscale <- 10*zscale }
           }
+          z <- round(z/zscale,1)*zscale
         }
-        else { z <- 1 }
-        z <- round(z/zscale,2)*zscale
+        else { z <- 0.001 }
         zby <- z/50
         if(k < x) { zfrom <- k-30*zby }
         else { zfrom <- k-70*zby }
@@ -1559,24 +1579,33 @@ Analytical <- R6::R6Class("Analytical",
       else
       {
         z <- 2*abs(sigma)
-        zscale <- 1
-        if(z > 0)
+        if(z > 0.001)
         {
+          zscale <- 1
+          zrnd <- 0
           if(z < 1)
           {
-            while(z < zscale) { zscale <- zscale/10 }
+            while(z < zscale)
+            {
+              zscale <- zscale/10
+              zrnd <- zrnd+1
+            }
           }
           else
           {
-            while(z > zscale) { zscale <- 10*zscale }
+            while(z > zscale)
+            {
+              zscale <- 10*zscale
+              zrnd <- zrnd+1
+            }
           }
+          z <- round(z/zscale,1)*zscale
         }
-        else { z <- 1 }
-        z <- round(z/zscale,2)*zscale
+        else { z <- 0.001 }
         zby <- z/50
         zscale <- 1
         while(abs(z) > zscale) { zscale <- 10*zscale }
-        z <- round(z/zscale,2)*zscale
+        z <- round(z/zscale,zrnd)*zscale
         zfrom <- z-50*zby
         zto <- zfrom+100*zby
       }
@@ -1590,9 +1619,9 @@ Analytical <- R6::R6Class("Analytical",
       if(is.infinite(tuppers[n])) { tuppers[n] <- s+1 }
       if(tuppers[n] > tuppers[1]) { t <- (tuppers[n]-s) }
       else { t <- (tuppers[1]-s) }
-      tscale <- 1
-      if(t > 0)
+      if(t > 0.001)
       {
+        tscale <- 1
         if(t < 1)
         {
           while(t < tscale) { tscale <- tscale/10 }
@@ -1601,9 +1630,9 @@ Analytical <- R6::R6Class("Analytical",
         {
           while(t > tscale) { tscale <- 10*tscale }
         }
+        t <- round(t/tscale,1)*tscale
       }
-      else { t <- 1 }
-      t <- round(t/tscale,2)*tscale
+      else { t <- 0.001 }
       tfrom <- s
       tto <- t+s
       tby <- t/100

@@ -1992,17 +1992,20 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       # time
       t <- 10
       if(rho > 0.0000000001) { t <- 5/rho }
-      tscale <- 1
-      if(t < 1)
+      if(t > 0.001)
       {
-        while(t < tscale) { tscale <- tscale/10 }
+        tscale <- 1
+        if(t < 1)
+        {
+          while(t < tscale) { tscale <- tscale/10 }
+        }
+        else
+        {
+          while(t > tscale) { tscale <- 10*tscale }
+        }
+        t <- round(t/tscale,1)*tscale
       }
-      else
-      {
-        while(t > tscale) { tscale <- 10*tscale }
-      }
-      t <- round(t/tscale,2)*tscale
-      if(t < 0.001) { t <- 0.001 }
+      else { t <- 0.001 }
       sfrom <- s[1]
       sto <- sfrom-t
       sby <- -t/100
@@ -2010,25 +2013,38 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
       # state
       if(rho > 0.000000001) { x <- 8*abs(sigma)/(2*rho)^0.5 }
       else { x <- 8*abs(sigma) }
-      xscale <- 1
-      if(x < 1)
+      if(x > 0.001)
       {
-        while(x < xscale) { xscale <- xscale/10 }
+        xscale <- 1
+        xrnd <- 0
+        if(x < 1)
+        {
+          while(x < xscale)
+          {
+            xscale <- xscale/10
+            xrnd <- xrnd+1
+          }
+        }
+        else
+        {
+          while(x > xscale)
+          {
+            xscale <- 10*xscale
+            xrnd <- xrnd+1
+          }
+        }
+        x <- round(x/xscale,1)*xscale
       }
-      else
-      {
-        while(x > xscale) { xscale <- 10*xscale }
-      }
-      x <- round(x/xscale,2)*xscale
-      if(x < 0.001) { x <- 0.001 }
+      else { x <- 0.001 }
       xby <- x/50
       xscale <- 1
       while(abs(k) > xscale) { xscale <- 10*xscale }
-      x <- round(k/xscale,2)*xscale
+      x <- round(k/xscale,xrnd)*xscale
       xfrom <- x-50*xby
       xto <- xfrom+100*xby
       xseq <- seq(from=xfrom,to=xto,by=xby)
       self$set_x_stoch_args(sseq,xseq,NULL,NULL,NULL,NULL,NULL)
+
       return(NULL)
     },
     # public undo methods ----

@@ -454,58 +454,55 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     set_y_stoch_args = function(t=NULL,y=NULL,x=NULL,psi=NULL,who=NULL)
     {
       if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_y_stoch_args(t,y,x,psi,"MC") }
-      if(!is.null(t) || !is.null(y))
+      if(!is.null(t))
       {
-        if(!is.null(t))
+        vec <- private$extract_vector(t,1)
+        if(!is.null(vec))
         {
-          vec <- private$extract_vector(t,1)
-          if(!is.null(vec))
+          if(!private$vecs_equal(vec,private$y_stoch_args$t))
           {
-            if(!private$vecs_equal(vec,private$y_stoch_args$t))
+            m <- length(vec)
+            if(m < 102)
             {
-              m <- length(vec)
-              if(m < 102)
-              {
-                if(m > length(private$y_stoch_args$t)) { private$stdnorm <- NULL }
-                private$y_stoch_args$t <- vec
-                private$yforward <- NULL
-                private$G <- NULL
-                private$H2 <- NULL
-                private$p <- NULL
-                private$Pneg <- NULL
-                private$Ppos <- NULL
-                private$PPneg <- NULL
-                private$PPpos <- NULL
-              }
-              else { message("MC:  101 times at most.  t not set.") }
-            }
-          }
-          else { message("MC:  t not set.") }
-        }
-        if(!is.null(y))
-        {
-          vec <- private$extract_vector(y,1)
-          if(!is.null(vec))
-          {
-            if(!private$vecs_equal(vec,private$y_stoch_args$y))
-            {
-              n <- length(vec)
-              ymin <- private$Miny()
-              if((vec[n]-vec[1])/(n-1) < (ymin[101]-ymin[1])/100)
-              {
-                private$y_stoch_args$y <- ymin
-                message("MC:  y lengthened for numerical stability.")
-              }
-              else { private$y_stoch_args$y <- vec }
+              if(m > length(private$y_stoch_args$t)) { private$stdnorm <- NULL }
+              private$y_stoch_args$t <- vec
+              private$yforward <- NULL
+              private$G <- NULL
+              private$H2 <- NULL
               private$p <- NULL
               private$Pneg <- NULL
               private$Ppos <- NULL
               private$PPneg <- NULL
               private$PPpos <- NULL
             }
+            else { message("MC:  101 times at most.  t not set.") }
           }
-          else { message("MC:  y not set.") }
         }
+        else { message("MC:  t not set.") }
+      }
+      if(!is.null(y))
+      {
+        vec <- private$extract_vector(y,1)
+        if(!is.null(vec))
+        {
+          if(!private$vecs_equal(vec,private$y_stoch_args$y))
+          {
+            n <- length(vec)
+            ymin <- private$Miny()
+            if((vec[n]-vec[1])/(n-1) < (ymin[101]-ymin[1])/100)
+            {
+              private$y_stoch_args$y <- ymin
+              if(is.null(who)) { message("MC:  y lengthened for numerical stability.") }
+            }
+            else { private$y_stoch_args$y <- vec }
+            private$p <- NULL
+            private$Pneg <- NULL
+            private$Ppos <- NULL
+            private$PPneg <- NULL
+            private$PPpos <- NULL
+          }
+        }
+        else { message("MC:  y not set.") }
       }
       if(!is.null(x))
       {
@@ -571,66 +568,63 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     set_x_stoch_args = function(s=NULL,x=NULL,y=NULL,r=NULL,phi=NULL,who=NULL)
     {
       if(is.null(who) && !is.null(private$OUP)) { private$OUP$send_x_stoch_args(s,x,y,r,phi,"MC") }
-      if(!is.null(s) || !is.null(x))
+      if(!is.null(s))
       {
-        if(!is.null(s))
+        vec <- private$extract_vector(s,-1)
+        if(!is.null(vec))
         {
-          vec <- private$extract_vector(s,-1)
-          if(!is.null(vec))
+          if(!private$vecs_equal(vec,private$x_stoch_args$s))
           {
-            if(!private$vecs_equal(vec,private$x_stoch_args$s))
+            m <- length(vec)
+            if(m < 102)
             {
-              m <- length(vec)
-              if(m < 102)
+              smax <- private$Maxs(vec[1])
+              if(vec[m] < smax[m])
               {
-                smax <- private$Maxs(vec[1])
-                if(vec[m] < smax[m])
-                {
-                  if(101 > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
-                  private$x_stoch_args$s <- smax
-                  message("MC:  s shortened for numerical stability.")
-                }
-                else
-                {
-                  if(m > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
-                  private$x_stoch_args$s <- vec
-                }
-                private$xbackward <- NULL
-                private$o <- NULL
-                private$Oneg <- NULL
-                private$Opos <- NULL
-                private$OOneg <- NULL
-                private$OOpos <- NULL
+                if(101 > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
+                private$x_stoch_args$s <- smax
+                if(is.null(who)) { message("MC:  s shortened for numerical stability.") }
               }
-              else { message("MC:  101 times at most.  s not set.") }
-            }
-          }
-          else { message("MC:  s not set.") }
-        }
-        if(!is.null(x))
-        {
-          vec <- private$extract_vector(x,1)
-          if(!is.null(vec))
-          {
-            if(!private$vecs_equal(vec,private$x_stoch_args$x))
-            {
-              n <- length(vec)
-              xmin <- private$Minx()
-              if((vec[n]-vec[1])/(n-1) < (xmin[101]-xmin[1])/100)
+              else
               {
-                private$x_stoch_args$x <- xmin
-                message("MC:  x lengthened for numerical stability.")
+                if(m > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
+                private$x_stoch_args$s <- vec
               }
-              else { private$x_stoch_args$x <- vec }
+              private$xbackward <- NULL
               private$o <- NULL
               private$Oneg <- NULL
               private$Opos <- NULL
               private$OOneg <- NULL
               private$OOpos <- NULL
             }
+            else { message("MC:  101 times at most.  s not set.") }
           }
-          else { message("MC:  x not set.") }
         }
+        else { message("MC:  s not set.") }
+      }
+      if(!is.null(x))
+      {
+        vec <- private$extract_vector(x,1)
+        if(!is.null(vec))
+        {
+          if(!private$vecs_equal(vec,private$x_stoch_args$x))
+          {
+            n <- length(vec)
+            xmin <- private$Minx()
+            if((vec[n]-vec[1])/(n-1) < (xmin[101]-xmin[1])/100)
+            {
+              private$x_stoch_args$x <- xmin
+              if(is.null(who)) { message("MC:  x lengthened for numerical stability.") }
+            }
+            else { private$x_stoch_args$x <- vec }
+            private$o <- NULL
+            private$Oneg <- NULL
+            private$Opos <- NULL
+            private$OOneg <- NULL
+            private$OOpos <- NULL
+          }
+        }
+        else { message("MC:  x not set.") }
       }
       if(!is.null(y))
       {
@@ -1452,8 +1446,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       smax <- private$Maxs()
       xmin <- private$Minx()
       self$set_x_stoch_args(smax,xmin,NULL,NULL,NULL)
-
       private$syncyxt <- 2
+
       return(NULL)
     },
     #' @description
@@ -1484,17 +1478,20 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         else if(rho > 0.0000000001) { ts <- 5/rho }
         else { ts <- 10 }
       }
-      tscale <- 1
-      if(ts < 1)
+      if(ts > 0.001)
       {
-        while(ts < tscale) { tscale <- tscale/10 }
+        tscale <- 1
+        if(ts < 1)
+        {
+          while(ts < tscale) { tscale <- tscale/10 }
+        }
+        else
+        {
+          while(ts > tscale) { tscale <- 10*tscale }
+        }
+        ts <- round(ts/tscale,1)*tscale
       }
-      else
-      {
-        while(ts > tscale) { tscale <- 10*tscale }
-      }
-      ts <- round(ts/tscale,2)*tscale
-      if(ts < 0.001) { ts <- 0.001 }
+      else { ts <- 0.001 }
       tfrom <- s
       tto <- s+ts
       tby <- ts/100
@@ -5929,18 +5926,21 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       t <- private$y_stoch_args[[1]]
       if(is.null(s)) { s <- t[1] }
       ts <- 10
-      if(rho > 0.0000000001) { ts <- 10/rho }
-      tscale <- 1
-      if(ts < 1)
+      if(rho > 0.0000000001) { ts <- 5/rho }
+      if(ts > 0.001)
       {
-        while(ts < tscale) { tscale <- tscale/10 }
+        tscale <- 1
+        if(ts < 1)
+        {
+          while(ts < tscale) { tscale <- tscale/10 }
+        }
+        else
+        {
+          while(ts > tscale) { tscale <- 10*tscale }
+        }
+        ts <- round(ts/tscale,1)*tscale
       }
-      else
-      {
-        while(ts > tscale) { tscale <- 10*tscale }
-      }
-      ts <- round(ts/tscale,2)*tscale
-      if(ts < 0.001) { ts <- 0.001 }
+      else { ts <- 0.001 }
       tfrom <- s
       tto <- s+ts
       tby <- ts/100
@@ -5954,18 +5954,21 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       t <- private$t_stoch_args[[1]]
       if(is.null(s)) { s <- t[1] }
       ts <- 10
-      if(rho > 0.0000000001) { ts <- 10/rho }
-      tscale <- 1
-      if(ts < 1)
+      if(rho > 0.0000000001) { ts <- 5/rho }
+      if(ts > 0.001)
       {
-        while(ts < tscale) { tscale <- tscale/10 }
+        tscale <- 1
+        if(ts < 1)
+        {
+          while(ts < tscale) { tscale <- tscale/10 }
+        }
+        else
+        {
+          while(ts > tscale) { tscale <- 10*tscale }
+        }
+        ts <- round(ts/tscale,1)*tscale
       }
-      else
-      {
-        while(ts > tscale) { tscale <- 10*tscale }
-      }
-      ts <- round(ts/tscale,2)*tscale
-      if(ts < 0.001) { ts <- 0.001 }
+      else { ts <- 0.001 }
       tfrom <- s
       tto <- s+ts
       tby <- ts/100
@@ -5980,17 +5983,20 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       if(is.null(t)) { t <- s[1] }
       st <- 10
       if(rho > 0.0000000001) { st <- 5/rho }
-      stcale <- 1
-      if(st < 1)
+      if(st > 0.001)
       {
-        while(st < stcale) { stcale <- stcale/10 }
+        stcale <- 1
+        if(st < 1)
+        {
+          while(st < stcale) { stcale <- stcale/10 }
+        }
+        else
+        {
+          while(st > stcale) { stcale <- 10*stcale }
+        }
+        st <- round(st/stcale,1)*stcale
       }
-      else
-      {
-        while(st > stcale) { stcale <- 10*stcale }
-      }
-      st <- round(st/stcale,2)*stcale
-      if(st < 0.001) { st <- 0.001 }
+      else { st <- 0.001 }
       sfrom <- t
       sto <- t-st
       sby <- st/100
@@ -6007,38 +6013,47 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       x <- private$y_stoch_args[[3]]
       m <- length(t)
       ts <- t[m]-t[1]
-      if(rho < 0.0000000001)
+      if(rho < 0.0000000001) { H <- sigma*ts^0.5  }
+      else { H <- (sigma^2/(2*rho)*(1-exp(-2*rho*ts)))^0.5 }
+      ydif <- 4*(abs(x-mu)*exp(-rho*ts)+H)
+      if(ydif > 0.001)
       {
-        G <- x
-        H <- sigma*ts^0.5
-      }
-      else
-      {
-        G <- mu+(x-mu)*exp(-rho*ts)
-        H <- (sigma^2/(2*rho)*(1-exp(-2*rho*ts)))^0.5
-      }
-      ydif <- abs(G+H-mu)
-      if(ydif < abs(x-mu)) { ydif <- abs(x-mu) }
-      if(ydif > 0)
-      {
-        ydif <- 3*ydif
         yscale <- 1
+        yrnd <- 0
         if(ydif < 1)
         {
-          while(ydif < yscale) { yscale <- yscale/10 }
+          while(ydif < yscale)
+          {
+            yscale <- yscale/10
+            yrnd <- yrnd+1
+          }
         }
         else
         {
-          while(ydif > yscale) { yscale <- 10*yscale }
+          while(ydif > yscale)
+          {
+            yscale <- 10*yscale
+            yrnd <- yrnd+1
+          }
         }
-        ydif <- round(ydif/yscale,2)*yscale
+        ydif <- round(ydif/yscale,1)*yscale
       }
-      else (ydif <- 60)
+      else { ydif <- 0.001 }
       yby <- ydif/100
-      yscale <- 1
       ydif <- 0.5*(x+mu)
-      while(abs(ydif) > yscale) { yscale <- 10*yscale }
-      ydif <- round(ydif/yscale,2)*yscale
+      if(abs(ydif) > 0)
+      {
+        yscale <- 1
+        if(abs(ydif) < 1)
+        {
+          while(abs(ydif) < yscale) { yscale <- yscale/10 }
+        }
+        else
+        {
+          while(abs(ydif) > yscale) { yscale <- 10*yscale }
+        }
+        ydif <- round(ydif/yscale,yrnd)*yscale
+      }
       yfrom <- ydif-50*yby
       yto <- yfrom+100*yby
       yseq <- seq(from=yfrom,to=yto,by=yby)
@@ -6054,38 +6069,47 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       y <- private$x_stoch_args[[3]]
       m <- length(s)
       st <- s[1]-s[m]
-      if(rho < 0.0000000001)
-      {
-        G <- y
-        H <- sigma*st^0.5
-      }
-      else
-      {
-        G <- mu+(y-mu)*exp(-rho*st)
-        H <- (sigma^2/(2*rho)*(1-exp(-2*rho*st)))^0.5
-      }
-      xdif <- abs(G+H-mu)
-      if(xdif < abs(y-mu)) { xdif <- abs(y-mu) }
+      if(rho < 0.0000000001) { H <- sigma*st^0.5  }
+      else { H <- (sigma^2/(2*rho)*(1-exp(-2*rho*st)))^0.5 }
+      xdif <- 4*(abs(y-mu)*exp(-rho*st)+H)
       if(xdif > 0)
       {
-        xdif <- 3*xdif
         xscale <- 1
+        xrnd <- 0
         if(xdif < 1)
         {
-          while(xdif < xscale) { xscale <- xscale/10 }
+          while(xdif < xscale)
+          {
+            xscale <- xscale/10
+            xrnd <- xrnd+1
+          }
         }
         else
         {
-          while(xdif > xscale) { xscale <- 10*xscale }
+          while(xdif > xscale)
+          {
+            xscale <- 10*xscale
+            xrnd <- xrnd+1
+          }
         }
-        xdif <- round(xdif/xscale,2)*xscale
+        xdif <- round(xdif/xscale,1)*xscale
       }
-      else { xdif <- 60 }
+      else { xdif <- 0.001 }
       xby <- xdif/100
-      xscale <- 1
       xdif <- 0.5*(y+mu)
-      while(abs(xdif) > xscale) { xscale <- 10*xscale }
-      xdif <- round(xdif/xscale,2)*xscale
+      if(abs(xdif) > 0)
+      {
+        xscale <- 1
+        if(abs(xdif) < 1)
+        {
+          while(abs(xdif) < xscale) { xscale <- xscale/10 }
+        }
+        else
+        {
+          while(abs(xdif) > xscale) { xscale <- 10*xscale }
+        }
+        xdif <- round(xdif/xscale,xrnd)*xscale
+      }
       xfrom <- xdif-50*xby
       xto <- xfrom+100*xby
       xseq <- seq(from=xfrom,to=xto,by=xby)
