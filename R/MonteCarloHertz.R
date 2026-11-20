@@ -258,6 +258,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       private$syncyxt <- 3
       private$forwardyt <- 3
       private$passaget <- 1
+      private$maxpaths <- 1000000
+      private$maxskip <- 20
+      private$maxtraces <- 100
       # undo ----
       private$undo_args <- list(list(oup_params=private$oup_params,y_stoch_args=private$y_stoch_args,x_stoch_args=private$x_stoch_args,t_stoch_args=private$t_stoch_args,path_args=private$path_args,plot_args=private$plot_args))
       private$undoIx <- 1
@@ -429,16 +432,19 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
           yseq <- private$y_stoch_args[[2]]
           ymin <- private$Miny()
           n <- length(yseq)
-          if((yseq[n]-yseq[1])/(n-1) < (ymin[101]-ymin[1])/100) { self$set_y_stoch_args(NULL,ymin,NULL,NULL,"MC") }
+          nmn <- length(ymin)
+          if((yseq[n]-yseq[1])/(n-1) < (ymin[nmn]-ymin[1])/(nmn-1)) { self$set_y_stoch_args(NULL,ymin,NULL,NULL,"MC") }
           # x_stoch_args
           sseq <- private$x_stoch_args[[1]]
           smax <- private$Maxs()
           m <- length(sseq)
-          if(sseq[1]-sseq[m] > smax[1]-smax[101]) { self$set_x_stoch_args(smax,NULL,NULL,NULL,NULL,"MC") }
+          mmx <- length(smax)
+          if(sseq[1]-sseq[m] > smax[1]-smax[mmx]) { self$set_x_stoch_args(smax,NULL,NULL,NULL,NULL,"MC") }
           xseq <- private$x_stoch_args[[2]]
           xmin <- private$Minx()
           n <- length(xseq)
-          if((xseq[n]-xseq[1])/(n-1) < (xmin[101]-xmin[1])/100) { self$set_x_stoch_args(NULL,xmin,NULL,NULL,NULL,"MC") }
+          nmn <- length(xmin)
+          if((xseq[n]-xseq[1])/(n-1) < (xmin[nmn]-xmin[1])/(nmn-1)) { self$set_x_stoch_args(NULL,xmin,NULL,NULL,NULL,"MC") }
         }
       }
       return(private$oup_params)
@@ -487,9 +493,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(!private$vecs_equal(vec,private$y_stoch_args$y))
           {
-            n <- length(vec)
             ymin <- private$Miny()
-            if((vec[n]-vec[1])/(n-1) < (ymin[101]-ymin[1])/100)
+            n <- length(vec)
+            nmn <- length(ymin)
+            if((vec[n]-vec[1])/(n-1) < (ymin[nmn]-ymin[1])/(nmn-1))
             {
               private$y_stoch_args$y <- ymin
               if(is.null(who)) { message("MC:  y lengthened for numerical stability.") }
@@ -581,7 +588,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               smax <- private$Maxs(vec[1])
               if(vec[m] < smax[m])
               {
-                if(101 > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
+                if(length(smax) > length(private$x_stoch_args$s)) { private$stdnorm <- NULL }
                 private$x_stoch_args$s <- smax
                 if(is.null(who)) { message("MC:  s shortened for numerical stability.") }
               }
@@ -609,9 +616,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         {
           if(!private$vecs_equal(vec,private$x_stoch_args$x))
           {
-            n <- length(vec)
             xmin <- private$Minx()
-            if((vec[n]-vec[1])/(n-1) < (xmin[101]-xmin[1])/100)
+            n <- length(vec)
+            nmn <- length(xmin)
+            if((vec[n]-vec[1])/(n-1) < (xmin[nmn]-xmin[1])/(nmn-1))
             {
               private$x_stoch_args$x <- xmin
               if(is.null(who)) { message("MC:  x lengthened for numerical stability.") }
@@ -822,8 +830,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     },
     #' @description
     #' Set path arguments
-    #' @param paths  number of paths 1<paths<1,000,000
-    #' @param skip   subdivide time intervals but report at times t 1<=skip<=50
+    #' @param paths  number of paths 1<=paths<=maxpaths
+    #' @param skip   subdivide time intervals but report at times t 1<=skip<=maxskip
     #' @param seed   seed for random number generators -inf<seed<inf
     #' @return list(paths,skip,seed)
     set_path_args = function(paths=NULL,skip=NULL,seed=NULL)
@@ -840,15 +848,15 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               sca <- 1
               message("MC:  paths set to 1.")
             }
-            else if (sca > 1000000)
+            else if (sca > private$maxpaths)
             {
-              sca <- 1000000
-              message("MC:  paths set to 1,000,000.")
+              sca <- private$maxpaths
+              message(paste0("MC:  paths set to ",private$maxpaths,"."))
             }
             private$path_args$paths <- sca
             private$plot_args$first <- 1
-            if(sca < 101) { private$plot_args$last <- sca }
-            else { private$plot_args$last <- 100 }
+            if(sca < private$maxtraces+1) { private$plot_args$last <- sca }
+            else { private$plot_args$last <- private$maxtraces }
             if(!is.null(private$stdnorm) && ncol(private$stdnorm) < sca) { private$stdnorm <- NULL }
             private$yforward <- NULL
             private$xbackward <- NULL
@@ -895,10 +903,10 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
               sca <- 1
               message("MC:  skip set to 1.")
             }
-            else if (sca > 20)
+            else if (sca > private$maxskip)
             {
-              sca <- 20
-              message("MC:  skip set to 20.")
+              sca <- private$maxskip
+              message(paste0("MC:  skip set to ",private$maxskip,"."))
             }
             if(sca > private$path_args$skip) { private$stdnorm <- NULL }
             private$path_args$skip <- sca
@@ -5625,6 +5633,9 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
     modebar_2D = NULL,
     modebar_3D = NULL,
     plot_types = NULL,
+    maxpaths = NULL,
+    maxskip = NULL,
+    maxtraces = NULL,
     # private colors ----
     rainbow = function(name,opaque)
     {
@@ -5933,12 +5944,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(ts < 1)
         {
           while(ts < tscale) { tscale <- tscale/10 }
+          ts <- round(ts/tscale,0)*tscale
         }
         else
         {
           while(ts > tscale) { tscale <- 10*tscale }
+          ts <- round(ts/tscale,1)*tscale
         }
-        ts <- round(ts/tscale,1)*tscale
       }
       else { ts <- 0.001 }
       tfrom <- s
@@ -5961,12 +5973,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(ts < 1)
         {
           while(ts < tscale) { tscale <- tscale/10 }
+          ts <- round(ts/tscale,0)*tscale
         }
         else
         {
           while(ts > tscale) { tscale <- 10*tscale }
+          ts <- round(ts/tscale,1)*tscale
         }
-        ts <- round(ts/tscale,1)*tscale
       }
       else { ts <- 0.001 }
       tfrom <- s
@@ -5989,12 +6002,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(st < 1)
         {
           while(st < stcale) { stcale <- stcale/10 }
+          st <- round(st/stcale,0)*stcale
         }
         else
         {
           while(st > stcale) { stcale <- 10*stcale }
+          st <- round(st/stcale,1)*stcale
         }
-        st <- round(st/stcale,1)*stcale
       }
       else { st <- 0.001 }
       sfrom <- t
@@ -6027,6 +6041,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             yscale <- yscale/10
             yrnd <- yrnd+1
           }
+          ydif <- round(ydif/yscale,0)*yscale
         }
         else
         {
@@ -6035,8 +6050,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             yscale <- 10*yscale
             yrnd <- yrnd+1
           }
+          ydif <- round(ydif/yscale,1)*yscale
         }
-        ydif <- round(ydif/yscale,1)*yscale
       }
       else { ydif <- 0.001 }
       yby <- ydif/100
@@ -6047,12 +6062,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(abs(ydif) < 1)
         {
           while(abs(ydif) < yscale) { yscale <- yscale/10 }
+          ydif <- round(ydif/yscale,yrnd-1)*yscale
         }
         else
         {
           while(abs(ydif) > yscale) { yscale <- 10*yscale }
+          ydif <- round(ydif/yscale,yrnd)*yscale
         }
-        ydif <- round(ydif/yscale,yrnd)*yscale
       }
       yfrom <- ydif-50*yby
       yto <- yfrom+100*yby
@@ -6083,6 +6099,7 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             xscale <- xscale/10
             xrnd <- xrnd+1
           }
+          xdif <- round(xdif/xscale,0)*xscale
         }
         else
         {
@@ -6091,8 +6108,8 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
             xscale <- 10*xscale
             xrnd <- xrnd+1
           }
+          xdif <- round(xdif/xscale,1)*xscale
         }
-        xdif <- round(xdif/xscale,1)*xscale
       }
       else { xdif <- 0.001 }
       xby <- xdif/100
@@ -6103,12 +6120,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
         if(abs(xdif) < 1)
         {
           while(abs(xdif) < xscale) { xscale <- xscale/10 }
+          xdif <- round(xdif/xscale,xrnd-1)*xscale
         }
         else
         {
           while(abs(xdif) > xscale) { xscale <- 10*xscale }
+          xdif <- round(xdif/xscale,xrnd)*xscale
         }
-        xdif <- round(xdif/xscale,xrnd)*xscale
       }
       xfrom <- xdif-50*xby
       xto <- xfrom+100*xby
@@ -6131,12 +6149,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       if(pmax < 1)
       {
         while(pmax < pscale) { pscale <- pscale/10 }
+        pmax <- round(pmax/pscale,1)*pscale
       }
       else
       {
         while(pmax > pscale) { pscale <- 10*pscale }
+        pmax <- round(pmax/pscale,2)*pscale
       }
-      pmax <- round(pmax/pscale,2)*pscale
 
       return(pmax)
     },
@@ -6148,12 +6167,13 @@ MonteCarlo <- R6::R6Class("MonteCarlo",
       if(ptmax < 1)
       {
         while(ptmax < pscale) { pscale <- pscale/10 }
+        ptmax <- round(ptmax/pscale,1)*pscale
       }
       else
       {
         while(ptmax > pscale) { pscale <- 10*pscale }
+        ptmax <- round(ptmax/pscale,2)*pscale
       }
-      ptmax <- round(ptmax/pscale,2)*pscale
 
       return(ptmax)
     },

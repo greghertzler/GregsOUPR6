@@ -1998,12 +1998,13 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
         if(t < 1)
         {
           while(t < tscale) { tscale <- tscale/10 }
+          t <- round(t/tscale,0)*tscale
         }
         else
         {
           while(t > tscale) { tscale <- 10*tscale }
+          t <- round(t/tscale,1)*tscale
         }
-        t <- round(t/tscale,1)*tscale
       }
       else { t <- 0.001 }
       sfrom <- s[1]
@@ -2024,6 +2025,7 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             xscale <- xscale/10
             xrnd <- xrnd+1
           }
+          x <- round(x/xscale,0)*xscale
         }
         else
         {
@@ -2032,8 +2034,8 @@ FiniteDifference <- R6::R6Class("FiniteDifference",
             xscale <- 10*xscale
             xrnd <- xrnd+1
           }
+          x <- round(x/xscale,1)*xscale
         }
-        x <- round(x/xscale,1)*xscale
       }
       else { x <- 0.001 }
       xby <- x/50

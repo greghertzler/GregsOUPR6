@@ -1314,12 +1314,13 @@ Analytical <- R6::R6Class("Analytical",
         if(z < 1)
         {
           while(z < zscale) { zscale <- zscale/10 }
+          z <- round(z/zscale,0)*zscale
         }
         else
         {
           while(z > zscale) { zscale <- 10*zscale }
+          z <- round(z/zscale,1)*zscale
         }
-        z <- round(z/zscale,1)*zscale
       }
       else { z <- 0.001 }
       zby <- z/50
@@ -1354,12 +1355,13 @@ Analytical <- R6::R6Class("Analytical",
         if(ts < 1)
         {
           while(ts < tscale) { tscale <- tscale/10 }
+          ts <- round(ts/tscale,0)*tscale
         }
         else
         {
           while(ts > tscale) { tscale <- 10*tscale }
+          ts <- round(ts/tscale,1)*tscale
         }
-        ts <- round(ts/tscale,1)*tscale
       }
       else { ts <- 0.001 }
       tfrom <- s
@@ -1381,6 +1383,7 @@ Analytical <- R6::R6Class("Analytical",
             yscale <- yscale/10
             yrnd <- yrnd+1
           }
+          ydif <- round(ydif/yscale,0)*yscale
         }
         else
         {
@@ -1389,8 +1392,8 @@ Analytical <- R6::R6Class("Analytical",
             yscale <- 10*yscale
             yrnd <- yrnd+1
           }
+          ydif <- round(ydif/yscale,1)*yscale
         }
-        ydif <- round(ydif/yscale,1)*yscale
       }
       else { ydif <- 0.001 }
       yby <- ydif/100
@@ -1401,12 +1404,13 @@ Analytical <- R6::R6Class("Analytical",
         if(abs(ydif) < 1)
         {
           while(abs(ydif) < yscale) { yscale <- yscale/10 }
+          ydif <- round(ydif/yscale,yrnd-1)*yscale
         }
         else
         {
           while(abs(ydif) > yscale) { yscale <- 10*yscale }
+          ydif <- round(ydif/yscale,yrnd)*yscale
         }
-        ydif <- round(ydif/yscale,yrnd)*yscale
       }
       yfrom <- ydif-50*yby
       yto <- yfrom+100*yby
@@ -1419,12 +1423,13 @@ Analytical <- R6::R6Class("Analytical",
       if(pmax < 1)
       {
         while(pmax < pscale) { pscale <- pscale/10 }
+        pmax <- round(pmax/pscale,1)*pscale
       }
       else
       {
         while(pmax > pscale) { pscale <- 10*pscale }
+        pmax <- round(pmax/pscale,2)*pscale
       }
-      pmax <- round(pmax/pscale,2)*pscale
       self$set_plot_args(pmax,NULL)
 
       return(NULL)
@@ -1457,6 +1462,7 @@ Analytical <- R6::R6Class("Analytical",
               xscale <- xscale/10
               xrnd <- xrnd+1
             }
+            x <- round(x/xscale,0)*xscale
           }
           else
           {
@@ -1465,8 +1471,8 @@ Analytical <- R6::R6Class("Analytical",
               xscale <- 10*xscale
               xrnd <- xrnd+1
             }
+            x <- round(x/xscale,1)*xscale
           }
-          x <- round(x/xscale,1)*xscale
         }
         else { x <- 0.001 }
         xby <- x/50
@@ -1491,6 +1497,7 @@ Analytical <- R6::R6Class("Analytical",
               xscale <- xscale/10
               xrnd <- xrnd+1
             }
+            x <- round(x/xscale,0)*xscale
           }
           else
           {
@@ -1499,8 +1506,8 @@ Analytical <- R6::R6Class("Analytical",
               xscale <- 10*xscale
               xrnd <- xrnd+1
             }
+            x <- round(x/xscale,1)*xscale
           }
-          x <- round(x/xscale,1)*xscale
         }
         else { x <- 0.001 }
         xby <- x/50
@@ -1524,12 +1531,13 @@ Analytical <- R6::R6Class("Analytical",
         if(t < 1)
         {
           while(t < tscale) { tscale <- tscale/10 }
+          t <- round(t/tscale,0)*tscale
         }
         else
         {
           while(t > tscale) { tscale <- 10*tscale }
+          t <- round(t/tscale,1)*tscale
         }
-        t <- round(t/tscale,1)*tscale
       }
       else { t <- 0.001 }
       sfrom <- s[1]
@@ -1563,12 +1571,13 @@ Analytical <- R6::R6Class("Analytical",
           if(z < 1)
           {
             while(z < zscale) { zscale <- zscale/10 }
+            z <- round(z/zscale,0)*zscale
           }
           else
           {
             while(z > zscale) { zscale <- 10*zscale }
+            z <- round(z/zscale,1)*zscale
           }
-          z <- round(z/zscale,1)*zscale
         }
         else { z <- 0.001 }
         zby <- z/50
@@ -1590,6 +1599,7 @@ Analytical <- R6::R6Class("Analytical",
               zscale <- zscale/10
               zrnd <- zrnd+1
             }
+            z <- round(z/zscale,0)*zscale
           }
           else
           {
@@ -1598,8 +1608,8 @@ Analytical <- R6::R6Class("Analytical",
               zscale <- 10*zscale
               zrnd <- zrnd+1
             }
+            z <- round(z/zscale,1)*zscale
           }
-          z <- round(z/zscale,1)*zscale
         }
         else { z <- 0.001 }
         zby <- z/50
@@ -1625,12 +1635,13 @@ Analytical <- R6::R6Class("Analytical",
         if(t < 1)
         {
           while(t < tscale) { tscale <- tscale/10 }
+          t <- round(t/tscale,0)*tscale
         }
         else
         {
           while(t > tscale) { tscale <- 10*tscale }
+          t <- round(t/tscale,1)*tscale
         }
-        t <- round(t/tscale,1)*tscale
       }
       else { t <- 0.001 }
       tfrom <- s
@@ -1648,12 +1659,13 @@ Analytical <- R6::R6Class("Analytical",
         if(ptmax < 1)
         {
           while(ptmax < pscale) { pscale <- pscale/10 }
+          ptmax <- round(ptmax/pscale,1)*pscale
         }
         else
         {
           while(ptmax > pscale) { pscale <- 10*pscale }
+          ptmax <- round(ptmax/pscale,2)*pscale
         }
-        ptmax <- round(ptmax/pscale,2)*pscale
         private$plot_info$plottype$ptmax <- ptmax
         self$set_plot_args(NULL,ptmax)
       }
